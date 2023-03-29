@@ -2492,8 +2492,9 @@ POSITION_DONE:=mcMoveAbsoluteCA.Done;
 //Test
 bStopCommandTriggered := TRUE;
 bStopCommandTriggered := TRUE;
-bStopCommandTriggered := TRUE;
-POSITION_DONE:=mcMoveAbsoluteCA.Done;]]></ST>
+//bStopCommandTriggered := TRUE;
+POSITION_DONE:=mcMoveAbsoluteCA.Done;
+//Simply]]></ST>
     </Implementation>
     <LineIds Name="Fb_MoverSequence">
       <LineId Id="3" Count="61" />
@@ -2637,7 +2638,7 @@ POSITION_DONE:=mcMoveAbsoluteCA.Done;]]></ST>
       <LineId Id="2" Count="0" />
       <LineId Id="2618" Count="0" />
       <LineId Id="2617" Count="0" />
-      <LineId Id="2619" Count="3" />
+      <LineId Id="2619" Count="4" />
     </LineIds>
   </POU>
 </TcPlcObject>
