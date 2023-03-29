@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="MAIN" Id="{fd835ba8-4538-4711-9017-05a7c6c2ed82}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	brun 		AT %Q* : BOOL;
+	bACK 		AT %Q* : BOOL;
+	bSafety_OK  AT %I* : BOOL;
+	bInit              : BOOL;
+	Safety_Timer       : TON;	
+	EMG_FALL		   : R_TRIG;
+	
+	OP10A_Robo_State AT %I* : USINT;
+	OP10B_Robo_State AT %I* : USINT;
+	
+	OP120_Light_Control: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Axis_Position_Bias();
+IF NOT bInit THEN
+ brun:=TRUE;
+ bACK:=TRUE;
+ bInit:=TRUE;
+END_IF
+Safety_Timer(IN:=bACK,PT:=T#1S);
+IF Safety_Timer.Q THEN
+	bACK:=FALSE;
+END_IF
+
+EMG_FALL(CLK:=bSafety_OK , Q=> );
+IF EMG_FALL.Q THEN
+   bACK:=TRUE;
+END_IF
+
+
+OP10_MAIN();
+OP20_MAIN();
+OP30_MAIN();
+OP40_MAIN();
+OP50_MAIN();
+OP60_MAIN();
+OP70_MAIN();
+OP80_MAIN();
+OP90_MAIN();
+OP110_MAIN();
+OP120_MAIN();
+OP130_MAIN();
+OP140_MAIN();
+IO_Diag();
+IO_OP10_PANEL();
+IO_OP10A_10B_JB();
+Master1_IO_Map();
+MASTER2_IO_Map();
+OP90_MP_IO();
+OP90_MASTER3_IO();
+OP90_JB_IO();
+OP160_MP_IO();
+OP160_MASTER4_IO();
+OP120_JB_IO();
+
+//MOdeselection From HMI
+IF (HMI_AutoMode AND NOT HMI_ManualMOde AND NOT HMI_StepMode) THEN
+		FB_MODE_BLOCK.ModeWord:=1;
+	ELSIF (NOT HMI_AutoMode AND HMI_ManualMOde AND NOT HMI_StepMode) THEN
+		FB_MODE_BLOCK.ModeWord:=2;
+	ELSIF  (NOT HMI_AutoMode AND NOT HMI_ManualMOde AND HMI_StepMode) THEN
+		FB_MODE_BLOCK.ModeWord:=3;
+    ELSE   
+		FB_MODE_BLOCK.ModeWord:=0;
+END_IF
+
+Servo_safety     := bSafety_OK;
+OperationEnable  := bSafety_OK;
+
+IF OperationEnable THEN
+	Servo_Enable:=TRUE;
+ELSE
+	Servo_Enable:=FALSE;
+END_IF
+
+FB_MODE_BLOCK(
+	ModeWord:= , 
+	HomeConditionOK:= ALL_STN_IN_HOME, 
+	OperationEnable:= bSafety_OK , 
+	StartPB:= START_PB, 
+	SafetyAndNOError:= bSafety_OK AND NOT ERROR_ACTIVE, 
+	ModeAck:= TRUE , 
+	HomingINProgress:= , 
+	TempHomeOK:= , 
+	ResetPB:= , 
+	AutoSelected=>AUTO_SELECTED , 
+	ManualSelected=> MANUAL_SELECTED, 
+	StepSelected=> STEP_SELECTED, 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=AUTO_RUNNING , 
+	StepRunning:=STEP_RUNNING , 
+	StartEnable:=START_ENABLE , 
+	MachineStop:=MACHINE_STOP);
+
+
+	
+Pulse_Block(
+	Q10Hz=> , 
+	Q5Hz=> , 
+	Q2_5Hz=> , 
+	Q2Hz=> , 
+	Q1_25Hz=> , 
+	Q1Hz=> , 
+	Q0_625Hz=> , 
+	Q0_5Hz=> );	
+	
+
+O120_VISN_LGHT1_ON_Q402_4 :=OP120_Light_Control;
+O120_VISN_LGHT2_ON_Q402_5 :=OP120_Light_Control;]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="2" Count="0" />
+      <LineId Id="11" Count="7" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="128" Count="1" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="35" Count="23" />
+      <LineId Id="62" Count="10" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="117" Count="1" />
+      <LineId Id="116" Count="0" />
+      <LineId Id="73" Count="19" />
+      <LineId Id="149" Count="1" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="96" Count="9" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="147" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

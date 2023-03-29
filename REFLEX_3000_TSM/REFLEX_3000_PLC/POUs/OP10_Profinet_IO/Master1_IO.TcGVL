@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="Master1_IO" Id="{e7d23550-2a47-411d-a184-1ffed91d1108}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	
+//port1
+I10A_MAIN_AIR_PRES_FB_I1000_0					: BOOL;
+I10A_SPARE_I1000_1                              : BOOL;
+I10A_BDY_REJ_BIN_OVERFLW_I1000_2                : BOOL;
+I10A_SPARE_I1000_3                              : BOOL;
+I10A_SPARE_I1000_4                              : BOOL;
+I10_LH_LNR_TRK_BDY_PRSN_I1000_5                 : BOOL;
+I10_RH_LNR_TRK_BDY_PRSN_I1000_6                 : BOOL;
+I10_LH_LNR_TRCK_FIX_CHO_1_I1000_7               : BOOL;
+
+I10_LH_LNR_TRCK_FIX_CHO_2_I1001_0               : BOOL;
+I10_RH_LNR_TRCK_FIX_CHO_1_I1001_1               : BOOL;
+I10_RH_LNR_TRCK_FIX_CHO_2_I1001_2               : BOOL;
+I10A_BDY1_PRSN_MOVER_I1001_3                    : BOOL;
+I10A_BDY2_PRSN_MOVER_I1001_4                    : BOOL;
+I10B_BDY1_PRSN_MOVER_I1001_5                    : BOOL;
+I10B_BDY2_PRSN_MOVER_I1001_6                    : BOOL;
+I10A_SPARE_I1001_7                              : BOOL;
+
+//port2
+I10A_DRUM_LH_CONV_OVR_FLW_I1010_0               : BOOL;
+I10A_DRUM_RH_CONV_OVR_FLW_I1010_1               : BOOL;
+I10A_ORING_LH_GRPR_CLSE_I1010_2                 : BOOL;
+I10A_ORING_LH_GRPR_OPN_I1010_3                  : BOOL;
+I10A_ORING_LH_PUSHR_CYL_REV_FWD_I1010_4         : BOOL;
+I10A_ORING_RH_GRPR_OPN_I1010_5            		: BOOL;
+I10A_ORING_RH_GRPR_CLSE_I1010_6             	: BOOL;
+I10A_ORING_RH_PUSHR_CYL_REV_FWD_I1010_7         : BOOL;
+
+I10A_ORING_ROTRY_CYL_O_DEG_I1011_0              : BOOL;
+I10A_ORING_ROTRY_CYL_180_DEG_I1011_1            : BOOL;
+I10A_ORING_HORZ_CYL_REV_I1011_2                 : BOOL;
+I10A_ORING_HORZ_CYL_FWD_I1011_3                 : BOOL;
+I10A_ORING_VERT_CYL_UP_I1011_4                  : BOOL;
+I10A_ORING_VERT_CYL_DWN_I1011_5                 : BOOL;
+I10A_LH_FIRTRE_ORING_REJ_CYL_REV_I1011_6        : BOOL;
+I10A_LH_FIRTRE_ORING_REJ_CYL_FWD_I1011_7        : BOOL;
+
+//port3
+I10A_RH_FIRTRE_ORING_REJ_CYL_REV_I1020_0        : BOOL;
+I10A_RH_FIRTRE_ORING_REJ_CYL_FWD_I1020_1        : BOOL;
+I10A_BDY_SING_CYL_CLSE_I1020_2                  : BOOL;
+I10A_BDY_SING_CYL_OPN_I1020_3                   : BOOL;
+I10A_SPARE_I1020_4                              : BOOL;
+I10A_SPARE_I1020_5                              : BOOL;
+I10A_SPARE_I1020_6                              : BOOL;
+I10A_SPARE_I1020_7                              : BOOL;
+
+I10A_SPARE_I1021_0                              : BOOL;
+I10A_SPARE_I1021_1                              : BOOL;
+I10A_SPARE_I1021_2                              : BOOL;
+I10A_SPARE_I1021_3                              : BOOL;
+I10A_SPARE_I1021_4                              : BOOL;
+I10A_SPARE_I1021_5                              : BOOL;
+I10A_SPARE_I1021_6                              : BOOL;
+I10A_SPARE_I1021_7                              : BOOL;
+
+//port4
+I10B_DRUM_LH_CONV_OVR_FLW_I1030_0               : BOOL;
+I10B_DRUM_RH_CONV_OVR_FLW_I1030_1               : BOOL;
+I10B_ORING_LH_GRPR_CLSE_I1030_2                 : BOOL;
+I10B_ORING_LH_GRPR_OPN_I1030_3                  : BOOL;
+I10B_ORING_LH_PUSHR_CYL_REV_FWD_I1030_4         : BOOL;
+I10B_ORING_RH_GRPR_CLSE_I1030_5             : BOOL;
+I10B_ORING_RH_GRPR_OPN_I1030_6             : BOOL;
+I10B_ORING_RH_PUSHR_CYL_REV_FWD_I1030_7         : BOOL;
+
+I10B_ORING_ROTRY_CYL_O_DEG_I1031_0              : BOOL;
+I10B_ORING_ROTRY_CYL_180_DEG_I1031_1            : BOOL;
+I10B_ORING_HORZ_CYL_REV_I1031_2                 : BOOL;
+I10B_ORING_HORZ_CYL_FWD_I1031_3                 : BOOL;
+I10B_ORING_VERT_CYL_UP_I1031_4                  : BOOL;
+I10B_ORING_VERT_CYL_DWN_I1031_5                 : BOOL;
+I10B_LH_FIRTRE_ORING_REJ_CYL_REV_I1031_6        : BOOL;
+I10B_LH_FIRTRE_ORING_REJ_CYL_FWD_I1031_7        : BOOL;
+
+//port5
+I10B_RH_FIRTRE_ORING_REJ_CYL_REV_I1040_0        : BOOL;
+I10B_RH_FIRTRE_ORING_REJ_CYL_FWD_I1040_1        : BOOL;
+I10B_BDY_SING_CYL_CLSE_I1040_2                  : BOOL;
+I10B_BDY_SING_CYL_OPN_I1040_3                   : BOOL;
+I10B_SPARE_I1040_4                              : BOOL;
+I10B_SPARE_I1040_5                              : BOOL;
+I10B_SPARE_I1040_6                              : BOOL;
+I10B_SPARE_I1040_7                              : BOOL;
+
+I10B_SPARE_I1041_0                              : BOOL;
+I10B_SPARE_I1041_1                              : BOOL;
+I10B_SPARE_I1041_2                              : BOOL;
+I10B_SPARE_I1041_3                              : BOOL;
+I10B_SPARE_I1041_4                              : BOOL;
+I10B_SPARE_I1041_5                              : BOOL;
+I10B_SPARE_I1041_6                              : BOOL;
+I10B_SPARE_I1041_7                              : BOOL;
+
+//port6
+O10A_ORING_LH_GRPR_CLSE_OPN_Q1050_0             : BOOL;
+O10A_ORING_LH_PUSHR_CYL_REV_FWD_Q1050_1         : Bool;
+O10A_ORING_RH_GRPR_CLSE_OPN_Q1050_2             : Bool;
+O10A_ORING_RH_PUSHR_CYL_REV_FWD_Q1050_3         : Bool;
+O10A_ORING_ROTRY_CYL_O_DEG_Q1050_4              : Bool;
+O10A_ORING_ROTRY_CYL_180_DEG_Q1050_5            : Bool;
+O10A_ORING_HORZ_CYL_REV_Q1050_6                 : Bool;
+O10A_ORING_HORZ_CYL_FWD_Q1050_7                 : BOOL;
+
+O10A_ORING_VERT_CYL_UP_Q1051_0                  : BOOL;
+O10A_ORING_VERT_CYL_DWN_Q1051_1                 : BOOL;
+O10A_LH_FIRTRE_ORING_REJ_CYL_REV_Q1051_2        : Bool;
+O10A_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1051_3        : Bool;
+O10A_RH_FIRTRE_ORING_REJ_CYL_REV_Q1051_4        : Bool;
+O10A_RH_FIRTRE_ORING_REJ_CYL_FWD_Q1051_5        : Bool;
+O10A_BDY_SING_CYL_CLSE_Q1051_6                  : Bool;
+O10A_BDY_SING_CYL_OPN_Q1051_7                   : BOOL;
+
+O10A_DRUM_FEED_AIRPURGE_ON_Q1052_0              : BOOL;
+O10A_SPARE_Q1052_1                              : Bool;
+O10A_SPARE_Q1052_2                              : Bool;
+O10A_SPARE_Q1052_3                              : Bool;
+O10A_SPARE_Q1052_4                              : Bool;
+O10A_SPARE_Q1052_5                              : Bool;
+O10A_SPARE_Q1052_6                              : Bool;
+O10A_SPARE_Q1052_7                              : BOOL;
+
+O10A_SPARE_Q1053_0                              : BOOL;
+O10A_SPARE_Q1053_1                              : Bool;
+O10A_SPARE_Q1053_2                              : Bool;
+O10A_SPARE_Q1053_3                              : Bool;
+O10A_SPARE_Q1053_4                              : Bool;
+O10A_SPARE_Q1053_5                              : Bool;
+O10A_SPARE_Q1053_6                              : Bool;
+O10A_SPARE_Q1053_7                              : BOOL;
+
+//port7
+O10B_ORING_LH_GRPR_CLSE_OPN_Q1060_0             : BOOL;
+O10B_ORING_LH_PUSHR_CYL_REV_FWD_Q1060_1         : Bool;
+O10B_ORING_RH_GRPR_CLSE_OPN_Q1060_2             : Bool;
+O10B_ORING_RH_PUSHR_CYL_REV_FWD_Q1060_3         : Bool;
+O10B_ORING_ROTRY_CYL_O_DEG_Q1060_4              : Bool;
+O10B_ORING_ROTRY_CYL_180_DEG_Q1060_5            : Bool;
+O10B_ORING_HORZ_CYL_REV_Q1060_6                 : Bool;
+O10B_ORING_HORZ_CYL_FWD_Q1060_7                 : BOOL;
+
+O10B_ORING_VERT_CYL_UP_Q1061_0                  : BOOL;
+O10B_ORING_VERT_CYL_DWN_Q1061_1                 : Bool;
+O10B_LH_FIRTRE_ORING_REJ_CYL_REV_Q1061_2        : Bool;
+O10B_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1061_3        : Bool;
+O10B_RH_FIRTRE_ORING_REJ_CYL_REV_Q1061_4        : Bool;
+O10B_RH_FIRTRE_ORING_REJ_CYL_FWD_Q1061_5        : Bool;
+O10B_BDY_SING_CYL_CLSE_Q1061_6                  : Bool;
+O10B_BDY_SING_CYL_OPN_Q1061_7                   : BOOL;
+
+O10B_DRUM_FEED_AIRPURGE_ON_Q1062_0              : BOOL;
+O10B_SPARE_Q1062_1                              : Bool;
+O10B_SPARE_Q1062_2                              : Bool;
+O10B_SPARE_Q1062_3                              : Bool;
+O10B_SPARE_Q1062_4                              : Bool;
+O10B_SPARE_Q1062_5                              : Bool;
+O10B_SPARE_Q1062_6                              : Bool;
+O10B_SPARE_Q1062_7                              : BOOL;
+
+O10B_SPARE_Q1063_0                              : BOOL;
+O10B_SPARE_Q1063_1                              : Bool;
+O10B_SPARE_Q1063_2                              : Bool;
+O10B_SPARE_Q1063_3                              : Bool;
+O10B_SPARE_Q1063_4                              : Bool;
+O10B_SPARE_Q1063_5                              : Bool;
+O10B_SPARE_Q1063_6                              : Bool;
+O10B_SPARE_Q1063_7                              : BOOL;
+
+//port8
+O20_LH_OIL_DISPN_ON_Q1150_0                     : BOOL;
+O20_LH_OIL_SPIN_ON_Q1150_1                     : BOOL;
+O20_RH_OIL_DISPN_ON_Q1150_2                      : BOOL;
+O20_RH_OIL_SPIN_ON_Q1150_3                      : Bool;
+O30_LH_REJ_CYL_REV_Q1150_4                      : BOOL;
+O30_LH_REJ_CYL_FWD_Q1150_5                      : BOOL;
+O30_RH_REJ_CYL_REV_Q1150_6                      : BOOL;
+O30_RH_REJ_CYL_FWD_Q1150_7                      : BOOL;
+
+O40_TOOL_CHO_UNLOCK_Q1151_0                     : Bool;
+O40_TOOL_CHO_LOCK_Q1151_1                       : Bool;
+O50_LH_GRIP_OPN_Q1151_2                         : BOOL;
+O50_LH_GRIP_CLSE_Q1151_3                        : BOOL;
+O50_RH_GRIP_OPN_Q1151_4                         : BOOL;
+O50_RH_GRIP_CLSE_Q1151_5                        : BOOL;
+O50_LH_REJ_CYL_REV_Q1151_6                      : BOOL;
+O50_LH_REJ_CYL_FWD_Q1151_7                      : BOOL;
+
+O50_RH_REJ_CYL_REV_Q1152_0                      : BOOL;
+O50_RH_REJ_CYL_FWD_Q1152_1                      : BOOL;
+O60_TOOL_CHO_UNLOCK_Q1152_2                     : Bool;
+O60_TOOL_CHO_LOCK_Q1152_3                       : Bool;
+O70_LH_REJ_CYL_REV_Q1152_4                      : BOOL;
+O70_LH_REJ_CYL_FWD_Q1152_5                      : BOOL;
+O70_RH_REJ_CYL_REV_Q1152_6                      : BOOL;
+O70_RH_REJ_CYL_FWD_Q1152_7                      : BOOL;
+
+O80_TOOL_CHO_UNLOCK_Q1153_0                     : Bool;
+O80_TOOL_CHO_LOCK_Q1153_1                       : Bool;
+O30_SPARE_Q1153_2                               : Bool;
+O30_AIR_PURGE_ON_Q1153_3                        : Bool;
+O50_AIR_PURGE_ON_Q1153_4                        : Bool;
+O70_AIR_PURGE_ON_Q1153_5                        : Bool;
+O30_SPARE_Q1153_6                               : Bool;
+O30_SPARE_Q1153_7                               : Bool;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP30_CONVEYOR" Id="{a6626815-80c6-4438-9f46-5f3b9643d738}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP30_CONVEYOR
+VAR
+	con_step_no : INT;
+	cam_trig : BOOL;
+	cam_ok : BOOL;
+	LH_Cam_OK : BOOL;
+	RH_Cam_OK : BOOL;
+	go : BOOL;
+	t1: ton;
+	t2: ton;
+	t3: ton;
+	t4: ton;
+	
+	temp: BOOL;
+	check:BOOL;
+	check1:ton;
+	fwd_time : INT :=500;
+	count_nok :INT;
+	forward: BOOL;
+	reverse: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (NOT OP30_AutoSelected OR  OP30_ErrorActive) THEN
+	OP30_AutoRunning:= FALSE;
+	SR30_CONV_servo_ctrl.VELmove_Start:=FALSE;
+	forward:=FALSE;
+	reverse:=FALSE;
+	con_step_no:= 10;
+END_IF	
+
+CASE con_step_no OF
+		10: IF (OP30_AutoSelected) THEN		// Check Automode Selected
+				con_step_no:=20;
+	        END_IF
+		
+	    20:IF (NOT OP30_ErrorActive) THEN		//Check No error
+		       con_step_no:=50;
+      	   END_IF
+		   
+      	50:IF ( NOT OP30_OperationCompleted) THEN		// Check Operation Completed Reset
+      		   con_step_no:=60;
+      	   END_IF
+		   
+		60:IF ( OP30_AutoRunning OR AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP30_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+				con_step_no:= 65;
+				OP30_AutoRunning:=TRUE;
+		   END_IF
+		   
+        65:	 SR30_CONV_servo_ctrl.Velocity:= 500;
+		//	fwd_time:=4000;			
+			forward:=TRUE;
+			SR30_CONV_servo_ctrl.VELmove_Start:=TRUE;	
+			IF t2.Q THEN
+    			forward:=FALSE;
+				SR30_CONV_servo_ctrl.VELmove_Start:=FALSE;
+				con_step_no:= 70;
+			END_IF
+		  
+		70: IF NOT SR30_CONV_servo_ctrl.VELmove_Start THEN
+			  cam_trig :=TRUE;
+			  IF t1.Q THEN
+				con_step_no:= 75;
+			  END_IF
+			END_IF	
+					
+		75:	IF (LH_Cam_OK AND RH_Cam_OK) AND NOT SR30_CONV_servo_ctrl.VELmove_Start AND SR30_CONV_servo_ctrl.Axis_ready THEN
+				IF t4.Q THEN
+				 con_step_no:= 90;
+				 count_nok:=0;	
+				END_IF
+			ELSIF (NOT LH_Cam_OK OR NOT RH_Cam_OK) AND count_nok<5 THEN
+				 count_nok := count_nok +1;
+				 con_step_no:= 77;	
+			ELSIF count_nok>=5 THEN
+	             fwd_time:=5000;
+				 con_step_no:= 80; 
+			END_IF
+			
+		76:	 IF NOT RH_Cam_OK AND NOT SR30_CONV_servo_ctrl.VELmove_Start THEN
+				CR30_RH_Rej_Cyl.AutoCmd1:=TRUE;
+				IF I30_LH_REJ_CYL_FWD_I1100_2  THEN
+					CR30_RH_Rej_Cyl.AutoCmd1:=FALSE;
+					CR30_RH_Rej_Cyl.AutoCmd2:=TRUE;					
+				END_IF
+				IF I30_LH_REJ_CYL_REV_I1100_3  AND count_nok<5 THEN
+					CR30_RH_Rej_Cyl.AutoCmd2:=FALSE;
+					fwd_time:=1000;
+				    con_step_no:= 77;
+				END_IF
+                IF count_nok<5 THEN
+					fwd_time:=1000;
+				    con_step_no:= 77;
+				ELSE 
+					fwd_time:=5000;
+				    con_step_no:= 77;	
+				END_IF
+			ELSE
+				fwd_time:=1000;
+				con_step_no:= 77;
+			END_IF	
+			
+	   77:	IF NOT LH_Cam_OK AND NOT SR30_CONV_servo_ctrl.VELmove_Start THEN	
+				CR30_LH_Rej_Cyl.AutoCmd1:=TRUE;
+				IF I30_LH_REJ_CYL_FWD_I1100_2  THEN
+					CR30_LH_Rej_Cyl.AutoCmd1:=FALSE;
+					CR30_LH_Rej_Cyl.AutoCmd2:=TRUE;				
+				END_IF
+				IF I30_LH_REJ_CYL_REV_I1100_3 AND count_nok<5 THEN
+					CR30_LH_Rej_Cyl.AutoCmd2:=FALSE;					
+					fwd_time:=1000;
+				    con_step_no:= 80;
+				END_IF
+				IF count_nok<5 THEN
+					fwd_time:=1000;
+				    con_step_no:= 80;
+				ELSE 
+					fwd_time:=5000;
+				    con_step_no:= 80;	
+				END_IF
+			ELSE
+				fwd_time:=1000;
+				con_step_no:= 80;
+			END_IF			
+			
+		80: 	IF fwd_time=5000 THEN
+			       count_nok:=0;	
+				END_IF
+                SR30_CONV_servo_ctrl.Velocity:= 500;				
+				forward:=TRUE;
+				SR30_CONV_servo_ctrl.VELmove_Start:=TRUE;	
+				IF t2.Q THEN
+    				forward:=FALSE;
+					SR30_CONV_servo_ctrl.VELmove_Start:=FALSE;
+					con_step_no:= 70;
+				END_IF
+		
+		90: 	SR30_CONV_servo_ctrl.Velocity:= -100;
+				reverse:=TRUE;
+				SR30_CONV_servo_ctrl.VELmove_Start:=TRUE;
+				IF t3.Q THEN
+ 					reverse:=FALSE;
+					SR30_CONV_servo_ctrl.VELmove_Start:=FALSE;
+					con_step_no:= 100;
+				END_IF		
+				
+		100: OP30_pick_ready:=TRUE;
+			 IF OP30_pick_done THEN
+				 OP30_pick_ready :=FALSE;
+				 OP30_pick_done:=FALSE;
+				 con_step_no:= 80;
+			 END_IF
+			 		
+				
+END_CASE
+
+t1(IN:=cam_trig ,PT:=T#500MS);
+IF cam_trig AND con_step_no=70  THEN
+	cam_ok:=FALSE;
+END_IF
+IF t1.Q THEN
+	cam_ok:=temp;
+	cam_trig :=FALSE;
+END_IF
+
+t2(IN:=forward ,PT:=INT_TO_TIME(fwd_time));
+t3(IN:=reverse ,PT:=T#500MS);
+t4(IN:=cam_ok,PT:=T#1S);
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP30_CONVEYOR">
+      <LineId Id="3" Count="145" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="servo_validation" Id="{f5246561-c584-4745-b30f-dfa4bdbe8b8d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK servo_validation
+
+VAR_INPUT
+offline_bit: BOOL;
+error_bit: BOOL	;
+servo_absolute: BOOL;
+target_position: REAL;
+servo_pos_delay_time: TIME;
+END_VAR
+
+VAR_OUTPUT
+	servo_pos_delay_time_display: TIME;
+	actual_position: REAL;
+	absolute_done: BOOL;
+END_VAR
+
+VAR
+	delay : ton;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// delay time move to timer
+servo_pos_delay_time:=delay.PT;
+
+// servo target position move to actual position
+IF offline_bit AND NOT error_bit AND servo_absolute THEN
+	delay.IN:=TRUE;
+	IF delay.Q THEN
+		absolute_done:=TRUE;
+		actual_position:=target_position;
+	END_IF
+END_IF
+
+
+
+// absolute done bit & timer in off
+F_TRIG(CLK:=servo_absolute , Q=> );
+
+IF f_trig.Q THEN
+	absolute_done:=FALSE;
+	delay.IN:=FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="servo_validation">
+      <LineId Id="3" Count="19" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

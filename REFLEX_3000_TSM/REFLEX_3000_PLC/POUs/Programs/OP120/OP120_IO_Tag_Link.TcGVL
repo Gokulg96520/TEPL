@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP120_IO_Tag_Link" Id="{45b001f9-d60d-4c7a-99d0-72f5d6c5e00f}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	
+//Robot Inputs
+OP120_SO_Mirror_Auto_enable AT %I*:BOOL;
+OP120_SO_Program_Execute AT %I*:BOOL;
+OP120_SO_Program_Waiting AT %I*:BOOL;
+OP120_SO_Program_Waiting2 AT %I*:BOOL;
+OP120_SO_Stop_Status AT %I*:BOOL;
+OP120_SO_Program_Sel_enabled_OP AT %I*:BOOL;
+OP120_SO_During_error AT %I*:BOOL;
+OP120_SO_During_Cycle_Stop AT %I*:BOOL;
+OP120_SO_Mirror_SRVO_Off AT %I*:BOOL;
+OP120_SO_Servo_ON_OFF_Status AT %I*:BOOL;
+OP120_SO_Auto_Operation_Enable AT %I*:BOOL;
+OP120_SO_Moving_Home AT %I*:BOOL;
+OP120_SO_Spare1 AT %I*:BOOL;
+OP120_SO_During_Machine_Lock AT %I*:BOOL;
+OP120_SO_H_Error AT %I*:BOOL;
+OP120_SO_L_Error AT %I*:BOOL;
+OP120_SO_Caution AT %I*:BOOL;
+OP120_SO_During_EMG_Stop AT %I*:BOOL;
+OP120_SO_Teach_Mode AT %I*:BOOL;
+OP120_SO_Auto_OP_Mode AT %I*:BOOL;
+OP120_SO_Auto_Ext_Mode AT %I*:BOOL;
+OP120_SO_TP_Enable AT %I*:BOOL;
+OP120_SO_Heartbeat AT %I*:BOOL;
+OP120_SO_Spare2 AT %I*:BOOL;
+OP120_SO_Rbt_In_Home AT %I*:BOOL;
+OP120_SO_Rbt_In_Pick_Zone AT %I*:BOOL;
+OP120_SO_Rbt_In_Place_Zone AT %I*:BOOL;
+OP120_SO_Rbt_In_Reject_Zone AT %I*:BOOL;
+OP120_SO_Rbt_In_ATC_Zone AT %I*:BOOL;
+OP120_SO_Spare4 AT %I*:BOOL;
+OP120_SO_Spare5 AT %I*:BOOL;
+OP120_SO_Spare6 AT %I*:BOOL;
+
+OP120_GO_Mode_Ack AT %I*:BYTE;
+OP120_GO_Variant_number_Ack AT %I*:BYTE;
+OP120_GO_Position_Rchd_Ack AT %I*:BYTE;
+OP120_GO_Auto_Status AT %I*:BYTE;
+OP120_GO_Byte_Spare1 AT %I*:BYTE;
+OP120_GO_Byte_Spare2 AT %I*:BYTE;
+OP120_GO_Byte_Spare3 AT %I*:BYTE;
+OP120_GO_Byte_Spare4 AT %I*:BYTE;
+OP120_GO_Error_Number AT %I*:BYTE;
+OP120_GO_Word_Spare AT %I*:BYTE;
+
+
+OP120_EO_Sequence_Running AT %I*:BOOL;
+OP120_EO_Sequence_Completed AT %I*:BOOL;
+OP120_EO_Spring_Pick_Completed AT %I*:BOOL;
+OP120_EO_Spring_Place_Pos_Reached AT %I*:BOOL;
+OP120_EO_Spring_Place_Completed AT %I*:BOOL;
+OP120_EO_NOK_Part_Dropped AT %I*:BOOL;
+OP120_EO_Spare2 AT %I*:BOOL;
+OP120_EO_Spare3 AT %I*:BOOL;
+OP120_EO_Spare4 AT %I*:BOOL;
+OP120_EO_Spare5 AT %I*:BOOL;
+OP120_EO_Spare6 AT %I*:BOOL;
+OP120_EO_Spare7 AT %I*:BOOL;
+OP120_EO_Spare8 AT %I*:BOOL;
+OP120_EO_Spare9 AT %I*:BOOL;
+OP120_EO_Step_Reached AT %I*:BOOL;
+OP120_EO_Spare11 AT %I*:BOOL;
+OP120_EO_RO_Gripper1_Open AT %I*:BOOL;
+OP120_EO_RO_Gripper1_Close AT %I*:BOOL;
+OP120_EO_RO_Gripper2_Open AT %I*:BOOL;
+OP120_EO_RO_Gripper2_Close AT %I*:BOOL;
+OP120_EO_RO_ATC_Open AT %I*:BOOL;
+OP120_EO_RO_ATC_Close AT %I*:BOOL;
+OP120_EO_RO_Spare18 AT %I*:BOOL;
+OP120_EO_RO_Spare19 AT %I*:BOOL;
+OP120_EO_RI_Gripper1_Open_FB AT %I*:BOOL;
+OP120_EO_RI_Gripper1_Close_FB AT %I*:BOOL;
+OP120_EO_RI_Gripper2_Open_FB AT %I*:BOOL;
+OP120_EO_RI_Gripper2_Close_FB AT %I*:BOOL;
+OP120_EO_RI_ATC_Open_FB AT %I*:BOOL;
+OP120_EO_RI_ATC_Close_FB AT %I*:BOOL;
+OP120_EO_ATC_Tool_Presence_1 AT %I*:BOOL;
+OP120_EO_ATC_Tool_Presence_2 AT %I*:BOOL;
+
+//Robo Outputs
+OP120_SI_Auto_Enable AT %Q*:BOOL;
+OP120_SI_Start AT %Q*:BOOL;
+OP120_SI_Stop AT %Q*:BOOL;
+OP120_SI_Stop2 AT %Q*:BOOL;
+OP120_SI_Spare1 AT %Q*:BOOL;
+OP120_SI_Program_Reset AT %Q*:BOOL;
+OP120_SI_Error_Reset AT %Q*:BOOL;
+OP120_SI_Cycle_Stop AT %Q*:BOOL;
+OP120_SI_Servo_OFF AT %Q*:BOOL;
+OP120_SI_Servo_ON AT %Q*:BOOL;
+OP120_SI_Operation_Enable AT %Q*:BOOL;
+OP120_SI_Move_Home AT %Q*:BOOL;
+OP120_SI_General_Output_reset AT %Q*:BOOL;
+OP120_SI_Machine_Lock AT %Q*:BOOL;
+OP120_SI_Spare2 AT %Q*:BOOL;
+OP120_SI_Spare3 AT %Q*:BOOL;
+OP120_SI_Spare4 AT %Q*:BOOL;
+OP120_SI_Spare5 AT %Q*:BOOL;
+OP120_SI_Spare6 AT %Q*:BOOL;
+OP120_SI_Spare7 AT %Q*:BOOL;
+OP120_SI_Spare8 AT %Q*:BOOL;
+OP120_SI_Spare9 AT %Q*:BOOL;
+OP120_SI_PLC_Heartbeat AT %Q*:BOOL;
+OP120_SI_Dry_Run AT %Q*:BOOL;
+OP120_SI_Homing_Start AT %Q*:BOOL;
+OP120_SI_Pick_Zone_Safe AT %Q*:BOOL;
+OP120_SI_Place_Zone_Safe AT %Q*:BOOL;
+OP120_SI_Reject_Zone_Safe AT %Q*:BOOL;
+OP120_SI_ATC_Tool_Safe AT %Q*:BOOL;
+OP120_SI_Spare11 AT %Q*:BOOL;
+OP120_SI_Spare12  AT %Q*:BOOL;
+OP120_SI_Spare13 AT %Q*:BOOL;
+
+
+OP120_GI_Mode AT %Q*:BYTE;
+OP120_GI_Variant_number AT %Q*:BYTE;
+OP120_GI_Position_Number AT %Q*:BYTE;
+OP120_GI_Byte_Spare1 AT %Q*:BYTE;
+OP120_GI_Byte_Spare2  AT %Q*:BYTE;
+OP120_GI_Byte_Spare3 AT %Q*:BYTE;
+OP120_GI_Byte_Spare4 AT %Q*:BYTE;
+OP120_GI_Byte_Spare5 AT %Q*:BYTE;
+OP120_GI_Word_Spare AT %Q*:BYTE;
+OP120_GI_Word_Spare1 AT %Q*:BYTE;
+
+OP120_EI_Manual_Seq_Start AT%Q*:BOOL;
+OP120_EI_Spare2 AT%Q*:BOOL;
+OP120_EI_Rdy_Pick_Spring AT%Q*:BOOL;
+OP120_EI_Rdy_Place_Spring AT%Q*:BOOL;
+OP120_EI_Insertion_Complete AT%Q*:BOOL;
+OP120_EI_Rdy_Place_Rejection AT%Q*:BOOL;
+OP120_EI_Spare4 AT%Q*:BOOL;
+OP120_EI_Spare5 AT%Q*:BOOL;
+OP120_EI_Spare6 AT%Q*:BOOL;
+OP120_EI_Spare7 AT%Q*:BOOL;
+OP120_EI_Spare8 AT%Q*:BOOL;
+OP120_EI_Spare9 AT%Q*:BOOL;
+OP120_EI_Spare10 AT%Q*:BOOL;
+OP120_EI_Spare11 AT%Q*:BOOL;
+OP120_EI_Step_Continue AT%Q*:BOOL;
+OP120_EI_Spare13 AT%Q*:BOOL;
+OP120_EI_Gripper1_Open AT%Q*:BOOL;
+OP120_EI_Gripper1_Close AT%Q*:BOOL;
+OP120_EI_Gripper2_Open AT%Q*:BOOL;
+OP120_EI_Gripper2_Close AT%Q*:BOOL;
+OP120_EI_ATC_Open AT%Q*:BOOL;
+OP120_EI_ATC_Close AT%Q*:BOOL;
+OP120_EI_Spare21 AT%Q*:BOOL;
+OP120_EI_Spare22 AT%Q*:BOOL;
+OP120_EI_Spare23 AT%Q*:BOOL;
+OP120_EI_Spare24 AT%Q*:BOOL;
+OP120_EI_Spare25 AT%Q*:BOOL;
+OP120_EI_Spare26 AT%Q*:BOOL;
+OP120_EI_Spare27 AT%Q*:BOOL;
+OP120_EI_Spare28 AT%Q*:BOOL;
+OP120_EI_Spare29 AT%Q*:BOOL;
+OP120_EI_Spare30 AT%Q*:BOOL;
+
+
+
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

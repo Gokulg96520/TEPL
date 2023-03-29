@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="cylinder_validation_st" Id="{ffe55ac7-d8d0-4863-830b-4000eaca632b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK cylinder_validation_st
+VAR_INPUT
+	en_in: BOOL;
+	error_bit: BOOL;
+	cylinder_work_coil:BOOL;
+	cylinder_home_coil:BOOL;
+	cylinder_mid_coil :BOOL;
+	delay_1: TIME;
+	delay_2: TIME;
+	delay_3: TIME;
+	
+END_VAR
+VAR_OUTPUT
+	en_out: BOOL;
+	cylinder_work_fb:BOOL;
+	cylinder_home_fb:BOOL;
+	cylinder_mid_fb :BOOL;
+	delay_display_1 : TIME;
+	delay_display_2 : TIME;
+	delay_display_3 : TIME;
+END_VAR
+VAR
+	sensor_delay_1: TON;
+	sensor_delay_2: TON;
+	sensor_delay_3: TON;
+	tim1 : ton;
+
+	
+END_VAR
+VAR_IN_OUT
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// cylinder validation block
+// timer inputs
+sensor_delay_1.PT :=delay_1;
+sensor_delay_2.PT :=delay_2;
+sensor_delay_3.PT :=delay_3;
+
+// offline test bit and error bit check
+IF en_in AND NOT error_bit THEN
+	en_out:=TRUE;
+END_IF
+
+// work feedback logic
+IF  en_out AND cylinder_work_coil THEN
+	sensor_delay_1.IN:=TRUE;
+	cylinder_home_fb :=FALSE;
+	cylinder_mid_fb  :=FALSE;
+	IF sensor_delay_1.Q THEN
+		cylinder_work_fb:=TRUE;
+	END_IF
+END_IF
+
+IF NOT cylinder_work_coil THEN
+	sensor_delay_1.IN:=FALSE;
+END_IF
+
+// home feedback logic
+IF  en_out AND cylinder_home_coil THEN
+	sensor_delay_2.IN:=TRUE;
+	cylinder_work_fb :=FALSE;
+	cylinder_mid_fb  :=FALSE;
+	IF sensor_delay_1.Q THEN
+		cylinder_home_fb:=TRUE;
+	END_IF
+END_IF
+
+IF NOT cylinder_home_coil THEN
+	sensor_delay_2.IN:=FALSE;
+END_IF
+
+// mid feedback logic
+IF  en_out AND cylinder_mid_coil THEN
+	sensor_delay_3.IN:=TRUE;
+	cylinder_work_fb :=FALSE;
+	cylinder_home_fb  :=FALSE;
+	IF sensor_delay_3.Q THEN
+		cylinder_mid_fb:=TRUE;
+	END_IF
+END_IF
+
+IF NOT cylinder_mid_coil THEN
+	sensor_delay_3.IN:=FALSE;
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="cylinder_validation_st">
+      <LineId Id="3" Count="51" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

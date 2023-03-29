@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP140_GVL" Id="{82446e90-6f8c-4f7e-b875-b583b09ea683}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	//GENERAL
+OP140_Auto:					BOOL;
+OP140_HomeRunning:			BOOL;
+OP140_ErrorActive:			BOOL;
+OP140_Home_PB:				BOOL;
+OP140_Work_PB:				BOOL;
+OP140_ManualSafetyBypass:	BOOL;
+OP140_LightCurtainBypass:	BOOL;
+OP140_OperationCompleted:	BOOL;
+OP140_LampCheck:			BOOL;
+OP140_MachineLamp:			BOOL;
+OP140_ComponentOk:			BOOL;
+OP140_ComponentNok:			BOOL;
+OP140_RepeatBit:			BOOL;
+OP140_HomingResetBit:		BOOL;
+OP140_ControlledByRobo:		BOOL;
+OP140_Any_Bypass:			BOOL;
+OP140_ManualModeStatus:		INT;
+OP140_ManualModeWord:		INT;
+OP140_AutoRunning:			BOOL;
+OP140_StepRunning:			BOOL;
+OP140_StartEnable:   		BOOL;
+OP140_Machine_Stop: 		BOOL;
+OP140_AutoSeq:				INT;
+OP140_LH_AutoSeq: 			INT;
+OP140_RH_AutoSeq: 			INT;
+OP140_Homing_Seq:			INT;
+
+//Automatic_Run:				BOOL;
+OP140_Prev_Stat_Operation_Completed: BOOL;
+OP140_Prev_Comp_Status: INT;
+OP140_Prev_LH_COMP_OK:BOOL;
+OP140_Prev_LH_COMP_NOK:BOOL;
+OP140_Prev_RH_COMP_OK:BOOL;
+OP140_Prev_RH_COMP_NOK:BOOL;
+OP140_LH_Operation_Completed:BOOL;
+OP140_RH_Operation_Completed:BOOL;
+
+OP140_LH_Comp_OK: BOOL;
+OP140_LH_Comp_NOK: BOOL;
+OP140_RH_Comp_OK: BOOL;
+OP140_RH_Comp_NOK: BOOL;
+
+
+//LH ATEQ Tags:
+OP140_LH_ATEQ_Result_Completed:BOOL;
+OP140_RH_ATEQ_Result_Completed:BOOL;
+//ModeSelection Outputs
+//OP140_AutoSelected:		    BOOL;
+OP140_ManualSelected:		BOOL;
+OP140_StepSelected:			BOOL;
+OP140_AutoSelected:		    BOOL;
+OP140_Temp_Home_Ok:			BOOL;
+OP140_Safety_No_Error:		BOOL;
+OP140_HomeConditionOK:		BOOL;
+
+//Manual Cylinder FB Tags
+CR140_Horz_Cyl_1_Status:	 INT;
+CR140_Horz_Cyl_2_Status:	 INT;
+CR140_Horz_Cyl_3_Status:	 INT;
+CR140_Vert_Cyl_1_Status:	 INT;
+CR140_Vert_Cyl_2_Status:	 INT;
+CR140_Vert_Cyl_3_Status:	 INT;
+CR140_Wipe_Cyl_1_Status:	 INT;
+CR140_Wipe_Cyl_2_Status:	 INT;
+CR140_Wipe_Cyl_3_Status:	 INT;
+
+//CR130_LH_Rotart_Cyl_Status:	 INT;
+
+CR140_Horz_Cyl_1: Cylinder_Block;
+	CR140_Horz_Cyl_2: Cylinder_Block;
+	CR140_Horz_Cyl_3: Cylinder_Block;
+	CR140_Vert_Cyl_1: Cylinder_Block;
+	CR140_Vert_Cyl_2: Cylinder_Block;
+	CR140_Vert_Cyl_3: Cylinder_Block;
+	CR140_Top_Wipe_Cyl_1: Cylinder_Block;
+	CR140_Top_Wipe_Cyl_2: Cylinder_Block;
+	CR140_Top_Wipe_Cyl_3: Cylinder_Block;
+	SR140_Vert_Servo_1: FB_Axis;
+	SR140_Vert_Servo_2: FB_Axis;
+	SR140_Vert_Servo_3: FB_Axis;
+	SR140_HMI_Vert_Servo_MC1:stManualModeAxis;
+	SR140_HMI_Vert_Servo_MC2:stManualModeAxis;
+	
+	SR140_Vert_Servo_Axis_1: Axis_ref;
+	SR140_Vert_Servo_AXis_2: Axis_ref;
+	SR140_Vert_Servo_Axis_3:Axis_ref;
+	
+	SR140_Vert_Servo_Ctrl_1: Servo_Control;
+	SR140_Vert_Servo_Ctrl_2:Servo_Control;
+//ATEQ Manual HMI Tags
+OP140_ATEQ_SEL_NO :INT;
+OP140_ATEQ_Start  :BOOL;
+OP140_ATEQ_Reset  :BOOL;
+OP140_ATEQ_Prog_No:INT;
+OP140_ATEQ_Result_Ok  :BOOL;
+OP140_ATEQ_Result_NOk  :BOOL;
+
+
+
+
+
+//HMI Tags(From HMI)
+OP140_HMI_AutoMode:						BOOL;
+OP140_HMI_ManualMOde:					BOOL;
+OP140_HMI_StepMode:						BOOL;
+OP140_HMI_CycleStart:					BOOL;
+OP140_HMI_Horz_Cyl1_Home_PB:			BOOL;
+OP140_HMI_Horz_Cyl1_Work_PB:			BOOL;
+OP140_HMI_Horz_Cyl2_Home_PB:			BOOL;
+OP140_HMI_Horz_Cyl2_Work_PB:			BOOL;
+OP140_HMI_Horz_Cyl3_Home_PB:			BOOL;
+OP140_HMI_Horz_Cyl3_Work_PB:			BOOL;
+OP140_HMI_Vert_Cyl1_Home_PB:			BOOL;
+OP140_HMI_Vert_Cyl1_Work_PB:			BOOL;
+OP140_HMI_Vert_Cyl2_Home_PB:			BOOL;
+OP140_HMI_Vert_Cyl2_Work_PB:			BOOL;
+OP140_HMI_Vert_Cyl3_Home_PB:			BOOL;
+OP140_HMI_Vert_Cyl3_Work_PB:			BOOL;
+OP140_HMI_Wipe_Cyl1_Home_PB:			BOOL;
+OP140_HMI_Wipe_Cyl1_Work_PB:			BOOL;
+OP140_HMI_Wipe_Cyl2_Home_PB:			BOOL;
+OP140_HMI_Wipe_Cyl2_Work_PB:			BOOL;
+OP140_HMI_Wipe_Cyl3_Home_PB:			BOOL;
+OP140_HMI_Wipe_Cyl3_Work_PB:			BOOL;
+OP140_HMI_Cycle_Start:					BOOL;
+OP140_HMI_Homing:						BOOL;
+SR130_Vert_Servo_Max_Lim:					BOOL;
+SR130_Vert_Servo_Work_vel:BOOL;
+
+
+
+
+//Error
+OP140_ErrorWord_0:    							 DINT;
+OP140_ErrorWord_1:								 DINT;
+OP140_ErrorWord_2:								 DINT;
+
+END_VAR
+]]></Declaration>
+  </GVL>
+</TcPlcObject>

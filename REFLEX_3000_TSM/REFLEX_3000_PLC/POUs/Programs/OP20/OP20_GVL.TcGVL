@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP20_GVL" Id="{81292742-e03a-478f-8852-26e78172858e}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+//GENERAL
+OP20_Auto:					BOOL;
+OP20_Mode_Ack:				BOOL;
+OP20_HomeRunning:			BOOL;
+OP20_ErrorActive:			BOOL;
+OP20_Home_PB:				BOOL;
+OP20_Work_PB:				BOOL;
+OP20_ManualSafetyBypass:	BOOL;
+OP20_LightCurtainBypass:	BOOL;
+OP20_OperationCompleted:	BOOL;
+OP20_LampCheck:				BOOL;
+OP20_MachineLamp:			BOOL;
+OP20_ComponentOk:			BOOL;
+OP20_ComponentNok:			BOOL;
+OP20_RepeatBit:				BOOL;
+OP20_HomingResetBit:		BOOL;
+OP20_ControlledByRobo:		BOOL;
+OP20_Any_Bypass:			BOOL;
+OP20_ManualModeStatus:		INT;
+OP20_ManualModeWord:		INT;
+OP20_AutoRunning:			BOOL;
+OP20_StepRunning:			BOOL;
+OP20_StartEnable:   		BOOL;
+OP20_HomeConditionOK:		BOOL;
+OP20_Temp_hmeOK:			BOOL;
+OP20_Machine_Stop: 			BOOL;
+OP20_AutoSeq:				INT;
+OP20_LH_AutoSeq: 			INT;
+OP20_RH_AutoSeq: 			INT;
+OP20_Homing_Seq:			INT;
+OP20_Safety_OK:				BOOL;
+
+Automatic_Run:				BOOL;    //from master mode block
+Manual_mode: 				BOOL;    //from master mode block
+
+OP20_Prev_Stat_Operation_Completed: BOOL;
+OP20_Prev_Comp_Status: INT;
+OP20_Prev_LH_COMP_OK:BOOL;
+OP20_Prev_LH_COMP_NOK:BOOL;
+OP20_Prev_RH_COMP_OK:BOOL;
+OP20_Prev_RH_COMP_NOK:BOOL;
+OP20_LH_Operation_Completed:BOOL;
+OP20_RH_Operation_Completed:BOOL;
+
+
+//Servo controls
+	OP20_Servo_Enable	: BOOL;
+	OP20_Servo_Reset	: BOOL;
+	SR20_Vert_servo: FB_Axis;
+	SR20_Vert_servo_ctrl:Servo_Control;
+	SR20_Vert_servo_status:stManualModeAxis;
+//ModeSelection Outputs
+//OP130_AutoSelected:		    BOOL;
+OP20_ManualSelected:		BOOL;
+OP20_StepSelected:			BOOL;
+OP20_AutoSelected:		    BOOL;
+
+
+//HMI Tags(From HMI)
+OP20_HMI_AutoMode:						BOOL;
+OP20_HMI_ManualMode:					BOOL;
+OP20_HMI_StepMode:						BOOL;
+OP20_HMI_CycleStart:					BOOL;
+OP20_HMI_Cycle_Start:					BOOL;
+OP20_HMI_Reset:						    BOOL;
+OP20_HMI_Homing:						BOOL;
+SR20_Vert_Servo_Max_Lim:				BOOL;
+
+OP20_HMI_Jog_Pos: BOOL;
+OP20_HMI_Jog_Neg: BOOL;
+//Error
+OP20_ErrorWord_0: DINT;
+OP20_ErrorWord_1: DINT;
+OP20_ErrorWord_2: DINT;
+
+OP20_AUTO_STP_NO: INT;
+
+// MANUAL
+		
+// AUTO	
+	OP20_STN_ENABLE					: BOOL;				// FROM MASTER CONTROL BLOCK
+	OP20_FIXTURE_2					: INT;               //For the comp status in the fixture
+	OP20_FIXTURE_1					: INT; 				 //For the comp status in the fixture
+// SERVO VARIABLE
+	OP20_VERT_SERVO_STRT			: BOOL;				// SERVO MOVE TO TARGET POSITION
+	OP20_SERVO_POS_DONE				: BOOL;				// SERVO POSITION REACHED
+	OP20_SERVO_ON_SFE_WRK			: BOOL;				// SERVO ACTUAL POSITION = SERVO SAFE POSITION
+	OP20_SERVO_ON_WRK				: BOOL;				// SERVO ACTUAL POSITION = SERVO WORK POSITION
+	OP20_SERVO_ON_HOME				: BOOL;				// SERVO ACTUAL POSITION = SERVO HOME POSITION	
+	
+	OP20_VERT_SERVO_HME_POS			: REAL := 0;         // SERVO IN HOME POSITION
+	OP20_VERT_SERVO_POSITION		: LREAL ;			// SERVO ACTUAL POSITION
+	OP20_VERT_SERVO_SFE_WRK_POS		: REAL := 0;		// SERVO SAFE WORK POSITION FROM RECEIPE
+	OP20_VERT_SERVO_WRK_POS			: REAL := 40;		// SERVO WORK POSITION FROM RECEIPE	
+	OP20_VERT_SERVO_TARGET			: REAL;				// SERVO AUTO TARGET POSITION
+
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	
+// MANUAL
+
+// AUTO
+	OP20_BYPASS						: BOOL;				// OP20 ON-BYPASS / OFF-NOT BYPASSED
+	OP20_LH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH OK BIT
+	OP20_LH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH NOK BIT
+	OP20_RH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH OK BIT
+	OP20_RH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH NOK BIT
+	
+	OP20_DLY_AFT_SFE_WRK			: INT:=100;				// AUTO DELAY TIMER AFTER SERVO REACH WORK
+	OP20_DLY_AFT_SPN_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER SPINNER START
+	OP20_DLY_AFT_OILNG_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER OILLING START
+	OP20_DLY_AFT_OILNG_FNISH		: INT:=100;				// AUTO DELAY TIMER AFTER OILLING FINISH
+//Setting Parameters
+    HMI_Servo_UP_Speed : LREAL;
+    HMI_Servo_Down_Speed : LREAL;
+    HMI_Torque_limit : REAL;
+	HMI_Stroke_Limit : REAL;
+
+
+END_VAR
+
+VAR_GLOBAL 
+	temp:BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

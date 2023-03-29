@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP50_Initialize_Seq" Id="{44d36e0d-21ba-4360-9a51-6fae0b6ee185}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP50_Initialize_Seq
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE OP50_Homing_Seq OF
+	0: IF (OP50_AutoSelected AND NOT OP50_HomeRunning AND NOT OP50_ErrorActive AND NOT OP50_AutoRunning AND NOT OP50_StepRunning AND NOT OP50_Temp_hmeOK) THEN
+		OP50_HomeRunning:=TRUE;
+		OP50_Homing_Seq:=10;	
+	   END_IF
+	   
+	10:IF (OP50_HomeRunning AND OP50_HMI_Homing)THEN 
+		IF (SR50_Vert_servo_ctrl.Axis_In_Home) THEN 
+			SR50_Vert_servo_ctrl.Axis_Home_Cmd:=FALSE;
+		ELSE
+			SR50_Vert_servo_ctrl.Axis_Home_Cmd:=TRUE;
+	    END_IF
+		OP50_Homing_Seq:=20;
+	   END_IF	
+	   
+   20: IF (SR50_Hori_servo_ctrl.Axis_In_Home) THEN 
+			SR50_Hori_servo_ctrl.Axis_Home_Cmd:=FALSE;
+		ELSE
+			SR50_Hori_servo_ctrl.Axis_Home_Cmd:=TRUE;
+	    END_IF
+		OP50_Homing_Seq:=40;
+		
+   40:  IF OP50_Gripper_LH_State THEN 
+			OP50_Gripper_LH_Close := TRUE;
+		ELSE
+			OP50_Gripper_LH_Close := FALSE;
+	    END_IF
+		OP50_Homing_Seq:=50;
+		
+   50: 	IF OP50_Gripper_RH_State THEN 
+			OP50_Gripper_RH_Close := TRUE;
+		ELSE
+			OP50_Gripper_RH_Close := FALSE;
+	    END_IF
+		OP50_Homing_Seq:=60;
+   60: IF CR50_LH_Rej_Cyl.Position2 THEN
+			CR50_LH_Rej_Cyl.HomingCmd1:=TRUE;	
+		END_IF
+		IF CR50_LH_Rej_Cyl.Position1 THEN
+			CR50_LH_Rej_Cyl.HomingCmd1:=FALSE;
+			OP50_Homing_Seq:=70;
+		END_IF
+		
+   70:	IF CR50_RH_Rej_Cyl.Position2 THEN
+			CR50_RH_Rej_Cyl.HomingCmd1:=TRUE;	
+		END_IF
+		IF CR50_RH_Rej_Cyl.Position1 THEN
+			CR50_RH_Rej_Cyl.HomingCmd1:=FALSE;
+			OP50_Homing_Seq:=80;
+		END_IF
+		
+   80:	OP50_Homing_Seq:=0;
+		OP50_HomeRunning:=FALSE;
+		OP50_HMI_Homing:=FALSE;
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP50_Initialize_Seq">
+      <LineId Id="3" Count="53" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="Master3_IO" Id="{44c3106d-d00c-498e-b0b9-a2b4002f3235}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	//port1
+I90_RET_LH_GRIPR_CYL_CLSE_I1200_0              :BOOL;
+I90_RET_LH_GRIPR_CYL_OPN_I1200_1               :BOOL;
+I90_RET_RH_GRIPR_CYL_CLSE_I1200_2              :BOOL;
+I90_RET_RH_GRIPR_CYL_OPN_I1200_3               :BOOL;
+I90_POSTN_SLIDE_CYL_REV_I1200_4                :BOOL;
+I90_POSTN_SLIDE_CYL_FWD_I1200_5                :BOOL;
+I90_LH_MOVR_SUP_VERT_CYL_DWN_I1200_6           :BOOL;
+I90_LH_MOVR_SUP_VERT_CYL_UP_I1200_7            :BOOL;
+											  
+I90_LH_MOVR_SUP_HORZ_CYL_REV_I1201_0           :BOOL;
+I90_LH_MOVR_SUP_HORZ_CYL_FWD_I1201_1           :BOOL;
+I90_RH_MOVR_SUP_VERT_CYL_DWN_I1201_2           :BOOL;
+I90_RH_MOVR_SUP_VERT_CYL_UP_I1201_3            :BOOL;
+I90_RH_MOVR_SUP_HORZ_CYL_REV_I1201_4           :BOOL;
+I90_RH_MOVR_SUP_HORZ_CYL_FWD_I1201_5           :BOOL;
+I90_SPARE_I1201_6                              :BOOL;
+I90_SPARE_I1201_7                              :BOOL;
+
+//port2
+I90_LH1_REJ_SLIDE_REV_I1210_0                  :BOOL;
+I90_LH1_REJ_SLIDE_FWD_I1210_1                  :BOOL;
+I90_RH1_REJ_SLIDE_REV_I1210_2                  :BOOL;
+I90_RH1_REJ_SLIDE_FWD_I1210_3                  :BOOL;
+I90_LH2_REJ_SLIDE_REV_I1210_4                  :BOOL;
+I90_LH2_REJ_SLIDE_FWD_I1210_5                  :BOOL;
+I90_RH2_REJ_SLIDE_REV_I1210_6                  :BOOL;
+I90_RH2_REJ_SLIDE_FWD_I1210_7                  :BOOL;
+											   
+I90_SPARE_I1211_0                              :BOOL;
+I90_SPARE_I1211_1                              :BOOL;
+I90_SPARE_I1211_2                              :BOOL;
+I90_SPARE_I1211_3                              :BOOL;
+I90_SPARE_I1211_4                              :BOOL;
+I90_SPARE_I1211_5                              :BOOL;
+I90_SPARE_I1211_6                              :BOOL;
+I90_SPARE_I1211_7                              :BOOL;
+
+//port3
+I120_PUSH_CYL_REV_I1220_0                      :BOOL;
+I120_PUSH_CYL_FWD_I1220_1                      :BOOL;
+I120_LH_SING_CYL_REV_I1220_2                   :BOOL;
+I120_LH_SING_CYL_FWD_I1220_3                   :BOOL;
+I120_CAMERA_SLIDECYL_REV_I1220_4               :BOOL;
+I120_CAMERA_SLIDECYL_FWD_I1220_5               :BOOL;
+I120_SPARE_I1220_6                             :BOOL;
+I120_SPARE_I1220_7                             :BOOL;
+											   
+I120_SPARE_I1221_0                             :BOOL;
+I120_SPARE_I1221_1                             :BOOL;
+I120_SPARE_I1221_2                             :BOOL;
+I120_SPARE_I1221_3                             :BOOL;
+I120_SPARE_I1221_4                             :BOOL;
+I120_SPARE_I1221_5                             :BOOL;
+I120_SPARE_I1221_6                             :BOOL;
+I120_SPARE_I1221_7                             :BOOL;
+
+//port 5
+O90_RET_LH_GRIPR_CYL_CLSE_Q1240_0              :BOOL;
+O90_RET_LH_GRIPR_CYL_OPN_Q1240_1               :BOOL;
+O90_RET_RH_GRIPR_CYL_CLSE_Q1240_2              :BOOL;
+O90_RET_RH_GRIPR_CYL_OPN_Q1240_3               :BOOL;
+O90_POS_LOCK_CYL1_VLVE_1_Q1240_4               :BOOL;
+O90_POS_LOCK_CYL1_VLVE_2_Q1240_5               :BOOL;
+O90_POS_LOCK_CYL2_VLVE_1_Q1240_6               :BOOL;
+O90_POS_LOCK_CYL2_VLVE_2_Q1240_7               :BOOL;
+											  
+O90_POSTN_SLIDE_CYL_REV_Q1241_0                :BOOL;
+O90_POSTN_SLIDE_CYL_FWD_Q1241_1                :BOOL;
+O90_LH_MOVR_SUP_VERT_CYL_DWN_Q1241_2           :BOOL;
+O90_LH_MOVR_SUP_VERT_CYL_UP_Q1241_3            :BOOL;
+O90_LH_MOVR_SUP_HORZ_CYL_REV_Q1241_4           :BOOL;
+O90_LH_MOVR_SUP_HORZ_CYL_FWD_Q1241_5           :BOOL;
+O90_RH_MOVR_SUP_VERT_CYL_DWN_Q1241_6           :BOOL;
+O90_RH_MOVR_SUP_VERT_CYL_UP_Q1241_7            :BOOL;
+											   
+O90_RH_MOVR_SUP_HORZ_CYL_REV_Q1242_0           :BOOL;
+O90_RH_MOVR_SUP_HORZ_CYL_FWD_Q1242_1           :BOOL;
+O90_SPARE_Q1242_2                              :BOOL;
+O90_SPARE_Q1242_3                              :BOOL;
+O90_SPARE_Q1242_4                              :BOOL;
+O90_SPARE_Q1242_5                              :BOOL;
+O90_SPARE_Q1242_6                              :BOOL;
+O90_SPARE_Q1242_7                              :BOOL;
+
+//port6
+O90_LH1_REJ_SLIDE_REV_Q1250_0                  :BOOL;
+O90_LH1_REJ_SLIDE_FWD_Q1250_1                  :BOOL;
+O90_RH1_REJ_SLIDE_REV_Q1250_2                  :BOOL;
+O90_RH1_REJ_SLIDE_FWD_Q1250_3                  :BOOL;
+O90_SPARE_Q1250_4                              :BOOL;
+O90_LH1_REJ_AIR_PURGE_Q1250_5                  :BOOL;
+O90_LH2_REJ_SLIDE_REV_Q1250_6                  :BOOL;
+O90_LH2_REJ_SLIDE_FWD_Q1250_7                  :BOOL;
+											  
+O90_RH2_REJ_SLIDE_REV_Q1251_0                  :BOOL;
+O90_RH2_REJ_SLIDE_FWD_Q1251_1                  :BOOL;
+O90_RH_REJ_AIR_PURGE_Q1251_2                   :BOOL;
+O90_SPARE_Q1251_3                              :BOOL;
+O90_SPARE_Q1251_4                              :BOOL;
+O90_SPARE_Q1251_5                              :BOOL;
+O90_SPARE_Q1251_6                              :BOOL;
+O90_SPARE_Q1251_7                              :BOOL;
+
+//port7
+O110_LH_OIL_DISPN_ON_Q1260_0                   :BOOL;
+O110_LH_OIL_SPIN_ON_Q1260_1                    :BOOL;
+O110_RH_OIL_DISPN_ON_Q1260_2                   :BOOL;
+O110_RH_OIL_SPIN_ON_Q1260_3                    :BOOL;
+O120_LH_GRPR_CLSE_Q1260_4                      :BOOL;
+O120_LH_GRPR_OPN_Q1260_5                       :BOOL;
+O120_RH_GRPR_CLSE_Q1260_6                      :BOOL;
+O120_RH_GRPR_OPN_Q1260_7                       :BOOL;
+											  
+O120_TOOL_CHO_UNLOCK_Q1261_0                   :BOOL;
+O120_TOOL_CHO_LOCK_Q1261_1                     :BOOL;
+O120_PUSH_CYL_REV_Q1261_2                      :BOOL;
+O120_PUSH_CYL_FWD_Q1261_3                      :BOOL;
+O120_LH_SING_CYL_REV_Q1261_4                   :BOOL;
+O120_LH_SING_CYL_FWD_Q1261_5                   :BOOL;
+O120_LH_REJ_AIR_PURGE_Q1261_6                  :BOOL;
+O120_RH_REJ_AIR_PURGE_Q1261_7                  :BOOL;
+											  
+O120_CAMERA_SLIDECYL_REV_Q1262_0               :BOOL;
+O120_CAMERA_SLIDECYL_FWD_Q1262_1               :BOOL;
+O120_SPARE_Q1262_2                             :BOOL;
+O120_SPARE_Q1262_3                             :BOOL;
+O120_SPARE_Q1262_4                             :BOOL;
+O120_SPARE_Q1262_5                             :BOOL;
+O120_SPARE_Q1262_6                             :BOOL;
+O120_SPARE_Q1262_7                             :BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

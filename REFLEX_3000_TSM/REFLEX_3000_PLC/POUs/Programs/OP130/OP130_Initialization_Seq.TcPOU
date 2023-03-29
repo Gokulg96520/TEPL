@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP130_Initialization_Seq" Id="{6aa9f027-32e5-46b1-be61-28bc463a96d7}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP130_Initialization_Seq
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_Stepper_Control.Axis_In_Home AND OP130_GVL.CR130_LH_Rot_Cyl.Position1 AND OP130_GVL.CR130_RH_Rot_Cyl.Position1 )THEN
+OP130_Temp_Home_OK:=TRUE;
+OP130_HomeRunning:=FALSE;
+OP130_Homing_Seq:=0;
+ELSE
+	//OP130_Temp_Home_OK:=FALSE;
+	
+END_IF
+
+CASE OP130_Homing_Seq OF
+	0: IF (OP130_Auto AND NOT OP130_HomeRunning AND  NOT OP130_ErrorActive AND  NOT OP130_AutoRunning AND NOT OP130_StepRunning	 AND NOT OP130_Temp_Home_OK) THEN
+		OP130_HomeRunning:=TRUE;
+		OP130_Homing_Seq:=10;	
+	   END_IF
+	10:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		IF (OP130_GVL.CR130_LH_Rot_Cyl.Position1 AND OP130_GVL.CR130_RH_Rot_Cyl.Position1)  THEN 
+			OP130_Homing_Seq:=20;
+			ELSE
+				OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd1:= TRUE;
+				OP130_GVL.CR130_RH_Rot_Cyl.HomingCmd1:= TRUE;
+				
+				IF (OP130_GVL.CR130_LH_Rot_Cyl.Position1 AND OP130_GVL.CR130_RH_Rot_Cyl.Position1 ) THEN
+					OP130_Homing_Seq:=20;
+				END_IF
+		END_IF
+		
+	END_IF
+	20:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+        IF (OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home)=TRUE THEN
+			OP130_Homing_Seq:=30;
+			ELSE
+				OP130_GVL.SR130_LH_Servo_Control.Axis_Home_Cmd:= TRUE;
+				OP130_GVL.SR130_RH_Servo_Control.Axis_Home_Cmd:= TRUE;
+				IF (OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home)=TRUE THEN
+				OP130_Homing_Seq:=30;
+				OP130_GVL.SR130_LH_Servo_Control.Axis_Home_Cmd:= FALSE;
+				OP130_GVL.SR130_RH_Servo_Control.Axis_Home_Cmd:= FALSE;
+				END_IF
+				
+				END_IF
+				END_IF
+		30:	IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+			IF (OP130_GVL.SR130_Stepper_Control.Axis_In_Home) THEN
+			OP130_Homing_Seq:=40;
+			ELSE
+				OP130_GVL.SR130_Stepper_Control.Axis_Home_Cmd:=TRUE;
+				IF(OP130_GVL.SR130_Stepper_Control.Axis_In_Home) THEN
+					OP130_Homing_Seq:=40;
+				END_IF
+				END_IF
+				END_IF
+				
+			40:	
+			OP130_Homing_Seq:=0;
+			OP130_HomeRunning:=FALSE;
+	
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP130_Initialization_Seq">
+      <LineId Id="3" Count="55" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

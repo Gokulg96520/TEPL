@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="iSchunkProcessData" Id="{211985d8-773a-4a8a-9e6b-791ae0f4b1f1}">
+    <Declaration><![CDATA[TYPE iSchunkProcessData :
+STRUCT
+	
+commandReleaseA:			BIT;
+commandReleaseB:			BIT;
+spare1:						BIT;
+spare2:						BIT;
+spare3:						BIT;
+spare4:						BIT;
+moduleReady:				BIT;
+spare5:						BIT;
+moduleIsMoving:				BIT;
+targetPosReached:			BIT;
+movementBlocked:			BIT;
+brakeActive:				BIT;
+modulIsReferenced:			BIT;
+info:						BIT;
+warning:					BIT;
+error:						BIT;
+activeCopy:					BYTE;
+digitalInputs:				BYTE;
+actualPos:					REAL;
+actualVelo:					REAL;
+actualCurrent:				REAL;
+errorCode:					BYTE;
+notUsed:					BYTE;
+
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

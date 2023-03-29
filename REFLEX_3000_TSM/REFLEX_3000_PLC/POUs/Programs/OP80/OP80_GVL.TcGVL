@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP80_GVL" Id="{ac910a72-5f03-43d5-9ac4-26d2be205cbe}">
+    <Declaration><![CDATA[VAR_GLOBAL
+	
+//GENERAL
+OP80_Auto:					BOOL;
+OP80_HomeRunning:			BOOL;
+OP80_ErrorActive:			BOOL;
+OP80_Home_PB:				BOOL;
+OP80_Work_PB:				BOOL;
+OP80_ManualSafetyBypass:	BOOL;
+OP80_LightCurtainBypass:	BOOL;
+OP80_OperationCompleted:	BOOL;
+OP80_LampCheck:				BOOL;
+OP80_MachineLamp:			BOOL;
+OP80_ComponentOk:			BOOL;
+OP80_ComponentNok:			BOOL;
+OP80_RepeatBit:				BOOL;
+OP80_HomingResetBit:		BOOL;
+OP80_ControlledByRobo:		BOOL;
+OP80_Any_Bypass:			BOOL;
+OP80_ManualModeStatus:		INT;
+OP80_ManualModeWord:		INT;
+OP80_AutoRunning:			BOOL;
+OP80_StepRunning:			BOOL;
+OP80_StartEnable:   		BOOL;
+OP80_Machine_Stop: 			BOOL;
+OP80_AutoSeq:				INT;
+OP80_LH_AutoSeq: 			INT;
+OP80_RH_AutoSeq: 			INT;
+OP80_Homing_Seq:			INT;
+OP80_HomeConditionOK:   	BOOL;
+OP80_Safety_OK:				BOOL;
+OP80_Mode_Ack:				BOOL;
+OP80_Temp_hmeOK:			BOOL;
+
+
+Automatic_Run:				BOOL;
+
+OP80_Prev_Stat_Operation_Completed: BOOL;
+OP80_Prev_Comp_Status: INT;
+OP80_Prev_LH_COMP_OK:BOOL;
+OP80_Prev_LH_COMP_NOK:BOOL;
+OP80_Prev_RH_COMP_OK:BOOL;
+OP80_Prev_RH_COMP_NOK:BOOL;
+OP80_LH_Operation_Completed:BOOL;
+OP80_RH_Operation_Completed:BOOL;
+
+//ModeSelection Outputs
+//OP130_AutoSelected:		    BOOL;
+OP80_ManualSelected:		BOOL;
+OP80_StepSelected:			BOOL;
+OP80_AutoSelected:		    BOOL;
+
+
+//HMI Tags(From HMI)
+OP80_HMI_AutoMode:						BOOL;
+OP80_HMI_ManualMOde:					BOOL;
+OP80_HMI_StepMode:						BOOL;
+OP80_HMI_CycleStart:					BOOL;
+OP80_HMI_Cycle_Start:					BOOL;
+OP80_HMI_Reset:						    BOOL;
+OP80_HMI_Homing:						BOOL;
+SR80_Vert_Servo_Max_Lim:				BOOL;
+
+//Error
+OP80_ErrorWord_0: DINT;
+OP80_ErrorWord_1: DINT;
+OP80_ErrorWord_2: DINT;
+
+//Servo
+SR80_Vert_servo : FB_Axis;
+
+SR80_Vert_servo_not_Home: BOOL;
+
+//MANUAL	
+	OP80_man_cyl_no 				: INT;
+	
+//AUTO	
+	OP80_STN_ENABLE					: BOOL;				// FROM MASTER CONTROL BLOCK 
+	OP80_AUTO_STP_NO				: INT;
+//LVDT 
+	OP80_SET_LVDT_VALUE				:LREAL;	           // FROM HMI OR RECIPE
+	OP80_LVDT_TOLERANCE 			:LREAL;			   // FROM HMI OR RECIPE
+	OP80_LH_LVDT_VALUE				:LREAL;			   // FROM LVDT
+	OP80_RH_LVDT_VALUE				:LREAL;
+
+// SERVO VARIABLE
+	OP80_VERT_SERVO_STRT			: BOOL;				// SERVO MOVE TO TARGET POSITION
+	OP80_SERVO_POS_DONE				: BOOL;				// SERVO POSITION REACHED
+	OP80_SERVO_ON_SFE_WRK			: BOOL;				// SERVO ACTUAL POSITION = SERVO SAFE POSITION
+	OP80_SERVO_ON_WRK				: BOOL;				// SERVO ACTUAL POSITION = SERVO WORK POSITION
+	OP80_SERVO_ON_HOME				: BOOL;				// SERVO ACTUAL POSITION = SERVO HOME POSITION	
+	  
+	OP80_VERT_SERVO_POSITION		: REAL;				// SERVO ACTUAL POSITION
+	
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	
+// MANUAL
+
+// AUTO
+	OP80_BYPASS						: BOOL;				// OP80 ON-BYPASS
+	OP80_LH_LVDT_OK					: BOOL;				// TO MASTER CONTROL BLOCK LH OK BIT
+	OP80_LH_LVDT_NOK				: BOOL;				// TO MASTER CONTROL BLOCK LH NOK BIT
+	OP80_RH_LVDT_OK					: BOOL;				// TO MASTER CONTROL BLOCK RH OK BIT
+	OP80_RH_LVDT_NOK				: BOOL;				// TO MASTER CONTROL BLOCK RH NOK BIT	
+	  
+	OP80_DLY_AFT_SFE_WRK			: INT := 200;				// AUTO DELAY TIMER AFTER SERVO REACH WORK
+
+//SERVO	
+	OP80_VERT_SERVO_HME_POS			: REAL :=0;             // SERVO HOME POSITION FROM HMI
+	OP80_VERT_SERVO_SFE_WRK_POS		: REAL :=40;				// SERVO SAFE WORK POSITION FROM RECEIPE
+	OP80_VERT_SERVO_WRK_POS			: REAL :=400;				// SERVO WORK POSITION FROM RECEIPE	
+	OP80_VERT_SERVO_TARGET			: REAL;				// SERVO AUTO TARGET POSITION	
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

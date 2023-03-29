@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Head1" Id="{18c214b1-aa21-4124-8d11-700a4dafec38}">
+    <Declaration><![CDATA[TYPE Head1 :
+STRUCT
+TimeoutActive:				BOOL;
+NewData:					BOOL;
+NotExist:					BOOL;
+ExistTC:					BOOL;
+Error:						BOOL;
+TimeoutOccurred:			BOOL;
+SendOK:						BOOL;
+ReceiveOK:					BOOL;
+NoDataCarrier:				BOOL;
+Busy:						BOOL;
+Done:						BOOL;
+EnhCommandActive:			BOOL;
+SglCommandActive:			BOOL;
+TransfToHead:				BOOL;
+Execute:					BOOL;
+SaveRead:					BOOL;
+SaveWrite:					BOOL;
+SaveQuit:					BOOL;
+SaveSpecialCommand:			BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

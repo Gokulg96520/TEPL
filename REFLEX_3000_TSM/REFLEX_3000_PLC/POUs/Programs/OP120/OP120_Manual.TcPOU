@@ -1,0 +1,444 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP120_Manual" Id="{5426593b-9944-486c-afe7-ace5b4f1a516}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP120_Manual
+VAR
+	SR120_Oring_Feed_Servo: FB_Axis;
+	OP120Enable: BOOL;
+	Op120bhome: BOOL;
+	op120bset: BOOL;
+	temp : bool;
+	vel_temp: LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Lifting Cyl
+
+//move ZERO to STATUS
+OP120_Lifting_Cyl_Status:=0;
+
+
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP120_Auto OR OP120_HomeRunning) THEN
+	CR120_Lifting_Cyl.AutoCmd1:=FALSE;
+	CR120_Lifting_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR120_Lifting_Cyl.SafeHome:= TRUE ;
+	ELSE 
+		CR120_Lifting_Cyl.SafeHome:= FALSE ;
+	END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR120_Lifting_Cyl.Safework:= TRUE ;
+	ELSE 
+		CR120_Lifting_Cyl.Safework:= FALSE ;
+	END_IF
+	
+// Manual PB  Cyl Mapping
+IF (CR120_HMI_Lifting_Cyl_Home_PB=TRUE) THEN
+	CR120_Lifting_Cyl.ManualPB1:=TRUE;
+	ELSE 
+		CR120_Lifting_Cyl.ManualPB1:=FALSE;
+	END_IF
+	
+IF (CR120_HMI_Lifting_Cyl_Work_PB=TRUE) THEN
+	CR120_Lifting_Cyl.ManualPB2:=TRUE;
+	ELSE 
+		CR120_Lifting_Cyl.ManualPB2:=FALSE;
+	END_IF
+
+
+	
+CR120_Lifting_Cyl(
+	Auto:=OP120_AutoSelected , 
+	Manual:= MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:=OP120_HMI_Reset , 
+	Sensor1:=I120_LH_SING_CYL_REV_I1220_2 , 
+	Sensor2:=I120_LH_SING_CYL_FWD_I1220_3 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:=5 , 
+	TimeOut3:=5 , 
+	Solenoid1=>O120_LH_SING_CYL_REV_Q1261_4 , 
+	Solenoid2=>O120_LH_SING_CYL_FWD_Q1261_5 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP120_Lifting_Cyl_Status );
+	
+	//Lifting Cyl
+
+//move ZERO to STATUS
+OP120_Gripper_Cyl_Status:=0;
+
+
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP120_Auto OR OP120_HomeRunning) THEN
+	CR120_Gripper_Cyl.AutoCmd1:=FALSE;
+	CR120_Gripper_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR120_Gripper_Cyl.SafeHome:= TRUE ;
+	ELSE 
+		CR120_Gripper_Cyl.SafeHome:= FALSE ;
+	END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR120_Gripper_Cyl.Safework:= TRUE ;
+	ELSE 
+		CR120_Gripper_Cyl.Safework:= FALSE ;
+	END_IF
+	
+// Manual PB  Cyl Mapping
+IF (CR120_HMI_Gripper_Cyl_Home_PB=TRUE) THEN
+	CR120_Gripper_Cyl.ManualPB1:=TRUE;
+	ELSE 
+		CR120_Gripper_Cyl.ManualPB1:=FALSE;
+	END_IF
+	
+IF (CR120_HMI_Gripper_Cyl_Work_PB=TRUE) THEN
+	CR120_Gripper_Cyl.ManualPB2:=TRUE;
+	ELSE 
+		CR120_Gripper_Cyl.ManualPB2:=FALSE;
+	END_IF
+
+
+	
+CR120_Gripper_Cyl(
+	Auto:=OP120_AutoSelected , 
+	Manual:= MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:=OP120_HMI_Reset , 
+	Sensor1:=(I120_LH_LOCKSPRING_GRPR_OPN_I405_5 AND I120_RH_LOCKSPRING_GRPR_OPN_I405_7)  , 
+	Sensor2:=(I120_LH_LOCKSPRING_GRPR_CLSE_I405_4 AND I120_RH_LOCKSPRING_GRPR_CLSE_I405_6), 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:=5 , 
+	TimeOut3:=5 , 
+	Solenoid1=>O120_LH_GRPR_OPN_Q1260_5 , 
+	Solenoid2=>O120_LH_GRPR_CLSE_Q1260_4 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP120_Gripper_Cyl_Status );
+	
+	
+// Horizontal Push Cyl
+
+//move ZERO to STATUS
+OP120_Horizontal_Push_Cyl_Status:=0;
+
+
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP120_Auto OR OP120_HomeRunning) THEN
+	CR120_Horizontal_Push_Cyl.AutoCmd1:=FALSE;
+	CR120_Horizontal_Push_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR120_Horizontal_Push_Cyl.SafeHome:= TRUE ;
+	ELSE 
+		CR120_Horizontal_Push_Cyl.SafeHome:= FALSE ;
+	END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR120_Horizontal_Push_Cyl.Safework:= TRUE ;
+	ELSE 
+	CR120_Horizontal_Push_Cyl.Safework:= FALSE ;
+	END_IF
+
+// Manual PB  Cyl Mapping
+IF (CR120_HMI_Horizontal_Push_Cyl_Home_PB=TRUE) THEN
+	CR120_Horizontal_Push_Cyl.ManualPB1:=TRUE;
+	ELSE 
+		CR120_Horizontal_Push_Cyl.ManualPB1:=FALSE;
+	END_IF
+	
+IF (CR120_HMI_Horizontal_Push_Cyl_Work_PB=TRUE) THEN
+	CR120_Horizontal_Push_Cyl.ManualPB2:=TRUE;
+	ELSE 
+		CR120_Horizontal_Push_Cyl.ManualPB2:=FALSE;
+	END_IF
+
+CR120_Horizontal_Push_Cyl(
+	Auto:=OP120_AutoSelected , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP120_HMI_Reset , 
+	Sensor1:= I120_PUSH_CYL_REV_I1220_0, 
+	Sensor2:=I120_PUSH_CYL_FWD_I1220_1 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz, 
+	BlinkingBit:= , 
+	TimeOut1:= 5, 
+	TimeOut2:=5 , 
+	TimeOut3:=5 , 
+	Solenoid1=>O120_PUSH_CYL_REV_Q1261_2 , 
+	Solenoid2=>O120_PUSH_CYL_FWD_Q1261_3 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP120_Horizontal_Push_Cyl_Status );
+	
+	// Camera Slide Cylinder
+	
+	
+
+//move ZERO to STATUS
+OP120_Camera_Slide_Cyl_Status:=0;
+
+
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP120_Auto OR OP120_HomeRunning) THEN
+	CR120_Camera_Slide_Cyl.AutoCmd1:=FALSE;
+	CR120_Camera_Slide_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR120_Camera_Slide_Cyl.SafeHome:= TRUE ;
+	ELSE 
+		CR120_Camera_Slide_Cyl.SafeHome:= FALSE ;
+	END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR120_Camera_Slide_Cyl.Safework:= TRUE ;
+	ELSE 
+	CR120_Camera_Slide_Cyl.Safework:= FALSE ;
+	END_IF
+
+// Manual PB  Cyl Mapping
+IF (CR120_HMI_Camera_Slide_Cyl_Home_PB=TRUE) THEN
+	CR120_Camera_Slide_Cyl.ManualPB1:=TRUE;
+	ELSE 
+		CR120_Camera_Slide_Cyl.ManualPB1:=FALSE;
+	END_IF
+	
+IF (CR120_HMI_Camera_Slide_Cyl_Work_PB=TRUE) THEN
+	CR120_Camera_Slide_Cyl.ManualPB2:=TRUE;
+	ELSE 
+		CR120_Camera_Slide_Cyl.ManualPB2:=FALSE;
+	END_IF
+
+CR120_Camera_Slide_Cyl(
+	Auto:=OP120_AutoSelected , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP120_HMI_Reset , 
+	Sensor1:= I120_CAMERA_SLIDECYL_REV_I1220_4, 
+	Sensor2:=I120_CAMERA_SLIDECYL_FWD_I1220_5 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz, 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:= 5, 
+	TimeOut3:=5 , 
+	Solenoid1=>O120_CAMERA_SLIDECYL_REV_Q1262_0 , 
+	Solenoid2=>O120_CAMERA_SLIDECYL_FWD_Q1262_1 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP120_Camera_Slide_Cyl_Status );
+	
+	//
+//SR120_Oring_Feed_Servo(
+//	bAxis1_Ref_Switch:= , 
+//	bInit:= , 
+//	bErrorReset:= , 
+//	bEnable:= , 
+//	bMoveVelocity:= , 
+//	bHalt:= , 
+//	bManualMode:= , 
+//	fHomePos:= , 
+//	fOverride:= , 
+//	fTargetPosition:= , 
+//	fTargetVelocity:= , 
+//	fAcc:= , 
+//	fDec:= , 
+//	Axis:=SR120_Oring_Feed_Servo_Axis , 
+//	bHome:=SR130_Oring_Feed_Servo_Control.Reference_Start , 
+//	bSetPosition:=SR130_Oring_Feed_Servo_Control.Axis_reference , 
+//	bMoveAbsolute:=SR130_Oring_Feed_Servo_Control.ABSmove_Start , 
+//	bMoveRelative:= SR130_Oring_Feed_Servo_Control.RELmove_Start, 
+//	stManualModeAxis:=SR130_Oring_Feed_Manual_Axis , 
+//	sAxisState=>SR130_Oring_Feed_Servo_Control.Axis_State , 
+//	bAxis_ready=>SR130_Oring_Feed_Servo_Control.Axis_ready , 
+//	bAxisInPosition=>SR130_Oring_Feed_Servo_Control.Axis_In_Pos , 
+//	bAxisError=>SR130_Oring_Feed_Servo_Control.Axis_Error , 
+//	bAxisEnabled=>SR130_Oring_Feed_Servo_Control.Axis_Enabled , 
+//	bAxisHomed=>SR130_Oring_Feed_Servo_Control.Axis_reference , 
+//	bSetPositionDone=> , 
+//	bHaltDone=>SR130_Oring_Feed_Servo_Control.Axis_Halted , 
+//	bSTOPDone=>SR130_Oring_Feed_Servo_Control.Axis_Stopped , 
+//	bHomeDone=> , 
+//	bDone=> );
+	
+	//Oring feed Servo 1
+	
+	
+	IF (TRUE) THEN
+		SR120_Oring_Feed_Servo_Control.Safety_cond:=TRUE;
+	END_IF
+
+vel_temp:= (-50);
+	
+SR120_Oring_Feed_Servo(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:=OP120_HMI_Reset OR Servo_Reset , 
+	bEnable:=OperationEnable,
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:=OP120_ManualSelected OR OP120Enable , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= SR120_Oring_Feed_Servo_Control.Velocity, 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety,
+	HME_WRITE_ADD:= 16#5017, 
+	Axis:= SR120_Oring_Feed_Servo_Axis, 
+	bHome:=Op120bhome, 
+	bSetPosition:=op120bset, 
+	bMoveVelocity:=SR120_Oring_Feed_Servo_Control.VELmove_Start ,	
+	bMoveAbsolute:= SR120_Oring_Feed_Servo_Control.ABSmove_Start, 
+	bMoveRelative:=SR120_Oring_Feed_Servo_Control.RELmove_Start , 
+	bMoveTorque:=SR120_Oring_Feed_Servo_Control.Torque_mode_Start , 
+	stManualModeAxis:=SR120_Oring_Feed_Manual_Axis , 
+	bmove_home:=SR120_Oring_Feed_Servo_Control.Axis_Home_Cmd , 
+	sAxisState=>SR120_Oring_Feed_Servo_Control.Axis_State , 
+	bAxis_ready=>SR120_Oring_Feed_Servo_Control.Axis_ready , 
+	bAxisInPosition=>SR120_Oring_Feed_Servo_Control.Axis_In_Pos , 
+	bAxisError=>SR120_Oring_Feed_Servo_Control.Axis_Error  , 
+	bAxisEnabled=>SR120_Oring_Feed_Servo_Control.Axis_Enabled , 
+	bAxisHomed=>SR120_Oring_Feed_Servo_Control.Axis_reference , 
+	bSetPositionDone=> , 
+	bHaltDone=>SR120_Oring_Feed_Servo_Control.Axis_Halted , 
+	bSTOPDone=>SR120_Oring_Feed_Servo_Control.Axis_Stopped , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=>SR120_Oring_Feed_Servo_Control.Trq_reached , 
+	bsafe_to_move=>SR120_Oring_Feed_Servo_Control.Safety_cond , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> , 
+	Actual_position=> , 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+SR120_Oring_Feed_Manual_Axis.jogPos :=OP120Enable ;	
+//Bowl  Control
+	
+	IF (OP120_Gvl.OP120_ManualSelected AND NOT OP120_Gvl.OP120_ErrorActive AND Op120_Gvl.OP120_HMI_Bowl_On_PB) THEN
+		O120_HPR_ENABLEQ600_0:=TRUE;		
+		
+	ELSIF (OP120_Gvl.OP120_AutoSelected AND NOT OP120_Gvl.OP120_ErrorActive AND I120_BOWL_RDYI600_3 AND NOT (I120_VBF_CONV_TRK1_OVERFLWI601_1 AND I120_VBF_CONV_TRK2_OVERFLWI601_2 )) THEN
+		O120_BOWL_ENABLEQ600_1:=TRUE;
+		ELSE
+			O120_BOWL_ENABLEQ600_1:=FALSE;
+		END_IF
+		IF (OP120_Gvl.OP120_AutoSelected) THEN
+			 Op120_Gvl.OP120_HMI_Bowl_On_PB:=FALSE;
+		END_IF
+		
+	//Hopper Control
+	IF (OP120_Gvl.OP120_ManualSelected AND NOT OP120_Gvl.OP120_ErrorActive AND Op120_Gvl.OP120_HMI_Hopper_On_PB) THEN
+				O120_HPR_ENABLEQ600_0 :=TRUE;
+	ELSIF (OP120_Gvl.OP120_AutoSelected AND NOT OP120_Gvl.OP120_ErrorActive  AND I120_BOWL_LOW_LVLI600_4 ) THEN
+				O120_HPR_ENABLEQ600_0 :=TRUE;
+				ELSE
+					O120_HPR_ENABLEQ600_0 :=FALSE;
+				END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="OP120_Manual">
+      <LineId Id="3" Count="74" />
+      <LineId Id="359" Count="73" />
+      <LineId Id="78" Count="75" />
+      <LineId Id="266" Count="0" />
+      <LineId Id="268" Count="71" />
+      <LineId Id="267" Count="0" />
+      <LineId Id="154" Count="38" />
+      <LineId Id="443" Count="1" />
+      <LineId Id="193" Count="15" />
+      <LineId Id="349" Count="0" />
+      <LineId Id="209" Count="2" />
+      <LineId Id="445" Count="0" />
+      <LineId Id="212" Count="23" />
+      <LineId Id="447" Count="0" />
+      <LineId Id="446" Count="0" />
+      <LineId Id="237" Count="19" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

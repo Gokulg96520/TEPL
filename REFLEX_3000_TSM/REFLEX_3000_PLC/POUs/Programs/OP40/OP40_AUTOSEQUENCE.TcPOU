@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP40_AUTOSEQUENCE" Id="{955fbac2-2bd0-4862-922f-7402196951a3}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP40_AUTOSEQUENCE
+VAR
+
+//INT
+
+	OP40_FIXTURE_2					: INT;
+	OP40_FIXTURE_1					: INT;	
+	
+// TIMER
+	OP40_AFT_WRK_POS : TON;
+	cycle_time: TIME;
+	T1: TIME;
+	T2: TIME;
+	Timer : TON;
+	check: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF (NOT OP40_AutoSelected) OR (OP40_ErrorActive OR OP40_HomeRunning ) THEN
+	OP40_AutoRunning:= FALSE;
+	OP40_STN_ENABLE:=FALSE;
+	OP40_AutoSeq:= 10;
+END_IF	
+
+
+CASE OP40_AutoSeq OF
+		
+		10: IF (OP40_AutoSelected) THEN		// Check Automode Selected
+				OP40_AutoSeq:=20;
+	        END_IF
+		
+	    20:IF ( NOT OP40_ErrorActive) THEN		//Check No error
+		       OP40_AutoSeq:=30;
+      	   END_IF
+		   
+      	30:IF (NOT OP40_HomeRunning) THEN		//Check No Homerunning
+      		   OP40_AutoSeq :=40;
+      	   END_IF
+		   
+        40:IF (OP40_Main.OP40_Modeselection_FB.TempHomeOK)THEN	//Check Machine in Home
+      		   OP40_AutoSeq:= 50;
+      	   END_IF
+		   
+      	50:IF ( NOT OP40_OperationCompleted) THEN		// Check Operation Completed Reset
+      		   OP40_AutoSeq:=60;
+      	   END_IF
+		   
+      	70:  // SERVO POSITION SAFE CHECK
+	       IF (OP40_GVL.OP40_SERVO_ON_SFE_WRK OR OP40_GVL.OP40_SERVO_ON_HOME) AND NOT SR40_Vert_servo_ctrl.ABSmove_Start THEN 
+	        SR40_Vert_servo_ctrl.Position:=OP40_GVL.OP40_VERT_SERVO_WRK_POS_1;   
+	        OP40_AutoSeq:=75;
+	       END_IF
+		   
+	   60:IF  (AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP40_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		    OP40_HomeConditionOK:=TRUE;
+	 			IF( OP40_Main.OP40_Modeselection_FB.HomeConditionOK AND OP40_AutoSelected) THEN
+					OP40_AutoRunning:=TRUE;
+					OP40_StepRunning:= FALSE;		
+				ELSIF (OP40_Main.OP40_Modeselection_FB.HomeConditionOK AND OP40_StepSelected) THEN
+					OP40_AutoRunning:=FALSE;
+					OP40_StepRunning:= TRUE;
+				END_IF;
+		  END_IF
+		  
+		  IF ((OP40_AutoRunning OR OP40_StepRunning) AND OP40_StartEnable) THEN
+			OP40_AutoSeq:= 70;
+		  END_IF	
+		   
+		75: // WAITING FOR MOVER AND MOVING SERVO TO TARGET POSITION
+			IF OP40_GVL.OP40_STN_ENABLE AND SR40_Vert_servo_ctrl.Position=OP40_VERT_SERVO_WRK_POS_1 THEN
+			 T1:=Timer.ET;
+			 SR40_Vert_servo_ctrl.Velocity:=2000;
+			 SR40_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+			 OP40_AutoSeq:=80;
+			END_IF
+			
+		80:  IF SR40_Vert_servo_ctrl.pos_done AND OP40_SERVO_ON_WRK_1 THEN
+			   SR40_Vert_servo_ctrl.ABSmove_Start:=FALSE;
+			   SR40_Vert_servo_ctrl.Velocity:=200;
+			   OP40_AutoSeq:=90;
+			 END_IF
+			  
+		90: IF OP40_GVL.OP40_SERVO_ON_WRK_1 AND NOT SR40_Vert_servo_ctrl.ABSmove_Start THEN
+			   SR40_Vert_servo_ctrl.Position:=OP40_GVL.OP40_VERT_SERVO_WRK_POS_2;                         
+               SR40_Vert_servo_ctrl.ABSmove_Start:=TRUE; 
+               OP40_AutoSeq:=100;
+			END_IF
+	
+			
+		100: // START THE SPINNER OK COMPONENT FIXTURE
+			IF OP40_AFT_WRK_POS.Q AND OP40_GVL.OP40_SERVO_ON_WRK_2  THEN	
+			 SR40_Vert_servo_ctrl.ABSmove_Start:=FALSE;		 
+			 IF OP40_FIXTURE_1=9999 THEN
+			  IF In_Range(OP40_LH_LVDT_VALUE,OP40_SET_LVDT_VALUE,OP40_LVDT_TOLERANCE) THEN
+				  OP40_LH_LVDT_OK := 1;
+				  OP40_LH_LVDT_NOK := 0;				  				  
+			  ELSE
+				  OP40_LH_LVDT_NOK := 1;
+				  OP40_LH_LVDT_OK := 0;
+			  END_IF  
+			 END_IF
+			 IF OP40_FIXTURE_2=9999 THEN
+			  IF In_Range(OP40_RH_LVDT_VALUE,OP40_SET_LVDT_VALUE,OP40_LVDT_TOLERANCE) THEN
+				  OP40_RH_LVDT_OK := 1;
+				  OP40_RH_LVDT_NOK := 0;			  				  
+			  ELSE
+				  OP40_RH_LVDT_NOK := 1;
+				  OP40_RH_LVDT_OK := 0;
+			  END_IF			  
+			 END_IF
+			IF NOT SR40_Vert_servo_ctrl.ABSmove_Start THEN
+				SR40_Vert_servo_ctrl.Position:=OP40_VERT_SERVO_SFE_WRK_POS;
+				SR40_Vert_servo_ctrl.Velocity:=2000;
+			END_IF	
+			 OP40_AutoSeq:=110;
+		 	END_IF
+			
+		110: // SERVO MOVE TO SAFE WORK POSITION	 
+			 IF NOT SR40_Vert_servo_ctrl.ABSmove_Start AND SR40_Vert_servo.fTargetPosition=OP40_VERT_SERVO_SFE_WRK_POS THEN
+				SR40_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+			END_IF
+			IF SR40_Vert_servo_ctrl.ABSmove_Start THEN
+				OP40_AutoSeq:=120;
+			END_IF
+				
+		120: // SERVO DONE
+			IF  SR40_Vert_servo_ctrl.pos_done AND OP40_SERVO_ON_SFE_WRK THEN
+			 T2:=Timer.ET;
+			 SR40_Vert_servo_ctrl.ABSmove_Start:=FALSE;
+			 OP40_AutoSeq:=70;
+			 OP40_STN_ENABLE:=FALSE;				
+			END_IF			
+END_CASE 
+
+cycle_time:=T2-T1;
+OP40_AFT_WRK_POS(IN:=(OP40_SERVO_ON_WRK_2 AND (OP40_AutoSeq=100)), PT:=INT_TO_TIME(OP40_DLY_AFT_SFE_WRK) , Q=> , ET=> );
+Timer(IN:=OP40_STN_ENABLE,PT:=T#10S);]]></ST>
+    </Implementation>
+    <LineIds Name="OP40_AUTOSEQUENCE">
+      <LineId Id="3" Count="118" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

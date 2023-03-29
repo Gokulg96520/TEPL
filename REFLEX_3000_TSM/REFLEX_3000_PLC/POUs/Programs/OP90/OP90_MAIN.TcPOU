@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP90_MAIN" Id="{632e0e57-1459-47f2-a5fe-1951d4342f01}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP90_MAIN
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP90_MANUAL();
+OP90_SERVO();
+
+IF OP90_SRV_RH_VERT.bAxisError OR OP90_SRV_LH_VERT.bAxisError OR OP90_GUIDE_SERVO.bAxisError OR OP90_SRV_HORZ.bAxisError THEN
+	OP90_ERROR_ACTIVE			:= TRUE;
+ELSE
+	OP90_ERROR_ACTIVE			:= FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="OP90_MAIN">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="8" Count="1" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="10" Count="2" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

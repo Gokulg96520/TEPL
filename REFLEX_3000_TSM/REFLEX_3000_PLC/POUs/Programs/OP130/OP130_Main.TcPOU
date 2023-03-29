@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP130_Main" Id="{0f6aa170-cc51-46ee-9e76-55a81a72ac31}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP130_Main
+VAR
+	OP130_Modeselection_FB: Mode_Selection_Block1;
+	
+	
+	
+	
+	Times: LREAL;
+	Start: BOOL;
+	// Servo Offline Testings
+	LH_Cylinder_Offline_FB: cylinder_2_pos;
+	RH_Cylinder_Offline_FB: cylinder_2_pos;
+	RH_Servo_Offline_Block: servo;
+	LH_Servo_Offline_Block: servo;
+	RH_Servo_EnableOffline_Block: servo;
+	
+	Clmap_Servo_Offline_Block: servo;
+	OP130_Cycle_Time_FB: FB_cycleTime;
+	Error_On: BOOL;
+	Error_On_LH: BOOL;
+	Error_On_RH: BOOL;
+	OP130_Clock: FB_SimClock;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Function Calling
+
+OP130_Manual();
+OP130_AutoSequence();
+OP130_LH_Auto();
+OP130_RH_Auto();
+OP130_Error();
+OP130_Initialization_Seq();
+
+
+
+//MOdeselection From HMI
+
+IF (OP130_HMI_AutoMode AND NOT OP130_HMI_ManualMOde AND NOT OP130_HMI_StepMode) THEN
+	OP130_Modeselection_FB.ModeWord:=1;
+	ELSIF (NOT OP130_HMI_AutoMode AND OP130_HMI_ManualMOde AND NOT OP130_HMI_StepMode) THEN
+		OP130_Modeselection_FB.ModeWord:=2;
+	ELSIF  (NOT OP130_HMI_AutoMode AND NOT OP130_HMI_ManualMOde AND  OP130_HMI_StepMode) THEN
+		OP130_Modeselection_FB.ModeWord:=3;
+    ELSE   
+		OP130_Modeselection_FB.ModeWord:=0;
+END_IF
+	
+
+
+
+
+
+OP130_Modeselection_FB(
+	ModeWord:= , 
+	HomeConditionOK:=OP130_Home_ConditionOK , 
+	OperationEnable:=OP130_OperationEnable , 
+	StartPB:=OP130_HMI_Cycle_Start , 
+	SafetyAndNOError:=OP130_SafetyNoerror , 
+	ModeAck:=TRUE , 
+	HomingINProgress:= , 
+	TempHomeOK:=OP130_Temp_Home_OK , 
+	ResetPB:= , 
+	AutoSelected=>OP130_AutoSelected , 
+	ManualSelected=>OP130_ManualSelected , 
+	StepSelected=>OP130_StepSelected , 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP130_AutoRunning , 
+	StepRunning:=OP130_StepRunning , 
+	StartEnable:=OP130_StartEnable , 
+	MachineStop:=OP130_Machine_Stop );
+	
+	
+	IF OP130_AutoSelected OR OP130_StepSelected THEN
+		OP130_Auto:=TRUE;
+		ELSE
+			OP130_Auto:=FALSE;
+		END_IF
+	
+	
+	
+	//OP130_Cycle Time
+	OP130_Cycle_Time_FB(i_b_startTime:=OP130_Cycle_Time_Start
+ , i_b_stopTime:=OP130_Cycle_Time_Stop , o_t_StationTime=> OP130_CycleTime);
+	
+	//pulse 
+	OP130_Clock(
+	Q10Hz=> , 
+	Q5Hz=> , 
+	Q2_5Hz=> , 
+	Q2Hz=> , 
+	Q1_25Hz=> , 
+	Q1Hz=>b1sec
+, 
+	Q0_625Hz=> , 
+	Q0_5Hz=> );
+ 
+ 
+ 
+ //Offline TEsting Block
+ LH_Cylinder_Offline_FB(
+	en_in:=TRUE , 
+	error_bit:=FALSE , 
+	cylinder_work_coil:= OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd2 , 
+	cylinder_home_coil:= OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd1 , 
+	delay_1:= LTIME#10S, 
+	delay_2:=LTIME#10S , 
+	en_out=> , 
+	cylinder_work_fb=>OP130_GVL.CR130_LH_Rot_Cyl.Sensor2 , 
+	cylinder_home_fb=>OP130_GVL.CR130_LH_Rot_Cyl.Sensor1 , 
+	delay_display_1=> , 
+	delay_display_2=> );
+	
+	
+	 RH_Cylinder_Offline_FB(
+	en_in:=TRUE , 
+	error_bit:=FALSE , 
+	cylinder_work_coil:=OP130_GVL.CR130_RH_Rot_Cyl.AutoCmd2 , 
+	cylinder_home_coil:=OP130_GVL.CR130_RH_Rot_Cyl.AutoCmd1 , 
+	delay_1:=LTIME#10S , 
+	delay_2:=LTIME#10S , 
+	en_out=> , 
+	cylinder_work_fb=>OP130_GVL.CR130_RH_Rot_Cyl.Sensor2 , 
+	cylinder_home_fb=>OP130_GVL.CR130_RH_Rot_Cyl.Sensor1 , 
+	delay_display_1=> , 
+	delay_display_2=> );
+	
+	
+	RH_Servo_Offline_Block(
+	offline_bit:= TRUE, 
+	error_bit:=Error_On_RH
+	
+ , 
+	servo_absolute:=OP130_GVL.SR130_RH_Servo_Control.ABSmove_Start , 
+	target_position:= , 
+	servo_pos_delay_time:=LTIME#10S , 
+	servo_pos_delay_time_display=> , 
+	actual_position=> , 
+	absolute_done=>OP130_GVL.SR130_RH_Servo_Control.Axis_In_Pos );
+	
+	LH_Servo_Offline_Block(
+	offline_bit:= TRUE, 
+	error_bit:=Error_On_LH , 
+	servo_absolute:=OP130_GVL.SR130_LH_Servo_Control.ABSmove_Start , 
+	target_position:= , 
+	servo_pos_delay_time:=LTIME#10S , 
+	servo_pos_delay_time_display=> , 
+	actual_position=> , 
+	absolute_done=>OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos );
+	
+	Clmap_Servo_Offline_Block(
+	offline_bit:= TRUE, 
+	error_bit:=FALSE , 
+	servo_absolute:= , 
+	target_position:= , 
+	servo_pos_delay_time:=LTIME#10S, 
+	servo_pos_delay_time_display=> , 
+	actual_position=> , 
+	absolute_done=> );
+	
+	
+	//Homing Cmd
+	
+	//Offline TEsting Block
+// LH_Cylinder_Offline_FB(
+//	en_in:=NOT OP130_Home_ConditionOK , 
+//	error_bit:=FALSE , 
+//	cylinder_work_coil:= , 
+//	cylinder_home_coil:=OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd1 , 
+//	delay_1:= , 
+//	delay_2:=LTIME#10S , 
+//	en_out=> , 
+//	cylinder_work_fb=> , 
+//	cylinder_home_fb=>OP130_GVL.CR130_LH_Rot_Cyl.Sensor1 , 
+//	delay_display_1=> , 
+//	delay_display_2=> );
+//	
+//	
+//	 RH_Cylinder_Offline_FB(
+//	en_in:= NOT OP130_Home_ConditionOK , 
+//	error_bit:=FALSE , 
+//	cylinder_work_coil:= , 
+//	cylinder_home_coil:=OP130_GVL.CR130_RH_Rot_Cyl.HomingCmd1 , 
+//	delay_1:= , 
+//	delay_2:=LTIME#10S , 
+//	en_out=> , 
+//	cylinder_work_fb=> , 
+//	cylinder_home_fb=>OP130_GVL.CR130_RH_Rot_Cyl.Sensor1 , 
+//	delay_display_1=> , 
+//	delay_display_2=> );
+//	
+//	
+//	
+//	RH_Servo_Offline_Block(
+//	offline_bit:= NOT OP130_Home_ConditionOK, 
+//	error_bit:=FALSE , 
+//	servo_absolute:=OP130_GVL.SR130_RH_Servo_Control.Axis_Home_Cmd , 
+//	target_position:= , 
+//	servo_pos_delay_time:=LTIME#10S , 
+//	servo_pos_delay_time_display=> , 
+//	actual_position=> , 
+//	absolute_done=>OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home );
+//	
+//	LH_Servo_Offline_Block(
+//	offline_bit:= NOT OP130_Home_ConditionOK, 
+//	error_bit:=FALSE , 
+//	servo_absolute:=OP130_GVL.SR130_LH_Servo_Control.Axis_Home_Cmd , 
+//	target_position:= , 
+//	servo_pos_delay_time:=LTIME#10S , 
+//	servo_pos_delay_time_display=> , 
+//	actual_position=> , 
+//	absolute_done=>OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home );
+//	
+//	Clmap_Servo_Offline_Block(
+//	offline_bit:= NOT OP130_Home_ConditionOK, 
+//	error_bit:=FALSE , 
+//	servo_absolute:=OP130_GVL.SR130_Stepper_Control.Axis_Home_Cmd , 
+//	target_position:= , 
+//	servo_pos_delay_time:=LTIME#10S , 
+//	servo_pos_delay_time_display=> , 
+//	actual_position=> , 
+//	absolute_done=> OP130_GVL.SR130_Stepper_Control.Axis_In_Home);
+	]]></ST>
+    </Implementation>
+    <LineIds Name="OP130_Main">
+      <LineId Id="3" Count="197" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="stManualModeAxis" Id="{681d9917-e2c2-4624-86f6-7fe59fa07a94}">
+    <Declaration><![CDATA[TYPE stManualModeAxis :
+STRUCT
+
+stationModeAutoManual	: BOOL;
+homing					: BOOL;
+reset					: BOOL;
+jogNeg					: BOOL;
+jogPos					: BOOL;
+moveAbsolute			: BOOL;
+moveRelative			: BOOL;
+moveVelocity			: BOOL;
+moveTorque				: BOOL;
+openBrake				: BOOL;
+axisState				: STRING;
+actualPosition			: LREAL;
+actualVelocity			: LREAL;
+targetPositon			: REAL;
+targetVelocity			: REAL;
+
+
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

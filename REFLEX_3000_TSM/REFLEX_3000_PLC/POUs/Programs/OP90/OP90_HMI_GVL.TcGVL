@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP90_HMI_GVL" Id="{aabe3639-9f81-4c73-ade2-56dd7a19ea25}">
+    <Declaration><![CDATA[//{attribute 'qualified_only'}
+VAR_GLOBAL
+//LREAL	
+	OP90_SERVO_ACTUAL_POS					: LREAL;
+//REAL
+	OP90_TRGT_POS							: REAL;
+	OP90_TRGT_VEL							: REAL;
+// INT
+	OP90_CYL_NUM							: INT;
+	OP90_SERVO_NUM							: INT;
+// BOOL
+	OP90_JOG_POS							: BOOL;
+	OP90_JOG_NEG							: BOOL;	
+	OP90_HOME								: BOOL;
+	OP90_WORK								: BOOL;
+	OP90_SET_HME							: BOOL;
+	OP90_MOVE_TARGT							: BOOL;
+	OP90_SERVO_FAULT						: BOOL;
+	OP90_HOME_REFERENCE						: BOOL;
+	OP90_M_SERVO_ENABLE						: BOOL;	
+	
+// WILL BE DELETED
+	MACHINE_RST: BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

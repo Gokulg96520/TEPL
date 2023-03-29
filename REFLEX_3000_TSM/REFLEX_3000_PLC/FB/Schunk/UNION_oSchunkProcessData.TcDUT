@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="UNION_oSchunkProcessData" Id="{ff0b4f41-0154-4b2f-ba32-6cb429ffaa5f}">
+    <Declaration><![CDATA[TYPE UNION_oSchunkProcessData :
+UNION
+	Schunk_out 		: ARRAY [0..11] OF WORD;
+	oSchunk_ProcessData	: oSchunkProcessData;
+END_UNION
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

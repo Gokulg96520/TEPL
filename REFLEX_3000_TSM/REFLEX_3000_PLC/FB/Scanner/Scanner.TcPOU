@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Scanner" Id="{255a0fc7-4285-4fcb-91b2-a3278a7e1d8a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Scanner
+VAR_INPUT
+	input: INPUT;
+	Trigger_enable: BOOL;
+	Trig: BOOL;
+	reset:BOOL;
+	Scan_Start:BOOL;
+END_VAR
+VAR_OUTPUT
+	output: OUTPUT;
+END_VAR
+VAR
+	trigger: R_TRIG;
+	rst: R_TRIG;
+	okay: R_TRIG;
+	acq: R_TRIG;
+	i: INT;
+	in: ARRAY[0..MAX_STRING_LENGTH] OF BYTE;
+	ok :BOOL;
+	nok:BOOL;
+	temp:INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[output.Error:=input.Fault;
+
+trigger(CLK:=Trig , Q=> );
+rst(CLK:=reset , Q=> );
+okay(CLK:=scan_start , Q=> );
+acq(CLK:=input.Acquiring);
+
+IF NOT input.Fault THEN
+	IF Trigger_enable=TRUE THEN
+		output.Trigger_Enable:=1;
+	ELSE
+		output.Trigger_Enable:=0;
+	END_IF
+	IF trigger.Q=TRUE AND Trigger_enable=TRUE THEN
+		output.Trigger:=1;
+	END_IF
+	IF okay.Q THEN
+		output.Trigger:=0;
+	END_IF
+	output.Result_ID:=input.Result_ID;
+END_IF
+
+IF input.Result_available AND ok AND NOT input.fault  AND NOT input.Acquiring AND (temp<>input.Result_ID) THEN
+	FOR i:=0 TO 245 DO
+	in[i]:=input.Result_data[i];
+    END_FOR
+	output.Result_data:=BYTEARR_TO_MAXSTRING(in:=in);
+	output.no_read:=FALSE;
+	output.Done:=TRUE;
+	temp:=input.Result_ID;
+	//output.Result_ID:=temp;
+	output.Result_acknowledge:=TRUE;
+  	output.Result_len:=input.Result_Length;
+
+ELSE
+	output.Result_acknowledge:=FALSE;   
+END_IF
+
+
+IF rst.Q=TRUE OR input.Acquiring THEN
+	output.no_read:=FALSE;
+    output.Done:=FALSE;
+END_IF
+
+
+IF input.Result_code=0 OR (NOT Scan_Start) THEN
+	output.Result_data:='';
+	output.no_read:=TRUE;
+	nok:=1;ok:=0;
+	output.Done:=TRUE;
+
+ELSIF input.Result_code=1 AND Scan_Start THEN
+	ok:=1;nok:=0;
+	temp:=input.Result_ID;
+END_IF
+
+
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="Scanner">
+      <LineId Id="3" Count="59" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

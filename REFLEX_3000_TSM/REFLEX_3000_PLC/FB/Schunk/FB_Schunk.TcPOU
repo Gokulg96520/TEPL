@@ -1,0 +1,427 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_Schunk" Id="{9092e881-5bc7-4110-a8d7-a33956becfd8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Schunk
+VAR_INPUT
+iHW: 											ARRAY [0..8] OF WORD;
+i_b_moveToPosition:								BOOL;
+i_b_moveRelativ:								BOOL;	
+i_b_reference:									BOOL;
+i_b_ackError:									BOOL;
+i_u_targetPos:									REAL;
+i_u_targetVelocity:								REAL;
+i_u_targetCurrent:								REAL;
+i_u_targetAcceleration:							REAL;
+i_u_targetJerk:									REAL;
+i_b_ManualMode: 								BOOL;
+
+END_VAR
+VAR_IN_OUT
+    stManualModeAxis  	: stManualModeAxis;
+END_VAR
+VAR_OUTPUT
+Status: 										STRING;	
+o_b_referenced:									BOOL;
+o_b_reachedPos:									BOOL;	
+o_u_actualPosition:								REAL;
+o_b_error:										BOOL;
+o_b_enable:										BOOL;
+oHW:											ARRAY [0..11] OF WORD;
+
+END_VAR
+VAR
+	
+iProcessData:									UNION_iSchunkProcessData;
+iStep:											ENUM_Schunk;
+bError:											BOOL;
+
+bHMFPErrorReset:								BOOL;
+bHMFPManualErrorReset:							BOOL;
+bHMFPHoming:									BOOL;
+bHMFPMovePosition:								BOOL;
+bHMFPMoveRelativ:								BOOL;
+bHMFPAxisHomeDone:								BOOL;
+bHMFPAxisPositionDone:							BOOL;
+tonStateTimeOut: 								TON;
+
+
+stat_commandReleaseA:							BOOL;
+stat_commandReleaseB:							BOOL;
+stat_oProcessData:								oSchunkProcessData;
+stat_iProcessData:								iSchunkProcessData;
+
+stat_targetVelocity:							REAL;
+stat_targetPos:									REAL;
+
+oProcessData:									UNION_oSchunkProcessData;
+stat_newJob:									BOOL;
+stat_HMnewJob:									BOOL;
+
+END_VAR
+
+VAR_TEMP
+bFPnewJob:										BOOL;
+bFPErrorReset: 									BOOL;
+bFPManualErrorReset:							BOOL;
+bFPHoming:										BOOL;
+bFPMovePosition:								BOOL;
+bFPMoveRelativ:									BOOL;
+bTIN:											BOOL;
+bFPAxisHomeDone:								BOOL;
+bFPAxisPositionDone:							BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+iProcessData.Schunk_in:= iHW;
+
+stat_iProcessData.actualPos:= FC_Real_Convert(in:= iProcessData.iSchunk_ProcessData.actualPos);
+stat_iProcessData.actualVelo:= FC_Real_Convert(in:= iProcessData.iSchunk_ProcessData.actualVelo);
+stat_iProcessData.actualCurrent:= FC_Real_Convert(in:= iProcessData.iSchunk_ProcessData.actualCurrent);
+
+
+// error bit
+bError:= iProcessData.iSchunk_ProcessData.error;
+
+// FP error reset
+bFPErrorReset:= i_b_ackError AND NOT bHMFPErrorReset;
+bHMFPErrorReset:= i_b_ackError;
+
+bFPManualErrorReset:=stManualModeAxis.reset AND NOT bHMFPManualErrorReset;
+bHMFPManualErrorReset:=stManualModeAxis.reset;
+
+// FP homing
+bFPHoming:= i_b_reference AND NOT bHMFPHoming;
+bHMFPHoming:=i_b_reference;
+
+
+// FP move position
+bFPMovePosition:= i_b_moveToPosition AND NOT bHMFPMovePosition;
+bHMFPMovePosition:= i_b_moveToPosition;
+
+// FP move relativ
+bFPMoveRelativ:= i_b_moveRelativ AND NOT bHMFPMoveRelativ;
+bHMFPMoveRelativ:=i_b_moveRelativ;
+
+// FP axis home done
+bFPAxisHomeDone:=iProcessData.iSchunk_ProcessData.modulIsReferenced AND NOT bHMFPAxisHomeDone;
+bHMFPAxisHomeDone:=iProcessData.iSchunk_ProcessData.modulIsReferenced;
+
+// FP axis position done
+bFPAxisPositionDone:=iProcessData.iSchunk_ProcessData.targetPosReached AND NOT bHMFPAxisPositionDone;
+bHMFPAxisPositionDone:= iProcessData.iSchunk_ProcessData.targetPosReached;
+
+
+// actual values 
+o_u_actualPosition:= stat_iProcessData.actualPos;
+stManualModeAxis.actualPosition := stat_iProcessData.actualPos;
+stManualModeAxis.actualVelocity := stat_iProcessData.actualVelo;
+
+
+
+// manual Mode
+IF i_b_ManualMode THEN	
+	stManualModeAxis.stationModeAutoManual:= FALSE;		
+ELSE
+	stManualModeAxis.jogPos := FALSE;
+	stManualModeAxis.jogNeg := FALSE;
+	stManualModeAxis.reset := FALSE;
+	StManualModeAxis.openBrake:= FALSE;
+	stManualModeAxis.homing:= FALSE;
+	stManualModeAxis.moveAbsolute:= FALSE;
+	stManualModeAxis.moveRelative:= FALSE;
+	stManualModeAxis.moveVelocity:= FALSE;	
+	stManualModeAxis.stationModeAutoManual:= TRUE;
+END_IF
+
+
+// velocity 
+IF i_b_ManualMode THEN
+	stat_targetVelocity:= stManualModeAxis.targetVelocity;
+ELSE
+	stat_targetVelocity:= i_u_targetVelocity;
+END_IF
+
+// Position
+IF i_b_ManualMode THEN
+	stat_targetPos:= stManualModeAxis.targetPositon;
+ELSE
+	stat_targetPos:= i_u_targetPos;
+END_IF
+
+
+stat_newJob:= FALSE;
+
+stat_oProcessData.commandReleaseA:= FALSE;
+stat_oProcessData.commandReleaseB:= FALSE;
+stat_oProcessData.jerkActivate:= FALSE;
+stat_oProcessData.currentActivate:= FALSE;
+stat_oProcessData.accelerationActivate:=FALSE;
+stat_oProcessData.velocityMove:= FALSE;
+stat_oProcessData.moveToPosition:= FALSE;
+stat_oProcessData.moveToRelativePosition:= FALSE;
+stat_oProcessData.modulReference:= FALSE;
+stat_oProcessData.restartModul:= FALSE;
+stat_oProcessData.ackError:= FALSE;
+stat_oProcessData.stop:= TRUE;
+stat_oProcessData.fastStop:= TRUE;
+
+
+
+CASE iStep OF
+	
+
+	ENUM_Schunk.Init:	//init all
+	
+						stat_newJob:= FALSE;
+
+						stat_oProcessData.commandReleaseA:= FALSE;
+						stat_oProcessData.commandReleaseB:= FALSE;
+						stat_oProcessData.jerkActivate:= FALSE;
+						stat_oProcessData.currentActivate:= FALSE;
+						stat_oProcessData.accelerationActivate:=FALSE;
+						stat_oProcessData.velocityMove:= FALSE;
+						stat_oProcessData.moveToPosition:= FALSE;
+						stat_oProcessData.moveToRelativePosition:= FALSE;
+						stat_oProcessData.modulReference:= FALSE;
+						stat_oProcessData.restartModul:= FALSE;
+						stat_oProcessData.ackError:= FALSE;
+						stat_oProcessData.stop:= TRUE;
+						stat_oProcessData.fastStop:= TRUE;
+
+						iStep:= ENUM_Schunk.Undefined;
+		
+	ENUM_Schunk.Undefined:
+	
+						IF bError THEN
+							iStep:= ENUM_Schunk.Error;
+						ELSE
+							iStep:= ENUM_Schunk.Ready;
+						END_IF
+				
+	ENUM_Schunk.Error:
+	
+						stat_newJob:= FALSE;
+						stat_oProcessData.jerkActivate:= FALSE;
+						stat_oProcessData.currentActivate:= FALSE;
+						stat_oProcessData.accelerationActivate:=FALSE;
+						stat_oProcessData.velocityMove:= FALSE;
+						stat_oProcessData.moveToPosition:= FALSE;
+						stat_oProcessData.moveToRelativePosition:= FALSE;
+						o_b_referenced:= FALSE;
+						o_b_reachedPos:= FALSE;
+						o_b_error:= TRUE;
+						
+						IF bFPErrorReset OR  bFPManualErrorReset THEN
+							iStep:= ENUM_Schunk.Reset;
+						END_IF
+						
+	ENUM_Schunk.Reset:
+	
+						stat_oProcessData.ackError:= TRUE;
+						stat_newJob:= TRUE;
+						bTIN:=TRUE;
+						o_b_error:= FALSE;
+						
+						IF NOT bError THEN
+							bTIN:=FALSE;
+							stat_oProcessData.ackError:= FALSE;
+							stat_newJob:= FALSE;
+							iStep:= ENUM_Schunk.Ready;
+						ELSIF tonStateTimeOut.Q THEN
+							bTIN:=FALSE;
+							stat_oProcessData.ackError:= FALSE;
+							stat_newJob:= FALSE;	
+							iStep:= ENUM_Schunk.Error;
+						END_IF
+						tonStateTimeOut(IN:=bTIN,PT:=T#30S);
+						
+	ENUM_Schunk.Ready:
+						//o_b_referenced:= FALSE;
+						//o_b_reachedPos:= FALSE;
+						
+						IF bError THEN
+							iStep:= ENUM_Schunk.Error;
+						ELSIF bFPHoming OR stManualModeAxis.homing THEN
+							iStep:= ENUM_Schunk.Homing;
+						ELSIF bFPMovePosition OR stManualModeAxis.moveAbsolute THEN
+							iStep:= ENUM_Schunk.MoveAbsolute;
+						ELSIF bFPMoveRelativ OR stManualModeAxis.moveRelative THEN
+							iStep:= ENUM_Schunk.MoveRelative;
+						END_IF
+
+	ENUM_Schunk.Homing:
+	
+					
+						
+						stat_oProcessData.modulReference:= TRUE;
+						stat_newJob:= TRUE;
+						bTIN:=TRUE;
+						
+						IF bError THEN
+							stat_oProcessData.modulReference:= FALSE;
+							bTIN:= FALSE;
+							stat_newJob:= FALSE;
+							iStep:= ENUM_Schunk.Error;
+						ELSIF bFPAxisHomeDone THEN
+							bTIN:= FALSE;
+							stat_oProcessData.modulReference:= FALSE;
+							stat_newJob:= FALSE;
+							o_b_referenced:= TRUE;
+							iStep:= ENUM_Schunk.Ready;
+						ELSIF tonStateTimeOut.Q THEN
+							bTIN:= FALSE;
+							stat_oProcessData.modulReference:= FALSE;
+							stat_newJob:= FALSE;
+							iStep:= ENUM_Schunk.Error;
+						END_IF
+						tonStateTimeOut(IN:=bTIN,PT:=T#30S);
+						
+	ENUM_Schunk.MoveAbsolute:
+	
+					
+	
+						stat_oProcessData.currentActivate:= TRUE;
+						stat_oProcessData.targetCurrent:= i_u_targetCurrent;
+						stat_oProcessData.jerkActivate:= TRUE;
+						stat_oProcessData.targetJerk:= i_u_targetJerk;
+						stat_oProcessData.accelerationActivate:=TRUE;
+						stat_oProcessData.targetAcc:= i_u_targetAcceleration;
+						stat_oProcessData.velocityMove:= TRUE;
+						stat_oProcessData.targetVelo:= stat_targetVelocity;
+						stat_oProcessData.moveToPosition:= TRUE;
+						stat_oProcessData.targetPos:= stat_targetPos;
+						stat_newJob:= TRUE;	
+
+
+						
+						bTIN:=TRUE;
+					
+
+	
+						IF bError THEN
+							stat_oProcessData.currentActivate:=FALSE;
+							stat_oProcessData.jerkActivate:=FALSE;
+							stat_oProcessData.accelerationActivate:=FALSE;
+							stat_oProcessData.velocityMove:=FALSE;
+							stat_oProcessData.moveToPosition:=FALSE;
+							bTIN:= FALSE;
+							stat_newJob:= FALSE;
+							iStep:= ENUM_Schunk.Error;
+						ELSIF bFPAxisPositionDone THEN
+							bTIN:= FALSE;
+							stat_oProcessData.currentActivate:=FALSE;
+							stat_oProcessData.jerkActivate:=FALSE;
+							stat_oProcessData.accelerationActivate:=FALSE;
+							stat_oProcessData.velocityMove:=FALSE;
+							stat_oProcessData.moveToPosition:=FALSE;
+							stat_newJob:= FALSE;
+							o_b_reachedPos:= TRUE;
+							iStep:= ENUM_Schunk.Ready;
+						ELSIF tonStateTimeOut.Q THEN
+							bTIN:= FALSE;
+							stat_oProcessData.currentActivate:=FALSE;
+							stat_oProcessData.jerkActivate:=FALSE;
+							stat_oProcessData.accelerationActivate:=FALSE;
+							stat_oProcessData.velocityMove:=FALSE;
+							stat_oProcessData.moveToPosition:=FALSE;
+							stat_newJob:= FALSE;
+							iStep:= ENUM_Schunk.Error;
+						END_IF
+						tonStateTimeOut(IN:=bTIN,PT:=T#30S);
+						
+	ENUM_Schunk.MoveRelative:
+						
+						
+	
+	
+						stat_oProcessData.currentActivate:= TRUE;
+						stat_oProcessData.targetCurrent:= i_u_targetCurrent;
+						stat_oProcessData.jerkActivate:= TRUE;
+						stat_oProcessData.targetJerk:= i_u_targetJerk;
+						stat_oProcessData.accelerationActivate:=TRUE;
+						stat_oProcessData.targetAcc:= i_u_targetAcceleration;
+						stat_oProcessData.velocityMove:= TRUE;
+						stat_oProcessData.targetVelo:= stat_targetVelocity;
+						stat_oProcessData.moveToRelativePosition:= TRUE;
+						stat_oProcessData.targetPos:= stat_targetPos;
+						stat_newJob:= TRUE;	
+						bTIN:=TRUE;
+						
+						IF bError THEN
+							stat_oProcessData.currentActivate:=FALSE;
+							stat_oProcessData.jerkActivate:=FALSE;
+							stat_oProcessData.accelerationActivate:=FALSE;
+							stat_oProcessData.velocityMove:=FALSE;
+							stat_oProcessData.moveToPosition:=FALSE;
+							bTIN:= FALSE;
+							stat_newJob:= FALSE;
+							iStep:= ENUM_Schunk.Error;
+						ELSIF bFPAxisPositionDone THEN
+							bTIN:= FALSE;
+							stat_oProcessData.currentActivate:=FALSE;
+							stat_oProcessData.jerkActivate:=FALSE;
+							stat_oProcessData.accelerationActivate:=FALSE;
+							stat_oProcessData.velocityMove:=FALSE;
+							stat_oProcessData.moveToRelativePosition:=FALSE;
+							stat_newJob:= FALSE;
+							o_b_reachedPos:=TRUE;
+							iStep:= ENUM_Schunk.Ready;
+						ELSIF tonStateTimeOut.Q THEN
+							bTIN:= FALSE;
+							stat_oProcessData.currentActivate:=FALSE;
+							stat_oProcessData.jerkActivate:=FALSE;
+							stat_oProcessData.accelerationActivate:=FALSE;
+							stat_oProcessData.velocityMove:=FALSE;
+							stat_oProcessData.moveToPosition:=FALSE;
+							stat_newJob:= FALSE;
+							iStep:= ENUM_Schunk.Error;
+						END_IF
+						tonStateTimeOut(IN:=bTIN,PT:=T#30S);
+END_CASE
+
+// job
+
+bFPnewJob:=stat_newJob AND NOT stat_HMnewJob;
+stat_HMnewJob:=stat_newJob;
+
+	IF bFPnewJob  THEN
+		stat_commandReleaseA:= NOT stat_commandReleaseA;
+		stat_oProcessData.commandReleaseA:= stat_commandReleaseA;
+		stat_commandReleaseB:= NOT stat_commandReleaseA;
+		stat_oProcessData.commandReleaseB:= stat_commandReleaseB;
+		
+		// Output
+		oProcessData.oSchunk_ProcessData:= stat_oProcessData;
+		oProcessData.oSchunk_ProcessData.targetPos:= FC_Real_Convert(in:= stat_oProcessData.targetPos );
+		oProcessData.oSchunk_ProcessData.targetVelo:= FC_Real_Convert(in:=stat_oProcessData.targetVelo );
+		oProcessData.oSchunk_ProcessData.targetCurrent:= FC_Real_Convert(in:=stat_oProcessData.targetCurrent );
+		oProcessData.oSchunk_ProcessData.targetAcc:= FC_Real_Convert(in:=stat_oProcessData.targetAcc );
+		oProcessData.oSchunk_ProcessData.targetJerk:= FC_Real_Convert(in:=stat_oProcessData.targetJerk );
+
+	END_IF
+
+	stManualModeAxis.axisState:= TO_STRING(iStep);
+	//Status :=stManualModeAxis.axisState;
+	oHW:=oProcessData.Schunk_out;
+	
+IF iHW[0].6 AND iHW[0].9 THEN
+	o_b_reachedPos := TRUE ;
+	Status :=stManualModeAxis.axisState;
+ELSIF iHW[0].8 THEN
+	Status:='Moving';
+	o_b_reachedPos := FALSE;
+END_IF
+
+IF iHW[0].6 THEN
+	o_b_enable := TRUE ;
+ELSE
+	o_b_enable := FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Schunk">
+      <LineId Id="3" Count="344" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

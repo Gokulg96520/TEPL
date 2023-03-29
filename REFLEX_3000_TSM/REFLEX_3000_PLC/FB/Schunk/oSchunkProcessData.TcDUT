@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="oSchunkProcessData" Id="{98cf777b-8eb3-4a48-905d-2da1eac634c3}">
+    <Declaration><![CDATA[TYPE oSchunkProcessData :
+STRUCT
+
+commandReleaseA:				BIT;
+commandReleaseB:				BIT;
+jerkActivate:					BIT;
+currentActivate:				BIT;
+accelerationActivate:			BIT;
+velocityMove:					BIT;
+moveToPosition:					BIT;
+moveToRelativePosition:			BIT;
+spare1:							BIT;
+modulReference:					BIT;
+spare2:							BIT;
+spare3:							BIT;
+restartModul:					BIT;
+ackError:						BIT;
+stop:							BIT;
+fastStop:						BIT;
+notUsed:						BYTE;
+digitalOutputs:					BYTE;
+targetPos:						REAL;
+targetVelo:						REAL;
+targetCurrent:					REAL;
+targetAcc:						REAL;
+targetJerk:						REAL;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

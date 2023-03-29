@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP130_Error" Id="{e187bf40-7001-497c-8767-043a3a372ebd}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP130_Error
+VAR
+	OP130_StErr_1: TON;
+	OP130_Step_Err_2: TON;
+	end: INT;
+	OP130_StepErr_3: TON;
+	OP130_StErr_4: TON;
+	OP130_Step_Err_5: TON;
+	OP130_StepErr_6: TON;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// Set ERROR ACTIVE
+IF ((OP130_GVl.OP130_ErrorWord_0 <> 0) OR (OP130_GVl.OP130_ErrorWord_1 <> 0 ) OR (OP130_GVl.OP130_ErrorWord_2 <> 0)) THEN
+	OP130_ErrorActive:= TRUE;
+	END_IF
+	//Reset ErrorActive
+IF (OP130_HMI_Reset) THEN 
+	OP130_ErrorActive:= TRUE;
+	OP130_GVl.OP130_ErrorWord_0:= 0;
+	OP130_GVl.OP130_ErrorWord_1:= 0;
+	OP130_GVl.OP130_ErrorWord_2:= 0;
+	
+	
+END_IF
+// Auto Seq Step Error
+//LH Seq
+
+//Rotary Cyl not in 0 Deg
+OP130_StErr_1(IN:=OP130_LH_AutoSeq=40 , PT:=T#1S , Q=> , ET=> );
+IF (OP130_LH_AutoSeq=40 AND NOT I130_LH_ROTRY_0_DEGI1300_0    AND OP130_StErr_1.Q) THEN
+	OP130_GVl.OP130_ErrorWord_0.0:=TRUE;
+END_IF
+// Servo Not Reached Work Pos
+OP130_Step_Err_2(IN:=OP130_LH_AutoSeq=70 , PT:=T#10S , Q=> , ET=> );
+
+IF (OP130_LH_AutoSeq=70 AND NOT OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos AND OP130_Step_Err_2.Q) THEN
+	OP130_GVl.OP130_ErrorWord_0.1:=TRUE;
+	END_IF
+// Servo not Reached Lock Pos 
+OP130_StepErr_3(IN:=OP130_LH_AutoSeq=110 , PT:=T#1S , Q=> , ET=> );
+IF (OP130_LH_AutoSeq=110 AND NOT OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos AND OP130_StepErr_3.Q) THEN
+	OP130_GVl.OP130_ErrorWord_0.2:=TRUE;	
+END_IF
+
+//RH Seq
+OP130_StErr_4(IN:=OP130_RH_AutoSeq=40 , PT:=T#1S , Q=> , ET=> );
+IF (OP130_RH_AutoSeq=40 AND NOT I130_RH_ROTRY_0_DEGI1300_2 AND OP130_StErr_4.Q) THEN
+	OP130_GVl.OP130_ErrorWord_0.3:=TRUE;
+END_IF
+// Servo Not Reached Work Pos
+OP130_Step_Err_5(IN:=OP130_RH_AutoSeq=70 , PT:=T#1S , Q=> , ET=> );
+
+IF (OP130_RH_AutoSeq=70 AND NOT OP130_GVL.SR130_RH_Servo_Control.Axis_In_Pos AND OP130_Step_Err_5.Q) THEN
+	OP130_GVl.OP130_ErrorWord_0.4:=TRUE;
+	END_IF
+// Servo not Reached Lock Pos 
+OP130_StepErr_6(IN:=OP130_RH_AutoSeq=110 , PT:=T#1S , Q=> , ET=> );
+IF (OP130_RH_AutoSeq=110 AND NOT OP130_GVL.SR130_RH_Servo_Control.Axis_In_Pos AND OP130_StepErr_6.Q) THEN
+	OP130_GVl.OP130_ErrorWord_0.5:=TRUE;	
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="OP130_Error">
+      <LineId Id="3" Count="48" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

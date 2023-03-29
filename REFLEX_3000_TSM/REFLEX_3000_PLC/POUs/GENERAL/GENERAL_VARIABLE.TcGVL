@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="GENERAL_VARIABLE" Id="{a1c64eee-afe8-465e-8be8-26df17a3f1f3}">
+    <Declaration><![CDATA[VAR_GLOBAL
+	ManualMOde          :BOOL;
+	OperationEnable     :BOOL;
+	MODE_WORD			:INT;
+	ALL_STN_IN_HOME		:BOOL;
+	SAFE_TO_WORK		:BOOL; 
+	START_PB			:BOOL;
+	MODE_CHANGE_ACK		:BOOL;
+	RESET_PB			:BOOL; //Mapped
+	AUTO_SELECTED		:BOOL;
+	MANUAL_SELECTED		:BOOL;
+	STEP_SELECTED		:BOOL;
+	AUTO_RUNNING		:BOOL;
+	STEP_RUNNING		:BOOL;
+	START_ENABLE		:BOOL;
+	MACHINE_STOP		:BOOL;
+	FB_MODE_BLOCK		:MODE_SELECTION_BLOCK1;
+	ERROR_ACTIVE		:BOOL;
+	IO_Page_Number		: INT;
+	
+	HMI_AutoMode : BOOL;
+	HMI_ManualMode : BOOL;
+	HMI_StepMode : BOOL;
+	
+	HMI_Target_Count : DINT;
+	HMI_Total_Count  : DINT;
+	HMI_OK_Count	 : DINT;
+	HMI_NOK_Count	 : DINT;
+	
+	Pulse_Block      : FB_SimClock;
+	Servo_Enable    : BOOL;
+    Servo_Safety    : BOOL;
+    Servo_Reset     : BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

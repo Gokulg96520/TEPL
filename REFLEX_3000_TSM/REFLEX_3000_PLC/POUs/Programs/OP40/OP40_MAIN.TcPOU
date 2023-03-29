@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP40_MAIN" Id="{48ab2033-8330-499e-941b-5b0a313c98f8}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP40_MAIN
+VAR
+	OP40_Modeselection_FB: Mode_Selection_Block1;	
+//	OP40_Cycle_Time: Cycle_Time_FB;
+	TP_100ms: TP;
+	Pulse_100ms: BOOL;
+	Times: LREAL;
+	reset: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Function Calling
+
+OP40_Manual();
+OP40_AUTOSEQUENCE();
+OP40_Error();
+OP40_Initialization_Seq();
+
+//MOdeselection From HMI
+
+IF (OP40_HMI_AutoMode AND NOT OP40_HMI_ManualMOde AND NOT OP40_HMI_StepMode) THEN
+		OP40_Modeselection_FB.ModeWord:=1;
+	ELSIF (NOT OP40_HMI_AutoMode AND OP40_HMI_ManualMOde AND NOT OP40_HMI_StepMode) THEN
+		OP40_Modeselection_FB.ModeWord:=2;
+	ELSIF  (NOT OP40_HMI_AutoMode AND NOT OP40_HMI_ManualMOde AND  OP40_HMI_StepMode) THEN
+		OP40_Modeselection_FB.ModeWord:=3;
+    ELSE   
+		OP40_Modeselection_FB.ModeWord:=0;
+END_IF
+OP40_Modeselection_FB(
+	ModeWord:= , 
+	HomeConditionOK:=OP40_HomeConditionOK , 
+	OperationEnable:=OP40_AutoSelected, 
+	StartPB:=OP40_HMI_Cycle_Start , 
+	SafetyAndNOError:= OP40_Safety_OK, 
+	ModeAck:=TRUE , 
+	HomingINProgress:=OP40_HomeRunning , 
+	TempHomeOK:=OP40_Temp_hmeOK , 
+	ResetPB:= , 
+	AutoSelected=> OP40_AutoSelected, 
+	ManualSelected=> OP40_ManualSelected, 
+	StepSelected=>OP40_StepSelected , 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP40_AutoRunning, 
+	StepRunning:=OP40_StepRunning , 
+	StartEnable:=OP40_StartEnable  , 
+	MachineStop:=OP40_Machine_Stop );
+(*
+IF (OP40_AutoSelected OR OP40_ManualSelected )AND NOT OP40_ErrorActive AND OP40_Safety_OK THEN
+	SR40_Vert_servo.bEnable:=TRUE;
+ELSE
+	SR40_Vert_servo.bEnable:=FALSE;
+END_IF
+
+IF OP40_GVL.SR40_Vert_servo.bAxisError OR NOT OP40_Safety_OK  THEN
+	OP40_ErrorActive:=TRUE;
+END_IF
+
+IF NOT SR40_Vert_servo.bAxisHomed THEN
+	SR40_Vert_servo_not_Home:=TRUE;
+ELSE
+	SR40_Vert_servo_not_Home:=FALSE;
+END_IF
+*)
+	//Cycle Time Block
+//	OP40_Cycle_Time(Cycle_Start_Bit:= , Pulse_100ms:=Pulse_100ms , Time_In_Sec=>Times , CT_Running=> );
+
+	
+	
+	//Pulse Generation 100ms
+	TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#100MS , Q=>Pulse_100ms, ET=> );]]></ST>
+    </Implementation>
+    <LineIds Name="OP40_MAIN">
+      <LineId Id="3" Count="59" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Mode_Selection_Block1" Id="{cccd5c07-64c3-4964-89c9-794947d7c7d3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Mode_Selection_Block1
+VAR_INPUT
+	ModeWord 				:INT;
+	HomeConditionOK 		:BOOL;
+	OperationEnable 		:BOOL;
+	StartPB 				:BOOL;
+	SafetyAndNOError 		:BOOL;
+	ModeAck 				:BOOL;
+	HomingINProgress		:BOOL;
+	TempHomeOK 				:BOOL;
+	ResetPB 				:BOOL;
+END_VAR
+VAR_OUTPUT
+	AutoSelected 			:BOOL;
+	ManualSelected 			:BOOL;
+	StepSelected 			:BOOL;
+	ModeSelAck_Indication 	:BOOL;
+	StatusDisplay 			:INT;
+END_VAR
+VAR_IN_OUT
+	AutoRunning 			:BOOL;
+	StepRunning 			:BOOL;
+	StartEnable 			:BOOL;
+	MachineStop 			:BOOL;
+END_VAR
+VAR
+	CycleStart_PLS 					:Tc2_Standard.R_TRIG;
+	CycleStart_Step_PLS				:Tc2_Standard.R_TRIG;
+	Status 							:INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+// Move Always "0" to the Status
+
+Status := 0;
+
+
+//Check Any Mode is Running
+
+IF AutoRunning AND ModeWord <> 0 THEN Status := 1; END_IF
+IF StepRunning AND ModeWord <> 0 THEN Status := 2; END_IF
+
+
+// AutoMode Selected
+
+IF ModeWord = 1 AND ModeAck AND Status = 0 THEN 
+	 AutoSelected :=1;
+	 ManualSelected :=0;
+	 StepSelected :=0;
+END_IF
+
+ 
+// ManualMode Selected
+
+IF ModeWord = 2 AND ModeAck AND Status = 0 THEN 
+	 AutoSelected :=0;
+	 ManualSelected :=1;
+	 StepSelected :=0;
+END_IF
+
+
+// StepMode Selected
+
+IF ModeWord = 3 AND ModeAck AND Status = 0 THEN 
+	 AutoSelected :=0;
+	 ManualSelected :=0;
+	 StepSelected :=1;
+END_IF
+
+
+//Auto Running or Step Running
+
+CycleStart_PLS(CLK := StartPB);
+
+IF CycleStart_PLS.Q AND OperationEnable AND HomeConditionOK  AND SafetyAndNOError THEN
+	IF AutoSelected THEN	
+		AutoRunning := 1;
+	END_IF
+	IF StepSelected THEN	
+		StepRunning := 1;
+	END_IF
+END_IF
+ 
+
+// Start Enable
+
+CycleStart_Step_PLS(CLK := StartPB);
+
+IF (AutoRunning OR StepRunning AND CycleStart_Step_PLS.Q) AND OperationEnable AND SafetyAndNOError THEN
+	StartEnable :=1;
+ELSE 
+	StartEnable :=0;
+END_IF
+
+
+// AutoRunning & StepRunning Reset
+
+IF NOT OperationEnable OR NOT SafetyAndNOError OR MachineStop OR HomingINProgress THEN
+	AutoRunning :=0;
+	StepRunning :=0;
+END_IF
+
+
+
+					(*>>>>>>>>>>>>         Status Disply          <<<<<<<<<<<<*)
+
+
+// Error Active Status Display
+
+IF OperationEnable AND SafetyAndNOError THEN
+	StatusDisplay :=1;
+END_IF
+
+
+// Mode Not Selected
+
+IF SafetyAndNOError AND NOT MachineStop AND NOT ManualSelected AND NOT AutoSelected AND NOT StepSelected THEN
+	StatusDisplay :=2;
+END_IF
+
+
+// Home Condition Not OK
+
+IF SafetyAndNOError AND NOT MachineStop AND NOT HomeConditionOK AND NOT StartEnable AND (AutoSelected OR StepSelected) THEN
+	StatusDisplay :=3;
+END_IF
+
+
+// Homing In Progress
+
+IF SafetyAndNOError AND HomingINProgress AND NOT HomeConditionOK AND NOT StartEnable AND NOT MachineStop THEN
+	StatusDisplay :=4;
+END_IF
+
+
+// Machine Forced Stop
+
+IF SafetyAndNOError AND NOT StartEnable AND MachineStop THEN
+	StatusDisplay :=5;
+END_IF
+
+
+// AutoRunning/StepRunning Status Display
+
+IF SafetyAndNOError AND AutoRunning THEN
+	StatusDisplay :=9;
+END_IF
+
+
+// StepRunning Status Display
+
+IF SafetyAndNOError AND StepRunning THEN
+	StatusDisplay :=10;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="Mode_Selection_Block1">
+      <LineId Id="3" Count="122" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

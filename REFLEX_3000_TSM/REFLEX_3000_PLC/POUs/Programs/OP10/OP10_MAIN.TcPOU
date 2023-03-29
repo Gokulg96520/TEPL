@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP10_MAIN" Id="{ba500af3-f48e-4f53-84e9-52ee6a87004f}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP10_MAIN
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP10_MANUAL();
+OP10_SERVO();]]></ST>
+    </Implementation>
+    <LineIds Name="OP10_MAIN">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

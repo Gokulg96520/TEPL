@@ -1,0 +1,407 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_Cognex_ProfiNET_1" Id="{877902c3-0e9d-4d6a-8b4e-14b196c1af60}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cognex_ProfiNET_1
+VAR_INPUT
+	tTimeout						: TIME := T#10S;
+	sJob_Name 						: STRING(63) := '';
+	stCognex_record_status     		: Acquisition_status;
+	Acquisition_ID					: UINT ;//number of shots
+	stCognex_Inspection_status 		: Inspection_status;
+	Error_Code						: UINT ;
+	wcommand_control_in 			: UINT;
+    aResults_64_Bytes	     		: ARRAY[0..63] OF BYTE;
+    number_of_inspections			: UINT;
+	iresult_code					: UINT;
+	
+	bTarget_job_ID					: UINT;
+END_VAR
+
+VAR_OUTPUT
+	Error_Status_message			:STRING;
+	bError							: BOOL := 0;
+	stCognex_record_control 		: Acquisition_control;
+	stCognex_inspection_control 	: Inspection_control;
+    wCommandControl_out 			: UINT;
+    aUser_data_64_Byte 			    : ARRAY[0..63] OF BYTE;
+	bJob_loading_completed 		    : BOOL := 0; //FP
+	bJob_load_failed        		: BOOL := 0; //FP
+	bInspection_Result_IO 			: BOOL := 0; //FP
+	bInspection_Result_NIO 			: BOOL := 0; //FP
+	bTXTSM_Error_Job_Change 		: BOOL;
+	bPictureTakenComplete			: BOOL;
+	Loaded_Job_ID					: UINT;
+END_VAR
+
+VAR_IN_OUT
+	bClear_Error					: BOOL := 0;
+	bJob_change_start				: BOOL := 0;
+	TXTSM_camera_not_online 		: BOOL := 0;
+	bTrigger_start					: BOOL := 0;
+END_VAR
+
+VAR
+	ttimeout_step					: TON;
+	tTimeoutStepTrigger			    : TON;
+	//JobChange
+	iStep_Jobchange 				: INT := 0;
+	bJob_change_io 					: BOOL:= 0;
+	bJob_change_nio 				: BOOL:= 0;
+	//Trigger
+	
+    iStep_Trigger				    : INT := 0;
+	bInspection_io 					: BOOL:= 0;
+	bInspection_nio 				: BOOL:= 0;
+	bHMFPInspection_Completed		: BOOL;//HM_FP_Inspection_Completed
+	bHMFNInspection_Completed		: BOOL;//HM_FN_Inspection_Completed
+    
+    Previous_job_id                 : UINT;   //Job ID for the last job loaded.
+    Previous_job_name               : STRING; // Job name of the last job loaded.
+END_VAR
+VAR_TEMP
+	tempaUserData_64_Byte		    : UNION_64Byte;
+	bT_in 							: BOOL := FALSE;
+	bT_inTrigger					: BOOL := FALSE;
+	FPInspection_Completed			: BOOL := FALSE;
+	FNInspection_Completed			: BOOL := FALSE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[stCognex_inspection_control.Buffer_Results_Enable 	:= FALSE;
+stCognex_inspection_control.Inspection_Results_Ack 	:= FALSE;
+
+// picture taken complete
+bPictureTakenComplete:=stCognex_record_status .Exposure_Complete AND (iStep_Trigger <> 0);
+stCognex_record_control.Clear_Exposure_Complete:= stCognex_record_status .Exposure_Complete;
+
+//#########################################################################
+//ErrorReset###############################################################
+//#########################################################################
+
+bError := stCognex_Inspection_status .Error;
+IF bError THEN
+	Previous_job_id   := 0;
+    Previous_job_name := '';
+END_IF
+
+IF stCognex_Inspection_status .Error AND bClear_Error THEN
+	stCognex_inspection_control.Clear_Error := TRUE;
+ELSE	
+	stCognex_inspection_control.Clear_Error := FALSE;
+END_IF;
+
+IF NOT stCognex_Inspection_status .Error THEN
+	bClear_Error:=FALSE;
+END_IF
+
+//#########################################################################
+//JobChange################################################################
+//#########################################################################
+
+CASE iStep_Jobchange OF 
+	0:	//Waiting for bJob_change_start
+		bJob_loading_completed := FALSE;
+		bJob_load_failed := FALSE;
+		bJob_change_io  := FALSE;
+		bJob_change_nio := FALSE;
+
+        // Job is still the same.
+        IF (TRUE
+            AND bJob_change_start
+            AND (iStep_Trigger = 0)
+            AND (Previous_job_id = bTarget_job_ID )
+            AND (Previous_job_name = sJob_Name)
+           )
+        THEN
+			bJob_change_start := FALSE;
+            
+        // Neuen Job laden.
+		ELSIF bJob_change_start AND (iStep_Trigger = 0)THEN
+			bJob_change_start := FALSE;
+			iStep_Jobchange := 1;
+		END_IF;
+		
+	1://Set Offline
+		stCognex_record_control.Set_Offline := TRUE;
+		bT_in := TRUE;
+		
+		IF stCognex_record_status .Online = FALSE 
+			AND ( stCognex_record_status .Offline_Bit0 
+					OR stCognex_record_status .Offline_Bit1 
+					OR stCognex_record_status .Offline_Bit2) 
+			THEN
+				bT_in := FALSE;
+				iStep_Jobchange := 2;
+		ELSIF ttimeout_step.Q THEN //Timeout 
+				bT_in := FALSE;
+				iStep_Jobchange := 8;
+		END_IF;
+		ttimeout_step(IN:= bT_in, PT:= tTimeout, Q=> , ET=> );
+		
+	2://Load command(Job ID)
+		wCommandControl_out := bTarget_job_ID;//4000;//
+		iStep_Jobchange := 3;
+		
+	3://Set Job name to user data
+		//FOR i:=0 TO 63 DO//initalize with 0
+		//	aBenutzerdaten_64_Byte[i] := 0;
+		//END_FOR;
+		tempaUserData_64_Byte.sString := sJob_Name;
+		aUser_data_64_Byte := tempaUserData_64_Byte.aArrayOfByte;
+		iStep_Jobchange := 4;
+
+	4://Set the Execute Command BIT in the Inspection Control Module.;
+		stCognex_inspection_control.Execute_Command := TRUE;
+		bT_in := TRUE;
+	
+		IF stCognex_Inspection_status .Command_Complete AND NOT stCognex_Inspection_status .Command_Executing THEN//Wait for result
+			IF stCognex_Inspection_status .Command_Failed THEN//Job load failed 
+				bT_in := FALSE;
+				iStep_Jobchange := 6;
+			ELSE//Job load ok
+				bT_in := FALSE;
+			iStep_Jobchange := 5;
+			END_IF;
+		ELSIF ttimeout_step.Q THEN //Timeout 
+			bT_in := FALSE;
+			iStep_Jobchange := 8;
+		END_IF;
+		ttimeout_step (IN:= bT_in, PT:= tTimeout, Q=> , ET=> );
+		
+	5: //Job load ok
+			bT_in:= TRUE;
+			stCognex_inspection_control.Execute_Command := FALSE;
+			bJob_change_io := TRUE;
+			bJob_change_nio := FALSE;
+            
+            Previous_job_id   := wcommand_control_in;
+            Previous_job_name := sJob_Name;
+			
+		IF NOT stCognex_Inspection_status .Command_Executing THEN
+			bT_in:= FALSE;
+			iStep_Jobchange := 7;
+		ELSIF ttimeout_step.Q THEN //Timeout 
+			bT_in := FALSE;
+			iStep_Jobchange := 8;
+		END_IF;
+		ttimeout_step(IN:= bT_in, PT:= tTimeout, Q=> , ET=> );
+			
+	6:	//Job load failed
+			bT_in:= TRUE;
+			stCognex_inspection_control.Execute_Command := FALSE;
+			bJob_change_io := FALSE;
+			bJob_change_nio := TRUE;
+            
+            Previous_job_id   := 0;
+            Previous_job_name := '';
+			
+		IF NOT stCognex_Inspection_status .Command_Executing THEN
+			bT_in:= FALSE;
+			iStep_Jobchange := 7;
+		ELSIF ttimeout_step.Q THEN //Timeout 
+			bT_in := FALSE;
+			iStep_Jobchange := 8;
+		END_IF;
+		ttimeout_step(IN:= bT_in, PT:= tTimeout, Q=> , ET=> );
+			
+	7://Set online 
+		bT_in := TRUE;
+		stCognex_record_control.Set_Offline := FALSE;
+		
+		IF stCognex_record_status .Online = TRUE THEN
+			iStep_Jobchange := 9;
+			bT_in := FALSE;
+		ELSIF ttimeout_step.Q THEN //Timeout 
+			iStep_Jobchange := 8;
+			bT_in := FALSE;
+		END_IF;
+		ttimeout_step(IN:= bT_in, PT:= tTimeout, Q=> , ET=> );
+		
+	8://Global Timeout
+			stCognex_record_control.Set_Offline := FALSE;
+			stCognex_inspection_control.Execute_Command := FALSE;
+			bJob_change_io := FALSE;
+			bJob_change_nio := TRUE;
+			iStep_Jobchange := 9;
+			
+	9://Set Output signals
+		bJob_loading_completed := bJob_change_io;
+		bJob_load_failed := bJob_change_nio;
+		iStep_Jobchange := 0;
+	ELSE //CASE JobChange default
+		
+	iStep_Jobchange := 0;
+	
+END_CASE;
+
+//output error messages Job-change
+
+IF bJob_change_nio THEN
+	bTXTSM_Error_Job_Change := TRUE;
+	Previous_job_id   := 0;
+    Previous_job_name := '';
+ELSIF (bJob_change_io AND NOT bJob_change_nio) OR bClear_Error THEN
+	bTXTSM_Error_Job_Change := FALSE;
+END_IF;
+
+
+
+//#########################################################################
+//Trigger##################################################################
+//#########################################################################
+//Inspection_Completed edge (Toggle)
+FPInspection_Completed 		:= stCognex_Inspection_status .Inspection_Completed AND NOT bHMFPInspection_Completed ;
+bHMFPInspection_Completed 	:= stCognex_Inspection_status .Inspection_Completed;
+
+FNInspection_Completed := NOT stCognex_Inspection_status .Inspection_Completed AND bHMFNInspection_Completed ;
+bHMFNInspection_Completed := 	stCognex_Inspection_status .Inspection_Completed;
+//Camera waiting for result:
+IF iStep_Trigger = 2
+	 OR iStep_Trigger = 3
+	 OR iStep_Trigger = 4 
+THEN
+	IF (FPInspection_Completed OR FNInspection_Completed) THEN
+        IF stCognex_Inspection_status .Job_Pass THEN
+		    bInspection_io  := TRUE;
+		    bInspection_nio := FALSE;
+        ELSE
+		    bInspection_io  := FALSE;
+		    bInspection_nio := TRUE;
+        END_IF
+	END_IF
+(* PHU: von ARU
+	IF (FPInspection_Completed OR FNInspection_Completed) AND stCognex_Inspektionsstatus.Job_Pass THEN
+		bInspection_io := TRUE; 
+	ELSIF (FPInspection_Completed OR FNInspection_Completed) AND NOT stCognex_Inspektionsstatus.Job_Pass THEN
+		bInspection_nio := TRUE; 
+	END_IF
+*)
+END_IF
+CASE iStep_Trigger OF 
+	0:	//Waiting for bTrigger_start
+		bInspection_Result_IO := FALSE;
+		bInspection_Result_NIO := FALSE;
+		bInspection_io  := FALSE;
+		bInspection_nio := FALSE;
+
+		IF bTrigger_start AND (iStep_Jobchange = 0) AND NOT bTXTSM_Error_Job_Change THEN
+			bTrigger_start := FALSE;
+			iStep_Trigger := 1;
+		END_IF;
+	1://Enable External Trigger
+		stCognex_record_control.Trigger_Enable := TRUE;
+		stCognex_record_control.Trigger := FALSE;
+		//stCognex_Aufnahmesteuerung.Trigger := FALSE;
+		
+		IF  stCognex_record_status .Trigger_Ready AND stCognex_record_status .Online AND NOT  stCognex_Inspection_status .System_Busy THEN//NOT stCognex_Inspektionsstatus.Command_Executing THEN
+			iStep_Trigger := 2;
+			
+		END_IF;
+	2://Trigger start
+	
+		
+		stCognex_record_control.Trigger := TRUE;
+		bT_inTrigger:= TRUE;
+		
+		IF stCognex_record_status .Trigger_Ack THEN
+			bT_inTrigger := FALSE;
+			iStep_Trigger := 3;
+		ELSIF tTimeoutStepTrigger.Q THEN //Timeout 
+			bT_inTrigger := FALSE;
+			iStep_Trigger := 0;
+		END_IF
+		
+		tTimeoutStepTrigger(IN:= bT_inTrigger, PT:= T#30S, Q=> , ET=> );		
+		
+	3://Trigger Reset	
+		stCognex_record_control.Trigger := FALSE;
+		bT_inTrigger:= TRUE;
+		
+		IF stCognex_record_status .Trigger_Ack = FALSE THEN
+			bT_inTrigger := FALSE;
+			iStep_Trigger := 4;
+		ELSIF tTimeoutStepTrigger.Q THEN //Timeout 
+			bT_inTrigger := FALSE;
+			iStep_Trigger := 0;
+		END_IF;
+		
+		tTimeoutStepTrigger(IN:= bT_inTrigger, PT:= T#30S, Q=> , ET=> );
+		
+	4://Wait for result
+	
+		bT_inTrigger:= TRUE;
+	
+		IF bInspection_io OR bInspection_nio THEN
+			bT_inTrigger:= FALSE;
+			iStep_Trigger := 5;
+		ELSIF tTimeoutStepTrigger.Q THEN //Timeout 
+			bT_inTrigger := FALSE;
+			iStep_Trigger := 0;
+		END_IF;
+		
+		tTimeoutStepTrigger(IN:= bT_inTrigger, PT:= T#30S, Q=> , ET=> );
+	
+	5://Set Output signals
+		IF bInspection_nio = TRUE THEN
+			bInspection_Result_NIO	:= TRUE; 
+			bInspection_Result_IO	:= FALSE;
+			iStep_Trigger := 0; 
+		ELSIF bInspection_io THEN
+			bInspection_Result_NIO	:= FALSE; 
+			bInspection_Result_IO	:= TRUE; 
+			iStep_Trigger := 0;
+		END_IF;
+
+
+	ELSE //CASE Trigger default
+		
+	iStep_Trigger := 0;
+
+END_CASE;
+
+
+	
+Loaded_Job_ID:=wcommand_control_in;
+
+//#########################################################################
+//output error messages##################################################
+//#########################################################################
+
+TXTSM_camera_not_online
+ := (NOT ( stCognex_record_status .Offline_Bit0 AND stCognex_record_status .Offline_Bit1 AND NOT stCognex_record_status .Offline_Bit2) 
+AND (NOT (iStep_Jobchange = 7))							
+AND (NOT stCognex_record_status .Online));
+
+IF TXTSM_camera_not_online
+ THEN
+   Previous_job_id   := 0;
+   Previous_job_name := '';
+END_IF;
+
+IF Error_Code=0 AND NOT TXTSM_camera_not_online THEN
+	Error_Status_message:= 'No Error and Camera Online';
+ELSIF TXTSM_camera_not_online THEN
+	Error_Status_message:='Camera_Offline';
+ELSIF Error_Code= 256 THEN
+	Error_Status_message:='Error_0x0100-Trigger set while disabled';
+ELSIF Error_Code= 257 THEN
+	Error_Status_message:='Error_0x0101-Trigger set while offline';
+ELSIF Error_Code= 1024 THEN
+	Error_Status_message:='Error_0x0400-Job change executing bit is always High';
+ELSIF Error_Code= 1025 THEN
+	Error_Status_message:='Error_0x0401-Job change requested while online';
+ELSIF Error_Code= 1026 THEN
+	Error_Status_message:='Error_0x0402-Requestd job is not saved';	
+ELSIF Error_Code= 1040 THEN
+	Error_Status_message:='Error_0x0410-Testrun disabled';
+ELSIF Error_Code= 1041 THEN
+	Error_Status_message:='Error_0x0411-Testrun requested while online';	
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Cognex_ProfiNET_1">
+      <LineId Id="3" Count="329" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

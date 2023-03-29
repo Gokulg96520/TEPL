@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP10_HMI_GVL" Id="{5cf5331b-ffae-43b8-91af-0067de377157}">
+    <Declaration><![CDATA[//{attribute 'qualified_only'}
+VAR_GLOBAL
+//LREAL
+	OP10A_SRV_ACT_POS								: LREAL;
+	OP10B_SRV_ACT_POS								: LREAL;
+//REAL
+	OP10A_TARGET_POSITION							: REAL;
+	OP10A_TARGET_VEL								: REAL;
+	OP10B_TARGET_POSITION							: REAL;
+//INT 
+	OP10_CYL_NO										: INT;
+	OP10B_CYL_NO									: INT;	
+	OP10_SERVO_NO									: INT;
+	OP10B_SERVO_NO									: INT;	
+//BOOL
+	OP10_HOME										: BOOL;
+	OP10_WORK										: BOOL;
+	OP10B_HOME										: BOOL;
+	OP10B_WORK										: BOOL;	
+	OP10_JOG_POSITIVE								: BOOL;
+	OP10_JOG_NEGATIVE								: BOOL;
+	OP10B_JOG_POSITIVE								: BOOL;
+	OP10B_JOG_NEGATIVE								: BOOL;
+	OP10A_SET_HOME									: BOOL;
+	OP10B_SET_HOME									: BOOL;
+	OP10A_MOVE_TARGET								: BOOL;
+	OP10A_SRV_FAULT									: BOOL;	
+	OP10B_SRV_FAULT									: BOOL;
+	OP10B_SRV_ENABLE								: BOOL;
+	OP10B_MOVE_TARGET								: BOOL;
+	OP10A_SRV_ENABLE								: BOOL;
+END_VAR
+
+
+
+
+]]></Declaration>
+  </GVL>
+</TcPlcObject>

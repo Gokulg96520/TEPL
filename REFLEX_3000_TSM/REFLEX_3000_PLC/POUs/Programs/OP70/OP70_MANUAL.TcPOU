@@ -1,0 +1,493 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP70_MANUAL" Id="{20128855-5d62-40cc-9a1d-939223909c99}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP70_MANUAL
+VAR
+	SR70_Vert_servo_Axis :AXIS_REF;
+	SR70_Hori_servo_Axis :AXIS_REF;
+	SR70_Conv_servo_Axis :AXIS_REF;
+	SR70_GUIDE_GRP_AXIS :AXIS_REF;
+	LH_Gripper_bMove	 : BOOL;
+	RH_Gripper_bMove	 : BOOL;
+	
+	temp_safe: BOOL;
+	temp:BOOL;
+
+	error70: BOOL;
+	OP70Enable: BOOL;
+	FESTO_NOT_NEED: BOOL;
+	NOT_REQ: BOOL;
+	OP70EnableHorz: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+OP70_VERT_SERVO_POSITION    := SR70_Vert_servo_ctrl.Actual_Position;
+OP70_VERT_SERVO_POS_DONE	:= SR70_Vert_servo_ctrl.pos_done ;
+
+OP70_HORI_SERVO_POSITION    := SR70_Hori_servo_ctrl.Actual_Position;
+OP70_HORI_SERVO_POS_DONE	:= SR70_Hori_servo_ctrl.pos_done ;
+
+OP70_CONV_SERVO_POSITION    := SR70_CONV_servo_ctrl.Actual_Position;
+OP70_CONV_SERVO_POS_DONE	:= SR70_CONV_servo_ctrl.pos_done ;
+
+
+// VERTICAL SERVO 
+IF In_Range(SR70_Vert_servo_status.actualPosition,OP70_VERT_SERVO_SFE_WRK_POS,1) THEN
+	OP70_VERT_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP70_VERT_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR70_Vert_servo_status.actualPosition,OP70_VERT_SERVO_HME_POS,1) THEN
+	OP70_VERT_SERVO_ON_HOME := TRUE;
+ELSE
+	OP70_VERT_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR70_Vert_servo_status.actualPosition,OP70_VERT_SERVO_PICK_POS,1) THEN
+	OP70_VERT_SERVO_ON_WRK_PICK := TRUE;
+ELSE
+	OP70_VERT_SERVO_ON_WRK_PICK := FALSE;
+END_IF		
+
+IF In_Range(SR70_Vert_servo_status.actualPosition,OP70_VERT_SERVO_PLACE_POS,1) THEN
+	OP70_VERT_SERVO_ON_WRK_PLACE := TRUE;
+ELSE
+	OP70_VERT_SERVO_ON_WRK_PLACE := FALSE;
+END_IF
+
+//HORIZONTAL SERVO
+IF In_Range(SR70_Hori_servo_status.actualPosition,OP70_HORI_SERVO_SFE_WRK_POS,1) THEN
+	OP70_HORI_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP70_HORI_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR70_Hori_servo_status.actualPosition,OP70_HORI_SERVO_HME_POS,1) THEN
+	OP70_HORI_SERVO_ON_HOME := TRUE;
+ELSE
+	OP70_HORI_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR70_Hori_servo_status.actualPosition,OP70_HORI_SERVO_PICK_POS,1) THEN
+	OP70_HORI_SERVO_ON_WRK_PICK := TRUE;
+ELSE
+	OP70_HORI_SERVO_ON_WRK_PICK := FALSE;
+END_IF	
+
+IF In_Range(SR70_Hori_servo_status.actualPosition,OP70_HORI_SERVO_PLACE_POS,1) THEN
+	OP70_HORI_SERVO_ON_WRK_PLACE := TRUE;
+ELSE
+	OP70_HORI_SERVO_ON_WRK_PLACE := FALSE;
+END_IF	
+
+//CONVEYOR SERVO
+
+IF In_Range(SR70_CONV_servo_status.actualPosition,OP70_CONV_SERVO_SFE_WRK_POS,1) THEN
+	OP70_CONV_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP70_CONV_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR70_CONV_servo_status.actualPosition,OP70_CONV_SERVO_HME_POS,1) THEN
+	OP70_CONV_SERVO_ON_HOME := TRUE;
+ELSE
+	OP70_CONV_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR70_CONV_servo_status.actualPosition,OP70_CONV_SERVO_WRK_POS,1) THEN
+	OP70_CONV_SERVO_ON_WRK := TRUE;
+ELSE
+	OP70_CONV_SERVO_ON_WRK := FALSE;
+END_IF	
+
+
+OP70_GVL.SR70_Vert_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP70_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= OP70_ManualSelected OR MANUAL_SELECTED ,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:=SR70_Vert_servo_ctrl.Position , 
+	fTargetVelocity:=SR70_Vert_servo_ctrl.Velocity , 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR70_Vert_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR70_Vert_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR70_Vert_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR70_Vert_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR70_Vert_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:= SR70_Vert_servo_Axis , 
+	HME_WRITE_ADD:= 16#500C,	
+	bHome:=SR70_Vert_servo_ctrl.Bsethome , 
+    bSetPosition:=SR70_Vert_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR70_Vert_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR70_Vert_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR70_Vert_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR70_Vert_servo_status , 
+	sAxisState=>SR70_Vert_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR70_Vert_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR70_Vert_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR70_Vert_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR70_Vert_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR70_Vert_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR70_Vert_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=> ,
+	bABS_Pos_done=> SR70_Vert_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );	
+
+OP70_GVL.SR70_HORI_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP70_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= OP70_ManualSelected OR MANUAL_SELECTED,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= SR70_HORI_servo_ctrl.Position , 
+	fTargetVelocity:= SR70_HORI_servo_ctrl.Velocity, 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR70_HORI_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR70_HORI_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR70_HORI_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR70_HORI_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR70_HORI_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:= SR70_HORI_servo_Axis , 
+	HME_WRITE_ADD:= 16#500B,	
+	bHome:=SR70_HORI_servo_ctrl.Bsethome , 
+    bSetPosition:=SR70_HORI_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR70_HORI_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR70_HORI_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR70_HORI_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR70_HORI_servo_status , 
+	sAxisState=>SR70_HORI_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR70_HORI_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR70_HORI_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR70_HORI_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR70_HORI_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR70_HORI_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR70_HORI_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=> ,
+	bABS_Pos_done=> SR70_HORI_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );
+
+OP70_GVL.SR70_CONV_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP70_HMI_Reset OR Servo_Reset , 
+	bEnable:=Servo_Enable, 
+	bMoveVelocity:=SR70_CONV_servo_ctrl.VELmove_Start , 
+	bHalt:= , 
+	bManualMode:= OP70_ManualSelected OR MANUAL_SELECTED ,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= SR70_CONV_servo_ctrl.Velocity, 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR70_CONV_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR70_CONV_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR70_CONV_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR70_CONV_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR70_CONV_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:= SR70_CONV_servo_Axis , 
+	HME_WRITE_ADD:= 16#500D,	
+	bHome:=SR70_CONV_servo_ctrl.Bsethome , 
+    bSetPosition:=SR70_CONV_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR70_CONV_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR70_CONV_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR70_CONV_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR70_CONV_servo_status , 
+	sAxisState=>SR70_CONV_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR70_CONV_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR70_CONV_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR70_CONV_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR70_CONV_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR70_CONV_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR70_CONV_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=>SR70_CONV_servo_ctrl.Safe_To_Move ,
+	bABS_Pos_done=> SR70_CONV_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );	
+	
+IF OP70_ManualSelected OR MANUAL_SELECTED THEN
+	SR70_Vert_servo_status.targetVelocity:=50;
+	SR70_Hori_servo_status.targetVelocity:=50;
+	SR70_CONV_servo_status.targetVelocity:=100;
+	OP70_Gripper_LH_Gripper_ctrl.Velocity       :=  300;
+	OP70_Gripper_RH_Gripper_ctrl.Velocity       :=  300;	
+	OP70_Gripper_LH_Gripper_ctrl.ABSmove_Start:=LH_Gripper_bMove;
+	OP70_Gripper_RH_Gripper_ctrl.ABSmove_Start:=RH_Gripper_bMove;
+END_IF
+OP70_Gripper_Current        :=  2;
+OP70_Gripper_Acceleration   :=  2500;	
+OP70_Gripper_Jerk           :=  50000;
+//LH Rejection Cylinder
+//move ZERO to STATUS
+//CR70_LH_Rej_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP70_Auto OR OP70_HomeRunning) THEN
+	CR70_LH_Rej_Cyl.AutoCmd1:=FALSE;
+	CR70_LH_Rej_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR70_LH_Rej_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR70_LH_Rej_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR70_LH_Rej_Cyl.Safework:= TRUE ;
+ELSE 
+	CR70_LH_Rej_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP70_HMI_LH_Rej_Cyl_Home_PB=TRUE) THEN
+	CR70_LH_Rej_Cyl.ManualPB1:=TRUE;
+ELSE 
+	CR70_LH_Rej_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP70_HMI_LH_Rej_Cyl_Work_PB=TRUE) THEN
+	CR70_LH_Rej_Cyl.ManualPB2:=TRUE;
+ELSE 
+	CR70_LH_Rej_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR70_LH_Rej_Cyl(
+	Auto:= OP70_AutoSelected , 
+	Manual:= OP70_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP70_HMI_Reset, 
+	Sensor1:=, 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:=5 , 
+	TimeOut3:=5 ,  
+	Solenoid1=> O70_LH_REJ_CYL_REV_Q1152_4 , 
+	Solenoid2=> O70_LH_REJ_CYL_FWD_Q1152_5  ,
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR70_LH_Rej_Cyl_status );
+
+
+//RH Rejection Cylinder
+//move ZERO to STATUS
+//CR70_RH_Rej_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP70_Auto OR OP70_HomeRunning) THEN
+	CR70_RH_Rej_Cyl.AutoCmd1:=FALSE;
+	CR70_RH_Rej_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR70_RH_Rej_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR70_RH_Rej_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR70_RH_Rej_Cyl.Safework:= TRUE ;
+ELSE 
+	CR70_RH_Rej_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP70_HMI_RH_Rej_Cyl_Home_PB=TRUE) THEN
+	CR70_RH_Rej_Cyl.ManualPB1:=TRUE;
+ELSE 
+	CR70_RH_Rej_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP70_HMI_RH_Rej_Cyl_Work_PB=TRUE) THEN
+	CR70_RH_Rej_Cyl.ManualPB2:=TRUE;
+ELSE 
+	CR70_RH_Rej_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR70_RH_Rej_Cyl(
+	Auto:= OP70_AutoSelected ,  
+	Manual:= OP70_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP70_HMI_Reset,                    
+	Sensor1:= , 
+	Sensor2:=  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:=5 , 
+	TimeOut3:=5 , 
+	Solenoid1=>O70_RH_REJ_CYL_REV_Q1152_6  , 
+	Solenoid2=>O70_RH_REJ_CYL_FWD_Q1152_7 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=>, 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR70_RH_Rej_Cyl_status );	
+	
+OP70_Gripper_LH(
+	iHW:= HwIn3 , 
+	o_b_enable=> OP70_Gripper_LH_Gripper_ctrl.Axis_Enabled ,
+	i_b_moveToPosition:=OP70_Gripper_LH_Gripper_ctrl.ABSmove_Start , 
+	i_b_moveRelativ:= , 
+	i_b_reference:=OP70_Gripper_LH_Gripper_ctrl.Reference_Start , 
+	i_b_ackError:=OP70_HMI_Reset , 
+	i_u_targetPos:=OP70_Gripper_LH_Gripper_ctrl.Position , 
+	i_u_targetVelocity:=OP70_Gripper_LH_Gripper_ctrl.Velocity , 
+	i_u_targetCurrent:= OP70_Gripper_Current , 
+	i_u_targetAcceleration:= OP70_Gripper_Acceleration , 
+	i_u_targetJerk:= OP70_Gripper_Jerk , 
+	i_b_ManualMode:= , 
+	stManualModeAxis:=OP70_Gripper_LH_Manual_Axis , 
+	Status=> , 
+	o_b_referenced=>OP70_Gripper_LH_Gripper_ctrl.Axis_reference , 
+	o_b_reachedPos=> OP70_Gripper_LH_Gripper_ctrl.pos_done , 
+	o_u_actualPosition=> OP70_Gripper_LH_Gripper_ctrl.Actual_Position , 
+	o_b_error=> OP70_Gripper_LH_Gripper_ctrl.Axis_Error, 
+	oHW=> HwOut3 );	
+	
+OP70_Gripper_RH(
+	iHW:= HwIn4 , 
+	o_b_enable => OP70_Gripper_RH_Gripper_ctrl.Axis_Enabled ,
+	i_b_moveToPosition:=OP70_Gripper_RH_Gripper_ctrl.ABSmove_Start , 
+	i_b_moveRelativ:= , 
+	i_b_reference:=OP70_Gripper_RH_Gripper_ctrl.Reference_Start , 
+	i_b_ackError:=OP70_HMI_Reset , 
+	i_u_targetPos:=OP70_Gripper_RH_Gripper_ctrl.Position , 
+	i_u_targetVelocity:=OP70_Gripper_RH_Gripper_ctrl.Velocity , 
+	i_u_targetCurrent:= OP70_Gripper_Current , 
+	i_u_targetAcceleration:= OP70_Gripper_Acceleration , 
+	i_u_targetJerk:= OP70_Gripper_Jerk , 
+	i_b_ManualMode:= , 
+	stManualModeAxis:=OP70_Gripper_RH_Manual_Axis , 
+	Status=> , 
+	o_b_referenced=>OP70_Gripper_RH_Gripper_ctrl.Axis_reference , 
+	o_b_reachedPos=> OP70_Gripper_RH_Gripper_ctrl.pos_done , 
+	o_u_actualPosition=> OP70_Gripper_RH_Gripper_ctrl.Actual_Position , 
+	o_b_error=> OP70_Gripper_RH_Gripper_ctrl.Axis_Error, 
+	oHW=> HwOut4 );		
+	
+OP70_GIUDE_GRP(														// FESTO GUIDE GRIPPER
+	bAxis1_Ref_Switch:= , 
+	bInit:=  , 
+	bErrorReset:= Servo_Reset  , 
+	bEnable:= Servo_Enable , /// MACHINE ERR REGISTER CHANGE
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MACHINE_MANUAL , 									//MANUAL REGISTER CHANGE
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP70_GIUDE_GRP_ctrl.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety , // CHANGE
+	Axis:= SR70_GUIDE_GRP_AXIS, 
+	bHome:= OP70_GIUDE_GRP_ctrl.Bsethome, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP70_GIUDE_GRP_ctrl.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP70_GIUDE_GRP_Manual_Axis, 
+ 	sAxisState=> OP70_GIUDE_GRP_ctrl.Axis_State, 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP70_GIUDE_GRP_ctrl.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP70_GIUDE_GRP_Manual_Axis.targetVelocity:=50;	]]></ST>
+    </Implementation>
+    <LineIds Name="OP70_MANUAL">
+      <LineId Id="3" Count="102" />
+      <LineId Id="455" Count="0" />
+      <LineId Id="106" Count="41" />
+      <LineId Id="456" Count="0" />
+      <LineId Id="148" Count="41" />
+      <LineId Id="461" Count="0" />
+      <LineId Id="190" Count="24" />
+      <LineId Id="504" Count="0" />
+      <LineId Id="503" Count="0" />
+      <LineId Id="480" Count="0" />
+      <LineId Id="482" Count="0" />
+      <LineId Id="215" Count="0" />
+      <LineId Id="501" Count="1" />
+      <LineId Id="216" Count="50" />
+      <LineId Id="457" Count="3" />
+      <LineId Id="271" Count="167" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="523" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

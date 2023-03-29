@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP120_JB" Id="{5be3c261-b351-43b7-95ba-02ef76ef8031}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+
+I120_SPARE_600_0I600_0             :BOOL;
+I120_HPR_LOW_LVL_FBI600_1          :BOOL;
+I120_HPR_SOL_DOOR_SW_FBI600_2      :BOOL;
+I120_BOWL_RDYI600_3                :BOOL;
+I120_BOWL_LOW_LVLI600_4            :BOOL;
+I120_BOWL_OFF_ONI600_5             :BOOL;
+I120_HPR_OFF_ONI600_6              :BOOL;
+I120_CONV_REVI600_7                :BOOL;
+I120_CONV_FWDI601_0                :BOOL;
+I120_VBF_CONV_TRK1_OVERFLWI601_1   :BOOL;
+I120_VBF_CONV_TRK2_OVERFLWI601_2   :BOOL;
+I120_CONV_TRK1_CHO_MOD1I601_3      :BOOL;
+I120_CONV_TRK1_CHO_MOD2I601_4      :BOOL;
+I120_CONV_TRK2_CHO_MOD1I601_5      :BOOL;
+I120_CONV_TRK2_CHO_MOD2I601_6      :BOOL;
+I120_CONV_TRK3_CHO_MOD1I601_7      :BOOL;
+								   			   
+I120_CONV_TRK3_CHO_MOD2I602_0      :BOOL;
+I120_VBFCONVTRKOVERFLW2I602_1      :BOOL;
+I120_SPARE_I602_2                  :BOOL;
+I120_SPARE_I602_3                  :BOOL;
+I120_SPARE_I602_4                  :BOOL;
+I120_SPARE_I602_5                  :BOOL;
+I120_SPARE_I602_6                  :BOOL;
+I120_SPARE_I602_7                  :BOOL;
+I120_SPARE_I603_0                  :BOOL;
+I120_SPARE_I603_1                  :BOOL;
+I120_SPARE_I603_2                  :BOOL;
+I120_SPARE_I603_3                  :BOOL;
+I120_SPARE_I603_4                  :BOOL;
+I120_SPARE_I603_5                  :BOOL;
+I120_SPARE_I603_6                  :BOOL;
+I120_SPARE_I603_7                  :BOOL;
+
+O120_HPR_ENABLEQ600_0              :BOOL;
+O120_BOWL_ENABLEQ600_1             :BOOL;
+O120_HPR_TWR_LMP_REDQ600_2         :BOOL;
+O120_HPR_TWR_LMP_GREENQ600_3       :BOOL;
+O120_BOWL_AIR_PURGE1Q600_4         :BOOL;
+O120_BOWL_AIR_PURGE2Q600_5         :BOOL;
+O120_HPR_DOOR_OPNQ600_6            :BOOL;
+O120_SPARE_Q600_7                  :BOOL;
+O120_SPARE_Q601_0                  :BOOL;
+O120_SPARE_Q601_1                  :BOOL;
+O120_SPARE_Q601_2                  :BOOL;
+O120_SPARE_Q601_3                  :BOOL;
+O120_SPARE_Q601_4                  :BOOL;
+O120_SPARE_Q601_5                  :BOOL;
+O120_SPARE_Q601_6                  :BOOL;
+O120_SPARE_Q601_7                  :BOOL;
+
+O120_SPARE_Q602_0                  :BOOL;
+O120_SPARE_Q602_1                  :BOOL;
+O120_SPARE_Q602_2                  :BOOL;
+O120_SPARE_Q602_3                  :BOOL;
+O120_SPARE_Q602_4                  :BOOL;
+O120_SPARE_Q602_5                  :BOOL;
+O120_SPARE_Q602_6                  :BOOL;
+O120_SPARE_Q602_7                  :BOOL;
+O120_SPARE_Q603_0                  :BOOL;
+O120_SPARE_Q603_1                  :BOOL;
+O120_SPARE_Q603_2                  :BOOL;
+O120_SPARE_Q603_3                  :BOOL;
+O120_SPARE_Q603_4                  :BOOL;
+O120_SPARE_Q603_5                  :BOOL;
+O120_SPARE_Q603_6                  :BOOL;
+O120_SPARE_Q603_7                  :BOOL;
+	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

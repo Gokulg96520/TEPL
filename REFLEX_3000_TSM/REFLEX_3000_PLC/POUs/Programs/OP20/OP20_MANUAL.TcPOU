@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP20_MANUAL" Id="{f4614820-3598-41f3-a44a-0528006d7718}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP20_MANUAL
+VAR
+
+//	SR20_Vert_servo_ctrl:Servo_Control_1;
+	SR20_Vert_servo_Axis :AXIS_REF;
+
+	OP20_LH_OIL_SPIN_M: BOOL;
+	OP20_RH_OIL_SPIN_M: BOOL;
+	OP20_LH_OIL_SPRAY_M: BOOL;
+	OP20_RH_OIL_SPRAY_M: BOOL;
+	temp_safe: BOOL;
+	temp:BOOL;
+	temp_1: BOOL;
+
+	
+	error: BOOL;
+	fb_initz: BOOL;
+	SERVO_LIMIT_WARNING: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// IF MANUAL IS SELECTED 
+IF ( MANUAL_SELECTED or OP20_HMI_ManualMode )AND NOT ERROR_ACTIVE THEN
+  
+    IF OP20_LH_OIL_SPIN_M THEN
+	    O20_LH_OIL_SPIN_ON_Q1150_1:=TRUE;
+	ELSE 
+		O20_LH_OIL_SPIN_ON_Q1150_1:=FALSE;
+	END_IF
+    IF OP20_RH_OIL_SPIN_M THEN
+	    O20_RH_OIL_SPIN_ON_Q1150_3:=TRUE;
+	ELSE 
+		O20_RH_OIL_SPIN_ON_Q1150_3:=FALSE;
+	END_IF	  
+	IF OP20_LH_OIL_SPRAY_M THEN
+	   O20_LH_OIL_DISPN_ON_Q1150_0:=TRUE;
+	   O20_LH_OIL_DISPN_FRL_VLVE_ON_Q401_7:=1;
+	ELSE 
+	   O20_LH_OIL_DISPN_ON_Q1150_0:=0;
+	   O20_LH_OIL_DISPN_FRL_VLVE_ON_Q401_7:=0;
+	END_IF
+	IF OP20_RH_OIL_SPRAY_M THEN
+	   O20_RH_OIL_DISPN_ON_Q1150_2:=TRUE;
+	   O20_RH_OIL_DISPN_FRL_VLVE_ON_Q401_5:=1;
+	ELSE 
+	   O20_RH_OIL_DISPN_ON_Q1150_2:=0;
+	   O20_RH_OIL_DISPN_FRL_VLVE_ON_Q401_5:=0;
+	END_IF	
+	
+END_IF
+
+OP20_VERT_SERVO_POSITION := SR20_Vert_servo_ctrl.Actual_Position;
+OP20_SERVO_POS_DONE	:= SR20_Vert_servo_ctrl.pos_done ;
+
+
+IF In_Range(SR20_Vert_servo_status.actualPosition,OP20_VERT_SERVO_SFE_WRK_POS,1) THEN
+	OP20_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP20_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR20_Vert_servo_status.actualPosition,OP20_VERT_SERVO_HME_POS,1) THEN
+	OP20_SERVO_ON_HOME := TRUE;
+ELSE
+	OP20_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR20_Vert_servo_status.actualPosition,OP20_VERT_SERVO_WRK_POS,1) THEN
+	OP20_SERVO_ON_WRK := TRUE;
+ELSE
+	OP20_SERVO_ON_WRK := FALSE;
+END_IF		
+
+SR20_Vert_servo_ctrl.Velocity := 2000;
+
+OP20_GVL.SR20_Vert_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= fb_initz, 
+	bErrorReset:=OP20_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED ,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:=SR20_Vert_servo_ctrl.Velocity , 
+	fAcc:= , 
+	fDec:= ,
+	Servo_High_Limit:= 25,	
+	Servo_Low_Limit:=1,	 	
+	WARNING_LIMIT:=1,		
+	Actual_Torque=> SR20_Vert_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR20_Vert_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR20_Vert_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR20_Vert_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR20_Vert_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:= SR20_Vert_servo_Axis , 
+	bHome:=SR20_Vert_servo_ctrl.Bsethome ,
+	HME_WRITE_ADD:= 16#5001, 
+    bSetPosition:=SR20_Vert_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR20_Vert_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR20_Vert_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR20_Vert_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR20_Vert_servo_status , 
+	sAxisState=>SR20_Vert_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR20_Vert_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR20_Vert_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR20_Vert_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR20_Vert_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR20_Vert_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR20_Vert_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=> ,
+	bABS_Pos_done=> SR20_Vert_servo_ctrl.pos_done , 
+	bHaltDone=> ,
+	SERVO_LIMIT_WARNING=>SERVO_LIMIT_WARNING, 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );	
+	
+IF OP20_ManualSelected or MANUAL_SELECTED THEN
+	SR20_Vert_servo_status.targetVelocity:=50;
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP20_MANUAL">
+      <LineId Id="3" Count="15" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="162" Count="0" />
+      <LineId Id="21" Count="2" />
+      <LineId Id="159" Count="0" />
+      <LineId Id="24" Count="1" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="26" Count="41" />
+      <LineId Id="136" Count="2" />
+      <LineId Id="68" Count="7" />
+      <LineId Id="117" Count="0" />
+      <LineId Id="76" Count="15" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="92" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

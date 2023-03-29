@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP50_GVL" Id="{915e8a16-d4c8-454b-ae92-a088e9b0e1da}">
+    <Declaration><![CDATA[VAR_GLOBAL
+			
+//GENERAL
+OP50_Auto:					BOOL;
+OP50_Mode_Ack:				BOOL;
+OP50_HomeRunning:			BOOL;
+OP50_ErrorActive:			BOOL;
+OP50_Home_PB:				BOOL;
+OP50_Work_PB:				BOOL;
+OP50_ManualSafetyBypass:	BOOL;
+OP50_LightCurtainBypass:	BOOL;
+OP50_OperationCompleted:	BOOL;
+OP50_LampCheck:				BOOL;
+OP50_MachineLamp:			BOOL;
+OP50_ComponentOk:			BOOL;
+OP50_ComponentNok:			BOOL;
+OP50_RepeatBit:				BOOL;
+OP50_HomingResetBit:		BOOL;
+OP50_ControlledByRobo:		BOOL;
+OP50_Any_Bypass:			BOOL;
+OP50_ManualModeStatus:		INT;
+OP50_ManualModeWord:		INT;
+OP50_AutoRunning:			BOOL;
+OP50_StepRunning:			BOOL;
+OP50_StartEnable:   		BOOL;
+OP50_HomeConditionOK:		BOOL;
+OP50_Temp_hmeOK:			BOOL;
+OP50_Machine_Stop: 			BOOL;
+OP50_AutoSeq:				INT;
+OP50_LH_AutoSeq: 			INT;
+OP50_RH_AutoSeq: 			INT;
+OP50_Homing_Seq:			INT;
+OP50_Safety_OK:				BOOL;
+
+OP50_ManualSelected:		BOOL;
+OP50_StepSelected:			BOOL;
+OP50_AutoSelected:		    BOOL;
+
+OP50_HMI_AutoMode:						BOOL;
+OP50_HMI_ManualMode:					BOOL;
+OP50_HMI_StepMode:						BOOL;
+OP50_HMI_CycleStart:					BOOL;
+OP50_HMI_Cycle_Start:					BOOL;
+
+OP50_HMI_Homing:						BOOL;
+
+SR50_Vert_servo: FB_Axis;
+
+
+SR50_Hori_servo: FB_Axis;
+
+
+SR50_Conv_servo: FB_Axis;
+
+
+OP50_GIUDE_GRP: FB_Axis_FESTO;
+
+
+
+Drum_feeder_ON 	  : BOOL;
+Drum_feeder_State : BOOL;
+
+Camera_LH_Trig : BOOL;
+Camera_LH_OK   : BOOL;
+
+Camera_RH_Trig : BOOL;
+Camera_RH_OK   : BOOL;
+
+//Cylinder
+CR50_LH_Rej_Cyl: Cylinder_Block;
+CR50_RH_Rej_Cyl: Cylinder_Block;
+CR50_LH_Grip_Cyl: Cylinder_Block;
+CR50_RH_Grip_Cyl: Cylinder_Block;
+CR50_LH_Rej_Cyl_status : INT;
+CR50_RH_Rej_Cyl_status : INT;
+CR50_LH_Grip_Cyl_status : INT;
+CR50_RH_Grip_Cyl_status : INT;
+OP50_HMI_LH_Rej_Cyl_Home_PB : BOOL;
+OP50_HMI_LH_Rej_Cyl_Work_PB : BOOL;
+OP50_HMI_RH_Rej_Cyl_Home_PB : BOOL;
+OP50_HMI_RH_Rej_Cyl_Work_PB : BOOL;
+OP50_HMI_LH_Grip_Cyl_Home_PB : BOOL;
+OP50_HMI_LH_Grip_Cyl_Work_PB : BOOL;
+OP50_HMI_RH_Grip_Cyl_Home_PB : BOOL;
+OP50_HMI_RH_Grip_Cyl_Work_PB : BOOL;
+//conveyor
+OP50_pick_ready: BOOL;
+OP50_pick_done : BOOL;
+
+// Sensors
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	OP50_Gripper_LH_Open  : BOOL;
+    OP50_Gripper_LH_Close : BOOL;
+    OP50_Gripper_LH_State : BOOL;  //1-- Open 0--Close
+    
+    OP50_Gripper_RH_Open  : BOOL;
+    OP50_Gripper_RH_Close : BOOL;
+    OP50_Gripper_RH_State : BOOL;
+
+
+    OP50_VERT_SERVO_POS_DONE	    	: BOOL;
+    OP50_VERT_SERVO_ON_SFE_WRK			: BOOL;
+    OP50_VERT_SERVO_ON_WRK_PICK			: BOOL;
+	OP50_VERT_SERVO_ON_WRK_PLACE		: BOOL;
+    OP50_VERT_SERVO_ON_HOME				: BOOL;
+	  
+	OP50_VERT_SERVO_POSITION		: LREAL ;
+	OP50_VERT_SERVO_HME_POS			: REAL := 0;  				
+	OP50_VERT_SERVO_SFE_WRK_POS		: REAL := 100;		
+	OP50_VERT_SERVO_PICK_POS		: REAL := 400;	
+	OP50_VERT_SERVO_PLACE_POS		: REAL := 200;
+
+    OP50_HORI_SERVO_POS_DONE	    	: BOOL;
+    OP50_HORI_SERVO_ON_SFE_WRK			: BOOL;
+    OP50_HORI_SERVO_ON_WRK_PICK			: BOOL;
+	OP50_HORI_SERVO_ON_WRK_PLACE		: BOOL;
+    OP50_HORI_SERVO_ON_HOME				: BOOL;
+	  
+	OP50_HORI_SERVO_POSITION		: LREAL ;
+	OP50_HORI_SERVO_HME_POS			: REAL := 0;  				
+	OP50_HORI_SERVO_SFE_WRK_POS		: REAL := 500;		
+	OP50_HORI_SERVO_PICK_POS		: REAL := 400;	
+	OP50_HORI_SERVO_PLACE_POS		: REAL := 200;
+	
+    OP50_CONV_SERVO_POS_DONE	    	: BOOL;
+    OP50_CONV_SERVO_ON_SFE_WRK			: BOOL;
+    OP50_CONV_SERVO_ON_WRK				: BOOL;
+    OP50_CONV_SERVO_ON_HOME				: BOOL;
+	
+	OP50_CONV_SERVO_POSITION		: LREAL ;
+	OP50_CONV_SERVO_HME_POS			: REAL;// := 0;  				
+	OP50_CONV_SERVO_SFE_WRK_POS		: REAL ;//:= 40;		
+	OP50_CONV_SERVO_WRK_POS			: REAL;// := 200;
+
+//Error
+OP50_ErrorWord_0: DINT;
+OP50_ErrorWord_1: DINT;
+OP50_ErrorWord_2: DINT;	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

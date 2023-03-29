@@ -1,0 +1,434 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP130_Manual" Id="{edc90e8d-fffe-4e89-880d-83ba0f8ef2b2}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP130_Manual
+VAR
+
+	OP130_Enable: BOOL;
+	FESTO_NOT_NEED: BOOL;
+	NOT_REQ: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//LH Rotary Cylinder
+
+//move ZERO to STATUS
+OP130_GVL.CR130_LH_Rotart_Cyl_Status:=0;
+
+
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP130_Auto OR OP130_HomeRunning) THEN
+	CR130_LH_Rot_Cyl.AutoCmd1:=FALSE;
+	CR130_LH_Rot_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR130_LH_Rot_Cyl.SafeHome:= TRUE ;
+	ELSE 
+		CR130_LH_Rot_Cyl.SafeHome:= FALSE ;
+	END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR130_LH_Rot_Cyl.Safework:= TRUE ;
+	ELSE 
+		CR130_LH_Rot_Cyl.Safework:= FALSE ;
+	END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP130_HMI_LH_Rotary_Cyl_Home_PB=TRUE) THEN
+	CR130_LH_Rot_Cyl.ManualPB1:=TRUE;
+	ELSE 
+		CR130_LH_Rot_Cyl.ManualPB1:=FALSE;
+	END_IF
+	
+IF (OP130_HMI_LH_Rotary_Cyl_Work_PB=TRUE) THEN
+	CR130_LH_Rot_Cyl.ManualPB2:=TRUE;
+	ELSE 
+		CR130_LH_Rot_Cyl.ManualPB2:=FALSE;
+	END_IF
+
+
+	
+CR130_LH_Rot_Cyl(
+	Auto:=OP130_GVL.OP130_AutoSelected , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:=OP130_ErrorActive , 
+	ResetPB:= , 
+	Sensor1:= I130_LH_ROTRY_180_DEGI1300_1, 
+	Sensor2:= I130_LH_ROTRY_0_DEGI1300_0, 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=> O130_LH_ROTRY_180_DEG_Q1340_1, 
+	Solenoid2=> O130_LH_ROTRY_0_DEG_Q1340_0, 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR130_LH_Rotart_Cyl_Status );
+	
+//RH Rotary Cylinder
+
+
+//move ZERO to STATUS
+OP130_GVL.CR130_RH_Rotart_Cyl_Status:=0;
+
+
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP130_Auto OR OP130_HomeRunning) THEN
+	CR130_RH_Rot_Cyl.AutoCmd1:=FALSE;
+	CR130_RH_Rot_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR130_RH_Rot_Cyl.SafeHome:= TRUE ;
+	ELSE 
+		CR130_RH_Rot_Cyl.SafeHome:= FALSE ;
+	END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR130_RH_Rot_Cyl.Safework:= TRUE ;
+	ELSE 
+		CR130_RH_Rot_Cyl.Safework:= FALSE ;
+	END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP130_HMI_RH_Rotary_Cyl_Home_PB=TRUE) THEN
+	CR130_RH_Rot_Cyl.ManualPB1:=TRUE;
+	ELSE 
+		CR130_RH_Rot_Cyl.ManualPB1:=FALSE;
+	END_IF
+	
+IF (OP130_HMI_RH_Rotary_Cyl_Work_PB=TRUE) THEN
+	CR130_RH_Rot_Cyl.ManualPB2:=TRUE;
+	ELSE 
+		CR130_RH_Rot_Cyl.ManualPB2:=FALSE;
+	END_IF
+
+
+	
+CR130_RH_Rot_Cyl(
+	Auto:=OP130_Auto , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:=OP130_ErrorActive , 
+	ResetPB:= , 
+	Sensor1:= I130_RH_ROTRY_180_DEGI1300_3, 
+	Sensor2:= I130_RH_ROTRY_0_DEGI1300_2, 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz  , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=> O130_RH_ROTRY_180_DEG_Q1340_3, 
+	Solenoid2=> O130_RH_ROTRY_0_DEG_Q1340_2, 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR130_RH_Rotart_Cyl_Status );
+	
+//LH Vertical Slide Servo
+
+// Servo Safe To move
+IF (TRUE) THEN 
+	SR130_LH_Servo_Control.Safe_To_Move:= TRUE;
+END_IF
+
+
+//SR130_LH_Vert_Servo(
+//	bAxis1_Ref_Switch:= , 
+//	bInit:= , 
+//	bErrorReset:= , 
+//	bEnable:= , 
+//	bMoveVelocity:= , 
+//	bHalt:= , 
+//	bManualMode:= , 
+//	fHomePos:=SR130_LH_Servo_Control.Reference_Position , 
+//	fOverride:= , 
+//	fTargetPosition:= , 
+//	fTargetVelocity:= , 
+//	fAcc:= , 
+//	fDec:= , 
+//	Axis:=SR130_RH_Vert_Servo_Axis, 
+//	bHome:=SR130_LH_Servo_Control.Reference_Start , 
+//	bSetPosition:=SR130_LH_Servo_Control.BsetPos , 
+//	bMoveAbsolute:=SR130_LH_Servo_Control.ABSmove_Start , 
+//	bMoveRelative:=SR130_LH_Servo_Control.RELmove_Start , 
+//	stManualModeAxis:=SR130_stManualModeAxis_LH_Vert_Servo, 
+//	sAxisState=>SR130_LH_Servo_Control.Axis_State , 
+//	bAxis_ready=>SR130_LH_Servo_Control.Axis_ready , 
+//	bAxisInPosition=>SR130_LH_Servo_Control.Axis_In_Pos , 
+//	bAxisError=>SR130_LH_Servo_Control.Axis_Error , 
+//	bAxisEnabled=>SR130_LH_Servo_Control.Axis_Enabled , 
+//	bAxisHomed=>SR130_LH_Servo_Control.Axis_reference , 
+//	bSetPositionDone=> , 
+//	bHaltDone=> , 
+//	bSTOPDone=> , 
+//	bHomeDone=> , 
+//	bDone=> );
+
+	
+	//LH Vertical Servo 1
+	SR130_LH_Vert_Servo(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:=OP130_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:=MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety , 
+	Axis:= SR130_LH_Vert_Servo_Axis, 
+	HME_WRITE_ADD:= 16#5012,	
+	bHome:= SR130_LH_Servo_Control.Reference_Start, 
+	bSetPosition:=SR130_LH_Servo_Control.BsetPos , 
+	bMoveAbsolute:=SR130_LH_Servo_Control.ABSmove_Start , 
+	bMoveRelative:=SR130_LH_Servo_Control.RELmove_Start , 
+	bMoveTorque:=SR130_LH_Servo_Control.Torque_mode_Start , 
+	stManualModeAxis:=SR130_stManualModeAxis_LH_Vert_Servo , 
+	bmove_home:=SR130_LH_Servo_Control.Axis_Home_Cmd , 
+	sAxisState=>SR130_LH_Servo_Control.Axis_State , 
+	bAxis_ready=>SR130_LH_Servo_Control.Axis_ready , 
+	bAxisInPosition=>SR130_LH_Servo_Control.Axis_In_Pos , 
+	bAxisError=>SR130_LH_Servo_Control.Axis_Error , 
+	bAxisEnabled=> SR130_LH_Servo_Control.Axis_Enabled, 
+	bAxisHomed=>SR130_LH_Servo_Control.Axis_reference  , 
+	bSetPositionDone=> , 
+	bHaltDone=> SR130_LH_Servo_Control.Axis_Halted, 
+	bSTOPDone=> SR130_LH_Servo_Control.Axis_Stopped, 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=>SR130_LH_Servo_Control.Trq_reached , 
+	bsafe_to_move=>SR130_LH_Servo_Control.Safe_To_Move , 
+	baxis_in_home_pos=>SR130_LH_Servo_Control.Axis_In_Home , 
+	bABS_Pos_done=> , 
+	Actual_position=> , 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+	
+	//RH Vertical Slide Servo
+
+// Servo Safe To move
+IF (TRUE) THEN 
+	SR130_RH_Servo_Control.Safe_To_Move:= TRUE;
+END_IF
+
+
+//SR130_RH_Vert_Servo(
+//	bAxis1_Ref_Switch:= , 
+//	bInit:= , 
+//	bErrorReset:= , 
+//	bEnable:= , 
+//	bMoveVelocity:= , 
+//	bHalt:= , 
+//	bManualMode:= , 
+//	fHomePos:=SR130_RH_Servo_Control.Reference_Position , 
+//	fOverride:= , 
+//	fTargetPosition:= , 
+//	fTargetVelocity:= , 
+//	fAcc:= , 
+//	fDec:= , 
+//	Axis:=SR130_LH_Vert_Servo_Axis , 
+//	bHome:=SR130_RH_Servo_Control.Reference_Start , 
+//	bSetPosition:=SR130_RH_Servo_Control.BsetPos , 
+//	bMoveAbsolute:=SR130_RH_Servo_Control.ABSmove_Start , 
+//	bMoveRelative:=SR130_RH_Servo_Control.RELmove_Start , 
+//	stManualModeAxis:=SR130_stManualModeAxis_RH_Vert_Servo , 
+//	sAxisState=>SR130_RH_Servo_Control.Axis_State , 
+//	bAxis_ready=>SR130_RH_Servo_Control.Axis_ready , 
+//	bAxisInPosition=>SR130_RH_Servo_Control.Axis_In_Pos , 
+//	bAxisError=>SR130_RH_Servo_Control.Axis_Error , 
+//	bAxisEnabled=>SR130_RH_Servo_Control.Axis_Enabled , 
+//	bAxisHomed=>SR130_RH_Servo_Control.Axis_reference , 
+//	bSetPositionDone=> , 
+//	bHaltDone=> , 
+//	bSTOPDone=> , 
+//	bHomeDone=> , 
+//	bDone=> );
+	
+//RH Vert Servo 1
+
+SR130_RH_Vert_Servo(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:=OP130_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:=MANUAL_SELECTED , 
+	fHomePos:=SR130_RH_Servo_Control.Reference_Position , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety , 
+	Axis:= SR130_RH_Vert_Servo_Axis, 
+	HME_WRITE_ADD:= 16#5013,	
+	bHome:=SR130_RH_Servo_Control.Reference_Start , 
+	bSetPosition:= SR130_RH_Servo_Control.BsetPos, 
+	bMoveAbsolute:=SR130_RH_Servo_Control.ABSmove_Start , 
+	bMoveRelative:=SR130_RH_Servo_Control.RELmove_Start , 
+	bMoveTorque:=SR130_RH_Servo_Control.Torque_mode_Start , 
+	stManualModeAxis:=SR130_stManualModeAxis_RH_Vert_Servo , 
+	bmove_home:=SR130_RH_Servo_Control.Axis_Home_Cmd , 
+	sAxisState=>SR130_RH_Servo_Control.Axis_State , 
+	bAxis_ready=>SR130_RH_Servo_Control.Axis_ready  , 
+	bAxisInPosition=>SR130_RH_Servo_Control.Axis_In_Pos , 
+	bAxisError=>SR130_RH_Servo_Control.Axis_Error , 
+	bAxisEnabled=>SR130_RH_Servo_Control.Axis_Enabled , 
+	bAxisHomed=>SR130_RH_Servo_Control.Axis_reference , 
+	bSetPositionDone=> , 
+	bHaltDone=>SR130_RH_Servo_Control.Axis_Halted , 
+	bSTOPDone=>SR130_RH_Servo_Control.Axis_Stopped , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> SR130_RH_Servo_Control.Trq_reached, 
+	bsafe_to_move=> SR130_RH_Servo_Control.Safe_To_Move, 
+	baxis_in_home_pos=>SR130_RH_Servo_Control.Axis_In_Home , 
+	bABS_Pos_done=> , 
+	Actual_position=>SR130_RH_Servo_Control.Actual_Position , 
+	Actual_velocity=>SR130_RH_Servo_Control.Actual_Velocity , 
+	Actual_Torque=> SR130_RH_Servo_Control.Actual_Torque);
+	
+	// Clamping Stepper 
+	// Servo Safe To move
+IF (TRUE) THEN 
+	SR130_RH_Servo_Control.Safe_To_Move:= TRUE;
+END_IF
+
+
+//SR130_Clm_Stepper(
+//	bAxis1_Ref_Switch:= , 
+//	bInit:= , 
+//	bErrorReset:= , 
+//	bEnable:= , 
+//	bMoveVelocity:= , 
+//	bHalt:= , 
+//	bManualMode:= , 
+//	fHomePos:=SR130_Stepper_Control.Reference_Position , 
+//	fOverride:= , 
+//	fTargetPosition:= , 
+//	fTargetVelocity:= , 
+//	fAcc:= , 
+//	fDec:= , 
+//	Axis:=SR130_Clm_Stepper_Axis , 
+//	bHome:=SR130_Stepper_Control.Reference_Start , 
+//	bSetPosition:=SR130_Stepper_Control.BsetPos , 
+//	bMoveAbsolute:=SR130_Stepper_Control.ABSmove_Start , 
+//	bMoveRelative:=SR130_Stepper_Control.RELmove_Start , 
+//	stManualModeAxis:=SR130_stManualModeAxis_Clamp_Stepper , 
+//	sAxisState=>SR130_Stepper_Control.Axis_State , 
+//	bAxis_ready=>SR130_Stepper_Control.Axis_ready , 
+//	bAxisInPosition=>SR130_Stepper_Control.Axis_In_Pos , 
+//	bAxisError=>SR130_Stepper_Control.Axis_Error , 
+//	bAxisEnabled=>SR130_Stepper_Control.Axis_Enabled , 
+//	bAxisHomed=>SR130_Stepper_Control.Axis_reference , 
+//	bSetPositionDone=> , 
+//	bHaltDone=> , 
+//	bSTOPDone=> , 
+//	bHomeDone=> , 
+//	bDone=> );
+	
+// Clamp Stepper 1	
+
+SR130_Clm_Stepper(														// FESTO GUIDE GRIPPER
+	bAxis1_Ref_Switch:= , 
+	bInit:=  , 
+	bErrorReset:=OP130_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable , /// MACHINE ERR REGISTER CHANGE
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 									//MANUAL REGISTER CHANGE
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP50_GIUDE_GRP_ctrl.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety , 					// CHANGE
+	Axis:= SR130_Clm_Stepper_Axis, 
+	bHome:=SR130_Stepper_Control.Reference_Start, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= SR130_Stepper_Control.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= SR130_stManualModeAxis_Clamp_Stepper, 
+ 	sAxisState=>SR130_Stepper_Control.Axis_State , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> , 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP50_GIUDE_GRP_Manual_Axis.targetVelocity := 50;
+IF 	MANUAL_SELECTED THEN
+SR130_stManualModeAxis_RH_Vert_Servo.targetVelocity:=5;
+SR130_stManualModeAxis_LH_Vert_Servo.targetVelocity:=5;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="OP130_Manual">
+      <LineId Id="3" Count="208" />
+      <LineId Id="414" Count="0" />
+      <LineId Id="212" Count="84" />
+      <LineId Id="415" Count="0" />
+      <LineId Id="297" Count="66" />
+      <LineId Id="421" Count="40" />
+      <LineId Id="405" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Name>Drive Manager 2</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{b2f6f5f2-edfe-498d-bcb2-d34839f946c0}</ProjectGuid>
+    <TcPath>
+    </TcPath>
+    <AssemblyName>REFLEX_3000_DM2</AssemblyName>
+    <RootNamespace>REFLEX_3000_DM2</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Box 54 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 55 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 56 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 57 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 59 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 60 (AMI8000-0100)_OP30_VERTICAL.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 61 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 63 (AMI8000-0100)_OP50_HORIZANTAL.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 64 (AMI8000-0100)_OP50_VERTICAL.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 65 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 67 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 68 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 69 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 71 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 72 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 73 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 74 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 76 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 77 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 79 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 80 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 82 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 83 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Box 84 %28AMI8000-0100%29.tcdmdrv">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+</Project>

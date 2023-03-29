@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Inspection_control" Id="{78a659f7-044a-4936-917f-2893818f8704}">
+    <Declaration><![CDATA[TYPE Inspection_control :
+STRUCT
+Buffer_Results_Enable	: BIT ;
+Inspection_Results_Ack	: BIT ;
+Set_User_Data			: BIT ;
+Execute_Command			: BIT ;
+Reserved4				: BIT ;
+Reserved5				: BIT ;
+Reserved6				: BIT ;
+Clear_Error				: BIT ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

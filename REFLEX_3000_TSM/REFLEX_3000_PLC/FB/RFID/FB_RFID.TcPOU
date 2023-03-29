@@ -1,0 +1,532 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_RFID" Id="{1b80f311-6325-474f-baf6-cd20221e7e87}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FINAL FB_RFID
+VAR_INPUT
+I_T_Timeout: 						TIME;
+I_b_Head1SingleEnhanced:	 		BOOL;
+I_b_Head1DataFixcode:				BOOL;
+I_b_Head1SpecialFixcode:			BOOL;
+I_b_Head1SpecialCommand:			BOOL;
+I_b_Head1Read:						BOOL;
+I_b_Head1Write:						BOOL;
+I_b_Head1Quit:						BOOL;
+I_i_Head1WordNum:					INT;
+I_w_Head1WordAddress:				WORD;
+I_w_Head1TagType:					WORD;
+HwIn:								ARRAY [0..63] OF BYTE;
+END_VAR
+VAR_IN_OUT
+IO_b_SetRestart:					BOOL;
+IO_b_InitFinish:					BOOL;
+Head1Data:							HeadData;
+head1:								Head1;
+Memory:								Memory;
+END_VAR
+VAR_OUTPUT
+O_b_Head1Busy:						BOOL;
+O_b_Head1Done:						BOOL;
+O_b_Head1NoDataCarrier:				BOOL;
+O_b_Head1Error:						BOOL;
+O_B_Head1Status:					BYTE;
+O_B_Head1ReplyCounter:				BYTE;	
+HwOut:								ARRAY [0..63] OF BYTE;
+END_VAR
+VAR
+state_init:							INT;
+state_cmd1:							INT;
+i:									INT;
+RTRIG_Read1:						R_TRIG;
+RTRIG_Write1:						R_TRIG;
+RTRIG_Quit1:						R_TRIG;
+RTRIG_SpecialCommand1:				R_TRIG;
+RTRIG_SetRestart:					R_TRIG;
+
+Head_1_InData: 						ARRAY [0..63] OF BYTE;
+Head_1_OutData:						ARRAY [0..63] OF BYTE;
+Watchdog1:							TON;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+(* Receive complete Input-Telegram from IdentControl each cycle *)
+ Memory.Memory := HwIn; 
+
+
+(* Check telegram *)
+
+    
+    IF Memory.OldReplyCounter <> Memory.Memory[3] THEN (* New telegram available *)
+        Memory.Headnumber := SHR(Memory.Memory[1] AND 16#E, 1); (* Get channel number *)
+        Memory.Togglebit := (Memory.Memory[1] AND 16#1); (* Get togglebit *)
+        Memory.OldCommandIn := Memory.Memory[0];
+        Memory.OldChannelIn := Memory.Memory[1];
+        Memory.OldStatus := Memory.Memory[2];
+        Memory.OldReplyCounter := Memory.Memory[3];
+         IF Memory.Headnumber = 1 THEN
+			MEMCPY( srcAddr:=ADR(Memory.Memory[0]),destAddr:=ADR(Head_1_InData[0])  , n:=SIZEOF( Memory.Memory));
+			MEMCPY( srcAddr:=ADR(Head_1_InData[4]),  destAddr:=ADR(Head1Data.ReadData[0]), n:=SIZEOF ( Head_1_InData));
+            Head1.NewData := TRUE;
+ 		  END_IF;
+      
+     END_IF;
+ 
+
+ 
+(* Define inputs as rising edges *)
+RTRIG_SetRestart(CLK := IO_b_SetRestart);
+RTRIG_Read1(CLK := I_b_Head1Read);
+RTRIG_Write1(CLK := I_b_Head1Write);
+RTRIG_Quit1(CLK := I_b_Head1Quit);
+RTRIG_SpecialCommand1(CLK := I_b_Head1SpecialCommand);
+
+(* Acknowledge rising edge *)
+IF RTRIG_Read1.Q THEN
+    Head1.SaveRead := TRUE;
+ELSIF RTRIG_Write1.Q THEN
+    Head1.SaveWrite := TRUE;
+ELSIF RTRIG_Quit1.Q THEN
+    Head1.SaveQuit := TRUE;
+ELSIF RTRIG_SpecialCommand1.Q THEN
+    Head1.SaveSpecialCommand := TRUE;
+END_IF;
+
+IF RTRIG_SetRestart.Q THEN
+    Head1.ExistTC := FALSE;
+    Head1.NotExist := FALSE;
+    Head1.Done := FALSE;
+    O_b_Head1Done := FALSE;
+    Head1.Error := FALSE;
+    O_b_Head1Error := FALSE;
+    Head1.Busy := FALSE;
+    O_b_Head1Busy := FALSE;
+    Head1.NoDataCarrier := FALSE;
+    O_b_Head1NoDataCarrier := FALSE;
+    Head1.SglCommandActive := FALSE;
+    Head1.EnhCommandActive := FALSE;
+    Head1.NewData := FALSE;
+    Head1.TimeoutActive := FALSE;
+    Head1.TimeoutOccurred := FALSE;
+    Head1.TransfToHead := FALSE;
+    Head1.SendOK := FALSE;
+    Head1.Execute := FALSE;
+    Head1.ReceiveOK := FALSE;
+    Head1.SaveRead := FALSE;
+    Head1.SaveWrite := FALSE;
+    Head1.SaveQuit := FALSE;
+    Head1.SaveSpecialCommand := FALSE;
+    
+    state_init := 1;
+    state_cmd1 := 0;
+    IO_b_InitFinish := FALSE;
+END_IF;
+
+(* ******************** Initialize routine ******************** *)
+CASE state_init OF
+        
+    0:  (* ********************** Idle state ******************* *)
+		;   
+    1:  (* ********************** Initialize variables  ******************* *)
+        
+        (* Clear OutData array *)
+        FOR i := 0 TO 63 BY 1 DO               //overwrite output data field of head 1
+            Head_1_OutData[i] := 16#0;        //new in V2.1
+        END_FOR;
+        
+        FOR i := 0 TO 59 BY 1 DO               //overwrite Write Data field of head 1
+            Head1Data.WriteData[i] := 16#0;
+        END_FOR;
+        
+        (* Clear InData array *)
+        FOR i := 0 TO 63 BY 1 DO               //overwrite input data field of head 1
+            Head_1_InData[i] := 16#0;         //new in V2.1
+            Memory.Memory[i] := 16#0;         //cverwrite Memory Input data field
+        END_FOR;
+        
+        FOR i := 0 TO 59 BY 1 DO
+             Head1Data.ReadData[i] := 16#0;   //overwrite Read Data field of head 1
+        END_FOR;
+        
+        
+        state_init := state_init + 1;   (* Go to next state *)
+        
+        
+    2: (* ***************** Send Change Tag Command For Channel 1 *************** *)
+        
+        (* Init OUTPUT Array with command *)
+        Head_1_OutData[0] := 16#04;    (*Command: Change Tag*)
+        Head_1_OutData[1] := 16#02;
+        Head_1_OutData[2] := WORD_TO_BYTE(SHR(I_w_Head1TagType, 8));
+        Head_1_OutData[3] := WORD_TO_BYTE(I_w_Head1TagType);
+        
+        Head1.Busy := TRUE;
+        O_b_Head1Busy := TRUE;
+        Head1.Done := FALSE;
+        O_b_Head1Done := FALSE;
+        Head1.TimeoutActive := TRUE;
+        
+        (* Invert togglebit to inform PLC, that a new telegram is available *)
+        IF Memory.Togglebit <> 1 THEN
+            Head_1_OutData[1] := Head_1_OutData[1] OR 16#1;
+        ELSE
+            Head_1_OutData[1] := Head_1_OutData[1] AND 16#FE;
+        END_IF;
+        
+        HwOut:=Head_1_OutData ; (* Write on BUS *)  (* Write on BUS *)
+     
+           
+            state_init := state_init + 1; (* Go to next state *)
+        
+        
+        
+    3: (* ******************** Wait for CT ************************ *)
+        IF Head1.NewData THEN
+            
+            Head1.NewData := FALSE;
+            O_B_Head1Status := Head_1_InData[2];
+            O_B_Head1ReplyCounter := Head_1_InData[3];
+            
+            (* Antenna OK *)
+            IF Head_1_InData[2] = 16#0 THEN
+                Head1.ExistTC := TRUE;
+                Head1.NotExist := FALSE;
+            END_IF;
+            (* Antenna not OK *)
+            IF Head_1_InData[2] = 16#6 THEN
+                Head1.ExistTC := FALSE;
+                Head1.NotExist := TRUE;
+            END_IF;
+            
+            (* Error *)
+            IF Head_1_InData[2] = 16#4
+                OR Head_1_InData[2] = 16#7
+                OR Head_1_InData[2] = 16#9 THEN
+                Head1.ExistTC := FALSE;
+                Head1.NotExist := FALSE;
+                Head1.Error := TRUE;
+                O_b_Head1Error := TRUE;
+            END_IF;
+            
+            (* Done *)
+            IF Head_1_InData[2] <> 16#FF THEN
+                Head1.Busy := FALSE;
+                O_b_Head1Busy := FALSE;
+                Head1.Done := TRUE;
+                O_b_Head1Done := TRUE;
+                Head1.TimeoutActive := FALSE;
+                state_init := state_init + 1; (* Go to next state *)
+            END_IF;
+        END_IF;
+        
+    4:  (* Initialization finished *)
+        IF (Head1.ExistTC OR Head1.NotExist) THEN
+            IO_b_InitFinish := TRUE;
+           // SetRestart := False;           //new in V2.1; Reset SetRestart from inside FB
+        END_IF;
+END_CASE;
+
+(* ******************** Function block ready ******************** *)
+IF IO_b_InitFinish THEN
+(* ********** Commands Channel 1 ********** *)
+    IF NOT Head1.Execute THEN
+        
+        (* ***** Quit ***** *)
+        IF Head1.SaveQuit THEN
+            Head_1_OutData[0] := 16#2;
+            
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Single Read Words ***** *)
+        IF Head1.SaveRead AND NOT I_b_Head1DataFixcode AND NOT I_b_Head1SingleEnhanced AND NOT I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#10;
+            Head_1_OutData[1] := WORD_TO_BYTE((INT_TO_WORD(SHL(I_i_Head1WordNum, 4)) OR 16#2));
+            Head_1_OutData[2] := WORD_TO_BYTE(SHR( I_w_Head1WordAddress AND 16#FF00,8));
+            Head_1_OutData[3] := WORD_TO_BYTE(I_w_Head1WordAddress);
+            
+            Head1.SglCommandActive := TRUE;
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Single Read Fixcode ***** *)
+        IF Head1.SaveRead AND I_b_Head1DataFixcode AND NOT I_b_Head1SingleEnhanced AND NOT I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#01;
+            Head_1_OutData[1] := 16#02;
+            
+            Head1.SglCommandActive := TRUE;
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Single Read SpecialFixcode ***** *)
+        IF Head1.SaveRead AND NOT I_b_Head1SingleEnhanced AND I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#0A;
+            Head_1_OutData[1] := 16#02;
+            
+            Head1.SglCommandActive := TRUE;
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Enhanced Read Words ***** *)
+        IF Head1.SaveRead AND NOT I_b_Head1DataFixcode AND I_b_Head1SingleEnhanced AND NOT I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#19;
+            Head_1_OutData[1] := WORD_TO_BYTE((INT_TO_WORD(SHL(I_i_Head1WordNum,  4)) OR 16#2));
+            Head_1_OutData[2] := WORD_TO_BYTE(SHR(I_w_Head1WordAddress AND 16#FF00, 8));
+            Head_1_OutData[3] := WORD_TO_BYTE(I_w_Head1WordAddress);
+            
+            Head1.EnhCommandActive := TRUE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Enhanced Read Fixcode ***** *)
+        IF Head1.SaveRead AND I_b_Head1DataFixcode AND I_b_Head1SingleEnhanced AND NOT I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#1D;
+            Head_1_OutData[1] := 16#02;
+            
+            Head1.EnhCommandActive := TRUE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Enhanced Read SpecialFixcode ***** *)
+        IF Head1.SaveRead AND I_b_Head1SingleEnhanced AND I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#71;
+            Head_1_OutData[1] := 16#02;
+            
+            Head1.EnhCommandActive := TRUE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Single Write Words ***** *)
+        IF Head1.SaveWrite AND NOT I_b_Head1DataFixcode AND NOT I_b_Head1SingleEnhanced AND NOT I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#40;
+            Head_1_OutData[1] := WORD_TO_BYTE((INT_TO_WORD(SHL(I_i_Head1WordNum, 4)) OR 16#2));
+            Head_1_OutData[2] := WORD_TO_BYTE(SHR( I_w_Head1WordAddress AND 16#FF00,  8));
+            Head_1_OutData[3] := WORD_TO_BYTE(I_w_Head1WordAddress);
+            //Copy Write Data field to Out Data beginning at element [4]
+            MEMCPY(srcAddr:=ADR(Head1Data.WriteData[0]) , destAddr:=ADR(Head_1_OutData[4]) , n:=SIZEOF(Head1Data.WriteData) );
+			
+            Head1.SglCommandActive := TRUE;
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Enhanced Write Words ***** *)
+        IF Head1.SaveWrite AND NOT I_b_Head1DataFixcode AND I_b_Head1SingleEnhanced AND NOT I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#1A;
+            Head_1_OutData[1] := WORD_TO_BYTE((INT_TO_WORD(SHL(I_i_Head1WordNum, 4)) OR 16#2));
+            Head_1_OutData[2] := WORD_TO_BYTE(SHR( I_w_Head1WordAddress AND 16#FF00, 8));
+            Head_1_OutData[3] := WORD_TO_BYTE(I_w_Head1WordAddress);
+            //Copy Write Data field to Out Data beginning at element [4]		 
+			MEMCPY(srcAddr:= ADR(Head1Data.WriteData[0]) , destAddr:=ADR(Head_1_OutData[4]) , n:=SIZEOF(Head1Data.WriteData) );		 
+	 
+            Head1.EnhCommandActive := TRUE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Single Write Fixcode ***** *) (* - default for IPC11, FixType = 11 & FixLen = 5 *)
+        IF Head1.SaveWrite AND I_b_Head1DataFixcode AND NOT I_b_Head1SingleEnhanced AND NOT I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#1F;
+            Head_1_OutData[1] := WORD_TO_BYTE((INT_TO_WORD(SHL(16#5,  4)) OR 16#2));
+            Head_1_OutData[2] := 16#31; (* ASCII 11 = 0x3131, overwrite fixcode *)
+            Head_1_OutData[3] := 16#31;
+            //Copy Write Data field to Out Data beginning at element [4]
+           MEMCPY(srcAddr:= ADR(Head1Data.WriteData[0]) , destAddr:=ADR(Head_1_OutData[4]) , n:=SIZEOF(Head1Data.WriteData) );
+            	 
+            Head1.SglCommandActive := TRUE;
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Single Write SpecialFixcode ***** *)
+        IF Head1.SaveWrite AND NOT I_b_Head1SingleEnhanced AND I_b_Head1SpecialFixcode THEN
+            Head_1_OutData[0] := 16#0D;
+            Head_1_OutData[1] := WORD_TO_BYTE((INT_TO_WORD(SHL(I_i_Head1WordNum, 4)) OR 16#2));
+            Head_1_OutData[2] := 16#0; (* reserved *)
+            Head_1_OutData[3] := 16#0; (* reserved *)
+            //Copy Write Data field to Out Data beginning at element [4]
+            MEMCPY(srcAddr:= ADR(Head1Data.WriteData[0]) , destAddr:=ADR(Head_1_OutData[4]) , n:=SIZEOF(Head1Data.WriteData ));
+		 
+            Head1.SglCommandActive := TRUE;
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+        
+        (* ***** Special Command ***** *)
+        IF Head1.SaveSpecialCommand AND NOT I_b_Head1SpecialFixcode THEN
+        (* Copy SpecialCommand-Array into Output-Array *)
+            //Copy the whole SpecialCommand data field to the Output Data
+			 MEMCPY(srcAddr:=ADR(Head1Data.SpecialCommand[0]) , destAddr:=ADR(Head_1_OutData[0]) , n:=SIZEOF(Head1Data.SpecialCommand) );		 
+			
+            Head1.SglCommandActive := TRUE;
+            Head1.EnhCommandActive := FALSE;
+            Head1.Execute := TRUE;
+            state_cmd1 := 1;
+        END_IF;
+    END_IF;
+    
+(* ***** Handle communication and analysis for channel 1 ***** *)
+    CASE state_cmd1 OF
+            
+        0:  (* ***** Idle state ***** *)
+//        IF NOT I_b_Head1SingleEnhanced
+//			AND NOT	I_b_Head1DataFixcode
+//			AND NOT	I_b_Head1SpecialFixcode
+//			AND NOT	I_b_Head1SpecialCommand
+//			AND NOT	I_b_Head1Read
+//			AND NOT	I_b_Head1Write
+//			AND NOT	I_b_Head1Quit
+//			THEN
+			O_b_Head1Done := FALSE;
+			//O_b_Head1NoDataCarrier := FALSE;
+//		END_IF
+
+        1:  (* ***** Execution ***** *)
+            IF Head1.Execute AND NOT Head1.TransfToHead THEN
+                
+                Head1.Busy := TRUE;
+                O_b_Head1Busy := TRUE;
+                Head1.Done := FALSE;
+                O_b_Head1Done := FALSE;
+                Head1.Error := FALSE;
+                O_b_Head1Error := FALSE;
+                Head1.SendOK := FALSE;
+                Head1.ReceiveOK := FALSE;
+                Head1.NoDataCarrier := FALSE;
+                O_b_Head1NoDataCarrier := FALSE;
+                Head1.NewData := FALSE;
+                Head1.TimeoutActive := TRUE;
+                Head1.TimeoutOccurred := FALSE;
+                Head1.TransfToHead := TRUE;
+                Head1.SaveRead := FALSE;
+                Head1.SaveWrite := FALSE;
+                Head1.SaveQuit := FALSE;
+                Head1.SaveSpecialCommand := FALSE;
+                
+                (* Invert togglebit => new telegram is available *)
+                IF Memory.Togglebit <> 1 THEN
+                    Head_1_OutData[1] := Head_1_OutData[1] OR 16#1;
+                ELSE
+                    Head_1_OutData[1] := Head_1_OutData[1] AND 16#FE;
+                END_IF;
+                
+               		HwOut:= Head_1_OutData ; (* Write on BUS *)
+               
+                 
+                    state_cmd1 := state_cmd1 + 1; (* Go to next state *)
+                
+            END_IF;
+            
+            
+        2:(* ***** Analyze InData ***** *)
+        (* Receive Telegram *)
+            IF Head1.NewData THEN
+                
+                Head1.NewData := FALSE;
+                (* Transfer status & reply counter to output *)
+                O_B_Head1Status := Head_1_InData[2];
+                O_B_Head1ReplyCounter := Head_1_InData[3];
+                
+                (* Analyze status *)
+                IF Head_1_InData[2] = 16#FF THEN
+                    Head1.SendOK := TRUE;
+                    Head1.TransfToHead := FALSE;
+                ELSE
+                    Head1.Execute := FALSE;
+                    Head1.ReceiveOK := TRUE;
+                    Head1.SglCommandActive := FALSE;
+                    Head1.TimeoutActive := FALSE;
+                    Head1.Busy := FALSE;
+                    O_b_Head1Busy := FALSE;
+                    Head1.Done := TRUE;
+                    O_b_Head1Done := TRUE;
+                    state_cmd1 := 0; (* Go to idle state *)
+                END_IF;
+                
+                IF Head_1_InData[2] = 16#0 THEN
+                    Head1.NoDataCarrier := FALSE;
+                    O_b_Head1NoDataCarrier := FALSE;
+                    Head1.Error := FALSE;      //new in 3.0
+                    O_b_Head1Error := FALSE;       //new in 3.0
+                END_IF;
+                
+                IF Head_1_InData[2] = 16#5 THEN
+                    Head1.NoDataCarrier := TRUE;
+                    O_b_Head1NoDataCarrier := TRUE;
+                    Head1.Error := FALSE;      //new in 3.0
+                    O_b_Head1Error := FALSE;       //new in 3.0
+                END_IF;
+                
+                (* Error states *)
+                IF Head_1_InData[2] = 16#4
+                    OR Head_1_InData[2] = 16#6
+                    OR Head_1_InData[2] = 16#7
+                    OR Head_1_InData[2] = 16#9
+                    OR Head_1_InData[2] = 16#A
+                    OR Head_1_InData[2] = 16#E THEN
+                    Head1.Error := TRUE;
+                    O_b_Head1Error := TRUE;
+                END_IF;
+                
+                (* Different output behaviour during active enhanced command *)
+                IF Head1.EnhCommandActive THEN
+                    state_cmd1 := 2; (* Receive new telegram *)
+                    Head1.Busy := TRUE;
+                    O_b_Head1Busy := TRUE;
+                    IF Head_1_InData[2] = 16#0 THEN
+                        Head1.Done := TRUE;
+                        O_b_Head1Done := TRUE;
+                    ELSE
+                        Head1.Done := FALSE;
+                        O_b_Head1Done := FALSE;
+                    END_IF;
+                END_IF;
+            END_IF;
+    END_CASE;
+END_IF;
+
+(* ***** Watchdog ***** *)
+Watchdog1(IN := Head1.TimeoutActive,
+           PT := I_T_Timeout);
+
+IF Watchdog1.Q THEN
+    Head1.TimeoutActive := FALSE;
+    Head1.TimeoutOccurred := TRUE;
+    Head1.SendOK := FALSE;
+    Head1.ReceiveOK := FALSE;
+    Head1.SglCommandActive := FALSE;
+    Head1.EnhCommandActive := FALSE;
+    Head1.Execute := FALSE;
+    Head1.TransfToHead := FALSE;
+    Head1.Error := TRUE;
+    O_b_Head1Error := TRUE;
+    Head1.Busy := FALSE;
+    O_b_Head1Busy := FALSE;
+    Head1.Done := TRUE;
+    O_b_Head1Done := TRUE;
+END_IF;
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_RFID">
+      <LineId Id="3" Count="472" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

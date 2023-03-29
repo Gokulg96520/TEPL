@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ENUM_Schunk" Id="{4852b753-45bc-411e-a7d3-32a9d1cfab37}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+{attribute 'to_string'}
+TYPE ENUM_Schunk :
+
+(
+	Init := 0,
+	Undefined,
+	Error,
+	Reset,
+	Stop,
+	Ready,//Wait for command
+	Homing,
+	SetPosition,
+	MoveAbsolute,
+	MoveRelative
+);	
+	
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

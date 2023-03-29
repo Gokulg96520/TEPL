@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_SimClock" Id="{fc9cf2c3-364a-484e-a2bc-6378c7f938ab}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SimClock
+VAR_INPUT
+	
+END_VAR
+VAR_OUTPUT
+
+Q10Hz				: BOOL;
+Q5Hz				: BOOL;
+Q2_5Hz				: BOOL;
+Q2Hz				: BOOL;
+Q1_25Hz				: BOOL;
+Q1Hz				: BOOL;
+Q0_625Hz			: BOOL;
+Q0_5Hz				: BOOL;
+
+
+END_VAR
+VAR
+	
+T1				: TOF;
+T2				: TOF;
+
+R10Hz			: R_Trig;
+R5Hz			: R_Trig;
+R2_5Hz			: R_Trig;
+R2Hz			: R_Trig;
+R1_25Hz			: R_Trig;
+R1Hz			: R_Trig;
+R0_625Hz		: R_Trig;
+R0_5Hz			: R_Trig;	
+RCTU			: R_Trig;
+
+CTU				: CTU;	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Clock block with variable pulse width.
+
+T1(IN:=NOT T2.Q , PT:= T#50MS, Q=>Q10Hz , ET=> );
+T2(IN:=T1.Q , PT:= T#50MS, Q=> , ET=> );
+
+
+R10Hz(CLK:=Q10Hz , Q=> );
+Q5Hz:= R10Hz.Q XOR Q5Hz;
+
+R5Hz(CLK:=Q5Hz , Q=>);
+Q2_5Hz:= R5Hz.Q XOR Q2_5Hz;
+
+R2_5Hz(CLK:=Q2_5Hz , Q=>);
+Q1_25Hz:= R2_5Hz.Q XOR Q1_25Hz;
+
+R1_25Hz(CLK:=Q1_25Hz , Q=>);
+Q0_625Hz:= R1_25Hz.Q XOR Q0_625Hz;
+
+
+CTU(
+	CU:= Q10Hz, 
+	RESET:= ctu.Q, 
+	PV:= 5, 
+	Q=> , 
+	CV=> );
+	
+	
+RCTU(CLK:=ctu.Q , Q=>);	
+Q2Hz:= RCTU.Q XOR Q2Hz;
+	
+	
+R2Hz(CLK:=Q2Hz , Q=> );
+Q1Hz:= R2Hz.Q XOR Q1Hz;	
+
+R1Hz(CLK:=Q1Hz , Q=> );
+Q0_5Hz:= R1Hz.Q XOR Q0_5Hz;	]]></ST>
+    </Implementation>
+    <LineIds Name="FB_SimClock">
+      <LineId Id="3" Count="34" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

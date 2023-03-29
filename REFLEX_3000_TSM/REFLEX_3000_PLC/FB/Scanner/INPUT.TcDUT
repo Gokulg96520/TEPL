@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="INPUT" Id="{ac388609-7c12-4385-a6fd-5bdf7de010f3}">
+    <Declaration><![CDATA[TYPE INPUT :
+STRUCT
+	 Result_available: BOOL;
+	 Trigger_ready: BOOL;
+	 trigger_Acknowledge: BOOL;
+	 Trigger_ID:INT;
+	 
+	 Acquiring:BOOL;
+	 Missed_Acquisition:BOOL;
+	 Decoding:BOOL;
+	 Decode_complete:BOOL;
+	 Fault: BOOL;
+	 
+	 Result_code: INT;
+	 Result_ID: INT;
+	 Result_Length: INT;
+	 Result_data: ARRAY[0..245] OF BYTE ;
+	 
+
+	 
+END_STRUCT
+      
+END_TYPE	   
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

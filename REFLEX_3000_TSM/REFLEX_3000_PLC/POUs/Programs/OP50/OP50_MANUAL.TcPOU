@@ -1,0 +1,577 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP50_MANUAL" Id="{9d7a3129-0454-434e-a5cf-8eb6cf581817}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP50_MANUAL
+VAR
+	SR50_Vert_servo_Axis :AXIS_REF;
+	SR50_Hori_servo_Axis :AXIS_REF;
+	SR50_Conv_servo_Axis :AXIS_REF;
+	SR50_GUIDE_GRP_AXIS :AXIS_REF;
+	temp_safe: BOOL;
+	temp:BOOL;
+
+	FESTO_NOT_NEED: BOOL;
+	NOT_REQ: BOOL;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP50_VERT_SERVO_POSITION    := SR50_Vert_servo_ctrl.Actual_Position;
+OP50_VERT_SERVO_POS_DONE	:= SR50_Vert_servo_ctrl.pos_done ;
+
+OP50_HORI_SERVO_POSITION    := SR50_Hori_servo_ctrl.Actual_Position;
+OP50_HORI_SERVO_POS_DONE	:= SR50_Hori_servo_ctrl.pos_done ;
+
+OP50_CONV_SERVO_POSITION    := SR50_CONV_servo_ctrl.Actual_Position;
+OP50_CONV_SERVO_POS_DONE	:= SR50_CONV_servo_ctrl.pos_done ;
+
+
+// VERTICAL SERVO 
+IF In_Range(SR50_Vert_servo_status.actualPosition,OP50_VERT_SERVO_SFE_WRK_POS,1) THEN
+	OP50_VERT_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP50_VERT_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR50_Vert_servo_status.actualPosition,OP50_VERT_SERVO_HME_POS,1) THEN
+	OP50_VERT_SERVO_ON_HOME := TRUE;
+ELSE
+	OP50_VERT_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR50_Vert_servo_status.actualPosition,OP50_VERT_SERVO_PICK_POS,1) THEN
+	OP50_VERT_SERVO_ON_WRK_PICK := TRUE;
+ELSE
+	OP50_VERT_SERVO_ON_WRK_PICK := FALSE;
+END_IF		
+
+IF In_Range(SR50_Vert_servo_status.actualPosition,OP50_VERT_SERVO_PLACE_POS,1) THEN
+	OP50_VERT_SERVO_ON_WRK_PLACE := TRUE;
+ELSE
+	OP50_VERT_SERVO_ON_WRK_PLACE := FALSE;
+END_IF
+
+//HORIZONTAL SERVO
+IF In_Range(SR50_Hori_servo_status.actualPosition,OP50_HORI_SERVO_SFE_WRK_POS,1) THEN
+	OP50_HORI_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP50_HORI_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR50_Hori_servo_status.actualPosition,OP50_HORI_SERVO_HME_POS,1) THEN
+	OP50_HORI_SERVO_ON_HOME := TRUE;
+ELSE
+	OP50_HORI_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR50_Hori_servo_status.actualPosition,OP50_HORI_SERVO_PICK_POS,1) THEN
+	OP50_HORI_SERVO_ON_WRK_PICK := TRUE;
+ELSE
+	OP50_HORI_SERVO_ON_WRK_PICK := FALSE;
+END_IF	
+
+IF In_Range(SR50_Hori_servo_status.actualPosition,OP50_HORI_SERVO_PLACE_POS,1) THEN
+	OP50_HORI_SERVO_ON_WRK_PLACE := TRUE;
+ELSE
+	OP50_HORI_SERVO_ON_WRK_PLACE := FALSE;
+END_IF	
+
+//CONVEYOR SERVO
+
+IF In_Range(SR50_CONV_servo_status.actualPosition,OP50_CONV_SERVO_SFE_WRK_POS,1) THEN
+	OP50_CONV_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP50_CONV_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR50_CONV_servo_status.actualPosition,OP50_CONV_SERVO_HME_POS,1) THEN
+	OP50_CONV_SERVO_ON_HOME := TRUE;
+ELSE
+	OP50_CONV_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR50_CONV_servo_status.actualPosition,OP50_CONV_SERVO_WRK_POS,1) THEN
+	OP50_CONV_SERVO_ON_WRK := TRUE;
+ELSE
+	OP50_CONV_SERVO_ON_WRK := FALSE;
+END_IF	
+
+
+OP50_GVL.SR50_Vert_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP50_HMI_Reset OR  Servo_Reset, 
+	bEnable:=Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= OP50_ManualSelected OR MANUAL_SELECTED ,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:=SR50_Vert_servo_ctrl.Position , 
+	fTargetVelocity:=SR50_Vert_servo_ctrl.Velocity , 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR50_Vert_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR50_Vert_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR50_Vert_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR50_Vert_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR50_Vert_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:= SR50_Vert_servo_Axis , 
+	bHome:=SR50_Vert_servo_ctrl.Bsethome ,
+	HME_WRITE_ADD:= 16#5009, 
+    bSetPosition:=SR50_Vert_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR50_Vert_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR50_Vert_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR50_Vert_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR50_Vert_servo_status , 
+	sAxisState=>SR50_Vert_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR50_Vert_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR50_Vert_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR50_Vert_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR50_Vert_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR50_Vert_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR50_Vert_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=> ,
+	bABS_Pos_done=> SR50_Vert_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );	
+
+OP50_GVL.SR50_HORI_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:=temp , 
+	bErrorReset:=OP50_HMI_Reset OR Servo_Reset , 
+	bEnable:=Servo_Enable , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= OP50_ManualSelected OR MANUAL_SELECTED,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= SR50_HORI_servo_ctrl.Position , 
+	fTargetVelocity:= SR50_HORI_servo_ctrl.Velocity, 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR50_HORI_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR50_HORI_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR50_HORI_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR50_HORI_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR50_HORI_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:= SR50_HORI_servo_Axis , 
+	HME_WRITE_ADD:= 16#5008, 
+	bHome:=SR50_HORI_servo_ctrl.Bsethome , 
+    bSetPosition:=SR50_HORI_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR50_HORI_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR50_HORI_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR50_HORI_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR50_HORI_servo_status , 
+	sAxisState=>SR50_HORI_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR50_HORI_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR50_HORI_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR50_HORI_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR50_HORI_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR50_HORI_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR50_HORI_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=> ,
+	bABS_Pos_done=> SR50_HORI_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );
+
+OP50_GVL.SR50_CONV_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP50_HMI_Reset OR Servo_reset , 
+	bEnable:=Servo_Enable, 
+	bMoveVelocity:=SR50_CONV_servo_ctrl.VELmove_Start , 
+	bHalt:= , 
+	bManualMode:= OP50_ManualSelected or MANUAL_SELECTED,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= SR50_CONV_servo_ctrl.Velocity, 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR50_CONV_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR50_CONV_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR50_CONV_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR50_CONV_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR50_CONV_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_safety,
+	Axis:= SR50_CONV_servo_Axis , 
+	HME_WRITE_ADD:= 16#500A,	
+	bHome:=SR50_CONV_servo_ctrl.Bsethome , 
+    bSetPosition:=SR50_CONV_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR50_CONV_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR50_CONV_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR50_CONV_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR50_CONV_servo_status , 
+	sAxisState=>SR50_CONV_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR50_CONV_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR50_CONV_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR50_CONV_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR50_CONV_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR50_CONV_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR50_CONV_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=>SR50_CONV_servo_ctrl.Safe_To_Move ,
+	bABS_Pos_done=> SR50_CONV_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );	
+	
+IF OP50_ManualSelected OR MANUAL_SELECTED THEN
+	SR50_Vert_servo_status.targetVelocity:=10;
+	SR50_Hori_servo_status.targetVelocity:=10;
+END_IF
+
+//LH Rejection Cylinder
+//move ZERO to STATUS
+//CR50_LH_Rej_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP50_Auto OR OP50_HomeRunning) THEN
+	CR50_LH_Rej_Cyl.AutoCmd1:=FALSE;
+	CR50_LH_Rej_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR50_LH_Rej_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR50_LH_Rej_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR50_LH_Rej_Cyl.Safework:= TRUE ;
+ELSE 
+	CR50_LH_Rej_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP50_HMI_LH_Rej_Cyl_Home_PB=TRUE) THEN
+	CR50_LH_Rej_Cyl.ManualPB1:=TRUE;
+ELSE 
+	CR50_LH_Rej_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP50_HMI_LH_Rej_Cyl_Work_PB=TRUE) THEN
+	CR50_LH_Rej_Cyl.ManualPB2:=TRUE;
+ELSE 
+	CR50_LH_Rej_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR50_LH_Rej_Cyl(
+	Auto:= OP50_AutoSelected , 
+	Manual:= OP50_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP50_HMI_Reset, 
+	Sensor1:=I50_LH_REJ_CYL_REV_I1101_3, 
+	Sensor2:=I50_LH_REJ_CYL_FWD_I1101_2,
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:= 5, 
+	TimeOut2:= 5, 
+	TimeOut3:= 5, 
+	Solenoid1=> O50_LH_REJ_CYL_REV_Q1151_6 , 
+	Solenoid2=> O50_LH_REJ_CYL_FWD_Q1151_7 ,
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR50_LH_Rej_Cyl_status );
+
+
+//RH Rejection Cylinder
+//move ZERO to STATUS
+//CR50_RH_Rej_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP50_Auto OR OP50_HomeRunning) THEN
+	CR50_RH_Rej_Cyl.AutoCmd1:=FALSE;
+	CR50_RH_Rej_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR50_RH_Rej_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR50_RH_Rej_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR50_RH_Rej_Cyl.Safework:= TRUE ;
+ELSE 
+	CR50_RH_Rej_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP50_HMI_RH_Rej_Cyl_Home_PB=TRUE) THEN
+	CR50_RH_Rej_Cyl.ManualPB1:=TRUE;
+ELSE 
+	CR50_RH_Rej_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP50_HMI_RH_Rej_Cyl_Work_PB=TRUE) THEN
+	CR50_RH_Rej_Cyl.ManualPB2:=TRUE;
+ELSE 
+	CR50_RH_Rej_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR50_RH_Rej_Cyl(
+	Auto:= OP50_AutoSelected ,  
+	Manual:= OP50_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP50_HMI_Reset,                    
+	Sensor1:= I50_RH_REJ_CYL_REV_I1101_5  , 
+	Sensor2:= I50_RH_REJ_CYL_FWD_I1101_4 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:= 5, 
+	TimeOut2:= 5, 
+	TimeOut3:= 5, 
+	Solenoid1=>O50_RH_REJ_CYL_REV_Q1152_0  , 
+	Solenoid2=>O50_RH_REJ_CYL_FWD_Q1152_1  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=>, 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR50_RH_Rej_Cyl_status );	
+	
+	
+	
+OP50_GIUDE_GRP(														// FESTO GUIDE GRIPPER
+	bAxis1_Ref_Switch:= , 
+	bInit:=  , 
+	bErrorReset:= Servo_Reset , 
+	bEnable:= Servo_Enable , /// MACHINE ERR REGISTER CHANGE
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 									//MANUAL REGISTER CHANGE
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP50_GIUDE_GRP_ctrl.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety , 					// CHANGE
+	Axis:= SR50_GUIDE_GRP_AXIS, 
+	bHome:= OP50_GIUDE_GRP_ctrl.Bsethome, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP50_GIUDE_GRP_ctrl.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP50_GIUDE_GRP_Manual_Axis, 
+ 	sAxisState=>OP50_GIUDE_GRP_ctrl.Axis_State , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP50_GIUDE_GRP_ctrl.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP50_GIUDE_GRP_Manual_Axis.targetVelocity := 50;	
+//LH Gripper Cylinder
+//move ZERO to STATUS
+//CR50_LH_Grip_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP50_Auto OR OP50_HomeRunning) THEN
+	CR50_LH_Grip_Cyl.AutoCmd1:=FALSE;
+	CR50_LH_Grip_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR50_LH_Grip_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR50_LH_Grip_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR50_LH_Grip_Cyl.Safework:= TRUE ;
+ELSE 
+	CR50_LH_Grip_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP50_HMI_LH_Grip_Cyl_Home_PB=TRUE) THEN
+	CR50_LH_Grip_Cyl.ManualPB1:=TRUE;
+ELSE 
+	CR50_LH_Grip_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP50_HMI_LH_Grip_Cyl_Work_PB=TRUE) THEN
+	CR50_LH_Grip_Cyl.ManualPB2:=TRUE;
+ELSE 
+	CR50_LH_Grip_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR50_LH_Grip_Cyl(
+	Auto:= OP50_AutoSelected , 
+	Manual:= OP50_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP50_HMI_Reset, 
+	Sensor1:=I50_LH_GRIP_CLSE_I1101_7 , 
+	Sensor2:=NOT I50_LH_GRIP_CLSE_I1101_7 ,
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:= 5, 
+	TimeOut2:= 5, 
+	TimeOut3:= 5, 
+	Solenoid1=> O50_LH_GRIP_CLSE_Q1151_3  , 
+	Solenoid2=> O50_LH_GRIP_OPN_Q1151_2  ,
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR50_LH_Grip_Cyl_status );
+	
+//RH Gripection Cylinder
+//move ZERO to STATUS
+//CR50_RH_Grip_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP50_Auto OR OP50_HomeRunning) THEN
+	CR50_RH_Grip_Cyl.AutoCmd1:=FALSE;
+	CR50_RH_Grip_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR50_RH_Grip_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR50_RH_Grip_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR50_RH_Grip_Cyl.Safework:= TRUE ;
+ELSE 
+	CR50_RH_Grip_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP50_HMI_RH_Grip_Cyl_Home_PB=TRUE) THEN
+	CR50_RH_Grip_Cyl.ManualPB1:=TRUE;
+ELSE 
+	CR50_RH_Grip_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP50_HMI_RH_Grip_Cyl_Work_PB=TRUE) THEN
+	CR50_RH_Grip_Cyl.ManualPB2:=TRUE;
+ELSE 
+	CR50_RH_Grip_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR50_RH_Grip_Cyl(
+	Auto:= OP50_AutoSelected , 
+	Manual:= OP50_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP50_HMI_Reset, 
+	Sensor1:= I50_RH_GRIP_CLSE_I1110_1, 
+	Sensor2:= NOT I50_RH_GRIP_CLSE_I1110_1,
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:= 5, 
+	TimeOut2:= 5, 
+	TimeOut3:= 5, 
+	Solenoid1=> O50_RH_GRIP_CLSE_Q1151_5 , 
+	Solenoid2=> O50_RH_GRIP_OPN_Q1151_4,
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR50_RH_Grip_Cyl_status );
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP50_MANUAL">
+      <LineId Id="3" Count="102" />
+      <LineId Id="558" Count="0" />
+      <LineId Id="106" Count="40" />
+      <LineId Id="559" Count="0" />
+      <LineId Id="147" Count="41" />
+      <LineId Id="572" Count="0" />
+      <LineId Id="189" Count="76" />
+      <LineId Id="560" Count="3" />
+      <LineId Id="270" Count="180" />
+      <LineId Id="568" Count="3" />
+      <LineId Id="455" Count="65" />
+      <LineId Id="564" Count="3" />
+      <LineId Id="525" Count="13" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

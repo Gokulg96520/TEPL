@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP90_VARIABLE" Id="{1742f8f9-568a-4613-92dd-a065ef348d0a}">
+    <Declaration><![CDATA[VAR_GLOBAL
+// FUNTIONAL BLOCK
+							(*CYLINDER*)
+	OP90_LH_GRIPPER							: Cylinder_Block;
+	OP90_RH_GRIPPER							: Cylinder_Block;	
+	OP90_POS1_LCK_CYL						: Cylinder_Block;
+	OP90_POS2_LCK_CYL						: Cylinder_Block;
+	OP90_POS_SLIDE_CYL						: Cylinder_Block;	
+	OP90_SUP_HORZP1_CYL						: Cylinder_Block;
+	OP90_SUP_VERTP1_CYL                     : Cylinder_Block;
+	OP90_SUP_HORZP2_CYL	                    : Cylinder_Block; 
+	OP90_SUP_VERTP2_CYL	                    : Cylinder_Block; 
+	OP90_LH_REJP1_CYL						: Cylinder_Block;
+	OP90_RH_REJP1_CYL                       : Cylinder_Block;
+	OP90_LH_REJP2_CYL                       : Cylinder_Block;
+	OP90_RH_REJP2_CYL                       : Cylinder_Block;
+							(*SERVO*)
+	OP90_SRVO_HORZ							: AXIS_REF;						
+	OP90_SRVO_LH_VERT						: AXIS_REF;	
+	OP90_SRVO_RH_VERT						: AXIS_REF;
+	OP90_STP_LH_ROTRY						: AXIS_REF;
+	OP90_STP_RH_ROTRY						: AXIS_REF;
+	OP90_GUID_SERV							: AXIS_REF;
+	OP90_SRV_CNVY_LH						: AXIS_REF;
+	OP90_SRV_CNVY_RH						: AXIS_REF;						
+	OP90_SRV_HORZ							: FB_Axis_FESTO;
+	OP90_SRV_LH_VERT						: FB_Axis_FESTO;
+	OP90_SRV_RH_VERT						: FB_Axis_FESTO;
+	OP90_GUIDE_SERVO						: FB_Axis_FESTO;
+	OP90_LH_SRV_ROTRY						: FB_Axis_FESTO;
+	OP90_RH_SRV_ROTRY						: FB_Axis_FESTO;
+	OP90_LH_CNVY							: FB_Axis;
+	OP90_RH_CNVY							: FB_Axis;
+	OP90_SRV_HORZ_STATUS					: stManualModeAxis;
+	OP90_SRV_LH_VERT_STATUS                 : stManualModeAxis;
+	OP90_SRV_RH_VERT_STATUS                 : stManualModeAxis;
+	OP90_STP_LH_ROTRY_STATUS				: stManualModeAxis;
+	OP90_STP_RH_ROTRY_STATUS				: stManualModeAxis;
+	OP90_GIUDE_SER_STATUS					: stManualModeAxis;
+	OP90_SRV_LH_CNVY_STATUS					: stManualModeAxis;
+	OP90_SRV_RH_CNVY_STATUS                 : stManualModeAxis;
+	OP90_SRV_HORZ_CNTRL						: Servo_Control;
+	OP90_SRV_LH_VERT_CNTRL                  : Servo_Control;
+	OP90_SRV_RH_VERT_CNTRL                  : Servo_Control;
+	OP90_STP_LH_ROTRY_CNTRL					: SERVO_Control;
+	OP90_STP_RH_ROTRY_CNTRL					: SERVO_Control;
+	OP90_SERVO_GUIDE_CNTRL					: Servo_Control;
+	OP90_SRV_LH_CNVY_CNTRL					: Servo_Control;
+	OP90_SRV_RH_CNVY_CNTRL                  : Servo_Control;
+	
+// HOMING 
+//BOOL
+	OP90_ALL_HOME							: BOOL;
+	START_HOMNG								: BOOL;
+	OP90_LH_GRP_HOMING1						: BOOL;
+	OP90_RH_GRP_HOMING1						: BOOL;
+	OP90_VERT_LHSERV_HOMG1					: BOOL;
+	OP90_VERT_RHSERV_HOMG1					: BOOL;
+	OP90_LH_GRP_SNR1						: BOOL;
+	OP90_HORZ_SERV_HOMING1					: BOOL;
+	OP90_VERT_SERVO_HOME					: BOOL;
+	OP90_HORZ_SERVO_HOME					: BOOL;
+	OP90_SUP_VERTP1_CYL_HOME1				: BOOL;
+	OP90_SUP_HORZP1_CYL_HOME1				: BOOL;
+	OP90_SUP_VERTP2_CYL_HOME1				: BOOL;
+	OP90_SUP_HORZP2_CYL_HOME1				: BOOL;
+	OP90_SUP_VERT_CYL_SNR1					: BOOL;
+// INT
+	OP90_HME_STP_NO							: INT;
+	OP10A_HME_STP_NO						: INT;
+	OP10B_HME_STP_NO						: INT;	
+//MANUAL
+
+								(*SERVO*)
+
+	
+	
+// AUTO	
+								(*CYLINDER*)
+
+	OP90_A_MVR_SUP_HORZP1_WRK				: BOOL;
+	OP90_A_MVR_SUP_HORZP1_HME				: BOOL;
+	OP90_A_MVR_SUP_HORZP2_HME				: BOOL;
+	OP90_A_MVR_SUP_HORZP2_WRK				: BOOL;
+	OP90_A_MVR_SUP_VERTP1_HME				: BOOL;
+	OP90_A_MVR_SUP_VERTP1_WRK				: BOOL;
+	OP90_A_MVR_SUP_VERTP2_HME				: BOOL;
+	OP90_A_MVR_SUP_VERTP2_WRK				: BOOL;
+	OP90_POS2								: BOOL;				// BASED ON THE MODEL SELECTION OP90_POS1 R POS 2 IS CHOOSEN FROM RECEIPE
+	OP90_POS1								: BOOL;	
+	OP90_A_RH_GRP_AUTCMD2					: BOOL;
+	OP90_A_RH_GRP_AUTCMD1					: BOOL;
+	OP90_A_LH_GRP_AUTCMD2					: BOOL;
+	OP90_A_LH_GRP_AUTCMD1					: BOOL;
+	OP90_ERROR_ACTIVE						: BOOL;
+								(*SERVO*)
+// BOOL
+	OP90_A_SRV_HORZ_WRK						: BOOL;
+	OP90_A_SRV_HORZ_HME						: BOOL;	
+	OP90_A_SRV_LHVERT_HME					: BOOL;	
+	OP90_A_SRV_LHVERT_PCKWRK				: BOOL;
+	OP90_A_SRV_LHVERT_SPLCWRK				: BOOL;
+	OP90_A_SRV_LHVERT_PLCWRK				: BOOL;
+	OP90_A_SRV_RHVERT_HME					: BOOL;	
+	OP90_A_SRV_RHVERT_PCKWRK				: BOOL;
+	OP90_A_SRV_RHVERT_SPLCWRK				: BOOL;
+	OP90_A_SRV_RHVERT_PLCWRK				: BOOL;
+	OP90_A_SRV_LH_ROTRY_WRK					: BOOL;
+	OP90_A_SRV_LH_ROTRY_HME					: BOOL;	
+	OP90_A_SRV_RH_ROTRY_WRK					: BOOL;	
+	OP90_A_SRV_RH_ROTRY_HME					: BOOL;	
+	
+	OP90_SRV_LH_VRT_HME_FB					: BOOL;
+	OP90_SRV_RH_VRT_HME_FB					: BOOL;
+	OP90_SRV_HORZ_HME_FB					: BOOL;
+	OP90_SRV_HORZ_WRK_FB					: BOOL;
+	OP90_SRV_LH_VRT_PCKWRK_FB				: BOOL;
+	OP90_SRV_RH_VRT_PCKWRK_FB				: BOOL;
+	OP90_SRV_LH_VRT_SPLCWRK_FB				: BOOL;
+	OP90_SRV_RH_VRT_SPLCWRK_FB				: BOOL;
+	OP90_SRV_LH_VRT_PLCWRK_FB				: BOOL;	
+	OP90_SRV_RH_VRT_PLCWRK_FB				: BOOL;
+	OP90_STP_LH_ROTY_HME_FB					: BOOL;
+	OP90_STP_LH_ROTY_WRK_FB					: BOOL;
+	OP90_STP_RH_ROTY_HME_FB					: BOOL;
+	OP90_STP_RH_ROTY_WRK_FB					: BOOL;
+	
+								(*CAMERA*)
+	OP90_LH_CMR_OK							: BOOL;
+	OP90_RH_CMR_OK							: BOOL;
+	
+	
+	
+//XTS
+	OP90_MOVER_HOME							: BOOL;					// MOVER REACHED THE POSITION AND READY FOR PROCESS
+	OP90_MVR_LH_CMPNOK						: BOOL;
+	OP90_MVR_RH_CMPNOK						: BOOL;	
+	
+	
+	
+	
+	
+	
+	
+// DELETE AFTER CHANGE
+	MACHINE_AUTO: BOOL;
+	MACHINE_MANUAL: BOOL;
+	MACHINE_ERR: BOOL;
+
+	MACHINE_ENABLE: BOOL;
+	MACHINE_1S : BOOL;
+	MACHINE_BLINK:BOOL;
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+// AUTO
+							(*CYLINDER*)
+	OP90_LH_CMP_PICKED						: BOOL;
+	OP90_RH_CMP_PICKED						: BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Cylinder_Block" Id="{e932644c-45b3-4f42-afe3-68ea32c5bc18}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Cylinder_Block
+VAR_INPUT
+	Auto :BOOL;
+	Manual :BOOL;
+	ErrorActive :BOOL;
+	ResetPB :BOOL;
+	Sensor1 :BOOL;
+	Sensor2 :BOOL;
+	ManualPB1 :BOOL;
+	ManualPB2 :BOOL;
+	AutoCmd1 :BOOL;
+	AutoCmd2 :BOOL;
+	OperationEnable :BOOL;
+	SafeHome :BOOL;
+	SafeWork :BOOL;
+	HomingCmd1 :BOOL;
+	Pulse_1Sec :BOOL;
+	BlinkingBit :BOOL;
+	TimeOut1 :INT;
+	TimeOut2 :INT;
+	TimeOut3 :INT;
+END_VAR
+VAR_OUTPUT
+	Solenoid1 :BOOL;
+	Solenoid2 :BOOL;
+	AlarmSensor1 :BOOL;
+	AlarmSensor2 :BOOL;
+	AlarmSolenoid1 :BOOL;
+	AlarmSolenoid2 :BOOL;
+	AllSignal :BOOL;
+	AlarmPresent :BOOL;
+	Position1 :BOOL;
+	Position2 :BOOL;
+	HomeSensorBlink :BOOL;
+	WorkSensorBlink :BOOL;
+END_VAR
+VAR_IN_OUT
+	Status :INT;
+END_VAR
+VAR
+	Timer1 :INT;
+	Timer2 :INT;
+	Timer3 :INT;
+	HomePositionErr_1SecPls :Tc2_Standard.R_TRIG;
+	WorkPositionErr_1SecPls :Tc2_Standard.R_TRIG;
+	BothSensorErr_1SecPls :Tc2_Standard.R_TRIG;
+	Temp4 :BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Status:=0;
+
+//Cylinder Moving to Home Position by Manual
+
+IF ManualPB1 THEN
+	IF NOT Manual THEN Status :=1; 
+	ELSIF ManualPB2 THEN Status :=2; 
+	ELSIF AllSignal THEN Status :=3;
+	ELSIF NOT OperationEnable THEN Status :=9; 
+	ELSIF Status =0 AND SafeHome THEN
+		Solenoid1 :=1;
+		Solenoid2 :=0;
+	END_IF 
+END_IF
+
+
+//Cylinder Moving to Work Position by Manual
+
+IF ManualPB2 THEN
+	IF NOT Manual THEN Status :=1; 
+	ELSIF ManualPB1 THEN Status :=2; 
+	ELSIF AllSignal THEN Status :=3;
+	ELSIF NOT OperationEnable THEN Status :=9; 
+	ELSIF Status =0 AND SafeWork THEN
+		Solenoid2 :=1;
+		Solenoid1 :=0;
+	END_IF 
+END_IF
+
+
+//Cylinder Moving to Home Position by Auto
+
+IF AutoCmd1 THEN
+	IF NOT Auto THEN Status :=5; 
+	ELSIF AutoCmd2 THEN Status :=6;
+	ELSIF ErrorActive THEN Status :=4; 
+	ELSIF AllSignal THEN Status :=3;
+	ELSIF NOT OperationEnable THEN Status :=9; 
+	ELSIF Status =0 AND SafeHome THEN
+		Solenoid1 :=1;
+		Solenoid2 :=0;
+	END_IF 
+END_IF
+
+
+//Cylinder Moving to Work Position by Auto
+
+IF AutoCmd2 THEN
+	IF NOT Auto THEN Status :=5; 
+	ELSIF AutoCmd1 THEN Status :=6;
+	ELSIF ErrorActive THEN Status :=4; 
+	ELSIF AllSignal THEN Status :=3;
+	ELSIF NOT OperationEnable THEN Status :=9; 
+	ELSIF Status =0 AND SafeWork THEN
+		Solenoid2 :=1;
+		Solenoid1 :=0;
+	END_IF 
+END_IF
+
+
+//Cylinder Moving to Home Position - Homing Cmd ON
+
+IF HomingCmd1 THEN 
+	IF AllSignal THEN Status :=3;
+	ELSIF NOT OperationEnable THEN Status :=9; 
+	ELSIF Status =0 AND SafeHome THEN
+		Solenoid1 :=1;
+		Solenoid2 :=0;
+	END_IF 
+END_IF
+
+
+// While Cylinder Moving Blinking IF Position Reached then Steady Indication
+
+HomeSensorBlink := (Solenoid1 AND NOT Sensor1 AND BlinkingBit) OR Sensor1;
+WorkSensorBlink := (Solenoid2 AND NOT Sensor2 AND BlinkingBit) OR Sensor2;
+
+
+// Position 1 Reached - Cylinder Timer OFF
+
+IF NOT Solenoid1 THEN Timer1 :=0; END_IF
+
+
+//Timer1 is for Monitoring Cylinder Home Position Time
+HomePositionErr_1SecPls(CLK := Pulse_1Sec);
+
+IF Solenoid1 AND HomePositionErr_1SecPls.Q THEN 
+Timer1 := Timer1 + 1;
+END_IF
+
+
+//Generate Alarm for Home Position Sensor & Valve
+
+IF Timer1 >= TimeOut1 AND NOT Sensor1 AND NOT Sensor2 THEN AlarmSensor1 :=1; END_IF
+IF Timer1 >= TimeOut1 AND NOT Sensor1 AND Sensor2 THEN AlarmSolenoid1 :=1; END_IF
+
+
+// Position 2 Reached - Cylinder Timer OFF
+
+IF NOT Solenoid2 THEN Timer2 :=0; END_IF
+
+
+//Timer2 is for Monitoring Cylinder Work Position Time
+WorkPositionErr_1SecPls(CLK := Pulse_1Sec);
+
+IF Solenoid2 AND WorkPositionErr_1SecPls.Q THEN 
+	Timer2 := Timer2 + 1;
+END_IF
+
+
+//Generate Alarm for Work Position Sensor & Valve
+
+IF Timer2 >= TimeOut2 AND NOT Sensor2 AND NOT Sensor1 THEN AlarmSensor2 :=1; END_IF
+IF Timer2 >= TimeOut2 AND NOT Sensor2 AND Sensor1 THEN AlarmSolenoid2 :=1; END_IF
+
+
+//Move "0" to Timer3 If anyone Sensor is not Sensing
+
+IF NOT Sensor1 AND NOT Sensor2 THEN Timer3 :=0; END_IF
+
+
+//Timer3 is for Monitoring Both Sensor ON Error
+BothSensorErr_1SecPls (CLK := Pulse_1Sec);
+
+ IF Sensor1 AND Sensor2 AND BothSensorErr_1SecPls.Q THEN
+	 Timer3 := Timer3 + 1;
+ END_IF
+ 
+ 
+ //Generate Alarm for Both Sensor ON Error
+ 
+ IF Timer3 >= TimeOut3 THEN AllSignal :=1; END_IF
+ 
+ 
+ //Reset the Valve when Operation Enable not Present
+ 
+ IF NOT OperationEnable THEN
+	 Solenoid1 :=0;
+	 Solenoid2 :=0;
+ END_IF
+
+ 
+//Position 1 is Cylinder Home Position || Position 2 is Cylinder Work Position
+
+Position1 := NOT AllSignal AND Sensor1 AND NOT Sensor2;
+Position2 := NOT AllSignal AND Sensor2 AND NOT Sensor1; 
+
+// ALARM RESET
+
+IF ResetPB THEN
+	
+AlarmSensor1 								:= FALSE;
+AlarmSensor2            					:= FALSE;
+AlarmSolenoid1          					:= FALSE;
+AlarmSolenoid2          					:= FALSE;
+AllSignal               					:= FALSE;
+
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="Cylinder_Block">
+      <LineId Id="3" Count="145" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="208" Count="4" />
+      <LineId Id="202" Count="0" />
+      <LineId Id="204" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

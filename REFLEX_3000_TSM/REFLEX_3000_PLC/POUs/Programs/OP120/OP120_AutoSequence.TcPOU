@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP120_AutoSequence" Id="{f73c1b6b-7bc7-4fff-8a80-b59a7a34cfef}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP120_AutoSequence
+VAR
+	OP120_AutoSeq:INT;
+	
+	
+	OP120_Lock_Push_Dly: TON;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (NOT OP120_Auto OR  OP120_ErrorActive OR OP120_HomeRunning ) THEN
+	OP120_GVL.OP120_AutoRunning:= FALSE;
+	OP120_ComponentOk:=FALSE;
+	OP120_ComponentNok:=FALSE;
+	OP120_AutoSeq:= 10;
+
+END_IF
+
+CASE OP120_AutoSeq OF 
+	10:IF (OP120_Auto) THEN		// Check Automode Selected
+		OP120_AutoSeq :=20;
+	    END_IF
+	20:IF ( NOT OP120_ErrorActive) THEN		//Check No error
+		OP120_AutoSeq:=30;
+	   END_IF
+	30:IF (NOT OP120_HomeRunning) THEN		//Check No Homerunning
+		OP120_AutoSeq :=40;
+		END_IF
+    40:IF (NOT OP120_GVL.OP120_Temp_Home_OK)THEN	//Check Machine in Home
+		OP120_AutoSeq:= 50;
+		END_IF
+	50:IF ( NOT OP120_OperationCompleted) THEN		// Check Operation Completed Reset
+		OP120_AutoSeq:=60;
+		END_IF
+	60:IF (NOT OP120_ComponentOk) THEN		// Check Component Ok Reset
+		OP120_AutoSeq:=70;
+		END_IF
+	70:IF (NOT OP120_ComponentNok) THEN 	// Check Component NOk Reset
+		OP120_AutoSeq:= 80;
+		END_IF
+    120:IF  (AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP120_GVL.OP120_HMI_CycleStart_PB )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		    OP120_GVL.OP120_HomeCondition_OK:=TRUE;
+	 			IF( OP120_GVL.OP120_HomeCondition_OK AND OP120_AutoSelected) THEN
+					OP120_GVL.OP120_AutoRunning:=TRUE;
+					OP120_GVL.OP120_StepRunning:= FALSE;
+				
+				ELSIF (OP120_Main.OP120_Modeselection_FB.HomeConditionOK AND OP120_StepSelected) THEN
+					OP120_GVL.OP120_AutoRunning:=FALSE;
+					OP120_GVL.OP120_StepRunning:= TRUE;
+				END_IF;
+		 END_IF
+		 IF ((OP120_GVL.OP120_AutoRunning OR OP120_GVL.OP120_StepRunning) AND OP120_GVL.OP120_StartEnable) THEN
+					OP120_AutoSeq:= 130;
+		END_IF
+	130:IF (OP120_Prev_Stat_Operation_Completed=TRUE) THEN // Check Previous Station Completed
+		             OP120_AutoSeq:= 140;
+	END_IF
+	140: IF (OP120_Prev_Comp_Status=1) THEN  // Check Compoent Status in Previuos Station
+		OP120_Prev_LH_COMP_OK:=TRUE;
+		OP120_Prev_RH_COMP_OK:=TRUE;
+		
+		ELSIF (OP120_Prev_Comp_Status=2)THEN 
+		OP120_Prev_LH_COMP_NOK:=TRUE;
+		OP120_Prev_RH_COMP_OK:=TRUE;
+		
+		ELSIF (OP120_Prev_Comp_Status=3)THEN 
+		OP120_Prev_LH_COMP_OK:=TRUE;
+		OP120_Prev_RH_COMP_NOK:=TRUE;
+		
+		ELSIF (OP120_Prev_Comp_Status=4)THEN 
+		OP120_Prev_LH_COMP_NOK:=TRUE;
+		OP120_Prev_RH_COMP_NOK:=TRUE;
+		
+		END_IF
+		IF (OP120_Prev_LH_COMP_OK OR OP120_Prev_LH_COMP_NOK) AND (OP120_Prev_RH_COMP_OK OR OP120_Prev_RH_COMP_NOK) THEN
+			 OP120_AutoSeq:= 150;
+		END_IF
+	150:IF OP120_GVL.OP120_StartEnable THEN
+		OP120_AutoSeq:= 160;
+	END_IF
+	
+	160:IF OP120_GVL.OP120_StartEnable AND OP120_IO_Tag_Link.OP120_EO_Spring_Pick_Completed  THEN
+		OP120_Comp_Picked:=TRUE;
+		OP120_Camera_OK:=FALSE;
+		
+		 OP120_AutoSeq:= 160;		
+	END_IF
+		
+	170:IF OP120_GVL.OP120_StartEnable AND OP120_IO_Tag_Link.OP120_EO_Spring_Place_Pos_Reached THEN
+		
+		 OP120_AutoSeq:= 170;
+		 END_IF
+	180:IF OP120_GVL.OP120_StartEnable  THEN
+		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd2:=TRUE;
+		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd1:=FALSE;
+		IF (OP120_GVL.CR120_Horizontal_Push_Cyl.Position2) THEN
+		OP120_AutoSeq:= 180;
+		END_IF
+		END_IF
+	190:IF OP120_GVL.OP120_StartEnable THEN 
+		
+	OP120_Lock_Push_Dly(IN:=OP120_AutoSeq= 180 , PT:= , Q=> , ET=> );
+		IF OP120_Lock_Push_Dly.Q THEN
+		OP120_AutoSeq:= 190;
+		END_IF
+		END_IF
+		
+	200:IF OP120_GVL.OP120_StartEnable  THEN 
+		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd1:=TRUE;
+		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd2:=FALSE;
+		IF (OP120_GVL.CR120_Horizontal_Push_Cyl.Position1) THEN
+		OP120_Lring_Placed:=TRUE;
+		OP120_AutoSeq:= 200;
+		END_IF
+		END_IF
+		
+	210:IF OP120_GVL.OP120_StartEnable THEN 
+		 OP120_IO_Tag_Link.OP120_EI_Insertion_Complete:=TRUE;
+		OP120_AutoSeq:= 210;
+	END_IF
+		
+	220:IF OP120_GVL.OP120_StartEnable AND  OP120_IO_Tag_Link.OP120_EO_Spring_Place_Completed THEN 	
+		OP120_Lring_Placed:=FALSE;
+		OP120_AutoSeq:= 220;		
+	END_IF
+	230:IF (OP120_GVL.OP120_StartEnable)  THEN 
+		OP120_OperationCompleted:=TRUE;	
+		OP120_AutoSeq:= 250;
+	END_IF
+		
+
+	
+	250:		// Reset All Bits							
+         OP120_LH_Comp_OK:=FALSE;
+         OP120_LH_Comp_NOK:=FALSE;
+         OP120_RH_Comp_OK:=FALSE;
+         OP120_RH_Comp_NOK:=FALSE;
+         OP120_LH_AutoSeq:=0;
+		OP120_RH_AutoSeq:=0;
+		OP120_AutoSeq:= 10;
+			
+	
+
+			
+			
+		
+		
+
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP120_AutoSequence">
+      <LineId Id="3" Count="137" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

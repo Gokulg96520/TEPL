@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP90_JB" Id="{a25cdf26-b5b9-44f0-aa9b-b512986ea26f}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+I90_SPARE_I500_0                     :BOOL;
+I90_HPR1_LOW_LVL_FBI500_1            :BOOL;
+I90_HPR1_SOL_DOOR_SW_FBI500_2        :BOOL;
+I90_BOWL1_RDYI500_3                  :BOOL;
+I90_BOWL1_LOW_LVLI500_4              :BOOL;
+I90_BOWL1_OFF_ONI500_5               :BOOL;
+I90_HPR1_OFF_ONI500_6                :BOOL;
+I90_CONV1_REVI500_7                  :BOOL;
+I90_CONV1_FWDI501_0                  :BOOL;
+I90_VBF1_CONV1_TRK1_OVERFLWI501_1    :BOOL;
+I90_VBF1_CONV1_TRK2_OVERFLWI501_2    :BOOL;
+I90_CONV1_TRK1_CHO_MOD1I501_3        :BOOL;
+I90_CONV1_TRK1_CHO_MOD2I501_4        :BOOL;
+I90_CONV1_TRK2_CHO_MOD1I501_5        :BOOL;
+I90_CONV1_TRK2_CHO_MOD2I501_6        :BOOL;
+I90_CONV1_TRK3_CHO_MOD1I501_7        :BOOL;
+
+
+I90_CONV1_TRK3_CHO_MOD2I502_0        :BOOL;
+I90_SPARE_I502_1                     :BOOL;
+I90_HPR2_LOW_LVL_FBI502_2            :BOOL;
+I90_HPR2_SOL_DOOR_SW_FBI502_3        :BOOL;
+I90_BOWL2_RDYI502_4                  :BOOL;
+I90_BOWL2_LOW_LVLI502_5              :BOOL;
+I90_BOWL2_OFF_ONI502_6               :BOOL;
+I90_HPR2_OFF_ONI502_7                :BOOL;
+I90_CONV2_REVI503_0                  :BOOL;
+I90_CONV2_FWDI503_1                  :BOOL;
+I90_VBF1_CONV2_TRK1_OVERFLWI503_2    :BOOL;
+I90_VBF1_CONV2_TRK2_OVERFLWI503_3    :BOOL;
+I90_CONV2_TRK1_CHO_MOD1I503_4        :BOOL;
+I90_CONV2_TRK1_CHO_MOD2I503_5        :BOOL;
+I90_CONV2_TRK2_CHO_MOD1I503_6        :BOOL;
+I90_CONV2_TRK2_CHO_MOD2I503_7        :BOOL;
+
+
+I90_CONV2_TRK3_CHO_MOD1I504_0        :BOOL;
+I90_CONV2_TRK3_CHO_MOD2I504_1        :BOOL;
+I90_VBF1_CONV_TRK_OVERFLW_2I504_2    :BOOL;
+I90_VBF2_CONV_TRK_OVERFLW_2I504_3    :BOOL;
+I90_SPARE_I504_4                     :BOOL;
+I90_SPARE_I504_5                     :BOOL;
+I90_SPARE_I504_6                     :BOOL;
+I90_SPARE_I504_7                     :BOOL;
+I90_SPARE_I505_0                     :BOOL;
+I90_SPARE_I505_1                     :BOOL;
+I90_SPARE_I505_2                     :BOOL;
+I90_SPARE_I505_3                     :BOOL;
+I90_SPARE_I505_4                     :BOOL;
+I90_SPARE_I505_5                     :BOOL;
+I90_SPARE_I505_6                     :BOOL;
+I90_SPARE_I505_7                     :BOOL;
+
+
+O90_HPR1_ENABLEQ500_0                :BOOL;
+O90_BOWL1_ENABLEQ500_1               :BOOL;
+O90_HPR1_TWR_LMP_REDQ500_2           :BOOL;
+O90_HPR1_TWR_LMP_GREENQ500_3         :BOOL;
+O90_BOWL1_AIR_PURGE1Q500_4           :BOOL;
+O90_BOWL1_AIR_PURGE2Q500_5           :BOOL;
+O90_HPR1_DOOR_OPNQ500_6              :BOOL;
+O90_SPARE_Q500_7                     :BOOL;
+O90_HPR2_ENABLEQ501_0                :BOOL;
+O90_BOWL2_ENABLEQ501_1               :BOOL;
+O90_HPR2_TWR_LMP_REDQ501_2           :BOOL;
+O90_HPR2_TWR_LMP_GREENQ501_3         :BOOL;
+O90_BOWL2_AIR_PURGE1Q501_4           :BOOL;
+O90_BOWL2_AIR_PURGE2Q501_5           :BOOL;
+O90_HPR2_DOOR_OPNQ501_6              :BOOL;
+O90_SPARE_Q501_7                     :BOOL;
+
+
+O90_SPARE_Q502_0                     :BOOL;
+O90_SPARE_Q502_1                     :BOOL;
+O90_SPARE_Q502_2                     :BOOL;
+O90_SPARE_Q502_3                     :BOOL;
+O90_SPARE_Q502_4                     :BOOL;
+O90_SPARE_Q502_5                     :BOOL;
+O90_SPARE_Q502_6                     :BOOL;
+O90_SPARE_Q502_7                     :BOOL;
+O90_SPARE_Q503_0                     :BOOL;
+O90_SPARE_Q503_1                     :BOOL;
+O90_SPARE_Q503_2                     :BOOL;
+O90_SPARE_Q503_3                     :BOOL;
+O90_SPARE_Q503_4                     :BOOL;
+O90_SPARE_Q503_5                     :BOOL;
+O90_SPARE_Q503_6                     :BOOL;
+O90_SPARE_Q503_7                     :BOOL;
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="MODE_SELECTION" Id="{d42a47fb-9fcb-4bb4-bd2b-776891b0b43e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MODE_SELECTION
+VAR
+		
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// MODE FUNTIONAL BLOCK
+
+FB_MODE_BLOCK(
+	ModeWord:= MODE_WORD, 
+	HomeConditionOK:= ALL_STN_IN_HOME, 
+	OperationEnable:= SAFE_TO_WORK, 
+	StartPB:= START_PB , 
+	SafetyAndNOError:= , 
+	ModeAck:=MODE_CHANGE_ACK, 
+	HomingINProgress:= , 
+	TempHomeOK:= , 
+	ResetPB:= RESET_PB, 
+	AutoSelected=> AUTO_SELECTED, 
+	ManualSelected=> MANUAL_SELECTED, 
+	StepSelected=> STEP_SELECTED, 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:= AUTO_RUNNING, 
+	StepRunning:= STEP_RUNNING, 
+	StartEnable:= START_ENABLE, 
+	MachineStop:= MACHINE_STOP);
+	
+	
+	
+	]]></ST>
+    </Implementation>
+    <LineIds Name="MODE_SELECTION">
+      <LineId Id="3" Count="23" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

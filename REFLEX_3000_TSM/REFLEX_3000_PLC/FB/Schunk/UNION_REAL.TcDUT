@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="UNION_REAL" Id="{7a68fe2e-2b54-4518-b12e-1c5c3d67ac86}">
+    <Declaration><![CDATA[TYPE UNION_REAL :
+UNION
+	rREAL	: REAL;
+	aARRAY	: ARRAY[0..3]OF BYTE;
+END_UNION
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="MASTER2_IO" Id="{931644ce-41c2-402e-aa0f-308d4c176b5a}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	//port1
+I30_DRUM_FEED_CONV1_OVERFLW_I1100_0				 : BOOL;
+I30_DRUM_FEED_CONV2_OVERFLW_I1100_1              : BOOL;
+I30_LH_REJ_CYL_FWD_I1100_2                       : BOOL;
+I30_LH_REJ_CYL_REV_I1100_3                       : BOOL;
+I30_RH_REJ_CYL_FWD_I1100_4                       : BOOL;
+I30_RH_REJ_CYL_REV_I1100_5                       : BOOL;
+I30_SPARE_I1100_6                                : BOOL;
+I30_SPARE_I1100_7                                : BOOL;
+
+I50_DRUM_FEED_CONV1_OVERFLW_I1101_0              : BOOL;
+I50_DRUM_FEED_CONV2_OVERFLW_I1101_1              : BOOL;
+I50_LH_REJ_CYL_FWD_I1101_2                       : BOOL;
+I50_LH_REJ_CYL_REV_I1101_3                       : BOOL;
+I50_RH_REJ_CYL_FWD_I1101_4                       : BOOL;
+I50_RH_REJ_CYL_REV_I1101_5                       : BOOL;
+I50_SPARE_I1101_6                                : BOOL;
+I50_LH_GRIP_CLSE_I1101_7                         : BOOL;
+
+//port2
+I50_SPARE_I1110_0                                : BOOL;
+I50_RH_GRIP_CLSE_I1110_1                         : BOOL;
+I70_DRUM_FEED_CONV1_OVERFLW_I1110_2              : BOOL;
+I70_DRUM_FEED_CONV2_OVERFLW_I1110_3              : BOOL;
+I70_LH_REJ_CYL_FWD_I1110_4                       : BOOL;
+I70_LH_REJ_CYL_REV_I1110_5                       : BOOL;
+I70_RH_REJ_CYL_FWD_I1110_6                       : BOOL;
+I70_RH_REJ_CYL_REV_I1110_7                       : BOOL;
+
+I70_SPARE_I1111_0                                : BOOL;
+I70_SPARE_I1111_1                                : BOOL;
+I70_SPARE_I1111_2                                : BOOL;
+I70_SPARE_I1111_3                                : BOOL;
+I70_SPARE_I1111_4                                : BOOL;
+I70_SPARE_I1111_5                                : BOOL;
+I70_SPARE_I1111_6                                : BOOL;
+I70_SPARE_I1111_7                                : BOOL;
+
+
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

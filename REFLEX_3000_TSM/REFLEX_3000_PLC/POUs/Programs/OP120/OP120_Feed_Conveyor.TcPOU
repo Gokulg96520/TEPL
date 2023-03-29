@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP120_Feed_Conveyor" Id="{06572652-2656-4bb2-bb70-302eb1942d5c}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP120_Feed_Conveyor
+VAR
+	
+	con_step_no : INT;
+	cam_trig : BOOL;
+	cam_ok : BOOL;
+	go : BOOL;
+	t1: ton;
+	t2: ton;
+	t3: ton;
+	t4: ton;
+	t5: ton;
+	
+	temp: BOOL;
+	check:BOOL;
+	check1:ton;
+	fwd_time : INT :=200;
+	count_nok :INT;
+	forward: BOOL;
+	reverse: BOOL;
+	//please delete
+	pick_ready:BOOL;
+	 pick_done:bool;
+	rev_time: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(*
+IF (NOT OP120_GVL.OP120_AutoSelected OR OP120_GVL.OP120_ErrorActive) THEN
+	OP120_GVL.OP120_AutoRunning:= FALSE;
+	OP120_GVL.SR130_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+	forward:=FALSE;
+	reverse:=FALSE;
+	con_step_no:= 10;
+END_IF	*)
+
+CASE con_step_no OF
+		10: IF (OP120_GVL.OP120_AutoSelected) THEN		// Check Automode Selected
+				con_step_no:=20;
+	        END_IF
+		
+	    20:IF (NOT OP120_GVL.OP120_ErrorActive) THEN		//Check No error
+		       con_step_no:=50;
+      	   END_IF
+		   
+      	50:IF ( NOT OP120_GVL.OP120_OperationCompleted) THEN		// Check Operation Completed Reset
+      		   con_step_no:=60;
+      	   END_IF
+		   
+		60:IF ( OP120_GVL.OP120_AutoRunning   OR (OP120_GVL.OP120_HMI_CycleStart_PB )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+				con_step_no:= 65;
+				OP120_GVL.OP120_AutoRunning:=TRUE;
+		   END_IF
+		   
+        65:	 SR120_Oring_Feed_Servo_Control.Velocity:= 500;
+		//	fwd_time:=4000;			
+			forward:=TRUE;
+			SR120_Oring_Feed_Servo_Control.VELmove_Start:=TRUE;	
+			IF t2.Q THEN
+    			forward:=FALSE;
+				OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+				con_step_no:= 70;
+			END_IF
+		  
+		70: IF NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start THEN
+			  cam_trig :=TRUE;
+			  IF t1.Q THEN
+				con_step_no:= 75;
+			  END_IF
+			END_IF	
+					
+		75:	IF cam_ok AND NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start AND OP120_GVL.SR120_Oring_Feed_Servo_Control.Axis_ready THEN
+				IF t4.Q THEN
+				 con_step_no:= 90;
+				 count_nok:=0;	
+				END_IF
+			ELSIF NOT cam_ok AND count_nok<5 AND NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start THEN
+				count_nok := count_nok +1;
+				fwd_time:=200;
+				con_step_no:= 80;
+			ELSIF NOT cam_ok AND count_nok>=5 AND NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start THEN
+				count_nok:=0;
+				fwd_time:=1000;
+				con_step_no:= 80;
+			END_IF
+			
+		80: 	 OP120_GVL.SR120_Oring_Feed_Servo_Control.Velocity:= 100;				
+				forward:=TRUE;
+				OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=TRUE;	
+				IF t2.Q THEN
+    				forward:=FALSE;
+					OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+					con_step_no:= 70;
+				END_IF
+		
+		90: 	 OP120_GVL.SR120_Oring_Feed_Servo_Control.Velocity:= -100;
+				reverse:=TRUE;
+				OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=TRUE;
+				IF t3.Q THEN
+ 					reverse:=FALSE;
+					OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+					con_step_no:= 100;
+				END_IF		
+				
+		100: pick_ready:=TRUE;
+			 IF pick_done THEN
+				 pick_ready :=FALSE;
+				 pick_done:=FALSE;
+				 con_step_no:= 80;
+			 END_IF
+			 		
+				
+END_CASE
+
+t1(IN:=cam_trig ,PT:=T#500MS);
+IF cam_trig AND con_step_no=70  THEN
+	cam_ok:=FALSE;
+END_IF
+IF t1.Q THEN
+	cam_ok:=temp;
+	cam_trig :=FALSE;
+END_IF
+
+t2(IN:=forward ,PT:=INT_TO_TIME(fwd_time));
+t3(IN:=reverse ,PT:=INT_TO_TIME(rev_time));
+t4(IN:=cam_ok,PT:=T#1S);
+t5(IN:=pick_ready,PT:=T#2S);
+
+IF t5.Q THEN
+	pick_done:=TRUE;
+END_IF
+
+
+
+
+
+	]]></ST>
+    </Implementation>
+    <LineIds Name="OP120_Feed_Conveyor">
+      <LineId Id="6" Count="99" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="135" Count="2" />
+      <LineId Id="106" Count="4" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP80_HMI_GVL" Id="{8640d6ff-29ea-4dea-896e-8a5e21c6ed53}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	
+SR80_Vert_servo_status:stManualModeAxis;
+SR80_Vert_servo_ctrl:Servo_Control;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

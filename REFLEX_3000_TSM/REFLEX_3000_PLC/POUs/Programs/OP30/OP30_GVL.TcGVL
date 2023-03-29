@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP30_GVL" Id="{be3040d8-1b7c-457d-bcd1-9515b212dc46}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+			
+//GENERAL
+OP30_Auto:					BOOL;
+OP30_Mode_Ack:				BOOL;
+OP30_HomeRunning:			BOOL;
+OP30_ErrorActive:			BOOL;
+OP30_Home_PB:				BOOL;
+OP30_Work_PB:				BOOL;
+OP30_ManualSafetyBypass:	BOOL;
+OP30_LightCurtainBypass:	BOOL;
+OP30_OperationCompleted:	BOOL;
+OP30_LampCheck:				BOOL;
+OP30_MachineLamp:			BOOL;
+OP30_ComponentOk:			BOOL;
+OP30_ComponentNok:			BOOL;
+OP30_RepeatBit:				BOOL;
+OP30_HomingResetBit:		BOOL;
+OP30_ControlledByRobo:		BOOL;
+OP30_Any_Bypass:			BOOL;
+OP30_ManualModeStatus:		INT;
+OP30_ManualModeWord:		INT;
+OP30_AutoRunning:			BOOL;
+OP30_StepRunning:			BOOL;
+OP30_StartEnable:   		BOOL;
+OP30_HomeConditionOK:		BOOL;
+OP30_Temp_hmeOK:			BOOL;
+OP30_Machine_Stop: 			BOOL;
+OP30_AutoSeq:				INT;
+OP30_LH_AutoSeq: 			INT;
+OP30_RH_AutoSeq: 			INT;
+OP30_Homing_Seq:			INT;
+OP30_Safety_OK:				BOOL;
+
+OP30_ManualSelected:		BOOL;
+OP30_StepSelected:			BOOL;
+OP30_AutoSelected:		    BOOL;
+
+OP30_HMI_AutoMode:						BOOL;
+OP30_HMI_ManualMode:					BOOL;
+OP30_HMI_StepMode:						BOOL;
+OP30_HMI_CycleStart:					BOOL;
+OP30_HMI_Cycle_Start:					BOOL;
+OP30_HMI_Reset:						    BOOL;
+OP30_HMI_Homing:						BOOL;
+
+SR30_Vert_servo: FB_Axis;
+SR30_Vert_servo_ctrl:Servo_Control;
+SR30_Vert_servo_status:stManualModeAxis;
+
+SR30_Hori_servo: FB_Axis;
+
+
+SR30_Conv_servo: FB_Axis;
+SR30_Conv_servo_ctrl:Servo_Control;
+SR30_Conv_servo_status:stManualModeAxis;
+
+OP30_Gripper_LH : FB_Schunk;
+OP30_Gripper_LH_Manual_Axis: stManualModeAxis; 
+OP30_Gripper_LH_Gripper_ctrl: Servo_Control; 
+
+OP30_GIUDE_GRP: FB_Axis_FESTO;
+
+
+OP30_Gripper_Current     : REAL;
+OP30_Gripper_Acceleration: REAL;
+OP30_Gripper_Jerk        : REAL;
+
+OP30_Gripper_RH : FB_Schunk;
+OP30_Gripper_RH_Manual_Axis: stManualModeAxis;
+OP30_Gripper_RH_Gripper_ctrl: Servo_Control; 
+
+OP30_Drum_feeder_ON 	  : BOOL;
+OP30_Drum_feeder_State : BOOL;
+
+Camera_LH_Trig : BOOL;
+Camera_LH_OK   : BOOL;
+
+Camera_RH_Trig : BOOL;
+Camera_RH_OK   : BOOL;
+
+//Cylinder
+CR30_LH_Rej_Cyl: Cylinder_Block;
+CR30_RH_Rej_Cyl: Cylinder_Block;
+CR30_LH_Rej_Cyl_status : INT;
+CR30_RH_Rej_Cyl_status : INT;
+OP30_HMI_LH_Rej_Cyl_Home_PB : BOOL;
+OP30_HMI_LH_Rej_Cyl_Work_PB : BOOL;
+OP30_HMI_RH_Rej_Cyl_Home_PB : BOOL;
+OP30_HMI_RH_Rej_Cyl_Work_PB : BOOL;
+
+//conveyor
+OP30_pick_ready: BOOL;
+OP30_pick_done : BOOL;
+
+//Schunk Gripper
+HwIn1 	 	AT%I*:	ARRAY [0..8] OF WORD;
+HwIn2  		AT%I*:	ARRAY [0..8] OF WORD;
+HwIn3 	 	AT%I*:	ARRAY [0..8] OF WORD;
+HwIn4  		AT%I*:	ARRAY [0..8] OF WORD;
+                    
+HwOut1		AT%Q*:	ARRAY [0..11] OF WORD;
+HwOut2		AT%Q*:	ARRAY [0..11] OF WORD;
+HwOut3		AT%Q*:	ARRAY [0..11] OF WORD;
+HwOut4		AT%Q*:	ARRAY [0..11] OF WORD;
+
+
+
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	OP30_Gripper_LH_Open  : BOOL;
+    OP30_Gripper_LH_Close : BOOL;
+    OP30_Gripper_LH_State : BOOL;  //1-- Open 0--Close
+    
+    OP30_Gripper_RH_Open  : BOOL;
+    OP30_Gripper_RH_Close : BOOL;
+    OP30_Gripper_RH_State : BOOL;
+
+
+    OP30_VERT_SERVO_POS_DONE	    	: BOOL;
+    OP30_VERT_SERVO_ON_SFE_WRK			: BOOL;
+    OP30_VERT_SERVO_ON_WRK_PICK			: BOOL;
+	OP30_VERT_SERVO_ON_WRK_PLACE		: BOOL;
+    OP30_VERT_SERVO_ON_HOME				: BOOL;
+	  
+	OP30_VERT_SERVO_POSITION		: LREAL ;
+	OP30_VERT_SERVO_HME_POS			: REAL := 0;  				
+	OP30_VERT_SERVO_SFE_WRK_POS		: REAL := 100;		
+	OP30_VERT_SERVO_PICK_POS		: REAL := 400;	
+	OP30_VERT_SERVO_PLACE_POS		: REAL := 200;
+
+    OP30_HORI_SERVO_POS_DONE	    	: BOOL;
+    OP30_HORI_SERVO_ON_SFE_WRK			: BOOL;
+    OP30_HORI_SERVO_ON_WRK_PICK			: BOOL;
+	OP30_HORI_SERVO_ON_WRK_PLACE		: BOOL;
+    OP30_HORI_SERVO_ON_HOME				: BOOL;
+	  
+	OP30_HORI_SERVO_POSITION		: LREAL ;
+	OP30_HORI_SERVO_HME_POS			: REAL := 0;  				
+	OP30_HORI_SERVO_SFE_WRK_POS		: REAL := 300;		
+	OP30_HORI_SERVO_PICK_POS		: REAL := 400;	
+	OP30_HORI_SERVO_PLACE_POS		: REAL := 200;
+	
+    OP30_CONV_SERVO_POS_DONE	    	: BOOL;
+    OP30_CONV_SERVO_ON_SFE_WRK			: BOOL;
+    OP30_CONV_SERVO_ON_WRK				: BOOL;
+    OP30_CONV_SERVO_ON_HOME				: BOOL;
+	
+	OP30_CONV_SERVO_POSITION		: LREAL ;
+	OP30_CONV_SERVO_HME_POS			: REAL;// := 0;  				
+	OP30_CONV_SERVO_SFE_WRK_POS		: REAL ;//:= 40;		
+	OP30_CONV_SERVO_WRK_POS			: REAL;// := 200;
+
+//Error
+OP30_ErrorWord_0: DINT;
+OP30_ErrorWord_1: DINT;
+OP30_ErrorWord_2: DINT;	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

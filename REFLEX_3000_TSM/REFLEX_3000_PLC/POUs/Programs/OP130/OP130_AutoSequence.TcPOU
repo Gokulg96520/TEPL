@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP130_AutoSequence" Id="{a9950a16-4d48-44b9-b6af-6bd42c698bdd}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP130_AutoSequence
+VAR
+	State: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (NOT OP130_Auto OR  OP130_ErrorActive OR OP130_HomeRunning ) THEN
+	OP130_GVL.OP130_AutoRunning:= FALSE;
+	OP130_ComponentOk:=FALSE;
+	OP130_ComponentNok:=FALSE;
+	OP130_AutoSeq:= 10;
+
+END_IF
+
+CASE OP130_AutoSeq OF 
+	10:IF (OP130_Auto) THEN		// Check Automode Selected
+		OP130_AutoSeq :=20;
+	    END_IF
+	20:IF ( NOT OP130_ErrorActive) THEN		//Check No error
+		OP130_AutoSeq:=30;
+	   END_IF
+	30:IF (NOT OP130_HomeRunning) THEN		//Check No Homerunning
+		OP130_AutoSeq :=40;
+		END_IF
+    40:IF ( OP130_GVL.OP130_Temp_Home_OK)THEN	//Check Machine in Home
+		OP130_AutoSeq:= 50;
+		END_IF
+	50:IF ( NOT OP130_OperationCompleted) THEN		// Check Operation Completed Reset
+		OP130_AutoSeq:=60;
+		END_IF
+	60:IF (NOT OP130_ComponentOk) THEN		// Check Component Ok Reset
+		OP130_AutoSeq:=70;
+		END_IF
+	70:IF (NOT OP130_ComponentNok) THEN 	// Check Component NOk Reset
+		OP130_AutoSeq:= 120;
+		END_IF
+    120:IF  (AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP130_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		   OP130_GVL.OP130_Home_ConditionOK:=TRUE;
+	 			IF( OP130_GVL.OP130_Home_ConditionOK AND OP130_AutoSelected) THEN
+					OP130_AutoRunning:=TRUE;
+					OP130_StepRunning:= FALSE;
+				
+				ELSIF (OP130_Home_ConditionOK AND OP130_StepSelected) THEN
+					OP130_AutoRunning:=FALSE;
+					OP130_StepRunning:= TRUE;
+				END_IF;
+		 END_IF
+		 IF ((OP130_AutoRunning OR OP130_StepRunning) AND OP130_StartEnable) THEN
+					OP130_AutoSeq:= 130;
+		END_IF
+	130:IF (OP130_Prev_Stat_Operation_Completed=TRUE) THEN // Check Previous Station Completed
+		             OP130_AutoSeq:= 140;
+	END_IF
+	140: IF (OP130_Prev_Comp_Status=1) THEN  // Check Compoent Status in Previuos Station
+		OP130_Prev_LH_COMP_OK:=TRUE;
+		OP130_Prev_RH_COMP_OK:=TRUE;
+		OP130_LH_AutoSeq:=10;
+		OP130_RH_AutoSeq:=10;
+		ELSIF (OP130_Prev_Comp_Status=2)THEN 
+		OP130_Prev_LH_COMP_NOK:=TRUE;
+		OP130_Prev_RH_COMP_OK:=TRUE;
+		OP130_LH_AutoSeq:=10;
+		OP130_RH_AutoSeq:=10;
+		ELSIF (OP130_Prev_Comp_Status=3)THEN 
+		OP130_Prev_LH_COMP_OK:=TRUE;
+		OP130_Prev_RH_COMP_NOK:=TRUE;
+		OP130_LH_AutoSeq:=10;
+		OP130_RH_AutoSeq:=10;
+		ELSIF (OP130_Prev_Comp_Status=4)THEN 
+		OP130_Prev_LH_COMP_NOK:=TRUE;
+		OP130_Prev_RH_COMP_NOK:=TRUE;
+		OP130_LH_AutoSeq:=10;
+		OP130_RH_AutoSeq:=10;
+		END_IF
+		IF (OP130_Prev_LH_COMP_OK OR OP130_Prev_LH_COMP_NOK) AND (OP130_Prev_RH_COMP_OK OR OP130_Prev_RH_COMP_NOK) THEN
+			OP130_Cycle_Time_Start:=TRUE;
+			 OP130_AutoSeq:= 150;
+		END_IF
+			
+	150:IF (OP130_LH_Operation_Completed AND OP130_RH_Operation_Completed) THEN	//Waiting For Both RH & LH Seq Completion
+		OP130_AutoSeq:= 160;
+		END_IF
+	160:IF ( OP130_StartEnable) THEN  // Operation Completed
+		
+	OP130_Cycle_Time_Stop:=TRUE;
+			OP130_OperationCompleted:=TRUE;
+			OP130_AutoSeq:= 170;
+		END_IF
+	170:IF (OP130_OperationCompleted=FALSE) THEN
+		OP130_AutoSeq:= 180;
+		END_IF
+	180:		// Reset All Bits							
+         OP130_LH_Comp_OK:=FALSE;
+         OP130_LH_Comp_NOK:=FALSE;
+         OP130_RH_Comp_OK:=FALSE;
+         OP130_RH_Comp_NOK:=FALSE;
+         OP130_LH_AutoSeq:=0;
+		OP130_RH_AutoSeq:=0;
+		OP130_AutoSeq:= 10;
+			
+	
+
+			
+			
+		
+		
+
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP130_AutoSequence">
+      <LineId Id="3" Count="100" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

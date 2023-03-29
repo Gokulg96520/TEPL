@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP160_MP" Id="{22031ba7-4e43-43ee-8e80-f9e7b2f814d0}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+I130_LH_ATC_DECLAMP_FBI700_0				:BOOL;
+I130_LH_ATC_CLAMP_FBI700_1                 :BOOL;
+I130_LH_ATC_STN_POKE_YOKE_1I700_2          :BOOL;
+I130_LH_ATC_STN_POKE_YOKE_2I700_3          :BOOL;
+I130_LH_ATC_STN_POKE_YOKE_3I700_4          :BOOL;
+I130_LH_ATC_STN_POKE_YOKE_4I700_5          :BOOL;
+I130_LH_ATC_SLAVE_MODL1I700_6              :BOOL;
+I130_LH_ATC_SLAVE_MODL2I700_7              :BOOL;
+I130_RH_ATC_DECLAMP_FBI701_0               :BOOL;
+I130_RH_ATC_CLAMP_FBI701_1                 :BOOL;
+I130_RH_ATC_STN_POKE_YOKE_1I701_2          :BOOL;
+I130_RH_ATC_STN_POKE_YOKE_2I701_3          :BOOL;
+I130_RH_ATC_STN_POKE_YOKE_3I701_4          :BOOL;
+I130_RH_ATC_STN_POKE_YOKE_4I701_5          :BOOL;
+I130_RH_ATC_SLAVE_MODL1I701_6              :BOOL;
+I130_RH_ATC_SLAVE_MODL2I701_7              :BOOL;
+
+I140_ATC1_DECLAMP_FBI702_0                 :BOOL;
+I140_ATC1_CLAMP_FBI702_1                   :BOOL;
+I140_ATC1_STN_POKE_YOKE_1I702_2            :BOOL;
+I140_ATC1_STN_POKE_YOKE_2I702_3            :BOOL;
+I140_ATC1_STN_POKE_YOKE_3I702_4            :BOOL;
+I140_ATC1_STN_POKE_YOKE_4I702_5            :BOOL;
+I140_ATC1_SLAVE_MODL1I702_6                :BOOL;
+I140_ATC1_SLAVE_MODL2I702_7                :BOOL;
+I140_SPARE_I703_0                          :BOOL;
+I140_SPARE_I703_1                          :BOOL;
+I140_SPARE_I703_2                          :BOOL;
+I140_LK_TST_1_PASI703_3                    :BOOL;
+I140_LK_TST_1_FLI703_4                     :BOOL;
+I140_LK_TST_1_REF_PRT_FLI703_5             :BOOL;
+I140_LK_TST_1_WARNGI703_6                  :BOOL;
+I140_LK_TST_1_END_CYCI703_7                :BOOL;
+
+										  
+I140_SPARE_I704_0I704_0                    :BOOL;
+I140_LK_TST_2_PASI704_1                    :BOOL;
+I140_LK_TST_2_FLI704_2                     :BOOL;
+I140_LK_TST_2_REF_PRT_FLI704_3             :BOOL;
+I140_LK_TST_2_WARNGI704_4                  :BOOL;
+I140_LK_TST_2_END_CYCI704_5                :BOOL;
+I140_SPARE_I704_6                          :BOOL;
+I140_SPARE_I704_7                          :BOOL;
+I140_ATC2_DECLAMP_FBI705_0                 :BOOL;
+I140_ATC2_CLAMP_FBI705_1                   :BOOL;
+I140_ATC2_STN_POKE_YOKE_1I705_2            :BOOL;
+I140_ATC2_STN_POKE_YOKE_2I705_3            :BOOL;
+I140_ATC2_STN_POKE_YOKE_3I705_4            :BOOL;
+I140_ATC2_STN_POKE_YOKE_4I705_5            :BOOL;
+I140_ATC2_SLAVE_MODL1I705_6                :BOOL;
+I140_ATC2_SLAVE_MODL2I705_7                :BOOL;
+										   
+
+I140_SPARE_I706_0                          :BOOL;
+I140_LK_TST_3_PASI706_1                    :BOOL;
+I140_LK_TST_3_FLI706_2                     :BOOL;
+I140_LK_TST_3_REF_PRT_FLI706_3             :BOOL;
+I140_LK_TST_3_WARNGI706_4                  :BOOL;
+I140_LK_TST_3_END_CYCI706_5                :BOOL;
+I140_SPARE_I706_6                          :BOOL;
+I140_SPARE_I706_7                          :BOOL;
+I140_SPARE_I707_0                          :BOOL;
+I140_LK_TST_4_PASI707_1                    :BOOL;
+I140_LK_TST_4_FLI707_2                     :BOOL;
+I140_LK_TST_4_REF_PRT_FLI707_3             :BOOL;
+I140_LK_TST_4_WARNGI707_4                  :BOOL;
+I140_LK_TST_4_END_CYCI707_5                :BOOL;
+I140_SPARE_I707_6                          :BOOL;
+I140_SPARE_I707_7                          :BOOL;
+
+
+I140_ATC3_DECLAMP_FBI708_0                 :BOOL;
+I140_ATC3_CLAMP_FBI708_1                   :BOOL;
+I140_ATC3_STN_POKE_YOKE_1I708_2            :BOOL;
+I140_ATC3_STN_POKE_YOKE_2I708_3            :BOOL;
+I140_ATC3_STN_POKE_YOKE_3I708_4            :BOOL;
+I140_ATC3_STN_POKE_YOKE_4I708_5            :BOOL;
+I140_ATC3_SLAVE_MODL1I708_6                :BOOL;
+I140_ATC3_SLAVE_MODL2I708_7                :BOOL;
+I140_SPARE_I709_0                          :BOOL;
+I140_SPARE_I709_1                          :BOOL;
+I140_SPARE_I709_2                          :BOOL;
+I140_LK_TST_5_PASI709_3                    :BOOL;
+I140_LK_TST_5_FLI709_4                     :BOOL;
+I140_LK_TST_5_REF_PRT_FLI709_5             :BOOL;
+I140_LK_TST_5_WARNGI709_6                  :BOOL;
+I140_LK_TST_5_END_CYCI709_7                :BOOL;
+
+I140_SPARE_I710_0                          :BOOL;
+I140_LK_TST_6_PASI710_1                    :BOOL;
+I140_LK_TST_6_FLI710_2                     :BOOL;
+I140_LK_TST_6_REF_PRT_FLI710_3             :BOOL;
+I140_LK_TST_6_WARNGI710_4                  :BOOL;
+I140_LK_TST_6_END_CYCI710_5                :BOOL;
+I160_ATC_DECLAMP_FBI710_6                  :BOOL;
+I160_ATC_CLAMP_FBI710_7                    :BOOL;
+I160_ATC1_STN_POKE_YOKE_1I711_0            :BOOL;
+I160_ATC1_STN_POKE_YOKE_2I711_1            :BOOL;
+I160_ATC1_STN_POKE_YOKE_3I711_2            :BOOL;
+I160_ATC1_STN_POKE_YOKE_4I711_3            :BOOL;
+I160_ATC1_SLAVE_TOOL1I711_4                :BOOL;
+I160_ATC1_SLAVE_TOOL2I711_5                :BOOL;
+I160_FIXT_LH_COMP_PP_GRPR_CLSEI711_6       :BOOL;
+I160_FIXT_LH_COMP_PP_GRPR_OPNI711_7        :BOOL;
+
+
+I160_RH_COMP_PP_GRPR_CLSEI712_0            :BOOL;
+I160_RH_COMP_PP_GRPR_OPNI712_1             :BOOL;
+I160_AUTOBAG_READYI712_2                   :BOOL;
+I160_SPARE_I712_3                          :BOOL;
+I160_SPARE_I712_4                          :BOOL;
+I160_AUTOBAG_ERR_STOPI712_5                :BOOL;
+I20_RESRVR_LW_LVLI712_6                    :BOOL;
+I20_OILTANK_PRES_SW_FBI712_7               :BOOL;
+I160_SPARE_I713_0                          :BOOL;
+I160_SPARE_I713_1                          :BOOL;
+I160_VFD_RDYI713_2                         :BOOL;
+I160_SPARE_I713_3                          :BOOL;
+I160_SPARE_I713_4                          :BOOL;
+I160_SPARE_I713_5                          :BOOL;
+I160_SPARE_I713_6                          :BOOL;
+I160_SPARE_I713_7                          :BOOL;
+
+
+I10A_DRUM_FEED_ALRMI714_0                  :BOOL;
+I10A_SPARE_I714_1                          :BOOL;
+I10A_DRUM_OFF_ON_I714_2                    :BOOL;
+I10A_DRUM_CONV_REV_I714_3                  :BOOL;
+I10A_DRUM_CONV_FWD_I714_4                  :BOOL;
+I10A_ROB_MAN_AUTO_MODE_I714_5              :BOOL;
+I160_SPARE_I714_6                          :BOOL;
+I160_SPARE_I714_7                          :BOOL;
+I160_SPARE_I715_0                          :BOOL;
+I160_SPARE_I715_1                          :BOOL;
+I160_SPARE_I715_2                          :BOOL;
+I160_SPARE_I715_3                          :BOOL;
+I160_SPARE_I715_4                          :BOOL;
+I160_SPARE_I715_5                          :BOOL;
+I160_SPARE_I715_6                          :BOOL;
+I160_SPARE_I715_7                          :BOOL;
+
+O140_LK_TST1_RST_Q700_0                   :BOOL;
+O140_LK_TST1_STRT_Q700_1                  :BOOL;
+O140_LK_TST1_SEL1_Q700_2                  :BOOL;
+O140_LK_TST1_SEL2_Q700_3                  :BOOL;
+O140_LK_TST1_SEL3_Q700_4                  :BOOL;
+O140_LK_TST1_SEL4_Q700_5                  :BOOL;
+O140_LK_TST1_SEL5_Q700_6                  :BOOL;
+O140_LK_TST1_SEL6_Q700_7                  :BOOL;
+O140_LK_TST1_SEL7_Q701_0                  :BOOL;
+O140_LK_TST2_RST_Q701_1                   :BOOL;
+O140_LK_TST2_STRT_Q701_2                  :BOOL;
+O140_LK_TST2_SEL1_Q701_3                  :BOOL;
+O140_LK_TST2_SEL2_Q701_4                  :BOOL;
+O140_LK_TST2_SEL3_Q701_5                  :BOOL;
+O140_LK_TST2_SEL4_Q701_6                  :BOOL;
+O140_LK_TST2_SEL5_Q701_7                  :BOOL;
+
+O140_LK_TST2_SEL6_Q702_0                  :BOOL;
+O140_LK_TST2_SEL7_Q702_1                  :BOOL;
+O140_LK_TST3_RST_Q702_2                   :BOOL;
+O140_LK_TST3_STRT_Q702_3                  :BOOL;
+O140_LK_TST3_SEL1_Q702_4                  :BOOL;
+O140_LK_TST3_SEL2_Q702_5                  :BOOL;
+O140_LK_TST3_SEL3_Q702_6                  :BOOL;
+O140_LK_TST3_SEL4_Q702_7                  :BOOL;
+O140_LK_TST3_SEL5_Q703_0                  :BOOL;
+O140_LK_TST3_SEL6_Q703_1                  :BOOL;
+O140_LK_TST3_SEL7_Q703_2                  :BOOL;
+O140_LK_TST4_RST_Q703_3                   :BOOL;
+O140_LK_TST4_STRT_Q703_4                  :BOOL;
+O140_LK_TST4_SEL1_Q703_5                  :BOOL;
+O140_LK_TST4_SEL2_Q703_6                  :BOOL;
+O140_LK_TST4_SEL3_Q703_7                  :BOOL;
+
+O140_LK_TST4_SEL4_Q704_0                  :BOOL;
+O140_LK_TST4_SEL5_Q704_1                  :BOOL;
+O140_LK_TST4_SEL6_Q704_2                  :BOOL;
+O140_LK_TST4_SEL7_Q704_3                  :BOOL;
+O140_LK_TST5_RST_Q704_4                   :BOOL;
+O140_LK_TST5_STRT_Q704_5                  :BOOL;
+O140_LK_TST5_SEL1_Q704_6                  :BOOL;
+O140_LK_TST5_SEL2_Q704_7                  :BOOL;
+O140_LK_TST5_SEL3_Q705_0                  :BOOL;
+O140_LK_TST5_SEL4_Q705_1                  :BOOL;
+O140_LK_TST5_SEL5_Q705_2                  :BOOL;
+O140_LK_TST5_SEL6_Q705_3                  :BOOL;
+O140_LK_TST5_SEL7_Q705_4                  :BOOL;
+O140_LK_TST6_RST_Q705_5                   :BOOL;
+O140_LK_TST6_STRT_Q705_6                  :BOOL;
+O140_LK_TST6_SEL1_Q705_7                  :BOOL;
+										   
+
+O140_LK_TST6_SEL2_Q706_0                  :BOOL;
+O140_LK_TST6_SEL3_Q706_1                  :BOOL;
+O140_LK_TST6_SEL4_Q706_2                  :BOOL;
+O140_LK_TST6_SEL5_Q706_3                  :BOOL;
+O140_LK_TST6_SEL6_Q706_4                  :BOOL;
+O140_LK_TST6_SEL7_Q706_5                  :BOOL;
+O150_VISN_LGHT_ON_Q706_6                   :BOOL;
+O150_BARLIGHT_OP1_Q706_7                   :BOOL;
+O150_BARLIGHT_OP2_Q707_0                   :BOOL;
+O160_CHECKER_LGHT_ON_Q707_1                :BOOL;
+O160_FUME_EXTRTR_ON_Q707_2                 :BOOL;
+O160_MC_LMP_ON_Q707_3                      :BOOL;
+O160_AUTOBAG_CNT_CMPLTD_Q707_4             :BOOL;
+O160_SAMPLE_PART_DOOR_OPN_Q707_5           :BOOL;
+O160_REJ_BIN_DOOR_OPN_Q707_6               :BOOL;
+O160_SPARE_Q707_7                          :BOOL;
+										   
+O160_VFD_FWD_Q708_0                        :BOOL;
+O160_VFD_REV_Q708_1                        :BOOL;
+O160_VFD_STOP_Q708_2                       :BOOL;
+O160_BOT_MC_LMP_ON_Q708_3                  :BOOL;
+O10A_DRUM_MTR_FWD_Q708_4                   :BOOL;
+O10A_DRUM_RST_Q708_5                       :BOOL;
+O10A_DRUM_EXT_SPEED_Q708_6                 :BOOL;
+O160_SPARE_Q708_7                          :BOOL;
+O10A_DRUM_RUN_IND_Q709_0                   :BOOL;
+O160_SPARE_Q709_1_Q709_1                   :BOOL;
+O10A_ROB_MAN_AUTO_MODE_Q709_2              :BOOL;
+O10B_ROB_MAN_AUTO_MODE_Q709_3              :BOOL;
+O120_ROB_MAN_AUTO_MODE_Q709_4              :BOOL;
+O160_SPARE_Q709_5                          :BOOL;
+O160_SPARE_Q709_6                          :BOOL;
+O160_SPARE_Q709_7                          :BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

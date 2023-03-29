@@ -1,0 +1,486 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP30_MANUAL" Id="{5fd1db08-f028-4fe1-b7f9-bac3f9599e71}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP30_MANUAL
+VAR
+	SR30_Vert_servo_Axis :AXIS_REF;
+	SR30_Hori_servo_Axis :AXIS_REF;
+	SR30_Conv_servo_Axis :AXIS_REF;
+	SR30_GUIDE_GRP_AXIS	 :AXIS_REF;
+	LH_Gripper_bMove	 : BOOL;
+	RH_Gripper_bMove	 : BOOL;
+	temp_safe: BOOL;
+	temp:BOOL;
+	error30: BOOL;
+	OP30Enable: BOOL;
+	FESTO_NOT_NEED: BOOL;
+	NOT_REQ: BOOL;
+	
+	
+	temp30: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+OP30_VERT_SERVO_POSITION    := SR30_Vert_servo_ctrl.Actual_Position;
+OP30_VERT_SERVO_POS_DONE	:= SR30_Vert_servo_ctrl.pos_done ;
+
+OP30_HORI_SERVO_POSITION    := SR30_Hori_servo_ctrl.Actual_Position;
+OP30_HORI_SERVO_POS_DONE	:= SR30_Hori_servo_ctrl.pos_done ;
+
+OP30_CONV_SERVO_POSITION    := SR30_CONV_servo_ctrl.Actual_Position;
+OP30_CONV_SERVO_POS_DONE	:= SR30_CONV_servo_ctrl.pos_done ;
+
+
+// VERTICAL SERVO 
+IF In_Range(SR30_Vert_servo_status.actualPosition,OP30_VERT_SERVO_SFE_WRK_POS,1) THEN
+	OP30_VERT_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP30_VERT_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR30_Vert_servo_status.actualPosition,OP30_VERT_SERVO_HME_POS,1) THEN
+	OP30_VERT_SERVO_ON_HOME := TRUE;
+ELSE
+	OP30_VERT_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR30_Vert_servo_status.actualPosition,OP30_VERT_SERVO_PICK_POS,1) THEN
+	OP30_VERT_SERVO_ON_WRK_PICK := TRUE;
+ELSE
+	OP30_VERT_SERVO_ON_WRK_PICK := FALSE;
+END_IF		
+
+IF In_Range(SR30_Vert_servo_status.actualPosition,OP30_VERT_SERVO_PLACE_POS,1) THEN
+	OP30_VERT_SERVO_ON_WRK_PLACE := TRUE;
+ELSE
+	OP30_VERT_SERVO_ON_WRK_PLACE := FALSE;
+END_IF
+
+//HORIZONTAL SERVO
+IF In_Range(SR30_Hori_servo_status.actualPosition,OP30_HORI_SERVO_SFE_WRK_POS,1) THEN
+	OP30_HORI_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP30_HORI_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR30_Hori_servo_status.actualPosition,OP30_HORI_SERVO_HME_POS,1) THEN
+	OP30_HORI_SERVO_ON_HOME := TRUE;
+ELSE
+	OP30_HORI_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR30_Hori_servo_status.actualPosition,OP30_HORI_SERVO_PICK_POS,1) THEN
+	OP30_HORI_SERVO_ON_WRK_PICK := TRUE;
+ELSE
+	OP30_HORI_SERVO_ON_WRK_PICK := FALSE;
+END_IF	
+
+IF In_Range(SR30_Hori_servo_status.actualPosition,OP30_HORI_SERVO_PLACE_POS,1) THEN
+	OP30_HORI_SERVO_ON_WRK_PLACE := TRUE;
+ELSE
+	OP30_HORI_SERVO_ON_WRK_PLACE := FALSE;
+END_IF	
+
+//CONVEYOR SERVO
+
+IF In_Range(SR30_CONV_servo_status.actualPosition,OP30_CONV_SERVO_SFE_WRK_POS,1) THEN
+	OP30_CONV_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP30_CONV_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR30_CONV_servo_status.actualPosition,OP30_CONV_SERVO_HME_POS,1) THEN
+	OP30_CONV_SERVO_ON_HOME := TRUE;
+ELSE
+	OP30_CONV_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR30_CONV_servo_status.actualPosition,OP30_CONV_SERVO_WRK_POS,1) THEN
+	OP30_CONV_SERVO_ON_WRK := TRUE;
+ELSE
+	OP30_CONV_SERVO_ON_WRK := FALSE;
+END_IF	
+
+
+OP30_GVL.SR30_Vert_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP30_HMI_Reset OR Servo_Reset , 
+	bEnable:=Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:=MANUAL_SELECTED,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:=SR30_Vert_servo_ctrl.Position , 
+	fTargetVelocity:=SR30_Vert_servo_ctrl.Velocity , 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR30_Vert_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR30_Vert_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR30_Vert_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR30_Vert_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR30_Vert_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:= Servo_Safety ,
+	HME_WRITE_ADD:= 16#5006,
+	Axis:= SR30_Vert_servo_Axis , 
+	bHome:=SR30_Vert_servo_ctrl.Bsethome , 
+    bSetPosition:=SR30_Vert_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR30_Vert_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR30_Vert_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR30_Vert_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR30_Vert_servo_status , 
+	sAxisState=>SR30_Vert_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR30_Vert_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR30_Vert_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR30_Vert_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR30_Vert_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR30_Vert_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR30_Vert_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=> ,
+	bABS_Pos_done=> SR30_Vert_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );	
+
+OP30_GVL.SR30_HORI_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP30_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= OP30_ManualSelected OR MANUAL_SELECTED ,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= SR30_HORI_servo_ctrl.Position , 
+	fTargetVelocity:= SR30_HORI_servo_ctrl.Velocity, 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR30_HORI_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR30_HORI_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR30_HORI_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR30_HORI_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR30_HORI_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	HME_WRITE_ADD:= 16#5005,
+	Axis:= SR30_HORI_servo_Axis , 
+	bHome:=SR30_HORI_servo_ctrl.Bsethome , 
+    bSetPosition:=SR30_HORI_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR30_HORI_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR30_HORI_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR30_HORI_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR30_HORI_servo_status , 
+	sAxisState=>SR30_HORI_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR30_HORI_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR30_HORI_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR30_HORI_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR30_HORI_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR30_HORI_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR30_HORI_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=> ,
+	bABS_Pos_done=> SR30_HORI_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );
+
+OP30_GVL.SR30_CONV_servo(
+	bAxis1_Ref_Switch:= temp, 
+	bInit:= , 
+	bErrorReset:=OP30_HMI_Reset OR Servo_Reset , 
+	bEnable:=Servo_Enable, 
+	bMoveVelocity:=SR30_CONV_servo_ctrl.VELmove_Start , 
+	bHalt:= , 
+	bManualMode:= OP30_ManualSelected OR MANUAL_SELECTED,
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= SR30_CONV_servo_ctrl.Velocity, 
+	fAcc:= , 
+	fDec:= ,
+	Actual_Torque=> SR30_CONV_servo_ctrl.Actual_Torque ,
+	Actual_position=>SR30_CONV_servo_ctrl.Actual_Position ,
+    Actual_velocity=>SR30_CONV_servo_ctrl.Actual_Velocity ,	
+	bmove_home:=SR30_CONV_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR30_CONV_servo_ctrl.Axis_In_Home ,
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:= SR30_CONV_servo_Axis ,
+	HME_WRITE_ADD:= 16#5007, 
+	bHome:=SR30_CONV_servo_ctrl.Bsethome , 
+    bSetPosition:=SR30_CONV_servo_ctrl.Bsetpos , 
+	bMoveAbsolute:=SR30_CONV_servo_ctrl.ABSmove_Start , 
+	bMoveRelative:=SR30_CONV_servo_ctrl.RELmove_Start , 
+	bMoveTorque :=SR30_CONV_servo_ctrl.Torque_mode_Start,
+	stManualModeAxis:=SR30_CONV_servo_status , 
+	sAxisState=>SR30_CONV_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR30_CONV_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR30_CONV_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR30_CONV_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR30_CONV_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR30_CONV_servo_ctrl.Axis_reference,
+	bTorqueReached=> SR30_CONV_servo_ctrl.Trq_reached, 
+	bSetPositionDone=>   ,
+	bsafe_to_move=>SR30_CONV_servo_ctrl.Safe_To_Move ,
+	bABS_Pos_done=> SR30_CONV_servo_ctrl.pos_done , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );	
+	
+IF OP30_ManualSelected OR MANUAL_SELECTED THEN
+	SR30_Vert_servo_status.targetVelocity:=50;
+	SR30_Hori_servo_status.targetVelocity:=50;
+	SR30_CONV_servo_status.targetVelocity:=100;
+	OP30_GIUDE_GRP_Manual_Axis.targetVelocity:=50;
+	OP30_Gripper_LH_Gripper_ctrl.Velocity       :=  500;
+	OP30_Gripper_RH_Gripper_ctrl.Velocity       :=  500;
+	OP30_Gripper_LH_Gripper_ctrl.ABSmove_Start  :=  LH_Gripper_bMove;
+	OP30_Gripper_RH_Gripper_ctrl.ABSmove_Start  :=  RH_Gripper_bMove;	
+END_IF
+
+//LH Rejection Cylinder
+//move ZERO to STATUS
+//CR30_LH_Rej_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP30_Auto OR OP30_HomeRunning) THEN
+	CR30_LH_Rej_Cyl.AutoCmd1:=FALSE;
+	CR30_LH_Rej_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR30_LH_Rej_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR30_LH_Rej_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR30_LH_Rej_Cyl.Safework:= TRUE ;
+ELSE 
+	CR30_LH_Rej_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP30_HMI_LH_Rej_Cyl_Home_PB=TRUE) THEN
+	CR30_LH_Rej_Cyl.ManualPB1:=TRUE;
+ELSE 
+	CR30_LH_Rej_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP30_HMI_LH_Rej_Cyl_Work_PB=TRUE) THEN
+	CR30_LH_Rej_Cyl.ManualPB2:=TRUE;
+ELSE 
+	CR30_LH_Rej_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR30_LH_Rej_Cyl(
+	Auto:= OP30_AutoSelected , 
+	Manual:= OP30_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP30_HMI_Reset, 
+	Sensor1:=I30_LH_REJ_CYL_REV_I1100_3, 
+	Sensor2:=I30_RH_REJ_CYL_FWD_I1100_4,
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= 1, 
+	SafeWork:= 1, 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:= 5, 
+	TimeOut2:= 5, 
+	TimeOut3:= 5, 
+	Solenoid1=> O30_LH_REJ_CYL_REV_Q1150_4 , 
+	Solenoid2=> O30_LH_REJ_CYL_FWD_Q1150_5  ,
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR30_LH_Rej_Cyl_status );
+
+
+//RH Rejection Cylinder
+//move ZERO to STATUS
+//CR30_RH_Rej_Cyl_Status:=0;
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP30_Auto OR OP30_HomeRunning) THEN
+	CR30_RH_Rej_Cyl.AutoCmd1:=FALSE;
+	CR30_RH_Rej_Cyl.AutoCmd2:=FALSE;		
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR30_RH_Rej_Cyl.SafeHome:= TRUE ;
+ELSE 
+	CR30_RH_Rej_Cyl.SafeHome:= FALSE ;
+END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR30_RH_Rej_Cyl.Safework:= TRUE ;
+ELSE 
+	CR30_RH_Rej_Cyl.Safework:= FALSE ;
+END_IF
+	
+// Manual PB  Cyl Mapping
+IF (OP30_HMI_RH_Rej_Cyl_Home_PB=TRUE) THEN
+	CR30_RH_Rej_Cyl.ManualPB1:=TRUE;
+	CR30_RH_Rej_Cyl.ManualPB2:=FALSE;
+ELSE 
+	CR30_RH_Rej_Cyl.ManualPB1:=FALSE;
+END_IF
+	
+IF (OP30_HMI_RH_Rej_Cyl_Work_PB=TRUE) THEN
+	CR30_RH_Rej_Cyl.ManualPB2:=TRUE;
+	CR30_RH_Rej_Cyl.ManualPB1:=FALSE;
+ELSE 
+	CR30_RH_Rej_Cyl.ManualPB2:=FALSE;
+END_IF
+	
+CR30_RH_Rej_Cyl(
+	Auto:= OP30_AutoSelected ,  
+	Manual:= OP30_ManualSelected OR MANUAL_SELECTED, 
+	ErrorActive:= , 
+	ResetPB:= OP30_HMI_Reset,                    
+	Sensor1:=I30_RH_REJ_CYL_REV_I1100_5 , 
+	Sensor2:= I30_RH_REJ_CYL_FWD_I1100_4 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= 1, 
+	SafeWork:= 1, 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:= 5, 
+	TimeOut2:= 5, 
+	TimeOut3:= 5, 
+	Solenoid1=>O30_RH_REJ_CYL_REV_Q1150_6  , 
+	Solenoid2=>O30_RH_REJ_CYL_FWD_Q1150_7  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=>, 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR30_RH_Rej_Cyl_status );		
+	
+OP30_Gripper_LH(
+	iHW:= HwIn1 , 
+	o_b_enable=> OP30_Gripper_LH_Gripper_ctrl.Axis_Enabled ,
+	i_b_moveToPosition:=OP30_Gripper_LH_Gripper_ctrl.ABSmove_Start , 
+	i_b_moveRelativ:= , 
+	i_b_reference:=OP30_Gripper_LH_Gripper_ctrl.Reference_Start , 
+	i_b_ackError:=OP30_HMI_Reset , 
+	i_u_targetPos:=OP30_Gripper_LH_Gripper_ctrl.Position , 
+	i_u_targetVelocity:=OP30_Gripper_LH_Gripper_ctrl.Velocity , 
+	i_u_targetCurrent:= OP30_Gripper_Current , 
+	i_u_targetAcceleration:= OP30_Gripper_Acceleration , 
+	i_u_targetJerk:= OP30_Gripper_Jerk , 
+	i_b_ManualMode:=temp30 , 
+	stManualModeAxis:=OP30_Gripper_LH_Manual_Axis , 
+	Status=>OP30_Gripper_LH_Gripper_ctrl.Axis_State , 
+	o_b_referenced=>OP30_Gripper_LH_Gripper_ctrl.Axis_reference , 
+	o_b_reachedPos=> OP30_Gripper_LH_Gripper_ctrl.pos_done , 
+	o_u_actualPosition=> OP30_Gripper_LH_Gripper_ctrl.Actual_Position , 
+	o_b_error=> OP30_Gripper_LH_Gripper_ctrl.Axis_Error, 
+	oHW=> HwOut1 );	
+	
+OP30_Gripper_RH(
+	iHW:= HwIn2 , 
+	o_b_enable => OP30_Gripper_RH_Gripper_ctrl.Axis_Enabled,
+	i_b_moveToPosition:=OP30_Gripper_RH_Gripper_ctrl.ABSmove_Start , 
+	i_b_moveRelativ:= , 
+	i_b_reference:=OP30_Gripper_RH_Gripper_ctrl.Reference_Start , 
+	i_b_ackError:=OP30_HMI_Reset, 
+	i_u_targetPos:=OP30_Gripper_RH_Gripper_ctrl.Position , 
+	i_u_targetVelocity:=OP30_Gripper_RH_Gripper_ctrl.Velocity , 
+	i_u_targetCurrent:= OP30_Gripper_Current , 
+	i_u_targetAcceleration:= OP30_Gripper_Acceleration , 
+	i_u_targetJerk:= OP30_Gripper_Jerk , 
+	i_b_ManualMode:= temp30, 
+	stManualModeAxis:=OP30_Gripper_RH_Manual_Axis , 
+	Status=>OP30_Gripper_RH_Gripper_ctrl.Axis_State , 
+	o_b_referenced=>OP30_Gripper_RH_Gripper_ctrl.Axis_reference , 
+	o_b_reachedPos=> OP30_Gripper_RH_Gripper_ctrl.pos_done , 
+	o_u_actualPosition=> OP30_Gripper_RH_Gripper_ctrl.Actual_Position , 
+	o_b_error=> OP30_Gripper_RH_Gripper_ctrl.Axis_Error, 
+	oHW=> HwOut2 );	
+	
+OP30_Gripper_Current        :=  2;
+OP30_Gripper_Acceleration   :=  2500;	
+OP30_Gripper_Jerk           :=  50000;
+	
+OP30_GIUDE_GRP(														// FESTO GUIDE GRIPPER
+	bAxis1_Ref_Switch:= , 
+	bInit:=  , 
+	bErrorReset:= Servo_Reset , 
+	bEnable:= Servo_Enable , /// MACHINE ERR REGISTER CHANGE
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 									//MANUAL REGISTER CHANGE
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP30_GIUDE_GRP_ctrl.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety , 					// CHANGE
+	Axis:= SR30_GUIDE_GRP_AXIS, 
+	bHome:= OP30_GIUDE_GRP_ctrl.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP30_GIUDE_GRP_ctrl.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP30_GIUDE_GRP_Manual_Axis, 
+ 	sAxisState=> OP30_GIUDE_GRP_ctrl.Axis_State, 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP30_GIUDE_GRP_ctrl.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );]]></ST>
+    </Implementation>
+    <LineIds Name="OP30_MANUAL">
+      <LineId Id="941" Count="188" />
+      <LineId Id="1634" Count="0" />
+      <LineId Id="1130" Count="20" />
+      <LineId Id="1393" Count="3" />
+      <LineId Id="1633" Count="0" />
+      <LineId Id="1397" Count="233" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

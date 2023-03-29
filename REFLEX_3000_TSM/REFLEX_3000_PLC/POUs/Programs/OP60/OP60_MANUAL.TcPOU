@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP60_MANUAL" Id="{8cf64803-c661-4fac-b428-b79c00744029}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP60_MANUAL
+VAR
+	
+    temp_safe:BOOL;
+	enable:BOOL;
+	reset:bool;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// IF MANUAL IS SELECTED 
+
+//SR60_Vert_servo_ctrl.ABSmove_Start:=OP60_VERT_SERVO_STRT;
+OP60_SERVO_POS_DONE:= SR60_Vert_servo_ctrl.pos_done;
+
+IF In_Range(SR60_Vert_servo_status.actualPosition,OP60_VERT_SERVO_SFE_WRK_POS,1) THEN
+	OP60_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP60_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR60_Vert_servo_status.actualPosition,OP60_VERT_SERVO_HME_POS,1) THEN
+	OP60_SERVO_ON_HOME := TRUE;
+ELSE
+	OP60_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR60_Vert_servo_status.actualPosition,OP60_VERT_SERVO_WRK_POS,1) THEN
+	OP60_SERVO_ON_WRK := TRUE;
+ELSE
+	OP60_SERVO_ON_WRK := FALSE;
+END_IF
+
+SR60_Vert_servo(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:= OP60_GVL.OP60_HMI_Reset OR Servo_Reset , 
+	bEnable:=Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED, 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety,
+	Axis:=SR60_Vert_servo_Axis  , 
+	bmove_home:=SR60_Vert_servo_ctrl.Axis_Home_Cmd ,
+	baxis_in_home_pos=>SR60_Vert_servo_ctrl.Axis_In_Home ,
+	HME_WRITE_ADD:= 16#5018, 
+	bHome:=SR60_Vert_servo_ctrl.Bsethome , 
+	bSetPosition:=SR60_Vert_servo_ctrl.BsetPos , 
+	bMoveAbsolute:=SR60_Vert_servo_ctrl.ABSmove_Start , 
+	bMoveTorque :=SR60_Vert_servo_ctrl.Torque_mode_Start,	
+	bMoveRelative:=SR60_Vert_servo_ctrl.RELmove_Start , 
+	stManualModeAxis:=SR60_Vert_servo_status , 
+	sAxisState=>SR60_Vert_servo_ctrl.Axis_State , 
+	bAxis_ready=>SR60_Vert_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR60_Vert_servo_ctrl.Axis_In_Pos, 
+	bAxisError=>SR60_Vert_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR60_Vert_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR60_Vert_servo_ctrl.Axis_reference, 
+	bSetPositionDone=>   ,
+    bsafe_to_move=>SR60_Vert_servo_ctrl.Safe_To_Move,  
+	bABS_Pos_done=> SR60_Vert_servo_ctrl.pos_done,
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> );
+	
+IF MANUAL_SELECTED THEN
+	SR60_Vert_servo_status.targetVelocity:=50;	
+END_IF	
+	
+
+OP60_LH_LVDT_VALUE := DINT_TO_REAL(OP60_LH)/10000;
+OP60_RH_LVDT_VALUE := DINT_TO_REAL(OP60_RH)/10000;]]></ST>
+    </Implementation>
+    <LineIds Name="OP60_MANUAL">
+      <LineId Id="3" Count="41" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="45" Count="22" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="83" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

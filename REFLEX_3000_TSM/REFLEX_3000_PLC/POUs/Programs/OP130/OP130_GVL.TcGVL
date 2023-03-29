@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP130_GVL" Id="{b4f1e74d-c701-494b-8f11-30febf45e2e2}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	//GENERAL
+OP130_Auto:					BOOL;
+OP130_HomeRunning:			BOOL;
+OP130_ErrorActive:			BOOL;
+OP130_Home_PB:				BOOL;
+OP130_Work_PB:				BOOL;
+OP130_ManualSafetyBypass:	BOOL;
+OP130_LightCurtainBypass:	BOOL;
+OP130_OperationCompleted:	BOOL;
+OP130_LampCheck:			BOOL;
+OP130_MachineLamp:			BOOL;
+OP130_ComponentOk:			BOOL;
+OP130_ComponentNok:			BOOL;
+OP130_RepeatBit:			BOOL;
+OP130_HomingResetBit:		BOOL;
+OP130_ControlledByRobo:		BOOL;
+OP130_Any_Bypass:			BOOL;
+OP130_ManualModeStatus:		INT;
+OP130_ManualModeWord:		INT;
+OP130_AutoRunning:			BOOL;
+OP130_StepRunning:			BOOL;
+OP130_StartEnable:   		BOOL;
+OP130_Machine_Stop: 		BOOL;
+OP130_AutoSeq:				INT;
+OP130_LH_AutoSeq: 			INT;
+OP130_RH_AutoSeq: 			INT;
+OP130_Homing_Seq:			INT;
+OP130_Dry_Run:				BOOL;
+//Automatic_Run:				BOOL;
+OP130_Prev_Stat_Operation_Completed: BOOL;
+OP130_Prev_Comp_Status: INT;
+OP130_Prev_LH_COMP_OK:BOOL;
+OP130_Prev_LH_COMP_NOK:BOOL;
+OP130_Prev_RH_COMP_OK:BOOL;
+OP130_Prev_RH_COMP_NOK:BOOL;
+OP130_LH_Operation_Completed:BOOL;
+OP130_RH_Operation_Completed:BOOL;
+
+OP130_LH_Comp_OK: BOOL;
+OP130_LH_Comp_NOK: BOOL;
+OP130_RH_Comp_OK: BOOL;
+OP130_RH_Comp_NOK: BOOL;
+//ModeSelection Outputs
+//OP130_AutoSelected:		    BOOL;
+OP130_ManualSelected:		BOOL;
+OP130_StepSelected:			BOOL;
+OP130_AutoSelected:		    BOOL;
+OP130_Temp_Home_OK:			BOOL;
+OP130_Home_ConditionOK:		BOOL;
+OP130_OperationEnable:		BOOL;
+OP130_SafetyNoerror:		BOOL;
+
+//Manual Cylinder FB Tags
+CR130_RH_Rotart_Cyl_Status:	 INT;
+CR130_LH_Rotart_Cyl_Status:	 INT;
+
+
+//Manual Control Inputs
+
+	CR130_LH_Rot_Cyl: Cylinder_Block;
+	CR130_RH_Rot_Cyl: Cylinder_Block;
+	SR130_LH_Vert_Servo: FB_Axis;
+	SR130_RH_Vert_Servo: FB_Axis;
+	
+	SR130_Clm_Stepper: FB_Axis_FESTO;
+	SR130_LH_Vert_Servo_Axis:AXIS_REF;
+	SR130_RH_Vert_Servo_Axis:AXIS_REF;
+	SR130_Clm_Stepper_Axis:AXIS_REF;
+	SR130_LH_Servo_Control:Servo_Control;
+	SR130_RH_Servo_Control:Servo_Control;
+	SR130_Stepper_Control:Servo_Control;
+	SR130_stManualModeAxis_LH_Vert_Servo:stManualModeAxis;
+	SR130_stManualModeAxis_RH_Vert_Servo:stManualModeAxis;
+	SR130_stManualModeAxis_Clamp_Stepper:stManualModeAxis;
+
+//HMI Tags(From HMI)
+OP130_HMI_AutoMode:						BOOL;
+OP130_HMI_ManualMOde:					BOOL;
+OP130_HMI_StepMode:						BOOL;
+OP130_HMI_CycleStart:					BOOL;
+OP130_HMI_LH_Rotary_Cyl_Home_PB:			BOOL;
+OP130_HMI_LH_Rotary_Cyl_Work_PB:			BOOL;
+OP130_HMI_RH_Rotary_Cyl_Home_PB:			BOOL;
+OP130_HMI_RH_Rotary_Cyl_Work_PB:			BOOL;
+OP130_HMI_Cycle_Start:					BOOL;
+OP130_HMI_Reset:						BOOL;
+OP130_HMI_Homing:						BOOL;
+SR130_LH_Vert_Servo_Max_Lim:					BOOL;
+SR130_RH_Vert_Servo_Max_Lim:					BOOL;
+SR130_Clm_Vert_Max_Lim:					BOOL;
+
+
+ 
+
+ 		// Servo Positions
+SR130_LH_Servo_Home_Position: 				LREAL;
+SR130_LH_Servo_Home_Velocity: 				LREAL;
+//SR130_HMI_LH_Servo_Work_Position:			LREAL;
+//SR130_HMI_LH_Servo_Work_Velocity:			LREAL;
+//SR130_HMI_LH_Servo_Lock_Position:			LREAL;
+//SR130_HMI_LH_Servo_Lock_Velocity:			LREAL;
+//SR130_HMI_LH_Servo_Rotation_Position:		LREAL;
+//SR130_HMI_LH_Servo_Rotation_Velocity:		LREAL;
+//SR130_HMI_LH_Servo_Torque_Low_Limit:			LREAL;
+//SR130_HMI_LH_Servo_Torque_High_Limit:			LREAL;
+//
+SR130_RH_Servo_Home_Position: 				LREAL;
+SR130_RH_Servo_Home_Velocity: 				LREAL;
+//SR130_HMI_RH_Servo_Work_Position:			LREAL;
+//SR130_HMI_RH_Servo_Work_Velocity:			LREAL;
+//SR130_HMI_RH_Servo_Lock_Position:			LREAL;
+//SR130_HMI_RH_Servo_Lock_Velocity:			LREAL;
+//SR130_HMI_RH_Servo_Rotation_Position:		LREAL;
+//SR130_HMI_RH_Servo_Rotation_Velocity:		LREAL;
+//SR130_HMI_RH_Servo_Torque_Low_Limit:			LREAL;
+//SR130_HMI_RH_Servo_Torque_High_Limit:			LREAL;
+
+
+SR130_Stepper_Home_Position:				LREAL;
+SR130_Stepper_Home_Velocity:				LREAL;
+SR130_Stepper_Work_Position: 				LREAL;
+SR130_Stepper_Work_Velocity: 				LREAL;
+
+
+
+
+
+
+//Error
+OP130_ErrorWord_0:    							 DINT;
+OP130_ErrorWord_1:								 DINT;
+OP130_ErrorWord_2:								 DINT;
+
+
+//Recipe Tags
+
+	//LH Servo
+SR130_HMI_LH_Servo_Work_Position:			LREAL;
+SR130_HMI_LH_Servo_Work_Velocity:			LREAL;
+SR130_HMI_LH_Servo_Lock_Position:			LREAL;
+SR130_HMI_LH_Servo_Lock_Velocity:			LREAL;
+SR130_HMI_LH_Servo_Rotation_Position:		LREAL;
+SR130_HMI_LH_Servo_Rotation_Velocity:		LREAL;
+SR130_HMI_LH_Servo_Torque_Low_Limit:			LREAL;
+SR130_HMI_LH_Servo_Torque_High_Limit:			LREAL;
+		//RH Servo
+SR130_HMI_RH_Servo_Work_Position:			LREAL;
+SR130_HMI_RH_Servo_Work_Velocity:			LREAL;
+SR130_HMI_RH_Servo_Lock_Position:			LREAL;
+SR130_HMI_RH_Servo_Lock_Velocity:			LREAL;
+SR130_HMI_RH_Servo_Rotation_Position:		LREAL;
+SR130_HMI_RH_Servo_Rotation_Velocity:		LREAL;
+SR130_HMI_RH_Servo_Torque_Low_Limit:		LREAL;
+SR130_HMI_RH_Servo_Torque_High_Limit:		LREAL;
+
+OP130_Torque_Monitor_Time:TIME;
+
+
+
+	OP130_Cycle_Time_Start: BOOL;
+	OP130_Cycle_Time_Stop: BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

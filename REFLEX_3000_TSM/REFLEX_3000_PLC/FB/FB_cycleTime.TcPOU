@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_cycleTime" Id="{005cdf51-9a68-45e7-87f9-368f5c9f7dea}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_cycleTime
+VAR_INPUT
+i_b_startTime			:BOOL;
+i_b_stopTime			:BOOL;
+END_VAR
+VAR_OUTPUT
+o_t_StationTime			: UDINT;	
+END_VAR
+
+VAR
+startTime				: ULINT;
+stopTime				: ULINT;
+FPstart					: BOOL;
+FPstop					: BOOL;
+HMFPstart				: BOOL;
+HMFPstop				: BOOL;	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FPstart:= i_b_startTime AND NOT HMFPstart;
+HMFPstart:= i_b_startTime;
+	
+	
+FPstop:= i_b_stopTime AND NOT HMFPstop;
+HMFPstop:= i_b_stopTime;
+
+
+IF FPstart THEN
+	startTime:= F_GetSystemTime();
+END_IF
+
+IF FPstop THEN
+	stopTime:= F_GetSystemTime();
+	o_t_StationTime:= ULINT_TO_UDINT(stopTime-startTime)/10000;
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_cycleTime">
+      <LineId Id="3" Count="15" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

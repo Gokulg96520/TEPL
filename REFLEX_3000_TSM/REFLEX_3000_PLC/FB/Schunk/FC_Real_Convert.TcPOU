@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FC_Real_Convert" Id="{cc07af6c-5b69-4915-bb68-dcf6562d63e4}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION FC_Real_Convert : REAL
+VAR_INPUT
+	in	:REAL;
+END_VAR
+VAR
+	uRealIn		:union_real;
+	uRealOut	:union_real;
+	
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[uRealIn.rREAL :=in;
+
+uRealOut.aARRAY[0] := uRealIn.aARRAY[3];
+uRealOut.aARRAY[1] := uRealIn.aARRAY[2];
+uRealOut.aARRAY[2] := uRealIn.aARRAY[1];
+uRealOut.aARRAY[3] := uRealIn.aARRAY[0];
+
+FC_Real_Convert:=uRealOut.rREAL;]]></ST>
+    </Implementation>
+    <LineIds Name="FC_Real_Convert">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

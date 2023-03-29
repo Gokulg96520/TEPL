@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Bypass" Id="{02d29601-9f89-434b-9e8b-34509c4d443c}">
+    <Declaration><![CDATA[TYPE Bypass :
+STRUCT
+OP120_Bypass_1:		BOOL;
+OP120_Bypass_2:		BOOL;
+OP120_Bypass_3:		BOOL;
+OP120_Bypass_4:		BOOL;
+OP120_Bypass_5:		BOOL;
+OP120_Bypass_6:		Bool;
+OP120_Bypass_7:		Bool;
+OP120_Bypass_8:		Bool;
+OP120_Bypass_9:		Bool;
+OP120_Bypass_10:    BOOL;
+OP120_Bypass_11:    Bool;
+OP120_Bypass_12:    Bool;
+OP120_Bypass_13:    Bool;
+OP120_Bypass_14:    Bool;
+OP120_AnyBypass:	INT;
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

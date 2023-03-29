@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Pulse_1s" Id="{f214de6f-119b-4b3a-9ec4-76e8e62fe084}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Pulse_1s
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	T1: TON;
+	T2: TON;
+	Out:bool;
+	ON: BOOL;
+	Sec: R_TRIG;
+	Count: INT;
+	Check: TON;
+	total: TIME;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Check(IN:=STart , PT:=T#10S , Q=> , ET=>total );
+IF (ON AND NOT Check.q) THEN
+	
+T1(IN:= NOT T2.q , PT:= T#50MS, Q=> , ET=> );
+T2(IN:=T1.q , PT:=T#50MS , Q=> , ET=> );
+END_IF 
+//IF ( T2.q) THEN
+//	Out:=TRUE;
+//	ELSE
+//		Out:=FALSE;
+//	END_IF
+Sec(CLK:= T1.q , Q=> );
+IF MAIN.temp THEN
+	Count:=Count+1;
+END_IF
+//IF NOT On THEN
+	//Count:=0;
+//END_IF
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="Pulse_1s">
+      <LineId Id="73" Count="19" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Inspection_status" Id="{4e3a562b-4507-4c58-827a-6b244a19462d}">
+    <Declaration><![CDATA[TYPE Inspection_status :
+STRUCT
+System_Busy				: BIT ;
+Inspection_Completed	: BIT ;
+Results_Buffer_Overrun	: BIT ;
+Results_Valid			: BIT ;
+Command_Executing		: BIT ;
+Command_Complete		: BIT ;
+Command_Failed			: BIT ;
+Set_User_Data_Ack		: BIT ;
+Job_Pass				: BIT ;
+Test_Run_Ready			: BIT ;
+Reserved2				: BIT ;
+Reserved3				: BIT ;
+Reserved4				: BIT ;
+Reserved5				: BIT ;
+Reserved6				: BIT ;
+Error					: BIT ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

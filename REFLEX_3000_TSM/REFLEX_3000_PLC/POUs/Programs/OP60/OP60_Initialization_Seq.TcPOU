@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP60_Initialization_Seq" Id="{d59cf6c1-c7f7-4a92-8e4a-ae05d793a677}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP60_Initialization_Seq
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (SR60_Vert_servo_ctrl.Axis_In_Home)THEN
+    OP60_Temp_hmeOK:=TRUE;
+	OP60_HomeRunning:=FALSE;
+	OP60_Homing_Seq:=0;
+ELSE
+	OP60_Temp_hmeOK:=FALSE;	
+END_IF
+
+CASE OP60_Homing_Seq OF
+	0: IF (OP60_AutoSelected AND NOT OP60_HomeRunning AND NOT OP60_ErrorActive AND NOT  OP60_AutoRunning AND NOT OP60_StepRunning AND NOT OP60_Temp_hmeOK ) THEN
+		OP60_HomeRunning:=TRUE;
+		OP60_Homing_Seq:=10;	
+	   END_IF
+	10:IF (OP60_HomeRunning AND OP60_HMI_Homing)THEN 
+		IF (SR60_Vert_servo_ctrl.Axis_In_Home) THEN 
+			OP60_Homing_Seq:=20;
+			SR60_Vert_servo_ctrl.Axis_Home_Cmd:=FALSE;
+		ELSE
+			SR60_Vert_servo_ctrl.Axis_Home_Cmd:=TRUE;
+	    END_IF
+	   END_IF		
+	20:	OP60_Homing_Seq:=0;
+		OP60_HomeRunning:=FALSE;
+	
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP60_Initialization_Seq">
+      <LineId Id="3" Count="23" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,1010 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_Axis" Id="{1eab4f4d-c28b-4859-b376-8a3becb6b86b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Axis
+VAR_INPUT
+	bAxis1_Ref_Switch 	 : BOOL;//HW-IN
+	bInit 				 : BOOL;
+	bErrorReset			 : BOOL;//FP Reset Axis Error
+	bEnable 			 : BOOL;//Power on
+	bMoveVelocity 		 : BOOL;
+	bHalt				 : BOOL;//Stop Absolute or Relative movement
+	bManualMode			 : BOOL;
+	fHomePos 			 : LREAL := 0.0;
+	fOverride 			 : LREAL := 100.0;
+	fTargetPosition 	 : LREAL ;//:=  10.0;
+	fTargetVelocity 	 : LREAL ; //:= 100.0;
+	fAcc				 : LREAL; //:= 100.0;
+	fDec				 : LREAL; //:= 100.0;
+	Servo_High_Limit	 : LREAL;
+	Servo_Low_Limit	 	 : LREAL;
+	WARNING_LIMIT		 : LREAL;	
+	Safe_move_Conditions : BOOL;
+	HME_WRITE_ADD		 : UDINT;
+END_VAR
+VAR_IN_OUT
+	Axis 				: AXIS_REF;
+	bHome 				: BOOL;
+	bSetPosition		: BOOL;//Set Position to HomePos
+	bMoveAbsolute 		: BOOL;
+	bMoveRelative 		: BOOL;
+	bMoveTorque			: BOOL;
+    stManualModeAxis  	: stManualModeAxis;
+	bmove_home			: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	sAxisState			: STRING := '';
+	bAxis_ready			: BOOL := 0;
+	bAxisInPosition		: BOOL := 0;//In Position or In Target Velocity
+	bAxisError			: BOOL := 0;
+	bAxisEnabled 		: BOOL := 0;//Power ON
+	bAxisHomed			: BOOL := 0;
+	bSetPositionDone	: BOOL := 0;
+	bHaltDone			: BOOL := 0;
+	bSTOPDone			: BOOL := 0;
+	bHomeDone			: BOOL := 0;
+	bDone				: BOOL := 0;//bMoveAbsolute + bMoveRelative
+	bTorqueReached		: BOOL := 0;
+	bsafe_to_move		: BOOL;
+	baxis_in_home_pos	: BOOL;
+	bABS_Pos_done		: BOOL;
+	Actual_position		: LREAL;
+	Actual_velocity		: LREAL;
+	Actual_Torque		: LREAL;
+    SERVO_LIMIT_WARNING	: BOOL;
+	
+END_VAR
+VAR
+	temp : LREAL;
+	fbAxisReset					: MC_Reset;
+	fbAxisPower					: MC_Power;
+	fbAxisStop        			: MC_Stop;
+	fbAxisHalt        			: MC_Halt;
+	fbAxisHome					: MC_Home;
+	fbAxisSetPosition 			: MC_SetPosition;
+	fbAxisJog 					: MC_Jog;
+	fbAxisMoveAbsolute			: MC_MoveAbsolute;
+	fbAxisMoveRelative 			: MC_MoveRelative;
+	fbAxisMoveVelocity			: MC_MoveVelocity;
+	fbAxisTorqueControl			: MC_TorqueControl;
+//Brake Controll
+	fbEcCoeSdoRead				: FB_EcCoeSdoRead;
+	fbEcCoeSdoWrite				: FB_EcCoeSdoWrite;
+	mcReadDriveAddress 			: MC_ReadDriveAddress;
+    vendorId   					: BOOL;//Struct HMI Brake open
+	bBrakeStateOld 				: BOOL;
+
+//Status Information
+	bAxisIsEnabled 				: BOOL;
+	bAxisIsHomed 				: BOOL;
+	bAxisInError 				: BOOL;
+	fActualTorque 				: LREAL;	
+
+//Allgemein
+	iSchritt 					: ENUM_Axis;
+	bHMFPErrorReset 			: BOOL;
+	bFPErrorReset 				: BOOL;
+	
+	bAxisResetExecute			: BOOL;
+	bAxisPowerExecute			: BOOL;
+	bAxisStopExecute        	: BOOL;
+	bAxisHaltExecute        	: BOOL;
+	bAxisHomeExecute			: BOOL;
+	bAxisSetPositionExecute 	: BOOL;
+	bAxisMoveAbsoluteExecute	: BOOL;
+	bAxisMoveRelativeExecute 	: BOOL;
+	bAxisMoveVelocityExecute	: BOOL;
+	bAxisJogExecutePos 			: BOOL;
+	bAxisJogExecuteNeg 			: BOOL;
+	bAxisMoveTorqueExecute		: BOOL;
+	fHMTargetPosition			: LREAL;
+	fHMTargetVelocity			: LREAL;
+	
+	bFPManualReset				: BOOL;
+	bHMFPManualReset			: BOOL;
+	
+	homeMode					: MC_HomingMode;
+	FB_SoEReset					: FB_SoEReset;
+	bHardwareReset				: BOOL;
+
+	st_Trq_options 				: St_TorqueControlOptions;
+	//temp						: BOOL;
+	moving_home					: INT;
+	bABS_done					: BOOL;
+	busy: BOOL;
+	act: BOOL;
+	id: UDINT;
+///////////////////////////////////////////////////////////////////////////////////////////////////	
+	FB_GetLocalAmsNetId_system		: FB_GetLocalAmsNetId;
+	ADSREAD_set_val					: ADSREAD;
+	ADSWRITE_Set_Val				: ADSWRITE;
+	bSet_Encoder_Zero_Rtrig			: R_trig;
+	F_TRIG1							: F_TRIG;
+	tDummy							: Ton;
+	lrRead_set_Value				: LREAL;
+	Step							: INT;
+	bSet_Encoder_Zero				: BOOL;
+	bRead_set_Value					: BOOL;
+	bWrite_set_Value				: BOOL;
+	bHome_ref_done					: BOOL;
+	TRIAL							: BOOL;
+	home_pressed					: BOOL;
+//	stAxis:AXIS_REF;
+//	MC_Power1: MC_Power;
+//	bEnable: BOOL;
+
+
+	LEG_LIMIT: BOOL;
+	POS_LIMIT: BOOL;
+	AUTO_TARGET_POSITION: LREAL;
+	MANUAL_TARGET_POSITION: LREAL;
+END_VAR
+VAR_TEMP
+ 	//tmpVelocityDirection		: MC_Direction;
+	tmpStManualModeAxis	  		: stManualModeAxis;
+	btmpFPBrake					: BOOL;
+//	tmpVelocityDirection        : MC_Direction;
+END_VAR
+
+
+VAR PERSISTENT
+	aa					: DINT;
+	lrWrite_set_Value	: LREAL;
+	HOMING_VALUE		: LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+//Init
+bHaltDone := FALSE;
+bSTOPDone := FALSE;
+
+//Read Axis Status	
+	bAxisIsEnabled := axis.NcToPlc.StateDWord.0;
+	bAxisIsHomed := axis.NcToPlc.StateDWord.1 OR TRIAL;
+	bAxisInError := axis.NcToPlc.StateDWord.31;
+	fActualTorque := axis.NcToPlc.ActTorque;
+    Axis.ReadStatus(); // PHU: fill its own status bits.
+//FP Error Reset
+	bFPErrorReset := bErrorReset AND NOT bHMFPErrorReset;
+	bHMFPErrorReset := bErrorReset;
+	
+	bFPManualReset:= stManualModeAxis.reset AND NOT bHMFPManualReset;
+	bHMFPManualReset:= stManualModeAxis.reset;
+	
+// Manual Mode
+IF bManualMode THEN
+	
+	stManualModeAxis.stationModeAutoManual:= FALSE;	
+	IF 	stManualModeAxis.jogPos THEN
+		tmpStManualModeAxis.jogPos := TRUE;
+	ELSE
+		tmpStManualModeAxis.jogPos := FALSE;		
+	END_IF
+	IF 	stManualModeAxis.jogNeg THEN
+		tmpStManualModeAxis.jogNeg := TRUE;
+	ELSE
+		tmpStManualModeAxis.jogNeg := FALSE;		
+	END_IF
+		
+ELSE
+	stManualModeAxis.jogPos := FALSE;
+	stManualModeAxis.jogNeg := FALSE;
+	stManualModeAxis.reset := FALSE;
+	StManualModeAxis.openBrake:= FALSE;
+	stManualModeAxis.homing:= FALSE;
+	stManualModeAxis.moveAbsolute:= FALSE;
+	stManualModeAxis.moveRelative:= FALSE;
+	stManualModeAxis.moveVelocity:= FALSE;
+	
+	tmpStManualModeAxis.jogPos := FALSE;		
+	tmpStManualModeAxis.jogNeg := FALSE;	
+	
+	
+	
+	stManualModeAxis.stationModeAutoManual:= TRUE;
+
+END_IF
+
+
+//###################################################################################
+//###################################################################################	
+	
+//###################################################################################
+//###################################################################################
+
+	CASE iSchritt OF 
+		
+	ENUM_Axis.Init 			://init all MC
+								bAxisResetExecute				:= FALSE;
+								bAxisPowerExecute				:= FALSE;
+								bAxisStopExecute        		:= FALSE;
+								bAxisHaltExecute        		:= FALSE;
+								bAxisHomeExecute				:= FALSE;
+								bAxisSetPositionExecute 		:= FALSE;
+								bAxisJogExecutePos 				:= FALSE;
+								bAxisJogExecuteNeg 				:= FALSE;
+								bAxisMoveAbsoluteExecute		:= FALSE;
+								bAxisMoveRelativeExecute 		:= FALSE;
+								bAxisMoveVelocityExecute		:= FALSE;
+								
+								iSchritt := ENUM_Axis.PowerOFF;
+								
+
+	ENUM_Axis.PowerOFF		: 	//Power off
+								bAxisPowerExecute		:= FALSE;
+								IF bInit THEN
+									iSchritt := ENUM_Axis.Init;
+								ELSIF bAxisInError THEN
+									iSchritt := ENUM_Axis.Error;
+								ELSIF bEnable AND TRIAL THEN
+									iSchritt := ENUM_Axis.PowerON;
+								END_IF
+								
+	ENUM_Axis.Error			:	//Error
+								bAxisPowerExecute			  := FALSE;
+								bMoveAbsolute				  := FALSE;
+								bMoveRelative			   	  := FALSE;
+								stManualModeAxis.moveAbsolute := FALSE;
+								stManualModeAxis.moveRelative := FALSE;
+								IF bInit THEN
+									iSchritt := ENUM_Axis.Init;
+								ELSIF bFPErrorReset OR bFPManualReset THEN
+									iSchritt := ENUM_Axis.Reset;
+								END_IF
+	ENUM_Axis.Reset			: //Error Reset
+								IF NOT fbAxisReset.Busy THEN
+									bAxisResetExecute 		:= TRUE;
+									bHardwareReset			:= axis.NcToPlc.StateDWord.28;
+								END_IF;
+								IF bInit THEN
+									bAxisResetExecute 		:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF fbAxisReset.Error (*OR bAxisInError *)THEN
+									bAxisResetExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF fbAxisReset.Done AND NOT bAxisInError THEN
+									bAxisResetExecute 	:= FALSE;
+									IF  bAxisInError THEN
+										iSchritt := ENUM_Axis.Error;
+									ELSE
+										iSchritt := ENUM_Axis.PowerOFF;
+									END_IF
+								END_IF
+
+	ENUM_Axis.PowerON		:	//Enable - Power on
+								bAxisPowerExecute := TRUE;
+								IF bInit THEN
+									bAxisPowerExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									iSchritt:= enum_axis.PowerOFF;
+								ELSIF fbAxisPower.Error OR bAxisInError THEN
+									bAxisPowerExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF fbAxisPower.Status THEN
+									iSchritt := ENUM_Axis.Ready;
+								END_IF
+	ENUM_Axis.Stop			://Axis Stop
+								bAxisStopExecute := TRUE;
+								IF bInit THEN
+									bAxisStopExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisStopExecute 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;	
+								ELSIF fbAxisStop.Error OR bAxisInError THEN
+									bAxisStopExecute := FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF fbAxisStop.Done THEN
+									bSTOPDone	:= TRUE;
+									bAxisStopExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.PowerOFF;
+								END_IF
+	ENUM_Axis.Halt			://Axis Halt
+								bAxisHaltExecute := TRUE;
+								IF bInit THEN
+									bAxisHaltExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisHaltExecute 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;	
+								ELSIF bAxisInError THEN
+									bAxisHaltExecute := FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF fbAxisHalt.Error (*OR bAxisInError *)THEN
+									bAxisHaltExecute := FALSE;
+									iSchritt := ENUM_Axis.Stop;
+								ELSIF fbAxisHalt.Done THEN
+									bHaltDone := TRUE;
+									bAxisHaltExecute := FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF
+	ENUM_Axis.Ready			: 	//Wait for command
+								bAxisInPosition := FALSE;
+								bHomeDone := FALSE;
+								bSetPositionDone := FALSE;
+								IF bInit THEN
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									iSchritt:= enum_axis.PowerOFF;		
+								ELSIF bAxisInError THEN
+									iSchritt := ENUM_Axis.Error;
+								ELSE
+									IF bHome OR stManualModeAxis.homing THEN
+										//iSchritt := ENUM_Axis.Homing;
+										home_pressed:=bHome;
+										home_pressed:=TRUE;
+									ELSIF bSetPosition THEN
+										//	iSchritt := ENUM_Axis.SetPosition;
+										home_pressed:=bSetPosition;
+										home_pressed:=TRUE;
+									ELSIF bAxisIsHomed THEN
+										IF tmpStManualModeAxis.jogPos THEN
+											iSchritt := ENUM_Axis.JogPos;
+										ELSIF tmpStManualModeAxis.jogNeg THEN
+											iSchritt := ENUM_Axis.JogNeg;
+										ELSIF bMoveAbsolute OR stManualModeAxis.moveAbsolute  THEN
+											iSchritt := ENUM_Axis.MoveAbsolute;
+										ELSIF bMoveRelative OR stManualModeAxis.moveRelative THEN
+											iSchritt := ENUM_Axis.MoveRelative;
+										ELSIF bMoveVelocity OR stManualModeAxis.moveVelocity THEN
+											iSchritt := ENUM_Axis.MoveVelocity;
+										ELSIF bMoveTorque OR stManualModeAxis.moveTorque THEN
+											iSchritt := ENUM_Axis.MoveTorque;
+										END_IF
+									END_IF	
+								END_IF							
+	ENUM_Axis.Homing		://Homing
+								IF NOT fbAxisHome.Busy THEN
+									bAxisHomeExecute := TRUE;
+								END_IF;
+								IF bInit THEN
+									bAxisHomeExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisHomeExecute:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;	
+								ELSIF fbAxisHome.Error OR bAxisInError THEN
+									bAxisHomeExecute:= FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF fbAxisHome.Done THEN
+									bHomeDone := TRUE;
+									bHome := FALSE;
+									stManualModeAxis.homing:= FALSE;
+									bAxisHomeExecute:= FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF
+	
+	ENUM_Axis.SetPosition	://Enable - Power on
+								IF NOT fbAxisSetPosition.Busy THEN
+									bAxisSetPositionExecute := TRUE;
+								END_IF;
+								IF bInit THEN
+									bAxisSetPositionExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisSetPositionExecute 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;		
+								ELSIF fbAxisSetPosition.Error OR bAxisInError THEN
+									bAxisSetPositionExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF fbAxisSetPosition.Done THEN
+									bAxisSetPositionExecute 	:= FALSE;
+									bSetPositionDone := TRUE;
+									bSetPosition := FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF
+
+	ENUM_Axis.JogPos		://Jog positive direction
+								IF NOT fbAxisJog.Busy THEN
+									bAxisJogExecutePos 		:= TRUE;
+								END_IF;
+								
+								IF bInit THEN
+									bAxisJogExecutePos 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisJogExecutePos 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;			
+								ELSIF fbAxisJog.Error OR bAxisInError THEN
+									bAxisJogExecutePos 		:= FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF NOT tmpStManualModeAxis.jogPos THEN
+									bAxisJogExecutePos 		:= FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF;
+	ENUM_Axis.JogNeg		://Jog negative direction
+								IF NOT fbAxisJog.Busy THEN
+									bAxisJogExecuteNeg 		:= TRUE;
+								END_IF;
+								
+								IF bInit THEN
+									bAxisJogExecuteNeg 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisJogExecuteNeg 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;		
+								ELSIF fbAxisJog.Error OR bAxisInError THEN
+									bAxisJogExecuteNeg 		:= FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF NOT tmpStManualModeAxis.jogNeg THEN
+									bAxisJogExecuteNeg 		:= FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF;
+	ENUM_Axis.MoveAbsolute	://MoveAbsolute
+								IF NOT fbAxisMoveAbsolute.Busy THEN
+									bAxisMoveAbsoluteExecute := TRUE;
+								END_IF;
+								IF bInit THEN
+									bAxisMoveAbsoluteExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisMoveAbsoluteExecute 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;		
+								ELSIF fbAxisMoveAbsolute.Error OR bAxisInError THEN
+									bAxisMoveAbsoluteExecute :=FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF bHalt THEN
+									bMoveAbsolute :=FALSE;
+									stManualModeAxis.moveAbsolute:= FALSE;
+									bAxisMoveAbsoluteExecute :=FALSE;
+									iSchritt := ENUM_Axis.Halt;
+								ELSIF fbAxisMoveAbsolute.Done THEN
+								//ELSIF fbAxisMoveAbsolute.Done AND NOT bMoveAbsolute THEN
+									bMoveAbsolute :=FALSE;
+									stManualModeAxis.moveAbsolute:= FALSE;
+									bAxisInPosition := TRUE;
+									bAxisMoveAbsoluteExecute :=FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF;
+	ENUM_Axis.MoveRelative	://MoveRelative
+								IF NOT fbAxisMoveRelative.Busy THEN
+									bAxisMoveRelativeExecute := TRUE;
+								END_IF;
+								IF bInit THEN
+									bAxisMoveRelativeExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisMoveRelativeExecute 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;		
+								ELSIF fbAxisMoveRelative.Error OR bAxisInError THEN
+									bAxisMoveRelativeExecute :=FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF bHalt THEN
+									bMoveRelative :=FALSE;
+									stManualModeAxis.moveRelative:= FALSE;
+									bAxisMoveRelativeExecute :=FALSE;
+									iSchritt := ENUM_Axis.Halt;
+								ELSIF fbAxisMoveRelative.Done THEN
+									bMoveRelative :=FALSE;
+									stManualModeAxis.moveRelative:= FALSE;
+									bAxisInPosition := TRUE;
+									bAxisMoveRelativeExecute :=FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF;
+	ENUM_Axis.MoveVelocity	://MoveVelocity
+								IF NOT fbAxisMoveVelocity.Busy THEN
+									bAxisMoveVelocityExecute := TRUE;				
+								END_IF;
+								
+								bAxisInPosition := fbAxisMoveVelocity.InVelocity;
+								IF bInit THEN
+									bAxisMoveVelocityExecute 	:= FALSE;
+									bAxisInPosition := FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisMoveVelocityExecute 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;		
+								ELSIF fbAxisMoveVelocity.Error OR bAxisInError THEN
+									bAxisInPosition := FALSE;
+									bAxisMoveVelocityExecute :=FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF NOT bMoveVelocity AND NOT stManualModeAxis.moveVelocity THEN
+									bAxisInPosition := FALSE;
+									bAxisMoveVelocityExecute :=FALSE;
+									iSchritt := ENUM_Axis.Halt;
+								END_IF;
+								
+	ENUM_Axis.MoveTorque  :		IF NOT fbAxisTorqueControl.Busy THEN
+									bAxisMoveTorqueExecute := TRUE;
+								END_IF;
+								IF bInit THEN
+									bAxisMoveTorqueExecute 	:= FALSE;
+									iSchritt := ENUM_Axis.Init;
+								ELSIF NOT benable THEN
+									bAxisMoveTorqueExecute 	:= FALSE;
+									iSchritt:= enum_axis.PowerOFF;		
+								ELSIF fbAxisTorqueControl.Error OR bAxisInError THEN
+									bAxisMoveTorqueExecute :=FALSE;
+									iSchritt := ENUM_Axis.Error;
+								ELSIF bHalt THEN
+									bMoveTorque	 :=FALSE;
+									stManualModeAxis.moveTorque:= FALSE;
+									bAxisMoveTorqueExecute :=FALSE;
+									iSchritt := ENUM_Axis.Halt;
+								ELSIF fbAxisTorqueControl.InTorque THEN
+								//ELSIF fbAxisMoveAbsolute.Done AND NOT bMoveAbsolute THEN
+									bMoveTorque :=FALSE;
+									stManualModeAxis.moveTorque:= FALSE;
+									bAxisInPosition := TRUE;
+									bAxisMoveTorqueExecute :=FALSE;
+									iSchritt := ENUM_Axis.Ready;
+								END_IF;					
+
+	END_CASE;
+	
+	
+	stManualModeAxis.axisState:= TO_STRING(iSchritt);
+//###################################################################################
+//###################################################################################
+//###################################################################################
+//###################################################################################
+
+
+
+fbAxisReset(
+	Axis:= Axis, 
+	Execute:= bAxisResetExecute , 
+	Done=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> );
+	
+fbAxisPower(
+	Axis:= Axis, 
+	Enable:= bAxisPowerExecute AND NOT home_pressed, 
+	Enable_Positive:= bAxisPowerExecute, 
+	Enable_Negative:= bAxisPowerExecute, 
+	Override:= fOverride, 
+	//BufferMode:= , 
+	//Options:= , 
+	Status=> , 
+	Busy=> , 
+	Active=> , 
+	Error=> , 
+	ErrorID=> );
+	
+fbAxisStop(
+	Axis:= Axis, 
+	Execute:= bAxisStopExecute, 
+	Deceleration:= fDec, 
+	Jerk:= 0, 
+	//Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> );
+	
+fbAxisHalt(
+	Axis:= Axis, 
+	Execute:= bAxisHaltExecute, 
+	Deceleration:= fDec, 
+	Jerk:= 0, 
+	//BufferMode:= , 
+	//Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=>, 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> );
+
+//Homingmode
+IF bAxisHomeExecute THEN
+	//HomeMode := MC_DefaultHoming;
+	HomeMode := MC_Direct;
+ELSIF bAxisSetPositionExecute THEN
+	//HomeMode := MC_ForceCalibration;
+		HomeMode := MC_Direct;
+END_IF;
+
+
+IF bManualMode THEN
+	fHMTargetPosition:= stManualModeAxis.targetPositon;//MANUAL_TARGET_POSITION;
+	fHMTargetVelocity:= stManualModeAxis.targetVelocity;
+ELSE
+	fHMTargetPosition:=AUTO_TARGET_POSITION;
+	fHMTargetVelocity:=fTargetVelocity;
+END_IF
+
+
+fbAxisHome(
+	Axis:= Axis, 
+	Execute:= bAxisHomeExecute OR bAxisSetPositionExecute , 
+	Position:= fHomePos, 
+	HomingMode:= HomeMode, //MC_DefaultHoming,//, MC_Block
+	//BufferMode:= , 
+	Options:= , 
+	bCalibrationCam:= bAxis1_Ref_Switch, 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> );
+
+fbAxisSetPosition(
+	Axis:= Axis, 
+	Execute:= bAxisSetPositionExecute, 
+	Position:= fHomePos, 
+	Mode:= FALSE, (* RELATIVE=True, ABSOLUTE=False (Default) *)
+	//Options:= , 
+	Done=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> );
+
+fbAxisJog(
+	Axis:= Axis, 
+	JogForward:=bAxisJogExecutePos ,// AND (POS_LIMIT OR 1)
+	JogBackwards:= bAxisJogExecuteNeg  , //AND (LEG_LIMIT OR 1)
+	//Mode:= MC_JOGMODE_STANDARD_SLOW, //MC_JOGMODE_STANDARD_SLOW, //MC_JOGMODE_STANDARD_FAST, //MC_JOGMODE_CONTINOUS, //MC_JOGMODE_INCHING, //MC_JOGMODE_INCHING_MODULO
+	//Position:= 0, 
+	Velocity:= stManualModeAxis.targetVelocity, 
+	Acceleration:= fAcc, 
+	Deceleration:= fDec, 
+	Jerk:= 0, 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> );
+	
+fbAxisMoveAbsolute(
+	Axis:= Axis, 
+	Execute:= bAxisMoveAbsoluteExecute, 
+	Position:= fHMTargetPosition,
+	Velocity:= ABS(fHMTargetVelocity),
+	Acceleration:= fAcc,
+	Deceleration:= fDec,
+	Jerk:= 0, 
+	//BufferMode:= , 
+	//Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> (bABS_done) , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> );
+
+bABS_Pos_done:=NOT (bABS_done);//fbAxisMoveAbsolute.Done;
+	
+fbAxisMoveRelative(
+	Axis:= Axis, 
+	Execute:= bAxisMoveRelativeExecute, 
+	Distance:= fHMTargetPosition, 
+	Velocity:= fHMTargetVelocity, 
+	Acceleration:= fAcc, 
+	Deceleration:= fDec, 
+	Jerk:= 0, 
+	//BufferMode:= , 
+	//Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> );
+
+IF 	fHMTargetVelocity >= 0 THEN  // fHMTargetVelocity>= 0
+	fbAxisMoveVelocity.Direction:= MC_Positive_Direction;
+ELSE
+	fbAxisMoveVelocity.Direction:= MC_Negative_Direction;
+END_IF
+	
+fbAxisMoveVelocity(
+	Axis:= Axis, 
+	Execute:= bAxisMoveVelocityExecute, 
+	Velocity:=ABS(fHMTargetVelocity), 
+	Acceleration:= fAcc, 
+	Deceleration:= fDec, 
+	Jerk:= 0, 
+	Direction:= ,//MC_Negative_Direction ,//OR MC_Positive_Direction, //tmpVelocityDirection,//MC_Undefined_Direction, //MC_Shortest_Way, //MC_Positive_Direction, //MC_Negative_Direction,
+	//BufferMode:= , 
+	//Options:= , 
+	InVelocity=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> );
+	
+//Brake controll
+vendorId	:= StManualModeAxis.openBrake;	
+btmpFPBrake :=  bBrakeStateOld <> vendorId;
+bBrakeStateOld := vendorId;
+
+mcReadDriveAddress(
+	Axis:= Axis, 
+	Execute:= btmpFPBrake, 
+	Done=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> , 
+	DriveAddress=> Axis.DriveAddress);
+
+	st_Trq_options.EnableManualTorqueStartValue :=TRUE;
+	st_Trq_options.ManualTorqueStartValue:= 0.5;
+	bTorqueReached:=fbAxisTorqueControl.InTorque;
+	
+fbAxisTorqueControl	(
+	Axis:= Axis , 
+	Execute:=bAxisMoveTorqueExecute , 
+	Relative:= , 
+	Torque:= 2 , 
+	TorqueRamp:= 1, 
+	VelocityLimitHigh:= 500, 
+	VelocityLimitLow:= -500, 
+	BufferMode:= , 
+	Options:= ,//st_Trq_options , 
+	InTorque=> , 
+	Busy=> busy, 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> act, 
+	ErrorId=> id );
+
+//	fbEcCoeSdoRead(
+//	sNetId:= Axis.DriveAddress.NetID,
+//	nSlaveAddr:= Axis.DriveAddress.SlaveAddress,
+//	nSubIndex:= 16#1, 
+//	nIndex:= 16#8012, 
+//	pDstBuf:= ADR(bBrakeStateOld), 
+//	cbBufLen:= SIZEOF(bBrakeStateOld), 
+//	bExecute:= mcReadDriveAddress.done, 
+//	tTimeout:= , 
+//	bBusy=> , 
+//	bError=> , 
+//	nErrId=> , 
+//	cbRead=> );
+
+fbEcCoeSdoWrite(
+	sNetId:= Axis.DriveAddress.NetID,
+	nSlaveAddr:= Axis.DriveAddress.SlaveAddress, 
+	nSubIndex:= 16#1, 
+	nIndex:= 16#8012, 
+	pSrcBuf:= ADR(bBrakeStateOld), 
+	cbBufLen:= SIZEOF(bBrakeStateOld), 
+	bExecute:= mcReadDriveAddress.done, 
+	tTimeout:= , 
+	bBusy=> , 
+	bError=> , 
+	nErrId=> );
+	
+			IF bHardwareReset THEN
+				FB_SoEReset(
+				Axis:= Axis,	
+				Execute:= TRUE,
+				);
+				IF NOT FB_SoEReset.Busy THEN
+					FB_SoEReset(
+					Axis:= Axis,	
+					Execute:= FALSE,
+					);
+					bHardwareReset:= FALSE;
+				END_IF	
+			END_IF		
+
+stManualModeAxis.actualPosition:=axis.NcToPlc.ActPos;
+stManualModeAxis.actualVelocity:=axis.NcToPlc.ActVelo;
+Actual_Torque:=fActualTorque;
+//###################################################################################
+//###################################################################################
+
+//Output Signals
+	sAxisState := TO_STRING(iSchritt);
+	bAxisHomed := bAxisIsHomed;
+	bAxisError := bAxisInError OR iSchritt = ENUM_Axis.Error;
+	bAxis_ready := (iSchritt = ENUM_Axis.Ready);
+	bAxisEnabled:= (iSchritt <> ENUM_Axis.PowerOFF) AND (iSchritt <> ENUM_Axis.Error);
+IF In_range(stManualModeAxis.actualPosition,0,1) THEN
+	baxis_in_home_pos:=TRUE;
+ELSE
+	baxis_in_home_pos:=FALSE;		
+END_IF	
+	
+IF Safe_move_Conditions THEN
+	bsafe_to_move:=TRUE;
+	fOverride := 100;
+ELSE
+	bsafe_to_move:=FALSE;
+	fOverride := 0;
+END_IF	
+
+IF bmove_home THEN
+	CASE moving_home OF
+		0:IF bmove_home AND NOT bMoveAbsolute AND NOT baxis_in_home_pos THEN
+            fTargetPosition:=0;
+		    moving_home:=1;	
+		  ELSIF baxis_in_home_pos THEN
+			bmove_home:=FALSE;
+			moving_home:=0;		
+		  END_IF
+	   
+		1: bMoveAbsolute:=TRUE; 
+		   moving_home:=2;  
+		
+		2:  IF In_range(stManualModeAxis.actualPosition,0,1) OR bDone THEN
+			 bMoveAbsolute:=FALSE;
+			// moving_home:=0;
+			 bmove_home:=FALSE;
+		    END_IF		
+	END_CASE
+ELSE
+	moving_home:=0;
+END_IF	
+
+Actual_position:=stManualModeAxis.actualPosition;
+Actual_velocity:=stManualModeAxis.actualVelocity;
+
+bAxisEnabled:= NOT bAxisError AND fbAxisPower.Status;
+
+
+
+///////////////////////////////////// AUTO HOMING	////////////////////////////////
+
+bSet_Encoder_Zero:=NOT TRIAL OR home_pressed;
+
+bSet_Encoder_Zero_Rtrig.CLK:=bSet_Encoder_Zero;
+bSet_Encoder_Zero_Rtrig();
+
+IF bSet_Encoder_Zero_Rtrig.Q THEN Step :=10; END_IF
+
+CASE Step OF 
+10:
+	lrRead_set_Value:=0; lrWrite_set_Value:=0; bRead_set_Value:=FALSE; bWrite_set_Value :=FALSE; 
+	Step:=Step+10;
+20:
+	lrWrite_set_Value:=0; bWrite_set_Value :=TRUE; 
+	tDummy.IN:=TRUE;
+	IF tDummy.Q THEN tDummy.IN:=FALSE ; bWrite_set_Value := FALSE;Step:= step+10; END_IF
+30:	IF home_pressed THEN
+	lrWrite_set_Value:= Axis.NcToPlc.ActPos * -1;
+	ELSE
+	 lrWrite_set_Value:=HOMING_VALUE;
+	END_IF;
+	Step:= step+10;
+40:
+	bWrite_set_Value := TRUE; tDummy.IN:=TRUE;
+	IF tDummy.Q THEN tDummy.IN:=FALSE ;Step:= step+10; bWrite_set_Value := FALSE; END_IF
+	IF ADSWRITE_Set_Val.ERR  THEN bWrite_set_Value := FALSE;tDummy.IN:=FALSE; Step:=10; END_IF
+50:
+	IF (LREAL_TO_INT(Axis.NcToPlc.ActPos*10)=0 OR (lrWrite_set_Value=HOMING_VALUE)) AND ( home_pressed OR NOT TRIAL) THEN
+		bHome_ref_done:=TRUE;	step:=99; bSet_Encoder_Zero:=FALSE; 
+	ELSE
+ 		step:=10;
+END_IF 
+	
+END_CASE
+
+FB_GetLocalAmsNetId_system.bExecute:=TRUE;
+FB_GetLocalAmsNetId_system();
+
+ADSWRITE_Set_Val(
+	NETID:=FB_GetLocalAmsNetId_system.AddrString , 
+	PORT:=501 , 	
+	IDXGRP:=HME_WRITE_ADD, 	
+	IDXOFFS:=16#07,  
+	LEN:= SIZEOF(lrWrite_set_Value), 
+	SRCADDR:= ADR(lrWrite_set_Value) , 
+	WRITE:=bWrite_set_Value ,   	    
+	TMOUT:=T#500MS , 
+	BUSY=> ,  
+	ERR=> , 	
+	ERRID=> );	
+
+tDummy.PT:=T#20MS;
+tDummy();	
+	
+(*MC_Power1(
+	Axis:=Axis, 
+	Enable:=bEnable AND NOT home_pressed, 
+	Enable_Positive:= 1, 
+	Enable_Negative:= 1, 
+	Override:=100 , 
+	BufferMode:= , 
+	Options:= , 
+	Status=> , 
+	Busy=> , 
+	Active=> , 
+	Error=> , 
+	ErrorID=> );*)
+
+TRIAL := (step=99);
+
+IF (lrWrite_set_Value<>HOMING_VALUE)AND(step=99)THEN
+	HOMING_VALUE:=lrWrite_set_Value;
+
+END_IF	
+
+IF step=99 THEN
+	home_pressed:=FALSE;
+ 	bHome:=FALSE;
+	bHomeDone := TRUE;
+	//bHome := FALSE;
+	stManualModeAxis.homing:= FALSE;
+	//bAxisHomeExecute:= FALSE;
+	//iSchritt := ENUM_Axis.Ready;	
+END_IF
+	
+	
+	
+//############################		SERVO LIMIT 	##############################	
+
+(*Servo_Low_Limit	  :=-1000;
+Servo_High_Limit  :=1000;
+IF (stManualModeAxis.actualPosition>=Servo_Low_Limit) THEN
+LEG_LIMIT			:= TRUE;
+ELSE	
+LEG_LIMIT			:= FALSE;
+END_IF;
+
+IF stManualModeAxis.actualPosition<=Servo_High_Limit THEN
+POS_LIMIT			:= TRUE;	
+ELSE
+POS_LIMIT			:= FALSE;
+END_IF
+
+IF (fTargetPosition<=Servo_Low_Limit) THEN
+	AUTO_TARGET_POSITION:=fTargetPosition;
+ELSE
+	AUTO_TARGET_POSITION:=Servo_Low_Limit;
+END_IF
+
+IF fTargetPosition>=Servo_High_Limit THEN
+	AUTO_TARGET_POSITION:=Servo_High_Limit;
+ELSE
+	AUTO_TARGET_POSITION:=fTargetPosition;
+END_IF
+
+IF (stManualModeAxis.targetPositon<=Servo_Low_Limit) THEN
+MANUAL_TARGET_POSITION:=Servo_Low_Limit;
+ELSE 
+MANUAL_TARGET_POSITION:=stManualModeAxis.targetPositon;	
+END_IF
+
+IF stManualModeAxis.targetPositon>=Servo_High_Limit THEN
+MANUAL_TARGET_POSITION:=Servo_High_Limit;
+ELSE
+MANUAL_TARGET_POSITION:=stManualModeAxis.targetPositon;
+END_IF
+
+IF (stManualModeAxis.actualPosition-WARNING_LIMIT)<=Servo_Low_Limit AND (stManualModeAxis.actualPosition+WARNING_LIMIT)<=Servo_High_Limit THEN
+SERVO_LIMIT_WARNING	:= TRUE;
+ELSE
+SERVO_LIMIT_WARNING	:= FALSE;	
+END_IF
+*)
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Axis">
+      <LineId Id="3" Count="779" />
+      <LineId Id="994" Count="0" />
+      <LineId Id="993" Count="0" />
+      <LineId Id="783" Count="0" />
+      <LineId Id="945" Count="5" />
+      <LineId Id="789" Count="0" />
+      <LineId Id="951" Count="0" />
+      <LineId Id="953" Count="0" />
+      <LineId Id="956" Count="0" />
+      <LineId Id="952" Count="0" />
+      <LineId Id="958" Count="2" />
+      <LineId Id="962" Count="1" />
+      <LineId Id="961" Count="0" />
+      <LineId Id="957" Count="0" />
+      <LineId Id="970" Count="3" />
+      <LineId Id="965" Count="0" />
+      <LineId Id="974" Count="0" />
+      <LineId Id="984" Count="3" />
+      <LineId Id="975" Count="1" />
+      <LineId Id="989" Count="3" />
+      <LineId Id="977" Count="0" />
+      <LineId Id="790" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

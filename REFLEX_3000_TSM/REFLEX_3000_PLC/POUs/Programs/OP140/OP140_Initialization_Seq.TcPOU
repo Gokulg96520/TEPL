@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP140_Initialization_Seq" Id="{1920a043-951f-40c7-a195-9f4b76d01e0f}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP140_Initialization_Seq
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home AND CR140_Horz_Cyl_1.Position1 AND  CR140_Horz_Cyl_2.Position1 AND  CR140_Horz_Cyl_3.Position1 AND  CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1)THEN
+OP140_Temp_Home_Ok:=TRUE;
+OP140_HomeRunning:=FALSE;
+OP140_Homing_Seq:=0;
+ELSE
+	OP140_Temp_Home_Ok:=FALSE;
+	
+END_IF
+
+CASE OP140_Homing_Seq OF
+	0: IF (OP140_Auto AND NOT OP140_HomeRunning AND  NOT OP140_ErrorActive AND  NOT OP140_AutoRunning AND NOT OP140_StepRunning	 AND NOT OP140_Temp_Home_Ok) THEN
+		OP140_HomeRunning:=TRUE;
+		OP140_Homing_Seq:=10;	
+	   END_IF
+	10:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
+        IF (SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home)=TRUE THEN
+			OP140_Homing_Seq:=30;
+			ELSE
+				SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:= TRUE;
+				SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:= TRUE;
+				SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:= TRUE;
+				IF (SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home)=TRUE THEN
+				OP140_Homing_Seq:=30;
+				SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:= FALSE;
+				SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:= FALSE;
+				SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:= FALSE;
+				END_IF
+				
+				END_IF
+				END_IF
+	20:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
+        IF ( CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1=TRUE ) THEN
+			OP140_Homing_Seq:=30;
+			ELSE
+	
+				CR140_Vert_Cyl_1.HomingCmd1:= TRUE;
+				CR140_Vert_Cyl_2.HomingCmd1:= TRUE;
+				CR140_Vert_Cyl_3.HomingCmd1:= TRUE;
+				
+				IF   CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1=TRUE THEN
+				OP140_Homing_Seq:=30;
+				
+				CR140_Vert_Cyl_1.HomingCmd1:= FALSE;
+				CR140_Vert_Cyl_2.HomingCmd1:= FALSE;
+				CR140_Vert_Cyl_3.HomingCmd1:= FALSE;
+				
+				END_IF
+				
+				END_IF
+				END_IF
+		30:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
+        IF ( CR140_Horz_Cyl_1.Position1 AND CR140_Horz_Cyl_2.Position1 AND  CR140_Horz_Cyl_3.Position1=TRUE ) THEN
+			OP140_Homing_Seq:=30;
+			ELSE
+	
+				CR140_Horz_Cyl_1.HomingCmd1:= TRUE;
+			CR140_Horz_Cyl_2.HomingCmd1:= TRUE;
+			CR140_Horz_Cyl_3.HomingCmd1:= TRUE;
+				
+				IF CR140_Horz_Cyl_1.Position1 AND  CR140_Horz_Cyl_2.Position1 AND CR140_Horz_Cyl_3.Position1 THEN
+				OP140_Homing_Seq:=30;
+				
+				CR140_Horz_Cyl_1.HomingCmd1:= FALSE;
+				CR140_Horz_Cyl_2.HomingCmd1:= FALSE;
+			CR140_Horz_Cyl_3.HomingCmd1:= FALSE;
+				
+				END_IF
+				
+				END_IF
+				END_IF
+				
+			40:	
+			OP140_Homing_Seq:=0;
+			OP140_HomeRunning:=FALSE;
+	
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP140_Initialization_Seq">
+      <LineId Id="3" Count="74" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP120_GVL" Id="{7c7d8993-bb40-4c72-ade2-c8610928c668}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	//GENERAL
+OP120_Auto:					BOOL;
+OP120_HomeRunning:			BOOL;
+OP120_ErrorActive:			BOOL;
+OP120_Home_PB:				BOOL;
+OP120_Work_PB:				BOOL;
+OP120_ManualSafetyBypass:	BOOL;
+OP120_LightCurtainBypass:	BOOL;
+OP120_OperationCompleted:	BOOL;
+OP120_LampCheck:			BOOL;
+OP120_MachineLamp:			BOOL;
+OP120_ComponentOk:			BOOL;
+OP120_ComponentNok:			BOOL;
+OP120_RepeatBit:			BOOL;
+OP120_HomingResetBit:		BOOL;
+OP120_ControlledByRobo:		BOOL;
+OP120_Any_Bypass:			BOOL;
+OP120_ManualModeStatus:		INT;
+OP120_ManualModeWord:		INT;
+
+OP120Seq:				INT;
+OP120_LH_AutoSeq: 			INT;
+OP120_RH_AutoSeq: 			INT;
+OP120_Homing_Seq:			INT;
+
+Automatic_Run:				BOOL;
+OP120_Prev_Stat_Operation_Completed: BOOL;
+OP120_Prev_Comp_Status: INT;
+OP120_Prev_LH_COMP_OK:BOOL;
+OP120_Prev_LH_COMP_NOK:BOOL;
+OP120_Prev_RH_COMP_OK:BOOL;
+OP120_Prev_RH_COMP_NOK:BOOL;
+OP120_LH_Operation_Completed:BOOL;
+OP120_RH_Operation_Completed:BOOL;
+
+OP120_LH_Comp_OK: BOOL;
+OP120_LH_Comp_NOK: BOOL;
+OP120_RH_Comp_OK: BOOL;
+OP120_RH_Comp_NOK: BOOL;
+
+OP120_RH_Laser_Start:BOOL;
+OP120_LH_Laser_Start:BOOL;
+OP120_RH_Laser_Completed:BOOL;
+OP120_LH_Laser_Completed:BOOL;
+OP120_Comp_Picked:BOOL;
+
+
+//AutoSequence 
+OP120_AutoSeq:			INT;
+
+//ModeSelection Outputs
+//OP120_AutoSelected:		    BOOL;
+OP120_ManualSelected:		BOOL;
+OP120_StepSelected:			BOOL;
+OP120_AutoSelected:		    BOOL;
+OP120_AutoRunning :BOOL;
+OP120_StepRunning:BOOL;
+OP120_StartEnable:BOOL;
+OP120_Machine_Stop:BOOL;
+//MAnual Control Tags
+CR120_Lifting_Cyl: Cylinder_Block;
+ CR120_Horizontal_Push_Cyl: Cylinder_Block;
+ CR120_Camera_Slide_Cyl: Cylinder_Block;
+CR120_Gripper_Cyl: Cylinder_Block;
+	SR120_Oring_Feed_Servo: FB_Axis;
+	SR120_Oring_Feed_Servo_Axis:AXIS_REF;
+	SR120_Oring_Feed_Servo_Control:Servo_Control;
+	SR120_Oring_Feed_Manual_Axis:stManualModeAxis;
+
+
+//Manual Cylinder FB Tags
+OP120_Lifting_Cyl_Status:	 INT;
+OP120_Gripper_Cyl_Status:	 INT;
+OP120_Horizontal_Push_Cyl_Status:INT;
+OP120_Camera_Slide_Cyl_Status:INT;
+//HMI Tags(From HMI)
+OP120_HMI_AutoMode:						BOOL;
+OP120_HMI_ManualMOde:					BOOL;
+OP120_HMI_StepMode:						BOOL;
+OP120_HMI_CycleStart_PB:				BOOL;
+OP120_HMI_Homing_PB:					BOOL;
+CR120_HMI_Gripper_Cyl_Home_PB:			BOOL;
+CR120_HMI_Gripper_Cyl_Work_PB:			BOOL;
+CR120_HMI_Lifting_Cyl_Home_PB:			BOOL;
+CR120_HMI_Lifting_Cyl_Work_PB:			BOOL;
+CR120_HMI_Horizontal_Push_Cyl_Home_PB:	BOOL;
+CR120_HMI_Horizontal_Push_Cyl_Work_PB:	BOOL;
+CR120_HMI_Camera_Slide_Cyl_Home_PB:	BOOL;
+CR120_HMI_Camera_Slide_Cyl_Work_PB:	BOOL;
+OP120_HMI_Bowl_ON_Time:					TIME;
+OP120_HMI_Bowl_OFF_time:				TIME;
+OP120_HMI_Bowl_On_PB:					BOOL;
+OP120_HMI_Hopper_On_PB:					BOOL;
+OP120_HMI_Reset:						BOOL;
+//Error
+OP120_ErrorWord_0:    							 DINT;
+OP120_ErrorWord_1:								 DINT;
+OP120_ErrorWord_2:								 DINT;
+
+// Robo Inouts
+OP120_Ready_To_Pick:					BOOL;
+OP120_Lring_Placed:						BOOL;
+
+//Camera Inputs
+OP120_Camera_OK:								BOOL;
+OP120_Camera_NOK:								BOOL;
+
+
+	OP120_Temp_Home_OK: BOOL;
+	OP120_HomeCondition_OK: BOOL;
+	OP120_OperationEnable: BOOL;
+	OP130_CycleTime: UDINT;
+	b1sec: BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

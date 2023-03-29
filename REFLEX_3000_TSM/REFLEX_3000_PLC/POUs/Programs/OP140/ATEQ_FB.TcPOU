@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="ATEQ_FB" Id="{dfacb954-e636-44c3-8c0b-c7e9f7855631}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ATEQ_FB
+VAR_INPUT
+	ATEQ_FB_Start_IP:BOOL;
+	ATEQ_FB_Prog_NO_IP:BOOL;
+	ATEQ_FB_Pass:BOOL;
+	ATEQ_FB_Fail:BOOL;
+	ATEQ_FB_EOP:BOOL;
+	
+	
+END_VAR
+VAR_OUTPUT
+	ATEQ_FB_Start_OP:BOOL;
+	Result_OK: ARRAY[1..2]  OF BOOL;
+	Result_NOK: ARRAY[1..2]  OF BOOL;
+	Result_Error:BOOL;
+	//Result_OK:BOOL;
+	//Result_NOK:BOOL;
+	
+	ATEQ_FB_Prog_NO_OP:BOOL;
+	Read_Result:bool;
+	
+	
+	
+END_VAR
+VAR_IN_OUT 
+	Result_Completed:BOOL;
+END_VAR
+VAR
+	Count:INT;
+	ATEQ_Start_Temp:BOOL;
+	ATEQ_Result_Error: TON;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF ATEQ_FB_Start_IP=TRUE AND ATEQ_FB_Start_OP=FALSE AND  Result_Completed=FALSE THEN 
+	Result_OK[1]:=FALSE;
+	Result_NOK[1]:= FALSE;
+	Result_OK[2]:=FALSE;
+	Result_NOK[2]:= FALSE;
+	Count:=1;
+	ATEQ_FB_Prog_NO_OP:=ATEQ_FB_Prog_NO_IP;
+	ATEQ_Start_Temp:=TRUE;
+	ATEQ_FB_Start_IP:=FALSE;
+	END_IF
+
+		
+
+IF ATEQ_Start_Temp:=TRUE AND  Count<=2 AND ATEQ_FB_Start_OP =FALSE AND Result_Nok[1]=FALSE THEN
+	ATEQ_FB_Start_OP:=TRUE;
+    Count:=Count+1;
+	END_IF
+	
+  IF ATEQ_FB_Start_OP= TRUE AND  ATEQ_FB_EOP=TRUE AND Result_Nok[1]=FALSE AND   Count<=2 THEN 
+	IF (ATEQ_FB_Pass= TRUE) THEN
+		Result_OK[Count]:=TRUE;
+		Result_NOK[Count]:= FALSE;
+	END_IF
+	IF(ATEQ_FB_Fail= TRUE) THEN
+		Result_OK[Count]:=FALSE;
+		Result_NOK[Count]:= TRUE;
+	END_IF
+	END_IF
+IF (Result_OK[Count] OR Result_NOK[Count] OR Result_NOK[1] ) THEN
+		Read_Result:=TRUE;
+		ATEQ_FB_Start_OP:=FALSE;
+		
+		
+	END_IF
+	IF ( Count>=2) OR Result_NOK[1]=TRUE THEN
+		Result_Completed:=TRUE;
+		ATEQ_FB_Start_OP:=FALSE;
+		ATEQ_Start_Temp:=FALSE;
+		
+			
+END_IF
+ATEQ_Result_Error(IN:= ATEQ_FB_Start_OP, PT:=T#5S , Q=>Result_Error , ET=> );
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="ATEQ_FB">
+      <LineId Id="3" Count="42" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

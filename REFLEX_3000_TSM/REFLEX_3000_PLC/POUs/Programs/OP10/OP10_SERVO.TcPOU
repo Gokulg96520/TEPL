@@ -1,0 +1,842 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP10_SERVO" Id="{6a608d9a-4baf-4389-82f9-82faf89646c7}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP10_SERVO
+VAR
+// IN_RANGE
+	OP10_BDY_GRP_FRT						: AXIS_REF;
+	OP10_BDY_GRP_SEC						: AXIS_REF;	
+	OP10A_LH_GRIPPER						: AXIS_REF;
+	OP10A_RH_GRIPPER						: AXIS_REF;
+	OP10A_LH_ROTARY							: AXIS_REF;
+	OP10A_RH_ROTARY							: AXIS_REF;
+	OP10A_CONVRY							: AXIS_REF;
+	OP10B_LH_GRIPPER						: AXIS_REF;
+	OP10B_RH_GRIPPER						: AXIS_REF;
+	OP10B_LH_ROTARY							: AXIS_REF;
+	OP10B_RH_ROTARY							: AXIS_REF;
+	OP10B_CONVRY							: AXIS_REF;	
+	OP10_SRV_BLCK_INTZ						: BOOL;
+	FESTO_NOT_NEED							: BOOL;
+	NOT_REQ									: BOOL;
+	OP10A_ERROR_ACTIVE: BOOL;
+	OP10A_LH_GRIPR_fb: STRING;
+	OP10B_LH_GRIPR_fb: STRING;
+	F: FB_Axis;
+END_VAR
+
+VAR PERSISTENT
+	OP10_SRV_FRT_BDYPCK_WRK_DEGREE			: LREAL;
+	OP10_SRV_FRT_BDYPCK_HME_DEGREE			: LREAL;
+	OP10_SRV_SCND_BDYPCK_WRK_DEGREE			: LREAL;
+	OP10_SRV_SCND_BDYPCK_HME_DEGREE			: LREAL;
+	OP10A_SRV_LH_HME_MM						: LREAL;
+	OP10A_SRV_LH_WRK_MM						: LREAL;
+	OP10_SRV_LH_BDYANG_HME_MM				: LREAL;
+	OP10A_SRV_RH_HME_MM						: LREAL;
+	OP10A_SRV_RH_WRK_MM						: LREAL;
+	OP10_SRV_LH_BDYANG_WRK_MM				: LREAL;
+	OP10_SRV_RH_BDYANG_HME_MM				: LREAL;
+	OP10_SRV_RH_BDYANG_WRK_MM				: LREAL;
+	OP10B_SRV_LH_WRK_MM						: LREAL;
+	OP10B_SRV_LH_HME_MM						: LREAL;
+	OP10B_SRV_RH_WRK_MM						: LREAL;
+	OP10B_SRV_RH_HME_MM						: LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[////////////////////////OP10 BODY PICK ROTATE SERVO ///////////////////////////
+IF OP10_A_SRV_FST_BDYPCK_WRK THEN
+	OP10_SRV_FRST_PCKBDY_CNT.ABSmove_Start		:= TRUE;
+	OP10_SRV_FRST_PCKBDY_CNT.Position			:= OP10_SRV_FRT_BDYPCK_WRK_DEGREE ;
+IF OP10_SRV_FRST_PCKBDY_WRK_FB THEN
+	OP10_SRV_FRST_PCKBDY_CNT.ABSmove_Start		:= FALSE;
+	OP10_A_SRV_FST_BDYPCK_WRK                  	:= FALSE;
+END_IF
+END_IF
+
+IF OP10_A_SRV_FST_BDYPCK_HME THEN
+	OP10_SRV_FRST_PCKBDY_CNT.ABSmove_Start		:= TRUE;
+	OP10_SRV_FRST_PCKBDY_CNT.Position			:= OP10_SRV_FRT_BDYPCK_HME_DEGREE ;
+IF OP10_SRV_FRST_PCKBDY_HME_FB THEN
+	OP10_SRV_FRST_PCKBDY_CNT.ABSmove_Start		:= FALSE;
+	OP10_A_SRV_FST_BDYPCK_HME                  	:= FALSE;
+END_IF
+END_IF
+
+IF OP10_A_SRV_SCND_BDYPCK_WRK THEN
+	OP10_SRV_SCND_PCKBDY_CNT.ABSmove_Start		:= TRUE;
+	OP10_SRV_SCND_PCKBDY_CNT.Position			:= OP10_SRV_SCND_BDYPCK_WRK_DEGREE ;
+IF OP10_SRV_SCND_PCKBDY_WRK_FB THEN
+	OP10_SRV_SCND_PCKBDY_CNT.ABSmove_Start		:= FALSE;
+	OP10_A_SRV_SCND_BDYPCK_WRK                  := FALSE;
+END_IF
+END_IF
+
+IF OP10_A_SRV_SCND_BDYPCK_HME THEN
+	OP10_SRV_SCND_PCKBDY_CNT.ABSmove_Start		:= TRUE;
+	OP10_SRV_SCND_PCKBDY_CNT.Position			:= OP10_SRV_SCND_BDYPCK_HME_DEGREE ;
+IF OP10_SRV_SCND_PCKBDY_HME_FB THEN
+	OP10_SRV_SCND_PCKBDY_CNT.ABSmove_Start		:= FALSE;
+	OP10_A_SRV_SCND_BDYPCK_HME                 	:= FALSE;
+END_IF
+END_IF
+
+///////////////////////////////////////////////////OP10A GRIPPER STEPPER/////////////////////////////////////////////
+
+IF OP10A_A_SRV_LH_GRPWRK THEN
+	OP10A_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_LH_BDYGRP_CNT.Position			:= OP10A_SRV_LH_WRK_MM;
+IF OP10A_A_SRV_LH_GRPWRK_FB THEN
+	OP10A_A_SRV_LH_GRPWRK						:= FALSE;
+	OP10A_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+IF OP10A_A_SRV_LH_GRPHME THEN
+	OP10A_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_LH_BDYGRP_CNT.Position			:= OP10A_SRV_LH_HME_MM;
+IF OP10A_A_SRV_LH_GRPHME_FB THEN
+	OP10A_A_SRV_LH_GRPHME						:= FALSE;
+	OP10A_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+IF OP10A_A_SRV_RH_GRPWRK THEN
+	OP10A_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_RH_BDYGRP_CNT.Position			:= OP10A_SRV_RH_WRK_MM;
+IF OP10A_A_SRV_RH_GRPWRK_FB THEN
+	OP10A_A_SRV_RH_GRPWRK						:= FALSE;
+	OP10A_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+IF OP10A_A_SRV_RH_GRPHME THEN
+	OP10A_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_RH_BDYGRP_CNT.Position			:= OP10A_SRV_RH_HME_MM;
+IF OP10A_A_SRV_RH_GRPHME_FB THEN
+	OP10A_A_SRV_RH_GRPHME						:= FALSE;
+	OP10A_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+//////////////////////////////////////OP10A ANGLE ROTATE /////////////////////
+
+IF OP10A_SRV_LH_BDYANG_HME THEN
+	OP10A_SRV_LH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_LH_BDYANG_CNT.Position			:= OP10_SRV_LH_BDYANG_HME_MM;
+IF OP10A_SRV_LH_BDYANG_HME_FB THEN
+	OP10A_SRV_LH_BDYANG_HME						:= FALSE;
+	OP10A_SRV_LH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+IF OP10A_SRV_LH_BDYANG_WRK THEN
+	OP10A_SRV_LH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_LH_BDYANG_CNT.Position			:= OP10_SRV_LH_BDYANG_WRK_MM;
+IF OP10A_SRV_LH_BDYANG_WRK_FB THEN
+	OP10A_SRV_LH_BDYANG_WRK						:= FALSE;
+	OP10A_SRV_LH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+IF OP10A_SRV_RH_BDYANG_HME THEN
+	OP10A_SRV_RH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_RH_BDYANG_CNT.Position			:= OP10_SRV_RH_BDYANG_HME_MM;
+IF OP10A_SRV_RH_BDYANG_HME_FB THEN
+	OP10A_SRV_RH_BDYANG_HME						:= FALSE;
+	OP10A_SRV_RH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+IF OP10A_SRV_RH_BDYANG_WRK THEN
+	OP10A_SRV_RH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10A_SRV_RH_BDYANG_CNT.Position			:= OP10_SRV_RH_BDYANG_WRK_MM;
+IF OP10A_SRV_LH_BDYANG_WRK_FB THEN
+	OP10A_SRV_RH_BDYANG_WRK						:= FALSE;
+	OP10A_SRV_RH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+/////////////////////////////////////////////////////OP10B ////////////////////////////////////////////////////
+
+IF OP10B_A_SRV_LH_GRPWRK THEN
+	OP10B_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_LH_BDYGRP_CNT.Position			:= OP10B_SRV_LH_WRK_MM;
+IF OP10B_A_SRV_LH_GRPWRK_FB THEN
+	OP10B_A_SRV_LH_GRPWRK						:= FALSE;
+	OP10B_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+IF OP10B_A_SRV_LH_GRPHME THEN
+	OP10B_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_LH_BDYGRP_CNT.Position			:= OP10B_SRV_LH_HME_MM;
+IF OP10B_A_SRV_LH_GRPHME_FB THEN
+	OP10B_A_SRV_LH_GRPHME						:= FALSE;
+	OP10B_SRV_LH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+IF OP10B_A_SRV_RH_GRPWRK THEN
+	OP10B_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_RH_BDYGRP_CNT.Position			:= OP10B_SRV_RH_WRK_MM;
+IF OP10B_A_SRV_RH_GRPWRK_FB THEN
+	OP10B_A_SRV_RH_GRPWRK						:= FALSE;
+	OP10B_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+IF OP10B_A_SRV_RH_GRPHME THEN
+	OP10B_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_RH_BDYGRP_CNT.Position			:= OP10B_SRV_RH_HME_MM;
+IF OP10B_A_SRV_RH_GRPHME_FB THEN
+	OP10B_A_SRV_RH_GRPHME						:= FALSE;
+	OP10B_SRV_RH_BDYGRP_CNT.ABSmove_Start		:= FALSE;		
+END_IF
+END_IF
+
+//////////////////////////////////////OP10B ANGLE ROTATE /////////////////////
+
+IF OP10B_SRV_LH_BDYANG_HME THEN
+	OP10B_SRV_LH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_LH_BDYANG_CNT.Position			:= OP10_SRV_LH_BDYANG_HME_MM;
+IF OP10B_SRV_LH_BDYANG_HME_FB THEN
+	OP10B_SRV_LH_BDYANG_HME						:= FALSE;
+	OP10B_SRV_LH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+IF OP10B_SRV_LH_BDYANG_WRK THEN
+	OP10B_SRV_LH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_LH_BDYANG_CNT.Position			:= OP10_SRV_LH_BDYANG_WRK_MM;
+IF OP10B_SRV_LH_BDYANG_WRK_FB THEN
+	OP10B_SRV_LH_BDYANG_WRK						:= FALSE;
+	OP10B_SRV_LH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+IF OP10B_SRV_RH_BDYANG_HME THEN
+	OP10B_SRV_RH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_RH_BDYANG_CNT.Position			:= OP10_SRV_RH_BDYANG_HME_MM;
+IF OP10B_SRV_RH_BDYANG_HME_FB THEN
+	OP10B_SRV_RH_BDYANG_HME						:= FALSE;
+	OP10B_SRV_RH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+IF OP10B_SRV_RH_BDYANG_WRK THEN
+	OP10B_SRV_RH_BDYANG_CNT.ABSmove_Start		:= TRUE;
+	OP10B_SRV_RH_BDYANG_CNT.Position			:= OP10_SRV_RH_BDYANG_WRK_MM;
+IF OP10B_SRV_LH_BDYANG_WRK_FB THEN
+	OP10B_SRV_RH_BDYANG_WRK						:= FALSE;
+	OP10B_SRV_RH_BDYANG_CNT.ABSmove_Start		:= FALSE;	
+END_IF
+END_IF
+
+
+
+// FEEDBACK CONDTION
+	OP10_SRV_FRST_PCKBDY_WRK_FB					:= OP10_SRV_FRST_PCKBDY_CNT.Axis_In_Pos AND In_Range(value:=OP10_SRV_FRST_PCKBDY_STUS.actualPosition , setvalue:=OP10_SRV_FRT_BDYPCK_WRK_DEGREE , tolerance:=0.2);
+	OP10_SRV_FRST_PCKBDY_HME_FB					:= OP10_SRV_FRST_PCKBDY_CNT.Axis_In_Pos AND In_Range(value:=OP10_SRV_FRST_PCKBDY_STUS.actualPosition , setvalue:=OP10_SRV_FRT_BDYPCK_HME_DEGREE , tolerance:=0.2);
+	OP10_SRV_SCND_PCKBDY_WRK_FB					:= OP10_SRV_SCND_PCKBDY_CNT.Axis_In_Pos AND In_Range(value:=OP10_SRV_SCND_PCKBDY_STUS.actualPosition , setvalue:=OP10_SRV_SCND_BDYPCK_WRK_DEGREE , tolerance:=0.2);
+	OP10_SRV_SCND_PCKBDY_HME_FB					:= OP10_SRV_SCND_PCKBDY_CNT.Axis_In_Pos AND In_Range(value:=OP10_SRV_SCND_PCKBDY_STUS.actualPosition , setvalue:=OP10_SRV_SCND_BDYPCK_HME_DEGREE , tolerance:=0.2);
+	OP10A_A_SRV_LH_GRPWRK_FB					:= OP10A_SRV_LH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_LH_BDYGRP_STUS.actualPosition , setvalue:=OP10A_SRV_LH_WRK_MM , tolerance:=0.2);
+	OP10A_A_SRV_LH_GRPHME_FB					:= OP10A_SRV_LH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_LH_BDYGRP_STUS.actualPosition , setvalue:=OP10A_SRV_LH_HME_MM , tolerance:=0.2);
+	OP10A_A_SRV_RH_GRPWRK_FB					:= OP10A_SRV_RH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_RH_BDYGRP_STUS.actualPosition , setvalue:=OP10A_SRV_RH_WRK_MM , tolerance:=0.2);
+	OP10A_A_SRV_RH_GRPHME_FB					:= OP10A_SRV_RH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_RH_BDYGRP_STUS.actualPosition , setvalue:=OP10A_SRV_RH_HME_MM , tolerance:=0.2);
+	OP10A_SRV_LH_BDYANG_HME_FB					:= OP10A_SRV_LH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_LH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_LH_BDYANG_HME_MM , tolerance:=0.2);
+	OP10A_SRV_LH_BDYANG_WRK_FB					:= OP10A_SRV_LH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_LH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_LH_BDYANG_WRK_MM , tolerance:=0.2);
+	OP10A_SRV_RH_BDYANG_HME_FB					:= OP10A_SRV_RH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_RH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_RH_BDYANG_HME_MM , tolerance:=0.2);
+	OP10A_SRV_LH_BDYANG_WRK_FB                  := OP10A_SRV_RH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10A_SRV_RH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_RH_BDYANG_WRK_MM , tolerance:=0.2);
+	OP10B_A_SRV_LH_GRPWRK_FB					:= OP10B_SRV_LH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_LH_BDYGRP_STUS.actualPosition , setvalue:=OP10B_SRV_LH_WRK_MM , tolerance:=0.2);
+	OP10B_A_SRV_LH_GRPHME_FB					:= OP10B_SRV_LH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_LH_BDYGRP_STUS.actualPosition , setvalue:=OP10B_SRV_LH_HME_MM , tolerance:=0.2);
+	OP10B_A_SRV_RH_GRPWRK_FB					:= OP10B_SRV_RH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_RH_BDYGRP_STUS.actualPosition , setvalue:=OP10B_SRV_RH_WRK_MM , tolerance:=0.2);
+	OP10B_A_SRV_RH_GRPHME_FB					:= OP10B_SRV_RH_BDYGRP_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_RH_BDYGRP_STUS.actualPosition , setvalue:=OP10B_SRV_RH_HME_MM , tolerance:=0.2);
+	OP10B_SRV_LH_BDYANG_HME_FB					:= OP10B_SRV_LH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_LH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_LH_BDYANG_HME_MM , tolerance:=0.2);
+	OP10B_SRV_LH_BDYANG_WRK_FB					:= OP10B_SRV_LH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_LH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_LH_BDYANG_WRK_MM , tolerance:=0.2);
+	OP10B_SRV_RH_BDYANG_HME_FB					:= OP10B_SRV_RH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_RH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_RH_BDYANG_HME_MM , tolerance:=0.2);
+	OP10B_SRV_LH_BDYANG_WRK_FB                  := OP10B_SRV_RH_BDYANG_CNT.Axis_In_Pos AND In_Range(value:=OP10B_SRV_RH_BDYANG_STUS.actualPosition , setvalue:=OP10_SRV_RH_BDYANG_WRK_MM , tolerance:=0.2);
+	
+	
+///////////////////////////ALL SERVO IN HOME////////////////////////////////////////	
+	
+IF OP10_SRV_FRST_PCKBDY_HME_FB AND OP10_SRV_SCND_PCKBDY_HME_FB  THEN
+	OP10_SRV_ALL_HOME							:= TRUE;
+ELSE
+	OP10_SRV_ALL_HOME							:= FALSE;	
+END_IF
+	
+IF OP10A_A_SRV_LH_GRPHME_FB AND OP10A_A_SRV_RH_GRPHME_FB AND OP10A_SRV_LH_BDYANG_HME_FB AND OP10A_SRV_RH_BDYANG_HME_FB  THEN
+	OP10A_SRV_ALL_HOME							:= TRUE;
+ELSE
+	OP10A_SRV_ALL_HOME							:= FALSE;
+END_IF
+	
+IF OP10B_A_SRV_LH_GRPHME_FB AND OP10B_A_SRV_RH_GRPHME_FB AND OP10B_SRV_LH_BDYANG_HME_FB AND OP10B_SRV_RH_BDYANG_HME_FB  THEN
+	OP10B_SRV_ALL_HOME							:= TRUE;
+ELSE
+	OP10B_SRV_ALL_HOME							:= FALSE;
+END_IF
+	
+OP10_FRT_BDY_GPR(
+	bAxis1_Ref_Switch:= , 																// NOT USED 
+	bInit:= OP10_SRV_BLCK_INTZ, 														// INITIALIZE ALL MC_BLOCK
+	bErrorReset:= MACHINE_RST OR Servo_Reset , 														// ERROR RESET
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE  ,								// MC_POWER ON
+	bMoveVelocity:= ,																	// MC_MOVE_VELOCITY_BLOCK 
+	bHalt:= ,																			// MC_HALT 
+	bManualMode:= MANUAL_SELECTED , 														// MANUAL MODE SELECTED
+	fHomePos:= , 																		// SET CURRENT POSSION AS GIVEN VALUE 
+	fOverride:= , 																		// OVERRIDE_ALWAYS_100
+	fTargetPosition:= OP10_SRV_FRST_PCKBDY_CNT.Position,								// TARGET POSITION DURING AUTO LOGIC 
+	fTargetVelocity:= , 																// TARGET VELOCITY DURING AUTO LOGIC
+	fAcc:= , 																			// ACCLERATION DURING AUTO
+	fDec:= , 																			// DEC DURING AUTO 
+	Safe_move_Conditions:=Servo_Safety,											// SAFE TO MOVE OR OVERRIDE IS DISABLED 
+	Axis:= OP10_BDY_GRP_FRT,															// AXIS REFERENCE 
+	bHome:= OP10_SRV_FRST_PCKBDY_CNT.Axis_Home_Cmd, 									// START HOMING TO HOMING BLOCK								
+	bSetPosition:= FESTO_NOT_NEED ,														// SET CURRENT POSITION AS HOME
+	bMoveAbsolute:= OP10_SRV_FRST_PCKBDY_CNT.ABSmove_Start,								// START ABS MOVE
+	bMoveRelative:= NOT_REQ , 															// START RELATIVE
+	bMoveTorque:= NOT_REQ ,																// START TORQUE 
+	stManualModeAxis:= OP10_SRV_FRST_PCKBDY_STUS, 										// MANUAL MODE CONTROL FOR JOG 	
+	sAxisState=> OP10_SRV_FRST_PCKBDY_CNT.Axis_State,                                      								
+	bAxis_ready=> , 																	// SERVO READY
+	bAxisInPosition=> , 																
+	bAxisError=> , 																		// SERVO IN ERROR
+	bAxisEnabled=> ,																	// SERVO ENABLED 
+	bAxisHomed=> , 																		// SERVO  REACHED HOME FROM FUNTIONAL BLOCK
+	bSetPositionDone=> ,                                								
+	bHaltDone=> , 																		// SERVO HALT D0NE
+	bSTOPDone=> , 																		// STOPED DURING ERR
+	bHomeDone=> , 																		// HOMING DONE FB
+	bDone=> ,
+	bTorqueReached=> ,                                  								
+	bsafe_to_move=> , 																	// SAFE TO MOVE CONDITION FB
+	baxis_in_home_pos=> , 																// SERVO ON HOME POSITION THROUGH CALCULATION
+	bABS_Pos_done=> OP10_SRV_FRST_PCKBDY_CNT.Axis_In_Pos, 								// SERVO IN POSITION
+	Actual_position=>,																// ACTUAL POSITION
+	Actual_velocity=> , 																// ACTUAL VELOCITY
+	Actual_Torque=> );																	// ACTUAL TORQUE
+	
+OP10_SEC_BDY_GPR(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset , 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE  , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= OP10_BDY_GRP_SEC, 
+	bHome:= OP10_SRV_SCND_PCKBDY_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10_SRV_SCND_PCKBDY_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10_SRV_SCND_PCKBDY_STUS,
+	sAxisState=>OP10_SRV_SCND_PCKBDY_CNT.Axis_State , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10_SRV_SCND_PCKBDY_CNT.Axis_In_Pos, 
+	Actual_position=>, 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+
+
+///////////////////////////////////		OP10A	///////////////////////////////
+
+
+	
+OP10A_LH_ROTY(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10A_SRV_LH_BDYANG_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety, 
+	Axis:= OP10A_LH_ROTARY, 
+	bHome:= OP10_SRV_FRST_PCKBDY_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10A_SRV_LH_BDYANG_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10A_SRV_LH_BDYANG_STUS, 
+ 	sAxisState=> OP10A_SRV_LH_BDYANG_CNT.Axis_State, 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10A_SRV_LH_BDYANG_CNT.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP10A_RH_ROTY(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10A_SRV_RH_BDYANG_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety , 
+	Axis:= OP10A_RH_ROTARY, 
+	bHome:= OP10A_SRV_RH_BDYANG_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10A_SRV_RH_BDYANG_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10A_SRV_RH_BDYANG_STUS, 
+ 	sAxisState=> , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10A_SRV_RH_BDYANG_CNT.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP10A_LH_GRIPR(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10A_SRV_LH_BDYGRP_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= OP10A_LH_GRIPPER, 
+	bHome:= OP10A_SRV_LH_BDYGRP_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10A_SRV_LH_BDYGRP_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10A_SRV_LH_BDYGRP_STUS, 
+ 	sAxisState=> OP10A_LH_GRIPR_fb, 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10A_SRV_LH_BDYGRP_CNT.Axis_In_Pos, 
+	Actual_position=>, 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP10A_RH_GRIPR(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10A_SRV_RH_BDYGRP_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= OP10A_RH_GRIPPER, 
+	bHome:= OP10A_SRV_RH_BDYGRP_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10A_SRV_RH_BDYGRP_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10A_SRV_RH_BDYGRP_STUS, 
+ 	sAxisState=> , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10A_SRV_RH_BDYGRP_CNT.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+
+	
+OP10A_CONVEYOR(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ, 
+	bErrorReset:=  MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED, 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10A_SRV_O_CNVY_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= OP10A_CONVRY, 
+	HME_WRITE_ADD:= 16#5002,	
+	bHome:= OP10A_SRV_O_CNVY_CNT.Bsethome, 
+	bSetPosition:= OP10A_SRV_O_CNVY_CNT.BsetPos, 
+	bMoveAbsolute:= OP10A_SRV_O_CNVY_CNT.ABSmove_Start, 
+	bMoveRelative:= OP10A_SRV_O_CNVY_CNT.RELmove_Start , 
+	bMoveTorque:= OP10A_SRV_O_CNVY_CNT.Torque_mode_Start, 
+	stManualModeAxis:= OP10A_SRV_O_CNVY_STUS , 
+	bmove_home:= OP10A_SRV_O_CNVY_CNT.Axis_Home_Cmd, 
+	sAxisState=> , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> , 
+	Actual_position=> , 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+	
+	
+	
+	
+	
+//////////////////////////////////////	OP10B	///////////////////////////////////////////////////////
+
+
+OP10B_LH_ROTY(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10B_SRV_LH_BDYANG_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= OP10B_LH_ROTARY, 
+	bHome:= OP10B_SRV_LH_BDYANG_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10B_SRV_LH_BDYANG_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10B_SRV_LH_BDYANG_STUS, 
+	sAxisState=> , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10B_SRV_LH_BDYANG_CNT.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP10B_RH_ROTY(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10B_SRV_RH_BDYANG_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety , 
+	Axis:= OP10B_RH_ROTARY, 
+	bHome:= OP10B_SRV_RH_BDYANG_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10B_SRV_RH_BDYANG_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10B_SRV_RH_BDYANG_STUS, 
+	sAxisState=> , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10B_SRV_RH_BDYANG_CNT.Axis_In_Pos, 
+	Actual_position=>,
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP10B_LH_GRIPR(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10B_SRV_LH_BDYGRP_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= OP10B_LH_GRIPPER, 
+	bHome:= OP10B_SRV_LH_BDYGRP_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10B_SRV_LH_BDYGRP_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10B_SRV_LH_BDYGRP_STUS, 
+ 	sAxisState=> OP10B_LH_GRIPR_fb, 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10B_SRV_LH_BDYGRP_CNT.Axis_In_Pos , 
+	Actual_position=>, 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+OP10B_RH_GRIPR(
+	bAxis1_Ref_Switch:= , 
+	bInit:= OP10_SRV_BLCK_INTZ , 
+	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bEnable:= Servo_Enable AND NOT OP10A_ERROR_ACTIVE , 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= OP10B_SRV_RH_BDYGRP_CNT.Position, 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety, 
+	Axis:= OP10B_RH_GRIPPER, 
+	bHome:= OP10B_SRV_RH_BDYGRP_CNT.Axis_Home_Cmd, 
+	bSetPosition:= FESTO_NOT_NEED , 
+	bMoveAbsolute:= OP10B_SRV_RH_BDYGRP_CNT.ABSmove_Start, 
+	bMoveRelative:= NOT_REQ , 
+	bMoveTorque:= NOT_REQ , 
+	stManualModeAxis:= OP10B_SRV_RH_BDYGRP_STUS, 
+ 	sAxisState=> OP10B_SRV_RH_BDYGRP_CNT.Axis_State, 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> OP10B_SRV_RH_BDYGRP_CNT.Axis_In_Pos , 
+	Actual_position=>, 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+	
+OP10B_CONVEYOR(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:= Servo_Reset , 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED, 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= OP10B_CONVRY, 
+	HME_WRITE_ADD:= 16#5003,	
+	bHome:= OP10B_SRV_O_CNVY_CNT.Bsethome , 
+	bSetPosition:= OP10B_SRV_O_CNVY_CNT.BsetPos, 
+	bMoveAbsolute:= OP10B_SRV_O_CNVY_CNT.ABSmove_Start, 
+	bMoveRelative:= OP10B_SRV_O_CNVY_CNT.RELmove_Start, 
+	bMoveTorque:= OP10B_SRV_O_CNVY_CNT.Torque_mode_Start, 
+	stManualModeAxis:= OP10B_SRV_O_CNVY_STUS, 
+	bmove_home:= OP10B_SRV_O_CNVY_CNT.Axis_Home_Cmd, 
+	sAxisState=>OP10B_SRV_O_CNVY_CNT.Axis_State , 
+	bAxis_ready=> , 
+	bAxisInPosition=> , 
+	bAxisError=> , 
+	bAxisEnabled=> , 
+	bAxisHomed=> , 
+	bSetPositionDone=> , 
+	bHaltDone=> , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> , 
+	bABS_Pos_done=> , 
+	Actual_position=> , 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+
+	
+	
+	 OP10A_SRV_LH_BDYGRP_STUS.targetVelocity 			:= 5;
+	 OP10A_SRV_RH_BDYGRP_STUS.targetVelocity			:= 5;
+	 OP10A_SRV_LH_BDYANG_STUS.targetVelocity            := 30;
+	 OP10A_SRV_RH_BDYANG_STUS.targetVelocity            := 30;
+	 OP10B_SRV_LH_BDYGRP_STUS.targetVelocity            := 5;
+	 OP10B_SRV_RH_BDYGRP_STUS.targetVelocity            := 5;
+	 OP10B_SRV_LH_BDYANG_STUS.targetVelocity            := 30;
+	 OP10B_SRV_RH_BDYANG_STUS.targetVelocity            := 30;
+	 OP10_SRV_FRST_PCKBDY_STUS.targetVelocity		    :=50;
+	 OP10_SRV_SCND_PCKBDY_STUS.targetVelocity			:=50;
+	 OP10A_SRV_O_CNVY_STUS.targetVelocity				:=100;
+	 OP10B_SRV_O_CNVY_STUS.targetVelocity				:=100;]]></ST>
+    </Implementation>
+    <LineIds Name="OP10_SERVO">
+      <LineId Id="3" Count="255" />
+      <LineId Id="260" Count="40" />
+      <LineId Id="302" Count="17" />
+      <LineId Id="703" Count="1" />
+      <LineId Id="320" Count="0" />
+      <LineId Id="706" Count="1" />
+      <LineId Id="705" Count="0" />
+      <LineId Id="321" Count="162" />
+      <LineId Id="688" Count="0" />
+      <LineId Id="484" Count="0" />
+      <LineId Id="715" Count="15" />
+      <LineId Id="842" Count="0" />
+      <LineId Id="731" Count="23" />
+      <LineId Id="708" Count="0" />
+      <LineId Id="713" Count="0" />
+      <LineId Id="709" Count="3" />
+      <LineId Id="689" Count="1" />
+      <LineId Id="692" Count="0" />
+      <LineId Id="691" Count="0" />
+      <LineId Id="485" Count="161" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="683" Count="0" />
+      <LineId Id="756" Count="0" />
+      <LineId Id="758" Count="15" />
+      <LineId Id="841" Count="0" />
+      <LineId Id="774" Count="23" />
+      <LineId Id="757" Count="0" />
+      <LineId Id="684" Count="3" />
+      <LineId Id="700" Count="0" />
+      <LineId Id="693" Count="6" />
+      <LineId Id="840" Count="0" />
+      <LineId Id="843" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

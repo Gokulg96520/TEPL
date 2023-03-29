@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP140_HMI_GVL" Id="{40db0daa-75dd-477b-976c-0d109ab3f098}">
+    <Declaration><![CDATA[//{attribute 'qualified_only'}
+VAR_GLOBAL
+	
+
+OP140_HMI_Reset							:BOOL;
+SR140_Vert_Servo_Ctrl_3					:Servo_Control;
+SR140_HMI_Vert_Servo_MC3				:stManualModeAxis;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

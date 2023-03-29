@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="In_Range" Id="{c95c3e3a-6d5f-49ab-a66a-d274a80839c3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION In_Range : BOOL
+VAR_INPUT
+	value,setvalue,tolerance:LREAL;
+END_VAR
+VAR
+	low: LREAL:= setvalue-tolerance;
+	high:LREAL:= setvalue+tolerance;;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (value>=low) AND (value<=high) THEN
+	In_Range:=TRUE;
+ELSE
+	In_Range:=FALSE;
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="In_Range">
+      <LineId Id="3" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

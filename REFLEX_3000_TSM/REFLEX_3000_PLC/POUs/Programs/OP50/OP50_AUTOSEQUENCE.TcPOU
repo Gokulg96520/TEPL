@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP50_AUTOSEQUENCE" Id="{0b8e818f-8aa6-4af7-9888-ca962721a986}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP50_AUTOSEQUENCE
+VAR
+	OP50_Oring_OK 	: BOOL;
+	MOVER_OK		: BOOL;
+	FIXTURE_LH		: INT;
+	FIXTURE_RH 		: INT;
+	del : ton;
+	tmp :BOOL;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// AUTO MODE
+IF (NOT OP50_AutoSelected OR  OP50_ErrorActive OR OP50_HomeRunning ) THEN
+	OP50_AutoRunning:= FALSE;
+	OP50_AutoSeq:= 10;
+END_IF	
+
+CASE OP50_AutoSeq OF
+	    10: IF (OP50_AutoSelected) THEN		// Check Automode Selected
+				OP50_AutoSeq:=20;
+	        END_IF
+		
+	    20:IF ( NOT OP50_ErrorActive) THEN		//Check No error
+		       OP50_AutoSeq:=50;
+      	   END_IF
+		   
+      	30:IF (NOT OP50_HomeRunning) THEN		//Check No Homerunning
+      		   OP50_AutoSeq :=40;
+      	   END_IF
+		   
+        40:IF (OP50_Main.OP50_Modeselection_FB.TempHomeOK)THEN	//Check Machine in Home
+      		   OP50_AutoSeq:= 50;
+      	   END_IF
+		   
+      	50:IF ( NOT OP50_OperationCompleted) THEN		// Check Operation Completed Reset
+      		   OP50_AutoSeq:=60;
+      	   END_IF
+		   
+		60:IF  ( AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP50_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		    OP50_GVL.OP50_HomeConditionOK:=TRUE;
+	 			IF( OP50_Main.OP50_Modeselection_FB.HomeConditionOK AND OP50_AutoSelected) THEN
+					OP50_GVL.OP50_AutoRunning:=TRUE;
+					OP50_GVL.OP50_StepRunning:= FALSE;
+				
+				ELSIF (OP50_Main.OP50_Modeselection_FB.HomeConditionOK AND OP50_StepSelected) THEN
+					OP50_GVL.OP50_AutoRunning:=FALSE;
+					OP50_GVL.OP50_StepRunning:= TRUE;
+				END_IF;
+		  END_IF
+		   IF ((OP50_AutoRunning OR OP50_StepRunning) AND OP50_StartEnable) THEN
+				OP50_AutoSeq:= 70;
+		   END_IF	
+		   
+		 70 : //MOVING HORIZONTAL SERVO TO PICK POSITION
+			  IF (OP50_HORI_SERVO_ON_SFE_WRK OR OP50_HORI_SERVO_ON_HOME OR OP50_HORI_SERVO_ON_WRK_PLACE )AND OP50_HORI_SERVO_POS_DONE AND NOT SR50_HORI_servo_ctrl.ABSmove_Start THEN 
+	           MOVER_OK := FALSE;
+			   SR50_Hori_servo_ctrl.Position:=OP50_HORI_SERVO_PICK_POS;
+			   tmp:=TRUE;
+			   IF del.Q THEN
+              	 OP50_AutoSeq:=80;
+			   END_IF 			  
+	          END_IF
+			 
+		 80 :  SR50_HORI_servo_ctrl.ABSmove_Start := TRUE;     //HORIZONTAL SERVO MOVING
+		       IF OP50_HORI_SERVO_ON_WRK_PICK THEN
+				   SR50_HORI_servo_ctrl.ABSmove_Start := FALSE;
+				   OP50_AutoSeq:=82;
+			   END_IF
+		
+	  	82 :  OP50_Gripper_LH_Close:=TRUE;  //CHECKING GRIPPER STATE BEFORE GRIPPING
+			  OP50_Gripper_RH_Close:=TRUE;
+			  IF NOT OP50_Gripper_LH_State AND NOT OP50_Gripper_RH_State THEN
+				   OP50_AutoSeq:=85;
+			  END_IF
+			   
+		85:	   // MOVING VERTICAL SERVO TO PICK POSITION
+               IF  OP50_HORI_SERVO_ON_WRK_PICK AND (OP50_VERT_SERVO_ON_SFE_WRK OR OP50_VERT_SERVO_ON_HOME) AND OP50_VERT_SERVO_POS_DONE AND NOT SR50_VERT_servo_ctrl.ABSmove_Start THEN
+				   SR50_Vert_servo_ctrl.Position:=OP50_VERT_SERVO_PICK_POS;
+			   tmp:=TRUE;
+			   IF del.Q THEN
+              	 OP50_AutoSeq:=90;
+			   END_IF 				   
+			   END_IF
+			   
+			   
+		90 :  IF OP50_pick_ready THEN  // WAITING FOR O-RING TO BE OK AND THEN MOVING THE VERTICAL SERVO
+			 	SR50_VERT_servo_ctrl.ABSmove_Start := TRUE;
+				OP50_AutoSeq:=100;
+		       END_IF
+			   
+			   
+	   100 : IF OP50_VERT_SERVO_ON_WRK_PICK AND NOT SR50_VERT_servo_ctrl.ABSmove_Start THEN
+				   SR50_VERT_servo_ctrl.ABSmove_Start := FALSE;
+				   SR50_Vert_servo_ctrl.Position:=OP50_VERT_SERVO_SFE_WRK_POS; // FEEDING SAFE-WORK POSITION TO VERTICAL SERVO
+			   tmp:=TRUE;
+			   IF del.Q THEN
+              	 OP50_AutoSeq:=110;
+			   END_IF 				   
+			 END_IF	   
+			 
+      110:    //PICKING O-RING
+    		   	OP50_Gripper_LH_Open:=TRUE;
+    		   	OP50_Gripper_RH_Open:=TRUE;					
+    		    OP50_AutoSeq:=120;
+    		
+      120: OP50_AutoSeq:=130;
+    		   
+      130: SR50_VERT_servo_ctrl.ABSmove_Start := TRUE;	   //MOVING VERTICL SERVO TO SAFE-WORK
+            IF OP50_VERT_SERVO_ON_SFE_WRK  THEN
+    	      SR50_VERT_servo_ctrl.ABSmove_Start := FALSE;
+			  OP50_pick_done:=TRUE;
+              OP50_AutoSeq:=140;   
+    		END_IF
+    		   
+      140:  IF OP50_Gripper_LH_State AND OP50_Gripper_RH_State THEN   // CHECKING GRIPPER STATE BEFORE PLACING 
+    		      OP50_AutoSeq:=150;
+    		ELSE    
+    			  OP50_AutoSeq:=220;
+    	    END_IF
+    	   
+    		  
+       150:  IF OP50_VERT_SERVO_ON_SFE_WRK  THEN // FEEDING PLACE POSITION TO HORIZONTAL SERVO
+    		   SR50_Hori_servo_ctrl.Position:=OP50_HORI_SERVO_PLACE_POS;
+			   tmp:=TRUE;
+			   IF del.Q THEN
+              	 OP50_AutoSeq:=160;
+			   END_IF 				 
+    		 END_IF
+    		   
+       160:  SR50_HORI_servo_ctrl.ABSmove_Start := TRUE;    // MOVING HORIZONTAL SERVO TO PLACE POSITION
+    		   IF OP50_HORI_SERVO_ON_WRK_PLACE THEN
+    			 SR50_HORI_servo_ctrl.ABSmove_Start := FALSE;
+    			 OP50_AutoSeq:=170;
+    		   END_IF
+       
+       170: //WAITING FOR MOVER TO BE OK 
+    		IF OP50_HORI_SERVO_ON_WRK_PLACE AND NOT SR50_VERT_servo_ctrl.ABSmove_Start AND OP50_VERT_SERVO_ON_SFE_WRK AND MOVER_OK THEN
+    	   		SR50_Vert_servo_ctrl.Position:=OP50_VERT_SERVO_PLACE_POS;
+			   tmp:=TRUE;
+			   IF del.Q THEN
+              	 OP50_AutoSeq:=180;
+			   END_IF 			
+      		END_IF
+    		
+       180: SR50_VERT_servo_ctrl.ABSmove_Start := TRUE; //MOVING VERTICAL SERVO TO PLACE POSITION
+    		IF OP50_VERT_SERVO_ON_WRK_PLACE THEN
+    			SR50_VERT_servo_ctrl.ABSmove_Start := FALSE;
+    			OP50_AutoSeq:=190;	
+    		END_IF	
+    
+       190:	IF FIXTURE_LH =99 THEN //PLACING THE O-RING  && RESULT UPDATION
+    			 OP50_Gripper_LH_Close:=TRUE; 
+    		END_IF	 
+    		IF FIXTURE_RH =99 THEN
+    			 OP50_Gripper_RH_Close:=TRUE;
+    		END_IF
+    		  OP50_AutoSeq:=200;
+    	
+       200:  //MOVING BACK TO VERTICAL SERVO SAFE POSITION
+    		 IF OP50_VERT_SERVO_ON_WRK_PLACE AND NOT SR50_VERT_servo_ctrl.ABSmove_Start THEN
+    		   SR50_Vert_servo_ctrl.Position:=OP50_VERT_SERVO_SFE_WRK_POS;
+			   tmp:=TRUE;
+			   IF del.Q THEN
+              	 OP50_AutoSeq:=210;
+			   END_IF 			   
+    		 END_IF 
+    		 
+       210:	 SR50_VERT_servo_ctrl.ABSmove_Start := TRUE;  //PROCEEDING FOR NEXT CYCLE          
+              IF OP50_VERT_SERVO_ON_SFE_WRK  THEN
+    			  SR50_VERT_servo_ctrl.ABSmove_Start := FALSE;			  
+    			  IF OP50_Gripper_LH_State OR OP50_Gripper_RH_State THEN
+    		  		OP50_AutoSeq:=220;
+    			  ELSE  				
+                  	OP50_AutoSeq:=70; 
+    			  END_IF  			  
+    		  END_IF
+    		  
+       220:  IF OP50_VERT_SERVO_ON_SFE_WRK AND NOT SR50_HORI_servo_ctrl.ABSmove_Start AND (OP50_HORI_SERVO_ON_WRK_PLACE OR OP50_HORI_SERVO_ON_WRK_Pick)  THEN
+    		  SR50_Hori_servo_ctrl.Position:=OP50_HORI_SERVO_SFE_WRK_POS;
+			   tmp:=TRUE;
+			   IF del.Q THEN
+              	 OP50_AutoSeq:=240;
+			   END_IF 			  
+    		 END_IF  
+    	
+       240: SR50_HORI_servo_ctrl.ABSmove_Start := TRUE;
+            IF OP50_HORI_SERVO_ON_SFE_WRK THEN
+    	  	   SR50_HORI_servo_ctrl.ABSmove_Start := FALSE;
+      		   OP50_Gripper_RH_Close:=TRUE;	
+    		   OP50_Gripper_LH_Close:=TRUE; 			   
+      		 END_IF
+    		 IF NOT OP50_Gripper_LH_State AND NOT OP50_Gripper_RH_State THEN
+    		   OP50_AutoSeq:=70;
+    		 END_IF
+
+END_CASE
+
+
+
+del(IN:=tmp,PT:=T#1S);
+IF del.Q THEN
+	tmp:=FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="OP50_AUTOSEQUENCE">
+      <LineId Id="3" Count="190" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

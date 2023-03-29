@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP10B_AUTO" Id="{e765b9af-b358-4d23-b33f-ed272fb0f526}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP10B_AUTO
+VAR
+	OP10B_CYL_IP					: OP10_ORNG_CYL_IP;
+	OP10B_CYL_OP					: OP10_ORNG_CYL_OP;
+	OP10B_PNP_FB					: OP10_ORING_PNP;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+
+
+
+
+OP10B_PNP_FB(
+	AUTO:= , 
+	MANUAL:= MACHINE_MANUAL, 
+	ERROR:= MACHINE_ERR, 
+	START_ENABLE:= MACHINE_ENABLE, 
+	ROBO_MVED_SFE:= , 
+	LH_CMR_OK:= , 
+	LH_CMR_NOK:= , 
+	RH_CMR_OK:= , 
+	RH_CMR_NOK:= , 
+	ROBO_REACHED:= , 
+	CYL_INPUTS:= OP10B_CYL_IP, 
+	DELY_TIME:= , 
+	O_RING_PLCED=> , 
+	RDY_TO_PICK_ORNG=> , 
+	LH_REJ_DONE=> , 
+	RH_REJ_DONE=> , 
+	CYL_OUTPUTS=> OP10B_CYL_OP);
+
+// OP10B AUTO LOGIC CYLINDERS MAPPING 
+
+									(*SENSOR_I/P*)
+	OP10B_CYL_IP.DEGREE_0				:=;
+	OP10B_CYL_IP.DEGREE_180				:=;
+    OP10B_CYL_IP.HORIZ_CYL_SNR1         :=;
+    OP10B_CYL_IP.HORIZ_CYL_SNR2         :=;
+    OP10B_CYL_IP.LH_O_GRP_SNR1       	:=;
+    OP10B_CYL_IP.LH_O_GRP_SNR2          :=;
+    OP10B_CYL_IP.LH_O_PUSH_SNR1         :=;
+    OP10B_CYL_IP.LH_O_PUSH_SNR2         :=;
+    OP10B_CYL_IP.LH_REJ_SNR1            :=;
+    OP10B_CYL_IP.LH_REJ_SNR2            :=;
+	OP10B_CYL_IP.RH_O_GRP_SNR1			:=;
+    OP10B_CYL_IP.RH_O_GRP_SNR2          :=;
+    OP10B_CYL_IP.RH_O_PUSH_SNR1         :=;
+    OP10B_CYL_IP.RH_O_PUSH_SNR2         :=;
+    OP10B_CYL_IP.RH_REJ_SNR1            :=;
+    OP10B_CYL_IP.RH_REJ_SNR2            :=;
+    OP10B_CYL_IP.VERT_CYL_SNR1          :=;
+    OP10B_CYL_IP.VERT_CYL_SNR2          :=;
+	
+									(*CYLINDER_AUTO_O/P*)	
+	
+	OP10B_ALL_CYL_HOME_FB				:=OP10B_CYL_OP.ALL_HOME			;
+	OP10B_O_0DEGRE_AUTOCMD1				:=OP10B_CYL_OP.DEGREE_AUT_CMD1	;
+	OP10B_O_180DEGRE_AUTOCMD2   		:=OP10B_CYL_OP.DEGREE_AUT_CMD2    ;
+	OP10B_O_HORZ_AUTOCMD1    			:=OP10B_CYL_OP.HORIZ_CYL_AUT_CMD1 ;
+	OP10B_O_HORZ_AUTOCMD2    			:=OP10B_CYL_OP.HORIZ_CYL_AUT_CMD2 ;
+	OP10B_A_O_LHGRIP_ONOFF    			:=OP10B_CYL_OP.LH_O_GRP_VALVE_ON  ;
+	OP10B_A_O_LHPUSH_CYL    			:=OP10B_CYL_OP.LH_O_PSH_VALVE_ON  ;
+	OP10B_A_LH_REJ_HOME	    			:=OP10B_CYL_OP.LH_REJ_CMD1        ;
+	OP10B_A_LH_REJ_WRK	    			:=OP10B_CYL_OP.LH_REJ_CMD2        ;
+	OP10B_A_O_RHGRIP_ONOFF    			:=OP10B_CYL_OP.RH_O_GRP_VALVE_ON  ;
+	OP10B_A_O_RHPUSH_CYL    			:=OP10B_CYL_OP.RH_O_PSH_VALVE_ON  ;
+	OP10B_A_RH_REJ_HOME	    			:=OP10B_CYL_OP.RH_REJ_CMD1        ;
+	OP10B_A_RH_REJ_WRK	    			:=OP10B_CYL_OP.RH_REJ_CMD2        ;
+	OP10B_O_VERT_AUTOCMD1    			:=OP10B_CYL_OP.VERT_CYL_AUT_CMD1  ;
+	OP10B_O_VERT_AUTOCMD2    			:=OP10B_CYL_OP.VERT_CYL_AUT_CMD2  ;
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP10B_AUTO">
+      <LineId Id="3" Count="63" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP40_Recipe" Id="{1fc1b693-668b-4f14-9199-c89713b4cd3c}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	OP40_DLY_BEF_MEAS : INT;
+	OP40_VERT_SERVO_WORK_POS : REAL;
+	OP40_VERT_SERVO_SFE_WORK_POS : REAL;	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP80_AUTOSEQUENCE" Id="{0ed9f4cc-886b-4926-8091-06cc86faab3a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP80_AUTOSEQUENCE
+VAR
+
+//INT
+
+	OP80_FIXTURE_2					: INT;
+	OP80_FIXTURE_1					: INT;	
+	
+// TIMER
+	OP80_AFT_WRK_POS : TON;
+	
+	check: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF (NOT OP80_AutoSelected) OR (OP80_ErrorActive OR OP80_HomeRunning ) THEN
+	OP80_AutoRunning:= FALSE;
+	OP80_STN_ENABLE:=FALSE;
+	OP80_AutoSeq:= 10;
+END_IF	
+
+
+CASE OP80_AutoSeq OF
+		
+		10: IF (OP80_AutoSelected) THEN		// Check Automode Selected
+				OP80_AutoSeq:=20;
+	        END_IF
+		
+	    20:IF ( NOT OP80_ErrorActive) THEN		//Check No error
+		       OP80_AutoSeq:=30;
+      	   END_IF
+		   
+      	30:IF (NOT OP80_HomeRunning) THEN		//Check No Homerunning
+      		   OP80_AutoSeq :=40;
+      	   END_IF
+		   
+        40:IF (OP80_Main.OP80_Modeselection_FB.TempHomeOK)THEN	//Check Machine in Home
+      		   OP80_AutoSeq:= 50;
+      	   END_IF
+		   
+      	50:IF ( NOT OP80_OperationCompleted) THEN		// Check Operation Completed Reset
+      		   OP80_AutoSeq:=60;
+      	   END_IF
+		   
+      	70:  // SERVO POSITION SAFE CHECK
+	       IF (OP80_GVL.OP80_SERVO_ON_SFE_WRK OR OP80_GVL.OP80_SERVO_ON_HOME) AND NOT SR80_Vert_servo_ctrl.ABSmove_Start THEN 
+	        SR80_Vert_servo.fTargetPosition:=OP80_GVL.OP80_VERT_SERVO_WRK_POS;   
+	        OP80_AutoSeq:=75;
+	       END_IF
+		   
+	   60:IF  (OP60_GVL.Automatic_Run OR (NOT OP60_GVL.Automatic_Run AND OP80_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		    OP80_HomeConditionOK:=TRUE;
+	 			IF( OP80_Main.OP80_Modeselection_FB.HomeConditionOK AND OP80_AutoSelected) THEN
+					OP80_AutoRunning:=TRUE;
+					OP80_StepRunning:= FALSE;		
+				ELSIF (OP80_Main.OP80_Modeselection_FB.HomeConditionOK AND OP80_StepSelected) THEN
+					OP80_AutoRunning:=FALSE;
+					OP80_StepRunning:= TRUE;
+				END_IF;
+		  END_IF
+		  
+		  IF ((OP80_AutoRunning OR OP80_StepRunning) AND OP80_StartEnable) THEN
+			OP80_AutoSeq:= 70;
+		  END_IF	
+		   
+		75: // WAITING FOR MOVER AND MOVING SERVO TO TARGET POSITION
+			IF OP80_GVL.OP80_STN_ENABLE AND SR80_Vert_servo.fTargetPosition=OP80_GVL.OP80_VERT_SERVO_WRK_POS THEN
+			 SR80_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+			 OP80_AutoSeq:=80;
+			END_IF
+			
+		80:  IF  OP80_SERVO_POS_DONE AND OP80_SERVO_ON_WRK THEN
+			  SR80_Vert_servo_ctrl.ABSmove_Start:=FALSE;
+			END_IF
+			  OP80_AutoSeq:=90;
+
+		
+		90:   OP80_AutoSeq:=100;
+	
+			
+		100: // START THE SPINNER OK COMPONENT FIXTURE
+			IF OP80_AFT_WRK_POS.Q THEN	
+		//	 SR80_Vert_servo_ctrl.ABSmove_Start:=FALSE;		 
+			 IF OP80_FIXTURE_1=9999 THEN
+			  IF In_Range(OP80_LH_LVDT_VALUE,OP80_SET_LVDT_VALUE,OP80_LVDT_TOLERANCE) THEN
+				  OP80_LH_LVDT_OK := 1;
+				  OP80_LH_LVDT_NOK := 0;				  				  
+			  ELSE
+				  OP80_LH_LVDT_NOK := 1;
+				  OP80_LH_LVDT_OK := 0;
+			  END_IF  
+			 END_IF
+			 IF OP80_FIXTURE_2=9999 THEN
+			  IF In_Range(OP80_RH_LVDT_VALUE,OP80_SET_LVDT_VALUE,OP80_LVDT_TOLERANCE) THEN
+				  OP80_RH_LVDT_OK := 1;
+				  OP80_RH_LVDT_NOK := 0;			  				  
+			  ELSE
+				  OP80_RH_LVDT_NOK := 1;
+				  OP80_RH_LVDT_OK := 0;
+			  END_IF			  
+			 END_IF
+			IF NOT SR80_Vert_servo_ctrl.ABSmove_Start THEN
+				SR80_Vert_servo.fTargetPosition:=OP80_VERT_SERVO_SFE_WRK_POS;
+			END_IF	
+			 OP80_AutoSeq:=110;
+		 	END_IF
+			
+		110: // SERVO MOVE TO SAFE WORK POSITION	 
+			 IF NOT SR80_Vert_servo_ctrl.ABSmove_Start AND SR80_Vert_servo.fTargetPosition=OP80_VERT_SERVO_SFE_WRK_POS THEN
+				SR80_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+			END_IF
+			IF SR80_Vert_servo_ctrl.ABSmove_Start THEN
+				OP80_AutoSeq:=120;
+			END_IF
+				
+		120: // SERVO DONE
+			IF  OP80_SERVO_POS_DONE AND OP80_SERVO_ON_SFE_WRK THEN
+			 SR80_Vert_servo_ctrl.ABSmove_Start:=FALSE;
+			 OP80_AutoSeq:=70;
+			 OP80_STN_ENABLE:=FALSE;				
+			END_IF			
+END_CASE 
+
+
+OP80_AFT_WRK_POS(IN:=(OP80_SERVO_ON_WRK AND (OP80_AutoSeq=100)), PT:=INT_TO_TIME(OP80_DLY_AFT_SFE_WRK) , Q=> , ET=> );
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP80_AUTOSEQUENCE">
+      <LineId Id="3" Count="110" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

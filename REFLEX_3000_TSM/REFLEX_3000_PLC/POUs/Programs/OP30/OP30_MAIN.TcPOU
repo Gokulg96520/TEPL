@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP30_MAIN" Id="{31c79d8c-32da-4354-a3ea-535813c7937b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP30_MAIN
+VAR
+	OP30_Modeselection_FB: Mode_Selection_Block1;
+	TP_100ms: TP;
+	Pulse_1s: BOOL;
+	Times: LREAL;
+	Pge_NUM : INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+OP30_Manual();
+OP30_AUTOSEQUENCE();
+OP30_CONVEYOR();
+OP30_Error();
+OP30_Initialize_Seq();
+
+//MOdeselection From HMI
+
+IF (OP30_GVL.OP30_HMI_AutoMode AND NOT OP30_GVL.OP30_HMI_ManualMOde AND NOT OP30_GVL.OP30_HMI_StepMode) THEN
+	OP30_Modeselection_FB.ModeWord:=1;
+	ELSIF (NOT OP30_GVL.OP30_HMI_AutoMode AND OP30_GVL.OP30_HMI_ManualMOde AND NOT OP30_GVL.OP30_HMI_StepMode) THEN
+		OP30_Modeselection_FB.ModeWord:=2;
+	ELSIF  (NOT OP30_GVL.OP30_HMI_AutoMode AND NOT OP30_GVL.OP30_HMI_ManualMOde AND  OP30_GVL.OP30_HMI_StepMode) THEN
+		OP30_Modeselection_FB.ModeWord:=3;
+    ELSE   
+		OP30_Modeselection_FB.ModeWord:=0;
+END_IF
+
+(*IF  (OP30_AutoSelected OR OP30_ManualSelected ) AND NOT OP30_ErrorActive AND OP30_Safety_OK THEN
+  SR30_CONV_servo.bEnable:=TRUE;
+  SR30_HORI_servo.bEnable:=TRUE;
+  SR30_VERT_servo.bEnable:=TRUE;
+ELSE 
+  SR30_CONV_servo.bEnable:=FALSE;
+  SR30_HORI_servo.bEnable:=FALSE;
+  SR30_VERT_servo.bEnable:=FALSE;	
+END_IF *)
+
+IF SR30_CONV_servo.bAxisError THEN//OR SR30_HORI_servo.bAxisError OR SR30_VERT_servo.bAxisError THEN
+	OP30_ErrorActive:=TRUE;
+END_IF
+	
+OP30_Modeselection_FB(
+	ModeWord:= , 
+	HomeConditionOK:=OP30_HomeConditionOK , 
+	OperationEnable:=OP30_AutoSelected AND OP30_Safety_OK , 
+	StartPB:=OP30_HMI_Cycle_Start , 
+	SafetyAndNOError:= OP30_Safety_OK, 
+	ModeAck:=TRUE , 
+	HomingINProgress:=OP30_HomeRunning , 
+	TempHomeOK:=OP30_Temp_hmeOK , 
+	ResetPB:= , 
+	AutoSelected=> OP30_AutoSelected, 
+	ManualSelected=> OP30_ManualSelected, 
+	StepSelected=>OP30_StepSelected , 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP30_AutoRunning, 
+	StepRunning:=OP30_StepRunning , 
+	StartEnable:=OP30_StartEnable  , 
+	MachineStop:=OP30_Machine_Stop );
+	
+TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#1S , Q=>Pulse_1s, ET=> );	]]></ST>
+    </Implementation>
+    <LineIds Name="OP30_MAIN">
+      <LineId Id="3" Count="52" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

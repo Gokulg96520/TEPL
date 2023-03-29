@@ -1,0 +1,709 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <FileVersion>1.0.0.0</FileVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{a81aa591-ed6d-4258-9508-024e958901bd}</ProjectGuid>
+    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <DownloadApplicationInfo>true</DownloadApplicationInfo>
+    <WriteProductVersion>true</WriteProductVersion>
+    <GenerateTpy>false</GenerateTpy>
+    <Name>REFLEX_3000_PLC</Name>
+    <ProgramVersion>3.1.4023.0</ProgramVersion>
+    <Application>{ed580957-0227-443e-b558-c3c52f90a3e8}</Application>
+    <TypeSystem>{cf62d344-5f81-49ee-a6b1-f51a4713adb5}</TypeSystem>
+    <Implicit_Task_Info>{f0abfd8a-fce1-4bf9-83f0-6fbed0fdb4ae}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{78b9f11a-2614-4134-9bd4-54741ef59a63}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{e57e4907-e1e9-4af1-b086-ac128262ad50}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{fbbfd65c-3539-4536-981d-0c320b43a01b}</LibraryReferences>
+    <Released>false</Released>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="FB\Axis\ENUM_Axis.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Axis\FB_Axis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Axis\FB_Axis_FESTO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Axis\Servo_Control.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Axis\stManualModeAxis.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cognex_Camera\Acquisition_control.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cognex_Camera\Acquisition_status.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cognex_Camera\FB_Cognex_ProfiNET_1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cognex_Camera\Inspection_control.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cognex_Camera\Inspection_status.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cognex_Camera\UNION_64Byte.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cylinder_Block.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Cylinder_Block_HOMING.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\FB_cycleTime.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\FB_SimClock.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\In_Range.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Mode_Selection_Block1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Pulse_1s.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\RFID\FB_RFID.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\RFID\Head1.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\RFID\HeadData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\RFID\Memory.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\RFID\UNION_RFID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\ROBO_FB.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Scanner\INPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Scanner\OUTPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Scanner\Scanner.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\ENUM_Schunk.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\FB_Schunk.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\FC_Real_Convert.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\iSchunkProcessData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\oSchunkProcessData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\stManualModeAxis_1.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\UNION_iSchunkProcessData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\UNION_oSchunkProcessData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FB\Schunk\UNION_REAL.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PlcTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POU1\Axis_Position_Bias.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POU1\MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GENERAL\GENERAL_VARIABLE.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\GENERAL\IO_Diag.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GENERAL\MODE_SELECTION.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO\OP120_JB_IO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO\OP160_MASTER4_IO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO\OP160_MP_IO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO\OP90_JB_IO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO\OP90_MASTER3_IO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO\OP90_MP_IO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_GVLs\Master3_IO.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_GVLs\Master4_IO.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_GVLs\OP120_JB.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_GVLs\OP160_MP.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_GVLs\OP90_JB.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_GVLs\OP90_MP.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_GVLs\SAFETY_IOs.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\IO_Mapping_OP10JB\IO_OP10A_10B_JB.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\IO_Mapping_OP10JB\IO_OP10_JB_IO.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\IO_mapping_OP10MP\IO_OP10_MP.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\IO_mapping_OP10MP\IO_OP10_PANEL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\OP10_Profinet_IO\Master1_IO.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\OP10_Profinet_IO\Master1_IO_Map.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\OP10_Profinet_IO\MASTER2_IO.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\OP10_Profinet_IO\MASTER2_IO_Map.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\OP160\OP160_Main.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\cylinder_2_pos.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\cylinder_3_pos.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\Cylinder_Block_v1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\cylinder_validation_st.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\offline_fb.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\offline_main.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\POU_1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\servo.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\offline testing\servo_validation.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10A_AUTO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10B_AUTO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_AUTO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_HMI_GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_HOMING.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_SCN_ENB.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_SERVO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP10\OP10_VARIABLE.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_ERROR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_HMI_GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP110\OP110_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\Bypass.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_AutoSequence.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_Error.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_Feed_Conveyor.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_IO_Tag_Link.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_Main.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_Manual.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_OringFeed.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_Recipe.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP120\OP120_Robo_Inputs.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_AutoSequence.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_Error.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_LH_Auto.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_Main.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_Manual.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_Recipe.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP130\OP130_RH_Auto.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\ATEQ_FB.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\ATEQ_LEAK.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\OP140_AutoSequence.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\OP140_Error.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\OP140_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\OP140_HMI_GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\OP140_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\OP140_Main.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP140\OP140_Manual.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP20\OP20_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP20\OP20_ERROR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP20\OP20_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP20\OP20_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP20\OP20_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP20\OP20_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP20\OP20_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_CONVEYOR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_Error.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_HMI_TAGS.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_Initialize_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP30\OP30_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP40\OP40_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP40\OP40_ERROR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP40\OP40_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP40\OP40_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP40\OP40_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP40\OP40_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP40\OP40_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_CONVEYOR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_Error.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_HMI_GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_Initialize_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP50\OP50_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP60\OP60_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP60\OP60_ERROR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP60\OP60_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP60\OP60_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP60\OP60_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP60\OP60_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP60\OP60_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_CONVEYOR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_Error.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_Initialize_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP70\OP70_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_AUTOSEQUENCE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_ERROR.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_HMI_GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_Initialization_Seq.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP80\OP80_Recipe.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP10_90_MODE_TIMER_BLCK.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_AUTO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_CAMERA.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_HMI_GVL.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_HOMING.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_MANUAL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_SCN_ENB.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_SERVO.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Programs\OP90\OP90_VARIABLE.TcGVL">
+      <SubType>Code</SubType>
+      <LinkAlways>true</LinkAlways>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DUTs" />
+    <Folder Include="FB" />
+    <Folder Include="FB\Axis" />
+    <Folder Include="FB\Cognex_Camera" />
+    <Folder Include="FB\RFID" />
+    <Folder Include="FB\Scanner" />
+    <Folder Include="FB\Schunk" />
+    <Folder Include="GVLs" />
+    <Folder Include="POUs" />
+    <Folder Include="POUs\GENERAL" />
+    <Folder Include="POUs\IO" />
+    <Folder Include="POUs\IO_GVLs" />
+    <Folder Include="POUs\IO_Mapping_OP10JB" />
+    <Folder Include="POUs\IO_mapping_OP10MP" />
+    <Folder Include="POUs\OP160" />
+    <Folder Include="POUs\OP10_Profinet_IO" />
+    <Folder Include="POUs\Programs" />
+    <Folder Include="POUs\Programs\offline testing" />
+    <Folder Include="POUs\Programs\OP10" />
+    <Folder Include="POUs\Programs\OP110" />
+    <Folder Include="POUs\Programs\OP120" />
+    <Folder Include="POUs\Programs\OP130" />
+    <Folder Include="POUs\Programs\OP140" />
+    <Folder Include="POUs\Programs\OP20" />
+    <Folder Include="POUs\Programs\OP30" />
+    <Folder Include="POUs\Programs\OP40" />
+    <Folder Include="POUs\Programs\OP50" />
+    <Folder Include="POUs\Programs\OP60" />
+    <Folder Include="POUs\Programs\OP70" />
+    <Folder Include="POUs\Programs\OP80" />
+    <Folder Include="POUs\Programs\OP90" />
+    <Folder Include="VISUs" />
+    <Folder Include="POU1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderReference Include="Festo_HomingLibrary">
+      <DefaultResolution>Festo_HomingLibrary, * (Festo)</DefaultResolution>
+      <Namespace>FestoHomingLib</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Festo_PtP_Base">
+      <DefaultResolution>Festo_PtP_Base, * (Festo)</DefaultResolution>
+      <Namespace>Festo_PtP_Base</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Festo_PtP_CiA402_ETC_CMMT_AS">
+      <DefaultResolution>Festo_PtP_CiA402_ETC_CMMT_AS, * (Festo)</DefaultResolution>
+      <Namespace>Festo_PtP_CiA402_ETC_CMMT_AS</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_EtherCAT">
+      <DefaultResolution>Tc2_EtherCAT, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_EtherCAT</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_MC2">
+      <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_MC2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_MC2_Drive">
+      <DefaultResolution>Tc2_MC2_Drive, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_MC2_Drive</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Standard">
+      <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Standard</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_System">
+      <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_System</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_Utilities">
+      <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Module">
+      <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Module</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Util">
+      <DefaultResolution>Util, * (System)</DefaultResolution>
+      <Namespace>Util</Namespace>
+    </PlaceholderReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="REFLEX_3000_PLC.tmc">
+      <SubType>Content</SubType>
+    </None>
+  </ItemGroup>
+  <ProjectExtensions>
+    <PlcProjectOptions>
+      <XmlArchive>
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
+      <v n="Name">"&lt;ProjectRoot&gt;"</v>
+      <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+        <v>{40450F57-0AA3-4216-96F3-5444ECB29763}</v>
+        <o>
+          <v n="Name">"{40450F57-0AA3-4216-96F3-5444ECB29763}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String" cvt="String">
+            <v>ActiveVisuProfile</v>
+            <v>IR0whWr8bwfwBwAAiD2qpQAAAABVAgAA37x72QAAAAABAAAAAAAAAAEaUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwACTHsAZgA5ADUAYgBiADQAMgA2AC0ANQA1ADIANAAtADQAYgA0ADUALQA5ADQAMAAwAC0AZgBiADAAZgAyAGUANwA3AGUANQAxAGIAfQADCE4AYQBtAGUABDBUAHcAaQBuAEMAQQBUACAAMwAuADEAIABCAHUAaQBsAGQAIAA0ADAAMgA0AC4ANwAFFlAAcgBvAGYAaQBsAGUARABhAHQAYQAGTHsAMQA2AGUANQA1AGIANgAwAC0ANwAwADQAMwAtADQAYQA2ADMALQBiADYANQBiAC0ANgAxADQANwAxADMAOAA3ADgAZAA0ADIAfQAHEkwAaQBiAHIAYQByAGkAZQBzAAhMewAzAGIAZgBkADUANAA1ADkALQBiADAANwBmAC0ANABkADYAZQAtAGEAZQAxAGEALQBhADgAMwAzADUANgBhADUANQAxADQAMgB9AAlMewA5AGMAOQA1ADgAOQA2ADgALQAyAGMAOAA1AC0ANAAxAGIAYgAtADgAOAA3ADEALQA4ADkANQBmAGYAMQBmAGUAZABlADEAYQB9AAoOVgBlAHIAcwBpAG8AbgALBmkAbgB0AAwKVQBzAGEAZwBlAA0KVABpAHQAbABlAA4aVgBpAHMAdQBFAGwAZQBtAE0AZQB0AGUAcgAPDkMAbwBtAHAAYQBuAHkAEAxTAHkAcwB0AGUAbQARElYAaQBzAHUARQBsAGUAbQBzABIwVgBpAHMAdQBFAGwAZQBtAHMAUwBwAGUAYwBpAGEAbABDAG8AbgB0AHIAbwBsAHMAEyhWAGkAcwB1AEUAbABlAG0AcwBXAGkAbgBDAG8AbgB0AHIAbwBsAHMAFCRWAGkAcwB1AEUAbABlAG0AVABlAHgAdABFAGQAaQB0AG8AcgAVIlYAaQBzAHUATgBhAHQAaQB2AGUAQwBvAG4AdAByAG8AbAAWFHYAaQBzAHUAaQBuAHAAdQB0AHMAFwxzAHkAcwB0AGUAbQAYGFYAaQBzAHUARQBsAGUAbQBCAGEAcwBlABkmRABlAHYAUABsAGEAYwBlAGgAbwBsAGQAZQByAHMAVQBzAGUAZAAaCGIAbwBvAGwAGyJQAGwAdQBnAGkAbgBDAG8AbgBzAHQAcgBhAGkAbgB0AHMAHEx7ADQAMwBkADUAMgBiAGMAZQAtADkANAAyAGMALQA0ADQAZAA3AC0AOQBlADkANAAtADEAYgBmAGQAZgAzADEAMABlADYAMwBjAH0AHRxBAHQATABlAGEAcwB0AFYAZQByAHMAaQBvAG4AHhRQAGwAdQBnAGkAbgBHAHUAaQBkAB8WUwB5AHMAdABlAG0ALgBHAHUAaQBkACBIYQBmAGMAZAA1ADQANAA2AC0ANAA5ADEANAAtADQAZgBlADcALQBiAGIANwA4AC0AOQBiAGYAZgBlAGIANwAwAGYAZAAxADcAIRRVAHAAZABhAHQAZQBJAG4AZgBvACJMewBiADAAMwAzADYANgBhADgALQBiADUAYwAwAC0ANABiADkAYQAtAGEAMAAwAGUALQBlAGIAOAA2ADAAMQAxADEAMAA0AGMAMwB9ACMOVQBwAGQAYQB0AGUAcwAkTHsAMQA4ADYAOABmAGYAYwA5AC0AZQA0AGYAYwAtADQANQAzADIALQBhAGMAMAA2AC0AMQBlADMAOQBiAGIANQA1ADcAYgA2ADkAfQAlTHsAYQA1AGIAZAA0ADgAYwAzAC0AMABkADEANwAtADQAMQBiADUALQBiADEANgA0AC0ANQBmAGMANgBhAGQAMgBiADkANgBiADcAfQAmFk8AYgBqAGUAYwB0AHMAVAB5AHAAZQAnVFUAcABkAGEAdABlAEwAYQBuAGcAdQBhAGcAZQBNAG8AZABlAGwARgBvAHIAQwBvAG4AdgBlAHIAdABpAGIAbABlAEwAaQBiAHIAYQByAGkAZQBzACgQTABpAGIAVABpAHQAbABlACkUTABpAGIAQwBvAG0AcABhAG4AeQAqHlUAcABkAGEAdABlAFAAcgBvAHYAaQBkAGUAcgBzACs4UwB5AHMAdABlAG0ALgBDAG8AbABsAGUAYwB0AGkAbwBuAHMALgBIAGEAcwBoAHQAYQBiAGwAZQAsEnYAaQBzAHUAZQBsAGUAbQBzAC1INgBjAGIAMQBjAGQAZQAxAC0AZAA1AGQAYwAtADQAYQAzAGIALQA5ADAANQA0AC0AMgAxAGYAYQA3ADUANgBhADMAZgBhADQALihJAG4AdABlAHIAZgBhAGMAZQBWAGUAcgBzAGkAbwBuAEkAbgBmAG8AL0x7AGMANgAxADEAZQA0ADAAMAAtADcAZgBiADkALQA0AGMAMwA1AC0AYgA5AGEAYwAtADQAZQAzADEANABiADUAOQA5ADYANAAzAH0AMBhNAGEAagBvAHIAVgBlAHIAcwBpAG8AbgAxGE0AaQBuAG8AcgBWAGUAcgBzAGkAbwBuADIMTABlAGcAYQBjAHkAMzBMAGEAbgBnAHUAYQBnAGUATQBvAGQAZQBsAFYAZQByAHMAaQBvAG4ASQBuAGYAbwA0MEwAbwBhAGQATABpAGIAcgBhAHIAaQBlAHMASQBuAHQAbwBQAHIAbwBqAGUAYwB0ADUaQwBvAG0AcABhAHQAaQBiAGkAbABpAHQAeQDQAAIaA9ADAS0E0AUGGgfQBwgaAUUHCQjQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtDtAPAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60BAAAA0A0BLRHQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0S0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAUAAAA0AwLrQIAAADQDQEtE9APAS0Q0AAJGgRFCgsEAwAAAAUAAAANAAAAAAAAANAMC60CAAAA0A0BLRTQDwEtENAACRoERQoLBAMAAAAFAAAADQAAAAAAAADQDAutAgAAANANAS0V0A8BLRDQAAkaBEUKCwQDAAAABQAAAA0AAAAAAAAA0AwLrQIAAADQDQEtFtAPAS0X0AAJGgRFCgsEAwAAAAUAAAANAAAAKAAAANAMC60EAAAA0A0BLRjQDwEtENAZGq0BRRscAdAAHBoCRR0LBAMAAAAFAAAADQAAAAAAAADQHh8tINAhIhoCRSMkAtAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAAAAANADAS0n0CgBLRHQKQEtENAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAQAAANADAS0n0CgBLRHQKQEtEJoqKwFFAAEC0AABLSzQAAEtF9AAHy0t0C4vGgPQMAutAQAAANAxC60XAAAA0DIarQDQMy8aA9AwC60CAAAA0DELrQMAAADQMhqtANA0Gq0A0DUarQA=</v>
+          </d>
+        </o>
+      </d>
+      <d n="Values" t="Hashtable" />
+    </o>
+        </Data>
+        <TypeList>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
+    </PlcProjectOptions>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,1087 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP140_Manual" Id="{68a90e96-50f6-4597-a00a-bb5bac5c4370}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP140_Manual
+VAR
+	 OP140_Enable:BOOL;
+	 OP140_ATEQ1_Manual_Start:BOOL;
+	 OP140_ATEQ2_Manual_Start:BOOL;
+	 OP140_ATEQ3_Manual_Start:BOOL;
+	 OP140_ATEQ4_Manual_Start:BOOL;
+	 OP140_ATEQ5_Manual_Start:BOOL;
+	 OP140_ATEQ6_Manual_Start:BOOL;
+	  OP140_ATEQ1_Auto_Start:BOOL;
+	 OP140_ATEQ2_Auto_Start:BOOL;
+	 OP140_ATEQ3_Auto_Start:BOOL;
+	 OP140_ATEQ4_Auto_Start:BOOL;
+	 OP140_ATEQ5_Auto_Start:BOOL;
+	 OP140_ATEQ6_Auto_Start:BOOL;
+	 OP140_ATEQ1_Manual_Prog_No:INT;
+	 OP140_ATEQ2_Manual_Prog_No:INT;
+	 OP140_ATEQ3_Manual_Prog_No:INT;
+	 OP140_ATEQ4_Manual_Prog_No:INT;
+	 OP140_ATEQ5_Manual_Prog_No:INT;
+	 OP140_ATEQ6_Manual_Prog_No:INT;
+	  OP140_ATEQ1_Reset:BOOL;
+	  OP140_ATEQ2_Reset:BOOL;
+	  OP140_ATEQ3_Reset:BOOL;
+	  OP140_ATEQ4_Reset:BOOL;
+	  OP140_ATEQ5_Reset:BOOL;
+	  OP140_ATEQ6_Reset:BOOL;
+	  OP140_ATEQ1_FB:ATEQ_LEAK;
+	   OP140_ATEQ2_FB:ATEQ_LEAK;
+	    OP140_ATEQ3_FB:ATEQ_LEAK;
+		 OP140_ATEQ4_FB:ATEQ_LEAK;
+		  OP140_ATEQ5_FB:ATEQ_LEAK;
+		   OP140_ATEQ6_FB:ATEQ_LEAK;
+	OP140_ATEQ1_ResultOK:BOOL;
+	 OP140_ATEQ2_ResultOK:BOOL;
+	 OP140_ATEQ3_ResultOK:BOOL;
+	 OP140_ATEQ4_ResultOK:BOOL;
+	 OP140_ATEQ5_ResultOK:BOOL;
+	 OP140_ATEQ6_ResultOK:BOOL;
+	 OP140_ATEQ1_ResultNOK:BOOL;
+	 OP140_ATEQ2_ResultNOK:BOOL;
+	 OP140_ATEQ3_ResultNOK:BOOL;
+	 OP140_ATEQ4_ResultNOK:BOOL;
+	 OP140_ATEQ5_ResultNOK:BOOL;
+	 OP140_ATEQ6_ResultNOK:BOOL;
+		
+	kok: ATEQ_LEAK;
+	manual: BOOL;
+	strat: BOOL;
+	reset: BOOL;
+	dd: ATEQ_LEAK;
+	ee: ATEQ_LEAK;
+	no: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Bottom Cylinder 1
+OP140_GVL.CR140_Horz_Cyl_1_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Horz_Cyl_1.SafeHome:= TRUE;
+	ELSE
+		CR140_Horz_Cyl_1.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Horz_Cyl_1.SafeWork:=TRUE;
+ELSE
+	CR140_Horz_Cyl_1.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Horz_Cyl1_Home_PB) THEN
+	CR140_Horz_Cyl_1.ManualPB1:=TRUE;
+	ELSE
+		CR140_Horz_Cyl_1.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Horz_Cyl1_Work_PB) THEN
+	CR140_Horz_Cyl_1.ManualPB2:=TRUE;
+	ELSE
+		CR140_Horz_Cyl_1.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Horz_Cyl_1(
+	Auto:=OP140_AutoSelected , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_HORZ_SUP1_CYL_REVI1301_0  , 
+	Sensor2:=I140_HORZ_SUP1_CYL_FWDI1301_1  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_HORZ_SUP1_CYL_REV_Q1341_0 , 
+	Solenoid2=>O140_HORZ_SUP1_CYL_FWD_Q1341_1 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP140_GVL.CR140_Horz_Cyl_1_Status );
+	
+	
+	//Bottom Cylinder 2
+OP140_GVL.CR140_Horz_Cyl_2_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Horz_Cyl_2.SafeHome:= TRUE;
+	ELSE
+		CR140_Horz_Cyl_2.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Horz_Cyl_2.SafeWork:=TRUE;
+ELSE
+	CR140_Horz_Cyl_2.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Horz_Cyl2_Home_PB) THEN
+	CR140_Horz_Cyl_2.ManualPB1:=TRUE;
+	ELSE
+		CR140_Horz_Cyl_2.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Horz_Cyl2_Work_PB) THEN
+	CR140_Horz_Cyl_2.ManualPB2:=TRUE;
+	ELSE
+		CR140_Horz_Cyl_2.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Horz_Cyl_2(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset  , 
+	Sensor1:=I140_HORZ_SUP2_CYL_REVI1310_0  , 
+	Sensor2:=I140_HORZ_SUP2_CYL_FWDI1310_1  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_HORZ_SUP2_CYL_REV_Q1342_0 , 
+	Solenoid2=>O140_HORZ_SUP2_CYL_FWD_Q1342_1  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP140_GVL.CR140_Horz_Cyl_2_Status);
+	
+	
+	//Bottom Cylinder 3
+OP140_GVL.CR140_Horz_Cyl_3_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Horz_Cyl_3.SafeHome:= TRUE;
+	ELSE
+		CR140_Horz_Cyl_3.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Horz_Cyl_3.SafeWork:=TRUE;
+ELSE
+	CR140_Horz_Cyl_3.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Horz_Cyl3_Home_PB) THEN
+	CR140_Horz_Cyl_3.ManualPB1:=TRUE;
+	ELSE
+		CR140_Horz_Cyl_3.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Horz_Cyl3_Work_PB) THEN
+	CR140_Horz_Cyl_3.ManualPB2:=TRUE;
+	ELSE
+		CR140_Horz_Cyl_3.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Horz_Cyl_3(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_HORZ_SUP3_CYL_REVI1310_6  , 
+	Sensor2:=I140_HORZ_SUP3_CYL_FWDI1310_7  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_HORZ_SUP3_CYL_REV_Q1343_0 , 
+	Solenoid2=>O140_HORZ_SUP3_CYL_FWD_Q1343_1  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP140_GVL.CR140_Horz_Cyl_1_Status );
+	
+	
+	//Vertical Cylinder 1
+OP140_Gvl.CR140_Vert_Cyl_1_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Vert_Cyl_1.SafeHome:= TRUE;
+	ELSE
+		CR140_Vert_Cyl_1.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Vert_Cyl_1.SafeWork:=TRUE;
+ELSE
+	CR140_Vert_Cyl_1.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Vert_Cyl1_Home_PB) THEN
+	CR140_Vert_Cyl_1.ManualPB1:=TRUE;
+	ELSE
+		CR140_Vert_Cyl_1.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Vert_Cyl1_Work_PB) THEN
+	CR140_Vert_Cyl_1.ManualPB2:=TRUE;
+	ELSE
+		CR140_Vert_Cyl_1.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Vert_Cyl_1(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_VERT_SUP1_CYL_REVI1301_2  , 
+	Sensor2:=I140_VERT_SUP1_CYL_FWDI1301_3  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz  , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_VERT_SUP1_CYL_REV_Q1341_2  , 
+	Solenoid2=>O140_VERT_SUP1_CYL_FWD_Q1341_3 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP140_Gvl.CR140_Vert_Cyl_1_Status );
+	
+		//Vertical Cylinder 2
+CR140_Vert_Cyl_2_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Vert_Cyl_2.SafeHome:= TRUE;
+	ELSE
+		CR140_Vert_Cyl_2.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Vert_Cyl_2.SafeWork:=TRUE;
+ELSE
+	CR140_Vert_Cyl_2.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Vert_Cyl2_Home_PB) THEN
+	CR140_Vert_Cyl_2.ManualPB1:=TRUE;
+	ELSE
+		CR140_Vert_Cyl_2.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Vert_Cyl2_Work_PB) THEN
+	CR140_Vert_Cyl_2.ManualPB2:=TRUE;
+	ELSE
+		CR140_Vert_Cyl_2.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Vert_Cyl_2(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_VERT_SUP2_CYL_REVI1310_2 , 
+	Sensor2:=I140_VERT_SUP2_CYL_FWDI1310_3 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_VERT_SUP2_CYL_REV_Q1342_2 , 
+	Solenoid2=>O140_VERT_SUP2_CYL_FWD_Q1342_3  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR140_Vert_Cyl_2_Status );
+	
+		//Vertical Cylinder 3
+CR140_Vert_Cyl_3_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Vert_Cyl_3.SafeHome:= TRUE;
+	ELSE
+		CR140_Vert_Cyl_3.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+   CR140_Vert_Cyl_3.SafeWork:=TRUE;
+ELSE
+	CR140_Vert_Cyl_3.SafeWork:=FALSE;
+END_IF
+//Manual PB 1
+IF(OP140_HMI_Vert_Cyl3_Home_PB) THEN
+	CR140_Vert_Cyl_3.ManualPB1:=TRUE;
+	ELSE
+		CR140_Vert_Cyl_3.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Vert_Cyl3_Work_PB) THEN
+	CR140_Vert_Cyl_3.ManualPB2:=TRUE;
+	ELSE
+		CR140_Vert_Cyl_3.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Vert_Cyl_3(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_VERT_SUP3_CYL_REVI1311_0 , 
+	Sensor2:=I140_VERT_SUP3_CYL_FWDI1311_1  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_VERT_SUP3_CYL_REV_Q1343_2 , 
+	Solenoid2=>O140_VERT_SUP3_CYL_FWD_Q1343_3  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR140_Vert_Cyl_3_Status );
+	
+		//Top Wipe Cylinder 
+CR140_Wipe_Cyl_1_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Top_Wipe_Cyl_1.SafeHome:= TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_1.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Top_Wipe_Cyl_1.SafeWork:=TRUE;
+ELSE
+	CR140_Top_Wipe_Cyl_1.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Wipe_Cyl1_Home_PB) THEN
+	CR140_Top_Wipe_Cyl_1.ManualPB1:=TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_1.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Wipe_Cyl1_Work_PB) THEN
+	CR140_Top_Wipe_Cyl_1.ManualPB2:=TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_1.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Top_Wipe_Cyl_1(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_WIPE1_CYL_REVI1301_4, 
+	Sensor2:=I140_WIPE1_CYL_FWDI1301_5 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_WIPE1_CYL_REV_Q1341_6 , 
+	Solenoid2=>O140_WIPE1_CYL_FWD_Q1341_7  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR140_Wipe_Cyl_1_Status );
+	
+	//Top Wipe Cyl 2
+	CR140_Wipe_Cyl_2_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Top_Wipe_Cyl_2.SafeHome:= TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_2.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Top_Wipe_Cyl_2.SafeWork:=TRUE;
+ELSE
+	CR140_Top_Wipe_Cyl_2.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Wipe_Cyl2_Home_PB) THEN
+	CR140_Top_Wipe_Cyl_2.ManualPB1:=TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_2.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Wipe_Cyl2_Work_PB) THEN
+	CR140_Top_Wipe_Cyl_2.ManualPB2:=TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_2.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Top_Wipe_Cyl_2(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_WIPE2_CYL_REVI1310_4 , 
+	Sensor2:=I140_WIPE2_CYL_FWDI1310_5  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:=10 , 
+	Solenoid1=>O140_WIPE2_CYL_REV_Q1342_6  , 
+	Solenoid2=>O140_WIPE2_CYL_FWD_Q1342_7 , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR140_Wipe_Cyl_2_Status );
+	
+//Wipe Cylinder 3
+
+CR140_Wipe_Cyl_3_Status:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR140_Top_Wipe_Cyl_3.SafeHome:= TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_3.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR140_Top_Wipe_Cyl_3.SafeWork:=TRUE;
+ELSE
+	CR140_Top_Wipe_Cyl_3.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP140_HMI_Wipe_Cyl3_Home_PB) THEN
+	CR140_Top_Wipe_Cyl_3.ManualPB1:=TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_3.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP140_HMI_Wipe_Cyl3_Work_PB) THEN
+	CR140_Top_Wipe_Cyl_3.ManualPB2:=TRUE;
+	ELSE
+		CR140_Top_Wipe_Cyl_3.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR140_Top_Wipe_Cyl_3(
+	Auto:= , 
+	Manual:=MANUAL_SELECTED , 
+	ErrorActive:= , 
+	ResetPB:=OP140_HMI_Reset , 
+	Sensor1:=I140_WIPE3_CYL_REVI1311_2 , 
+	Sensor2:=I140_WIPE3_CYL_FWDI1311_3  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:= Pulse_Block.Q1Hz, 
+	BlinkingBit:= , 
+	TimeOut1:=10 , 
+	TimeOut2:=10 , 
+	TimeOut3:= 10, 
+	Solenoid1=>O140_WIPE3_CYL_REV_Q1343_6 , 
+	Solenoid2=>O140_WIPE3_CYL_FWD_Q1343_7  , 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR140_Wipe_Cyl_3_Status );
+		
+	
+	//Vertical Servo 1
+	
+	// Safe to Move
+	
+	IF(TRUE)		THEN
+		
+		SR140_Vert_Servo_Ctrl_1.Safe_To_Move:=TRUE;
+		ELSE
+			SR140_Vert_Servo_Ctrl_1.Safe_To_Move:=FALSE;
+		END_IF
+
+		//LH Vertical Servo 1
+SR140_Vert_Servo_1(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:=OP140_HMI_Reset OR Servo_Reset, 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:=MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety , 
+	Axis:= SR140_Vert_Servo_Axis_1, 
+	HME_WRITE_ADD:= 16#5016,	
+	bHome:=SR140_Vert_Servo_Ctrl_1.Reference_Start, 
+	bSetPosition:=SR140_Vert_Servo_Ctrl_1.BsetPos , 
+	bMoveAbsolute:=SR140_Vert_Servo_Ctrl_1.ABSmove_Start , 
+	bMoveRelative:=SR140_Vert_Servo_Ctrl_1.RELmove_Start , 
+	bMoveTorque:=SR140_Vert_Servo_Ctrl_1.Torque_mode_Start , 
+	stManualModeAxis:=SR140_HMI_Vert_Servo_MC1 , 
+	bmove_home:=SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd , 
+	sAxisState=>SR140_Vert_Servo_Ctrl_1.Axis_State , 
+	bAxis_ready=>SR140_Vert_Servo_Ctrl_1.Axis_ready , 
+	bAxisInPosition=>SR140_Vert_Servo_Ctrl_1.Axis_In_Pos , 
+	bAxisError=>SR140_Vert_Servo_Ctrl_1.Axis_Error , 
+	bAxisEnabled=>SR140_Vert_Servo_Ctrl_1.Axis_Enabled, 
+	bAxisHomed=>SR140_Vert_Servo_Ctrl_1.Axis_reference  , 
+	bSetPositionDone=> , 
+	bHaltDone=> SR140_Vert_Servo_Ctrl_1.Axis_Halted, 
+	bSTOPDone=> SR140_Vert_Servo_Ctrl_1.Axis_Stopped, 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=>SR140_Vert_Servo_Ctrl_1.Trq_reached , 
+	bsafe_to_move=>SR140_Vert_Servo_Ctrl_1.Safe_To_Move , 
+	baxis_in_home_pos=>SR140_Vert_Servo_Ctrl_1.Axis_In_Home , 
+	bABS_Pos_done=> , 
+	Actual_position=> , 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+	//Vertical Servo 2
+	
+	// Safe to Move
+	
+	IF(TRUE)		THEN
+		
+		SR140_Vert_Servo_Ctrl_2.Safe_To_Move:=TRUE;
+		ELSE
+			SR140_Vert_Servo_Ctrl_2.Safe_To_Move:=FALSE;
+		END_IF
+
+SR140_Vert_Servo_2(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:=OP140_HMI_Reset OR Servo_Reset, 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:=MANUAL_SELECTED , 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= , 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety , 
+	Axis:= SR140_Vert_Servo_Axis_2, 
+	HME_WRITE_ADD:= 16#5014,	
+	bHome:=SR140_Vert_Servo_Ctrl_2.Reference_Start, 
+	bSetPosition:=SR140_Vert_Servo_Ctrl_2.BsetPos , 
+	bMoveAbsolute:=SR140_Vert_Servo_Ctrl_2.ABSmove_Start , 
+	bMoveRelative:=SR140_Vert_Servo_Ctrl_2.RELmove_Start , 
+	bMoveTorque:=SR140_Vert_Servo_Ctrl_2.Torque_mode_Start , 
+	stManualModeAxis:=SR140_HMI_Vert_Servo_MC2 , 
+	bmove_home:=SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd , 
+	sAxisState=>SR140_Vert_Servo_Ctrl_2.Axis_State , 
+	bAxis_ready=>SR140_Vert_Servo_Ctrl_2.Axis_ready , 
+	bAxisInPosition=>SR140_Vert_Servo_Ctrl_2.Axis_In_Pos , 
+	bAxisError=>SR140_Vert_Servo_Ctrl_2.Axis_Error , 
+	bAxisEnabled=>SR140_Vert_Servo_Ctrl_2.Axis_Enabled, 
+	bAxisHomed=>SR140_Vert_Servo_Ctrl_2.Axis_reference  , 
+	bSetPositionDone=> , 
+	bHaltDone=> SR140_Vert_Servo_Ctrl_2.Axis_Halted, 
+	bSTOPDone=> SR140_Vert_Servo_Ctrl_2.Axis_Stopped, 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=>SR140_Vert_Servo_Ctrl_2.Trq_reached , 
+	bsafe_to_move=>SR140_Vert_Servo_Ctrl_2.Safe_To_Move , 
+	baxis_in_home_pos=>SR140_Vert_Servo_Ctrl_2.Axis_In_Home , 
+	bABS_Pos_done=> , 
+	Actual_position=> , 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+	
+		//Vertical Servo 3
+	
+	// Safe to Move
+	
+	IF(TRUE)		THEN
+		
+		SR140_Vert_Servo_Ctrl_3.Safe_To_Move:=TRUE;
+		ELSE
+			SR140_Vert_Servo_Ctrl_3.Safe_To_Move:=FALSE;
+		END_IF
+
+SR140_Vert_Servo_3(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:=OP140_HMI_Reset OR Servo_Reset , 
+	bEnable:= Servo_Enable, 
+	bMoveVelocity:= , 
+	bHalt:= , 
+	bManualMode:= MANUAL_SELECTED, 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= , 
+	fTargetVelocity:= 5, 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:=Servo_Safety , 
+	Axis:= SR140_Vert_Servo_Axis_3,
+	HME_WRITE_ADD:= 16#5015, 
+	bHome:=SR140_Vert_Servo_Ctrl_3.Reference_Start, 
+	bSetPosition:=SR140_Vert_Servo_Ctrl_3.BsetPos , 
+	bMoveAbsolute:=SR140_Vert_Servo_Ctrl_3.ABSmove_Start , 
+	bMoveRelative:=SR140_Vert_Servo_Ctrl_3.RELmove_Start , 
+	bMoveTorque:=SR140_Vert_Servo_Ctrl_3.Torque_mode_Start , 
+	stManualModeAxis:=SR140_HMI_Vert_Servo_MC3 , 
+	bmove_home:=SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd , 
+	sAxisState=>SR140_Vert_Servo_Ctrl_3.Axis_State , 
+	bAxis_ready=>SR140_Vert_Servo_Ctrl_3.Axis_ready , 
+	bAxisInPosition=>SR140_Vert_Servo_Ctrl_3.Axis_In_Pos , 
+	bAxisError=>SR140_Vert_Servo_Ctrl_3.Axis_Error , 
+	bAxisEnabled=>SR140_Vert_Servo_Ctrl_3.Axis_Enabled, 
+	bAxisHomed=>SR140_Vert_Servo_Ctrl_3.Axis_reference  , 
+	bSetPositionDone=> , 
+	bHaltDone=> SR140_Vert_Servo_Ctrl_3.Axis_Halted, 
+	bSTOPDone=> SR140_Vert_Servo_Ctrl_3.Axis_Stopped, 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=>SR140_Vert_Servo_Ctrl_3.Trq_reached , 
+	bsafe_to_move=>SR140_Vert_Servo_Ctrl_3.Safe_To_Move , 
+	baxis_in_home_pos=>SR140_Vert_Servo_Ctrl_3.Axis_In_Home , 
+	bABS_Pos_done=> , 
+	Actual_position=> , 
+	Actual_velocity=> , 
+	Actual_Torque=> );
+
+IF MANUAL_SELECTED THEN
+SR140_HMI_Vert_Servo_MC1.targetVelocity:=5;
+SR140_HMI_Vert_Servo_MC2.targetVelocity:=5;
+SR140_HMI_Vert_Servo_MC3.targetVelocity:=5;
+END_IF
+
+
+//HMI Sel ATEQ
+CASE OP140_ATEQ_SEL_NO of
+	1:
+			 OP140_ATEQ1_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ1_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ1_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+	2:
+			 OP140_ATEQ2_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ2_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ2_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	3:       
+			 OP140_ATEQ3_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ3_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ3_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	4:
+	
+				 OP140_ATEQ4_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ4_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ4_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	5:			
+				 OP140_ATEQ5_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ5_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ5_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	6:
+	
+				OP140_ATEQ6_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ6_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ6_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+	
+END_CASE
+
+
+	
+//ATEQ Manual Actuation
+ OP140_ATEQ1_FB(
+	AutoSelected:= , 
+	ManualSelected:=OP140_ManualSelected OR  MANUAL_SELECTED , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:= , 
+	Erroractive:= , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ1_Manual_Prog_No , 
+	Auto_Prog_No:= , 
+	Testpass:= I140_LK_TST_1_PASI703_3, 
+	Testfail:=I140_LK_TST_1_FLI703_4 , 
+	Reffail:=I140_LK_TST_1_REF_PRT_FLI703_5 , 
+	Alarm:=I140_LK_TST_1_WARNGI703_6 , 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST1_STRT_Q700_1 , 
+	ResetOP=>O140_LK_TST1_RST_Q700_0 , 
+	ResultOK=>OP140_ATEQ1_ResultOK , 
+	ResultNOK=> OP140_ATEQ1_ResultNOK , 
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST1_SEL1_Q700_2 , 
+	ProgSel2=>O140_LK_TST1_SEL2_Q700_3 , 
+	ProgSel3=> O140_LK_TST1_SEL3_Q700_4, 
+	ProgSel4=> O140_LK_TST1_SEL4_Q700_5, 
+	ProgSel5=>O140_LK_TST1_SEL5_Q700_6 , 
+	ProgSel6=> O140_LK_TST1_SEL6_Q700_7, 
+	ProgSel7=>O140_LK_TST1_SEL7_Q701_0 , 
+	ProgSel8=> );
+
+//ATEQ 2
+
+OP140_ATEQ2_FB(
+	AutoSelected:= , 
+	ManualSelected:=OP140_ManualSelected OR  MANUAL_SELECTED , 
+	Manual_Start:= OP140_ATEQ2_Manual_Start , 
+	Auto_Start:= , 
+	Erroractive:= , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ2_Manual_Prog_No , 
+	Auto_Prog_No:= , 
+	Testpass:= I140_LK_TST_2_PASI704_1, 
+	Testfail:=I140_LK_TST_2_FLI704_2 , 
+	Reffail:=I140_LK_TST_2_REF_PRT_FLI704_3 , 
+	Alarm:=I140_LK_TST_2_WARNGI704_4 , 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST2_STRT_Q701_2 , 
+	ResetOP=>O140_LK_TST2_RST_Q701_1 , 
+	ResultOK=>OP140_ATEQ2_ResultOK , 
+	ResultNOK=> OP140_ATEQ2_ResultNOK , 
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST2_SEL1_Q701_3 , 
+	ProgSel2=>O140_LK_TST2_SEL2_Q701_4 , 
+	ProgSel3=> O140_LK_TST2_SEL3_Q701_5, 
+	ProgSel4=> O140_LK_TST2_SEL4_Q701_6, 
+	ProgSel5=>O140_LK_TST2_SEL5_Q701_7 , 
+	ProgSel6=> O140_LK_TST2_SEL6_Q702_0, 
+	ProgSel7=>O140_LK_TST2_SEL7_Q702_1 , 
+	ProgSel8=> );
+//ATEQ 3
+
+OP140_ATEQ3_FB(
+	AutoSelected:= , 
+	ManualSelected:=OP140_ManualSelected OR  MANUAL_SELECTED , 
+	Manual_Start:= OP140_ATEQ3_Manual_Start , 
+	Auto_Start:= , 
+	Erroractive:= , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ3_Manual_Prog_No , 
+	Auto_Prog_No:= , 
+	Testpass:= I140_LK_TST_3_PASI706_1, 
+	Testfail:=I140_LK_TST_3_FLI706_2 , 
+	Reffail:=I140_LK_TST_3_REF_PRT_FLI706_3 , 
+	Alarm:=I140_LK_TST_3_WARNGI706_4 , 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST3_STRT_Q702_3 , 
+	ResetOP=>O140_LK_TST3_RST_Q702_2 , 
+	ResultOK=>OP140_ATEQ3_ResultOK , 
+	ResultNOK=> OP140_ATEQ3_ResultNOK , 
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST3_SEL1_Q702_4 , 
+	ProgSel2=>O140_LK_TST3_SEL2_Q702_5 , 
+	ProgSel3=> O140_LK_TST3_SEL3_Q702_6, 
+	ProgSel4=> O140_LK_TST3_SEL4_Q702_7, 
+	ProgSel5=>O140_LK_TST3_SEL5_Q703_0 , 
+	ProgSel6=> O140_LK_TST3_SEL6_Q703_1, 
+	ProgSel7=>O140_LK_TST3_SEL7_Q703_2 , 
+	ProgSel8=> );
+
+	//ATEQ 4
+	
+	OP140_ATEQ4_FB(
+	AutoSelected:= , 
+	ManualSelected:=OP140_ManualSelected OR  MANUAL_SELECTED , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:= , 
+	Erroractive:= , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ1_Manual_Prog_No , 
+	Auto_Prog_No:= , 
+	Testpass:= I140_LK_TST_1_PASI703_3, 
+	Testfail:=I140_LK_TST_1_FLI703_4 , 
+	Reffail:=I140_LK_TST_1_REF_PRT_FLI703_5 , 
+	Alarm:=I140_LK_TST_1_WARNGI703_6 , 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST1_STRT_Q700_1 , 
+	ResetOP=>O140_LK_TST1_RST_Q700_0 , 
+	ResultOK=>OP140_ATEQ1_ResultOK , 
+	ResultNOK=> OP140_ATEQ1_ResultNOK , 
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST1_SEL1_Q700_2 , 
+	ProgSel2=>O140_LK_TST1_SEL2_Q700_3 , 
+	ProgSel3=> O140_LK_TST1_SEL3_Q700_4, 
+	ProgSel4=> O140_LK_TST1_SEL4_Q700_5, 
+	ProgSel5=>O140_LK_TST1_SEL5_Q700_6 , 
+	ProgSel6=> O140_LK_TST1_SEL6_Q700_7, 
+	ProgSel7=>O140_LK_TST1_SEL7_Q701_0 , 
+	ProgSel8=> );
+	
+	
+	//ATEQ 5
+	
+	OP140_ATEQ5_FB(
+	AutoSelected:= , 
+	ManualSelected:=OP140_ManualSelected OR  MANUAL_SELECTED , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:= , 
+	Erroractive:= , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ1_Manual_Prog_No , 
+	Auto_Prog_No:= , 
+	Testpass:= I140_LK_TST_1_PASI703_3, 
+	Testfail:=I140_LK_TST_1_FLI703_4 , 
+	Reffail:=I140_LK_TST_1_REF_PRT_FLI703_5 , 
+	Alarm:=I140_LK_TST_1_WARNGI703_6 , 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST1_STRT_Q700_1 , 
+	ResetOP=>O140_LK_TST1_RST_Q700_0 , 
+	ResultOK=>OP140_ATEQ1_ResultOK , 
+	ResultNOK=> OP140_ATEQ1_ResultNOK , 
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST1_SEL1_Q700_2 , 
+	ProgSel2=>O140_LK_TST1_SEL2_Q700_3 , 
+	ProgSel3=> O140_LK_TST1_SEL3_Q700_4, 
+	ProgSel4=> O140_LK_TST1_SEL4_Q700_5, 
+	ProgSel5=>O140_LK_TST1_SEL5_Q700_6 , 
+	ProgSel6=> O140_LK_TST1_SEL6_Q700_7, 
+	ProgSel7=>O140_LK_TST1_SEL7_Q701_0 , 
+	ProgSel8=> );
+
+	//ATEQ 6
+	
+	OP140_ATEQ6_FB(
+	AutoSelected:= , 
+	ManualSelected:=OP140_ManualSelected OR  MANUAL_SELECTED , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:= , 
+	Erroractive:= , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ1_Manual_Prog_No , 
+	Auto_Prog_No:= , 
+	Testpass:= I140_LK_TST_1_PASI703_3, 
+	Testfail:=I140_LK_TST_1_FLI703_4 , 
+	Reffail:=I140_LK_TST_1_REF_PRT_FLI703_5 , 
+	Alarm:=I140_LK_TST_1_WARNGI703_6 , 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST1_STRT_Q700_1 , 
+	ResetOP=>O140_LK_TST1_RST_Q700_0 , 
+	ResultOK=>OP140_ATEQ1_ResultOK , 
+	ResultNOK=> OP140_ATEQ1_ResultNOK , 
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST1_SEL1_Q700_2 , 
+	ProgSel2=>O140_LK_TST1_SEL2_Q700_3 , 
+	ProgSel3=> O140_LK_TST1_SEL3_Q700_4, 
+	ProgSel4=> O140_LK_TST1_SEL4_Q700_5, 
+	ProgSel5=>O140_LK_TST1_SEL5_Q700_6 , 
+	ProgSel6=> O140_LK_TST1_SEL6_Q700_7, 
+	ProgSel7=>O140_LK_TST1_SEL7_Q701_0 , 
+	ProgSel8=> );
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP140_Manual">
+      <LineId Id="3" Count="599" />
+      <LineId Id="744" Count="0" />
+      <LineId Id="603" Count="52" />
+      <LineId Id="745" Count="0" />
+      <LineId Id="656" Count="52" />
+      <LineId Id="746" Count="0" />
+      <LineId Id="709" Count="29" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="753" Count="2" />
+      <LineId Id="933" Count="1" />
+      <LineId Id="937" Count="3" />
+      <LineId Id="942" Count="1" />
+      <LineId Id="941" Count="0" />
+      <LineId Id="944" Count="1" />
+      <LineId Id="947" Count="1" />
+      <LineId Id="946" Count="0" />
+      <LineId Id="949" Count="2" />
+      <LineId Id="953" Count="1" />
+      <LineId Id="952" Count="0" />
+      <LineId Id="955" Count="1" />
+      <LineId Id="958" Count="1" />
+      <LineId Id="957" Count="0" />
+      <LineId Id="960" Count="2" />
+      <LineId Id="964" Count="1" />
+      <LineId Id="963" Count="0" />
+      <LineId Id="936" Count="0" />
+      <LineId Id="935" Count="0" />
+      <LineId Id="768" Count="0" />
+      <LineId Id="816" Count="0" />
+      <LineId Id="830" Count="1" />
+      <LineId Id="884" Count="28" />
+      <LineId Id="834" Count="0" />
+      <LineId Id="833" Count="0" />
+      <LineId Id="832" Count="0" />
+      <LineId Id="972" Count="30" />
+      <LineId Id="971" Count="0" />
+      <LineId Id="1004" Count="31" />
+      <LineId Id="1003" Count="0" />
+      <LineId Id="1036" Count="0" />
+      <LineId Id="1038" Count="33" />
+      <LineId Id="1073" Count="30" />
+      <LineId Id="1072" Count="0" />
+      <LineId Id="1104" Count="0" />
+      <LineId Id="1106" Count="29" />
+      <LineId Id="1105" Count="0" />
+      <LineId Id="1037" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

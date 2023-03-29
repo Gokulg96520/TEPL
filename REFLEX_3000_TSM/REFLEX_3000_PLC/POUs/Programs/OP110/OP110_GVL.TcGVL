@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP110_GVL" Id="{ac4b2cf1-7076-41cd-9ff8-199cc1bd313f}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+//GENERAL
+OP110_Auto:					BOOL;
+OP110_Mode_Ack:				BOOL;
+OP110_HomeRunning:			BOOL;
+OP110_ErrorActive:			BOOL;
+OP110_Home_PB:				BOOL;
+OP110_Work_PB:				BOOL;
+OP110_ManualSafetyBypass:	BOOL;
+OP110_LightCurtainBypass:	BOOL;
+OP110_OperationCompleted:	BOOL;
+OP110_LampCheck:				BOOL;
+OP110_MachineLamp:			BOOL;
+OP110_ComponentOk:			BOOL;
+OP110_ComponentNok:			BOOL;
+OP110_RepeatBit:				BOOL;
+OP110_HomingResetBit:		BOOL;
+OP110_ControlledByRobo:		BOOL;
+OP110_Any_Bypass:			BOOL;
+OP110_ManualModeStatus:		INT;
+OP110_ManualModeWord:		INT;
+OP110_AutoRunning:			BOOL;
+OP110_StepRunning:			BOOL;
+OP110_StartEnable:   		BOOL;
+OP110_HomeConditionOK:		BOOL;
+OP110_Temp_hmeOK:			BOOL;
+OP110_Machine_Stop: 			BOOL;
+OP110_AutoSeq:				INT;
+OP110_LH_AutoSeq: 			INT;
+OP110_RH_AutoSeq: 			INT;
+OP110_Homing_Seq:			INT;
+OP110_Safety_OK:				BOOL;
+
+Automatic_Run:				BOOL;    //from master mode block
+Manual_mode: 				BOOL;    //from master mode block
+
+OP110_Prev_Stat_Operation_Completed: BOOL;
+OP110_Prev_Comp_Status: INT;
+OP110_Prev_LH_COMP_OK:BOOL;
+OP110_Prev_LH_COMP_NOK:BOOL;
+OP110_Prev_RH_COMP_OK:BOOL;
+OP110_Prev_RH_COMP_NOK:BOOL;
+OP110_LH_Operation_Completed:BOOL;
+OP110_RH_Operation_Completed:BOOL;
+
+
+//Servo controls
+	OP110_Servo_Enable	: BOOL;
+	OP110_Servo_Reset	: BOOL;
+	SR110_Vert_servo_not_Home: BOOL;
+	SR110_Vert_servo: FB_Axis;
+	
+//ModeSelection Outputs
+//OP130_AutoSelected:		    BOOL;
+OP110_ManualSelected:		BOOL;
+OP110_StepSelected:			BOOL;
+OP110_AutoSelected:		    BOOL;
+
+
+//HMI Tags(From HMI)
+OP110_HMI_AutoMode:						BOOL;
+OP110_HMI_ManualMode:					BOOL;
+OP110_HMI_StepMode:						BOOL;
+//OP110_HMI_CycleStart:					BOOL;
+OP110_HMI_Cycle_Start:					BOOL;
+
+OP110_HMI_Homing:						BOOL;
+SR20_Vert_Servo_Max_Lim:				BOOL;
+OP110_HMI_Jog_Pos: BOOL;
+OP110_HMI_Jog_Neg: BOOL;
+//Error
+OP110_ErrorWord_0: DINT;
+OP110_ErrorWord_1: DINT;
+OP110_ErrorWord_2: DINT;
+
+OP110_AUTO_STP_NO: INT;
+
+// MANUAL
+		
+// AUTO	
+	OP110_STN_ENABLE					: BOOL;				// FROM MASTER CONTROL BLOCK
+	OP110_FIXTURE_2					: INT;               //For the comp status in the fixture
+	OP110_FIXTURE_1					: INT; 				 //For the comp status in the fixture
+// SERVO VARIABLE
+	OP110_VERT_SERVO_STRT			: BOOL;				// SERVO MOVE TO TARGET POSITION
+	OP110_SERVO_POS_DONE				: BOOL;				// SERVO POSITION REACHED
+	OP110_SERVO_ON_SFE_WRK			: BOOL;				// SERVO ACTUAL POSITION = SERVO SAFE POSITION
+	OP110_SERVO_ON_WRK				: BOOL;				// SERVO ACTUAL POSITION = SERVO WORK POSITION
+	OP110_SERVO_ON_HOME				: BOOL;				// SERVO ACTUAL POSITION = SERVO HOME POSITION	
+	
+	OP110_VERT_SERVO_HME_POS			: REAL := 0;         // SERVO IN HOME POSITION
+	OP110_VERT_SERVO_POSITION		: LREAL ;			// SERVO ACTUAL POSITION
+	OP110_VERT_SERVO_SFE_WRK_POS		: REAL := 40;		// SERVO SAFE WORK POSITION FROM RECEIPE
+	OP110_VERT_SERVO_WRK_POS			: REAL := 200;		// SERVO WORK POSITION FROM RECEIPE	
+	OP110_VERT_SERVO_TARGET			: REAL;				// SERVO AUTO TARGET POSITION
+
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	
+// MANUAL
+
+// AUTO
+	OP110_BYPASS						: BOOL;				// OP110 ON-BYPASS / OFF-NOT BYPASSED
+	OP110_LH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH OK BIT
+	OP110_LH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH NOK BIT
+	OP110_RH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH OK BIT
+	OP110_RH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH NOK BIT
+	
+	OP110_DLY_AFT_SFE_WRK			: INT:=100;				// AUTO DELAY TIMER AFTER SERVO REACH WORK
+	OP110_DLY_AFT_SPN_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER SPINNER START
+	OP110_DLY_AFT_OILNG_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER OILLING START
+	OP110_DLY_AFT_OILNG_FNISH		: INT:=100;				// AUTO DELAY TIMER AFTER OILLING FINISH
+// SERVO VARIABLE
+
+END_VAR
+
+VAR_GLOBAL 
+	temp:BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

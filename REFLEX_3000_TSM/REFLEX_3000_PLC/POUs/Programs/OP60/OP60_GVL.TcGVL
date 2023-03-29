@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP60_GVL" Id="{4d4b882b-4ad7-4bfd-b585-eac36e2962ee}">
+    <Declaration><![CDATA[VAR_GLOBAL
+	
+//GENERAL
+OP60_Auto:					BOOL;
+OP60_HomeRunning:			BOOL;
+OP60_ErrorActive:			BOOL;
+OP60_Home_PB:				BOOL;
+OP60_Work_PB:				BOOL;
+OP60_ManualSafetyBypass:	BOOL;
+OP60_LightCurtainBypass:	BOOL;
+OP60_OperationCompleted:	BOOL;
+OP60_LampCheck:				BOOL;
+OP60_MachineLamp:			BOOL;
+OP60_ComponentOk:			BOOL;
+OP60_ComponentNok:			BOOL;
+OP60_RepeatBit:				BOOL;
+OP60_HomingResetBit:		BOOL;
+OP60_ControlledByRobo:		BOOL;
+OP60_Any_Bypass:			BOOL;
+OP60_ManualModeStatus:		INT;
+OP60_ManualModeWord:		INT;
+OP60_AutoRunning:			BOOL;
+OP60_StepRunning:			BOOL;
+OP60_StartEnable:   		BOOL;
+OP60_Machine_Stop: 			BOOL;
+OP60_AutoSeq:				INT;
+OP60_LH_AutoSeq: 			INT;
+OP60_RH_AutoSeq: 			INT;
+OP60_Homing_Seq:			INT;
+OP60_HomeConditionOK:   	BOOL;
+OP60_Safety_OK:				BOOL;
+OP60_Mode_Ack:				BOOL;
+OP60_Temp_hmeOK:			BOOL;
+
+
+Automatic_Run:				BOOL;
+
+OP60_Prev_Stat_Operation_Completed: BOOL;
+OP60_Prev_Comp_Status: INT;
+OP60_Prev_LH_COMP_OK:BOOL;
+OP60_Prev_LH_COMP_NOK:BOOL;
+OP60_Prev_RH_COMP_OK:BOOL;
+OP60_Prev_RH_COMP_NOK:BOOL;
+OP60_LH_Operation_Completed:BOOL;
+OP60_RH_Operation_Completed:BOOL;
+
+//ModeSelection Outputs
+//OP130_AutoSelected:		    BOOL;
+OP60_ManualSelected:		BOOL;
+OP60_StepSelected:			BOOL;
+OP60_AutoSelected:		    BOOL;
+
+
+//HMI Tags(From HMI)
+OP60_HMI_AutoMode:						BOOL;
+OP60_HMI_ManualMOde:					BOOL;
+OP60_HMI_StepMode:						BOOL;
+OP60_HMI_CycleStart:					BOOL;
+OP60_HMI_Cycle_Start:					BOOL;
+OP60_HMI_Reset:						    BOOL;
+OP60_HMI_Homing:						BOOL;
+SR60_Vert_Servo_Max_Lim:				BOOL;
+
+//Error
+OP60_ErrorWord_0: DINT;
+OP60_ErrorWord_1: DINT;
+OP60_ErrorWord_2: DINT;
+
+//Servo
+SR60_Vert_servo : FB_Axis;
+SR60_Vert_servo_ctrl:Servo_Control;
+SR60_Vert_servo_not_Home: BOOL;
+SR60_Vert_servo_status:stManualModeAxis;
+SR60_Vert_servo_Axis :AXIS_REF;
+
+//MANUAL	
+	OP60_man_cyl_no 				: INT;
+	
+//AUTO	
+	OP60_STN_ENABLE					: BOOL;				// FROM MASTER CONTROL BLOCK 
+	OP60_AUTO_STP_NO				: INT;
+//LVDT 
+	OP60_SET_LVDT_VALUE				:LREAL;	           // FROM HMI OR RECIPE
+	OP60_LVDT_TOLERANCE 			:LREAL;			   // FROM HMI OR RECIPE
+	OP60_LH_LVDT_VALUE				:LREAL;			   // FROM LVDT
+	OP60_RH_LVDT_VALUE				:LREAL;
+
+// SERVO VARIABLE
+	OP60_VERT_SERVO_STRT			: BOOL;				// SERVO MOVE TO TARGET POSITION
+	OP60_SERVO_POS_DONE				: BOOL;				// SERVO POSITION REACHED
+	OP60_SERVO_ON_SFE_WRK			: BOOL;				// SERVO ACTUAL POSITION = SERVO SAFE POSITION
+	OP60_SERVO_ON_WRK				: BOOL;				// SERVO ACTUAL POSITION = SERVO WORK POSITION
+	OP60_SERVO_ON_HOME				: BOOL;				// SERVO ACTUAL POSITION = SERVO HOME POSITION	
+	  
+	OP60_VERT_SERVO_POSITION		: REAL;				// SERVO ACTUAL POSITION
+	
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	
+// MANUAL
+
+// AUTO
+	OP60_BYPASS						: BOOL;				// OP60 ON-BYPASS
+	OP60_LH_LVDT_OK					: BOOL;				// TO MASTER CONTROL BLOCK LH OK BIT
+	OP60_LH_LVDT_NOK				: BOOL;				// TO MASTER CONTROL BLOCK LH NOK BIT
+	OP60_RH_LVDT_OK					: BOOL;				// TO MASTER CONTROL BLOCK RH OK BIT
+	OP60_RH_LVDT_NOK				: BOOL;				// TO MASTER CONTROL BLOCK RH NOK BIT	
+	  
+	OP60_DLY_AFT_SFE_WRK			: INT := 200;				// AUTO DELAY TIMER AFTER SERVO REACH WORK
+
+//SERVO	
+	OP60_VERT_SERVO_HME_POS			: REAL :=0;             // SERVO HOME POSITION FROM HMI
+	OP60_VERT_SERVO_SFE_WRK_POS		: REAL :=40;				// SERVO SAFE WORK POSITION FROM RECEIPE
+	OP60_VERT_SERVO_WRK_POS			: REAL :=400;				// SERVO WORK POSITION FROM RECEIPE	
+	OP60_VERT_SERVO_TARGET			: REAL;				// SERVO AUTO TARGET POSITION	
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

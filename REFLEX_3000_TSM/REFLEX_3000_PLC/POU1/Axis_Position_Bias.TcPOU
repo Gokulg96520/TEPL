@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Axis_Position_Bias" Id="{bd0eba3f-833f-4f6a-9632-d8aaf4fb3b87}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Axis_Position_Bias
+VAR
+	bSet_Encoder_Zero: BOOL;
+	bSet_Encoder_Zero_Rtrig: R_trig;
+	Step: INT;
+	ADSREAD_set_val: ADSREAD;
+	FB_GetLocalAmsNetId_system: FB_GetLocalAmsNetId;
+	lrRead_set_Value: LREAL;
+	stAxis:AXIS_REF;
+	
+	ADSWRITE_Set_Val: ADSWRITE;
+	
+	tDummy: Ton;
+	bRead_set_Value: BOOL;
+	bWrite_set_Value: BOOL;
+	bHome_ref_done: BOOL;
+	MC_Power1: MC_Power;
+	bEnable: BOOL;
+	TRIAL: BOOL;
+	F_TRIG1: F_TRIG;
+	home_pressed: BOOL;
+	
+END_VAR
+
+VAR PERSISTENT
+	aa: DINT;
+lrWrite_set_Value: LREAL;
+HOMING_VALUE: LREAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[bSet_Encoder_Zero:=NOT TRIAL OR home_pressed;
+
+bSet_Encoder_Zero_Rtrig.CLK:=bSet_Encoder_Zero;
+bSet_Encoder_Zero_Rtrig();
+
+IF bSet_Encoder_Zero_Rtrig.Q THEN Step :=10; END_IF
+
+CASE Step OF 
+10:
+	lrRead_set_Value:=0; lrWrite_set_Value:=0; bRead_set_Value:=FALSE; bWrite_set_Value :=FALSE; 
+	Step:=Step+10;
+20:
+	lrWrite_set_Value:=0; bWrite_set_Value :=TRUE; 
+	tDummy.IN:=TRUE;
+	IF tDummy.Q THEN tDummy.IN:=FALSE ; bWrite_set_Value := FALSE;Step:= step+10; END_IF
+30:	IF home_pressed THEN
+	lrWrite_set_Value:= stAxis.NcToPlc.ActPos * -1;
+	ELSE
+	 lrWrite_set_Value:=HOMING_VALUE;
+	END_IF;
+	Step:= step+10;
+40:
+	bWrite_set_Value := TRUE; tDummy.IN:=TRUE;
+	IF tDummy.Q THEN tDummy.IN:=FALSE ;Step:= step+10; bWrite_set_Value := FALSE; END_IF
+	IF ADSWRITE_Set_Val.ERR  THEN bWrite_set_Value := FALSE;tDummy.IN:=FALSE; Step:=10; END_IF
+50:
+	IF (LREAL_TO_INT(stAxis.NcToPlc.ActPos*10)=0 OR (lrWrite_set_Value=HOMING_VALUE)) AND ( home_pressed OR NOT TRIAL) THEN
+		bHome_ref_done:=TRUE;	step:=99; bSet_Encoder_Zero:=FALSE;
+	ELSE
+ 		step:=10;
+END_IF 
+	
+END_CASE
+
+FB_GetLocalAmsNetId_system.bExecute:=TRUE;
+FB_GetLocalAmsNetId_system();
+
+ADSWRITE_Set_Val(
+	NETID:=FB_GetLocalAmsNetId_system.AddrString , 
+	PORT:=501 , 	
+	IDXGRP:=16#5006, 	
+	IDXOFFS:=16#07,  
+	LEN:= SIZEOF(lrWrite_set_Value), 
+	SRCADDR:= ADR(lrWrite_set_Value) , 
+	WRITE:=bWrite_set_Value ,   	    
+	TMOUT:=T#500MS , 
+	BUSY=> ,  
+	ERR=> , 	
+	ERRID=> );	
+
+tDummy.PT:=T#20MS;
+tDummy();	
+	
+(*MC_Power1(
+	Axis:=stAxis, 
+	Enable:=bEnable AND NOT home_pressed, 
+	Enable_Positive:= 1, 
+	Enable_Negative:= 1, 
+	Override:=100 , 
+	BufferMode:= , 
+	Options:= , 
+	Status=> , 
+	Busy=> , 
+	Active=> , 
+	Error=> , 
+	ErrorID=> );*)
+
+TRIAL := (step=99);
+
+IF (lrWrite_set_Value<>HOMING_VALUE)AND(step=99)THEN
+	HOMING_VALUE:=lrWrite_set_Value;
+END_IF	
+	
+	
+	
+	
+	]]></ST>
+    </Implementation>
+    <LineIds Name="Axis_Position_Bias">
+      <LineId Id="3" Count="16" />
+      <LineId Id="223" Count="1" />
+      <LineId Id="123" Count="1" />
+      <LineId Id="20" Count="6" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="28" Count="10" />
+      <LineId Id="87" Count="3" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="91" Count="3" />
+      <LineId Id="40" Count="16" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="61" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP80_ERROR" Id="{971343f7-8b93-4ae4-a5a9-55b2b23ea903}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP80_ERROR
+VAR
+	OP80_StErr_1: TON;
+	OP80_Step_Err_2: TON;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// Set ERROR ACTIVE
+IF ((OP80_GVL.OP80_ErrorWord_0<>0) OR (OP80_GVL.OP80_ErrorWord_1<>0) OR (OP80_GVL.OP80_ErrorWord_2<>0)) THEN
+	OP80_GVL.OP80_ErrorActive:= TRUE;
+	END_IF
+
+//Reset ErrorActive
+IF (OP80_GVL.OP80_HMI_Reset) THEN 
+	OP80_GVL.OP80_ErrorActive:= FALSE;
+	OP80_GVL.OP80_ErrorWord_0:= 0;
+	OP80_GVL.OP80_ErrorWord_1:= 0;
+	OP80_GVL.OP80_ErrorWord_2:= 0;
+
+END_IF
+
+// Auto Seq Step Error
+//Servo not reaching work position
+OP80_StErr_1(IN:=(OP80_GVL.OP80_AUTO_STP_NO=80) , PT:=T#1S , Q=> , ET=> );
+IF (OP80_GVL.OP80_AUTO_STP_NO=6 AND NOT OP80_GVL.OP80_SERVO_ON_WRK AND OP80_StErr_1.Q) THEN
+	OP80_GVL.OP80_ErrorWord_0.0:=TRUE;
+END_IF
+
+// Servo Not Reached home position or safe-work position
+OP80_Step_Err_2(IN:=OP80_GVL.OP80_AUTO_STP_NO=120 , PT:=T#1S , Q=> , ET=> );
+IF (OP80_GVL.OP80_AUTO_STP_NO=16 AND NOT SR40_Vert_servo_ctrl.Axis_In_Home AND OP80_Step_Err_2.Q) THEN
+	OP80_GVL.OP80_ErrorWord_0.1:=TRUE;
+	END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP80_ERROR">
+      <LineId Id="3" Count="26" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

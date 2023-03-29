@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="Master4_IO" Id="{7c98d7ee-abc9-4089-98c4-a78bb96dd5e3}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+//port1					
+I130_LH_ROTRY_0_DEGI1300_0                :BOOL;
+I130_LH_ROTRY_180_DEGI1300_1              :BOOL;
+I130_RH_ROTRY_0_DEGI1300_2                :BOOL;
+I130_RH_ROTRY_180_DEGI1300_3              :BOOL;
+I130_SPARE_I1300_4                        :BOOL;
+I130_SPARE_I1300_5                        :BOOL;
+I130_SPARE_I1300_6                        :BOOL;
+I130_SPARE_I1300_7                        :BOOL;
+										  
+I140_HORZ_SUP1_CYL_REVI1301_0             :BOOL;
+I140_HORZ_SUP1_CYL_FWDI1301_1             :BOOL;
+I140_VERT_SUP1_CYL_REVI1301_2             :BOOL;
+I140_VERT_SUP1_CYL_FWDI1301_3             :BOOL;
+I140_WIPE1_CYL_REVI1301_4                 :BOOL;
+I140_WIPE1_CYL_FWDI1301_5                 :BOOL;
+I140_SPARE_I1301_6                        :BOOL;
+I140_SPARE_I1301_7                        :BOOL;
+										  
+// port 2                         
+I140_HORZ_SUP2_CYL_REVI1310_0             :BOOL;
+I140_HORZ_SUP2_CYL_FWDI1310_1             :BOOL;
+I140_VERT_SUP2_CYL_REVI1310_2             :BOOL;
+I140_VERT_SUP2_CYL_FWDI1310_3             :BOOL;
+I140_WIPE2_CYL_REVI1310_4                 :BOOL;
+I140_WIPE2_CYL_FWDI1310_5                 :BOOL;
+I140_HORZ_SUP3_CYL_REVI1310_6             :BOOL;
+I140_HORZ_SUP3_CYL_FWDI1310_7             :BOOL;
+										  
+I140_VERT_SUP3_CYL_REVI1311_0             :BOOL;
+I140_VERT_SUP3_CYL_FWDI1311_1             :BOOL;
+I140_WIPE3_CYL_REVI1311_2                 :BOOL;
+I140_WIPE3_CYL_FWDI1311_3                 :BOOL;
+I140_LEAKTEST_PRESS_SWI1311_4             :BOOL;
+I140_SPARE_I1311_5                        :BOOL;
+I160_MOVR_REM_CYL_REVI1311_6             :BOOL;
+I160_MOVR_REM_CYL_FWDI1311_7             :BOOL;
+										  
+// port 3                        									  
+I160_SLIDE_CYL_REVI1320_0                 :BOOL;
+I160_SLIDE_CYL_FWDI1320_1                 :BOOL;
+I160_SLAVE1_PRSN_PARK_TRAYI1320_2         :BOOL;
+I160_SLAVE2_PRSN_PARK_TRAYI1320_3         :BOOL;
+I160_FIXT_COMP1_PRSNI1320_4               :BOOL;
+I160_FIXT_COMP2_PRSNI1320_5               :BOOL;
+I160_SPARE_I1320_6                        :BOOL;
+I160_SPARE_I1320_7                        :BOOL;
+										  
+I160_SPARE_I1321_0                        :BOOL;
+I160_SPARE_I1321_1                        :BOOL;
+I160_SPARE_I1321_2                        :BOOL;
+I160_SPARE_I1321_3                        :BOOL;
+I160_SPARE_I1321_4                        :BOOL;
+I160_SPARE_I1321_5                        :BOOL;
+I160_SPARE_I1321_6                        :BOOL;
+I160_SPARE_I1321_7                        :BOOL;
+										  
+// port 4                        
+I160_LH_PALLET_LOCK_CYL_UNLOCKI1330_0     :BOOL;
+I160_LH_PALLET_LOCK_CYL_LOCKI1330_1       :BOOL;
+I160_RH_PALLET_LOCK_CYL_UNLOCKI1330_2     :BOOL;
+I160_RH_PALLET_LOCK_CYL_LOCKI1330_3       :BOOL;
+I160_SPARE_I1330_4                        :BOOL;
+I160_CONV_BDY_PRSN1_SENI1330_5            :BOOL;
+I160_CONV_BDY_PRSN2_SENI1330_6            :BOOL;
+I160_SPARE_I1330_7                        :BOOL;
+										  
+I160_REJ_BOX_DOOR_CLSEI1331_0             :BOOL;
+I160_SAM_PART_BAG_DOOR_CLSEI1331_1        :BOOL;
+I160_TROLLEY_FIXT_PRSNI1331_2             :BOOL;
+I160_SAM_BOX_DOOR_CLSEI1331_3             :BOOL;
+I160_SPARE_I1331_4                        :BOOL;
+I160_SPARE_I1331_5                        :BOOL;
+I160_SPARE_I1331_6                        :BOOL;
+I160_SPARE_I1331_7                        :BOOL;
+										 
+//PORT5                            									 
+O130_LH_ROTRY_0_DEG_Q1340_0               :BOOL;
+O130_LH_ROTRY_180_DEG_Q1340_1             :BOOL;
+O130_RH_ROTRY_0_DEG_Q1340_2               :BOOL;
+O130_RH_ROTRY_180_DEG_Q1340_3             :BOOL;
+O130_LH_TOOL_CHO_UNLOCK_Q1340_4           :BOOL;
+O130_LH_TOOL_CHO_LOCK_Q1340_5             :BOOL;
+O130_RH_TOOL_CHO_UNLOCK_Q1340_6           :BOOL;
+O130_RH_TOOL_CHO_LOCK_Q1340_7             :BOOL;
+										 
+O140_HORZ_SUP1_CYL_REV_Q1341_0            :BOOL;
+O140_HORZ_SUP1_CYL_FWD_Q1341_1            :BOOL;
+O140_VERT_SUP1_CYL_REV_Q1341_2            :BOOL;
+O140_VERT_SUP1_CYL_FWD_Q1341_3            :BOOL;
+O140_TOOL1_CHO_UNLOCK_Q1341_4             :BOOL;
+O140_TOOL1_CHO_LOCK_Q1341_5               :BOOL;
+O140_WIPE1_CYL_REV_Q1341_6                :BOOL;
+O140_WIPE1_CYL_FWD_Q1341_7                :BOOL;
+										  
+O140_HORZ_SUP2_CYL_REV_Q1342_0            :BOOL;
+O140_HORZ_SUP2_CYL_FWD_Q1342_1            :BOOL;
+O140_VERT_SUP2_CYL_REV_Q1342_2            :BOOL;
+O140_VERT_SUP2_CYL_FWD_Q1342_3            :BOOL;
+O140_TOOL2_CHO_UNLOCK_Q1342_4             :BOOL;
+O140_TOOL2_CHO_LOCK_Q1342_5               :BOOL;
+O140_WIPE2_CYL_REV_Q1342_6                :BOOL;
+O140_WIPE2_CYL_FWD_Q1342_7                :BOOL;
+										  
+O140_HORZ_SUP3_CYL_REV_Q1343_0            :BOOL;
+O140_HORZ_SUP3_CYL_FWD_Q1343_1            :BOOL;
+O140_VERT_SUP3_CYL_REV_Q1343_2            :BOOL;
+O140_VERT_SUP3_CYL_FWD_Q1343_3            :BOOL;
+O140_TOOL3_CHO_UNLOCK_Q1343_4             :BOOL;
+O140_TOOL3_CHO_LOCK_Q1343_5               :BOOL;
+O140_WIPE3_CYL_REV_Q1343_6                :BOOL;
+O140_WIPE3_CYL_FWD_Q1343_7                :BOOL;
+										  
+//PORT6                           									  
+O160_VISN_CHECK_AIR_PURGE_Q1350_0         :BOOL;
+O160_FIXT_PP_GRPR_CLSE_OPN_Q1350_1        :BOOL;
+O160_LH_COMP_PP_GRPR_CLSE_OPN_Q1350_2     :BOOL;
+O160_RH_COMP_PP_GRPR_CLSE_OPN_Q1350_3     :BOOL;
+O160_SLIDE_CYL_REV_Q1350_4                :BOOL;
+O160_SLIDE_CYL_FWD_Q1350_5                :BOOL;
+O160_SPARE_Q1350_6                        :BOOL;
+O160_SPARE_Q1350_7                        :BOOL;
+										 
+O160_TOOL_CHO_UNLOCK_Q1351_0              :BOOL;
+O160_TOOL_CHO_LOCK_Q1351_1                :BOOL;
+O160_LH_PALLET_LOCK_CYL_UNLOCK_Q1351_2    :BOOL;
+O160_LH_PALLET_LOCK_CYL_LOCK_Q1351_3      :BOOL;
+O160_RH_PALLET_LOCK_CYL_UNLOCK_Q1351_4    :BOOL;
+O160_RH_PALLET_LOCK_CYL_LOCK_Q1351_5      :BOOL;
+O160_SPARE_Q1351_6                        :BOOL;
+O160_SPARE_Q1351_7                        :BOOL;
+										  
+O160_SPARE_Q1352_0                        :BOOL;
+O160_SPARE_Q1352_1                        :BOOL;
+OP160_MOVR_REM_CYL_REV_Q1352_2           :BOOL;
+OP160_MOVR_REM_CYL_FWD_Q1352_3           :BOOL;
+O160_SPARE_Q1352_4                        :BOOL;
+O160_SPARE_Q1352_5                        :BOOL;
+O160_SPARE_Q1352_6                        :BOOL;
+O160_SPARE_Q1352_7                        :BOOL;
+										 
+O160_SPARE_Q1353_0                        :BOOL;
+O160_SPARE_Q1353_1                        :BOOL;
+O160_SPARE_Q1353_2                        :BOOL;
+O160_SPARE_Q1353_3                        :BOOL;
+O160_SPARE_Q1353_4                        :BOOL;
+O160_SPARE_Q1353_5                        :BOOL;
+O160_SPARE_Q1353_6                        :BOOL;
+O160_SPARE_Q1353_7                        :BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

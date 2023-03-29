@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP70_GVL" Id="{09b80a07-4e53-455f-8c74-745e8ef98964}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+			
+//GENERAL
+OP70_Auto:					BOOL;
+OP70_Mode_Ack:				BOOL;
+OP70_HomeRunning:			BOOL;
+OP70_ErrorActive:			BOOL;
+OP70_Home_PB:				BOOL;
+OP70_Work_PB:				BOOL;
+OP70_ManualSafetyBypass:	BOOL;
+OP70_LightCurtainBypass:	BOOL;
+OP70_OperationCompleted:	BOOL;
+OP70_LampCheck:				BOOL;
+OP70_MachineLamp:			BOOL;
+OP70_ComponentOk:			BOOL;
+OP70_ComponentNok:			BOOL;
+OP70_RepeatBit:				BOOL;
+OP70_HomingResetBit:		BOOL;
+OP70_ControlledByRobo:		BOOL;
+OP70_Any_Bypass:			BOOL;
+OP70_ManualModeStatus:		INT;
+OP70_ManualModeWord:		INT;
+OP70_AutoRunning:			BOOL;
+OP70_StepRunning:			BOOL;
+OP70_StartEnable:   		BOOL;
+OP70_HomeConditionOK:		BOOL;
+OP70_Temp_hmeOK:			BOOL;
+OP70_Machine_Stop: 			BOOL;
+OP70_AutoSeq:				INT;
+OP70_LH_AutoSeq: 			INT;
+OP70_RH_AutoSeq: 			INT;
+OP70_Homing_Seq:			INT;
+OP70_Safety_OK:				BOOL;
+
+OP70_ManualSelected:		BOOL;
+OP70_StepSelected:			BOOL;
+OP70_AutoSelected:		    BOOL;
+
+OP70_HMI_AutoMode:						BOOL;
+OP70_HMI_ManualMode:					BOOL;
+OP70_HMI_StepMode:						BOOL;
+OP70_HMI_CycleStart:					BOOL;
+OP70_HMI_Cycle_Start:					BOOL;
+OP70_HMI_Reset:						    BOOL;
+OP70_HMI_Homing:						BOOL;
+
+SR70_Vert_servo: FB_Axis;
+SR70_Vert_servo_ctrl:Servo_Control;
+SR70_Vert_servo_status:stManualModeAxis;
+
+SR70_Hori_servo: FB_Axis;
+SR70_Hori_servo_ctrl:Servo_Control;
+SR70_Hori_servo_status:stManualModeAxis;
+
+SR70_Conv_servo: FB_Axis;
+SR70_Conv_servo_ctrl:Servo_Control;
+SR70_Conv_servo_status:stManualModeAxis;
+
+OP70_GIUDE_GRP: FB_Axis_FESTO;
+OP70_GIUDE_GRP_Manual_Axis: stManualModeAxis; 
+OP70_GIUDE_GRP_ctrl: Servo_Control;
+
+
+
+Drum_feeder_ON 	  : BOOL;
+Drum_feeder_State : BOOL;
+
+Camera_LH_Trig : BOOL;
+Camera_LH_OK   : BOOL;
+
+Camera_RH_Trig : BOOL;
+Camera_RH_OK   : BOOL;
+
+//Cylinder
+CR70_LH_Rej_Cyl: Cylinder_Block;
+CR70_RH_Rej_Cyl: Cylinder_Block;
+CR70_LH_Rej_Cyl_status : INT;
+CR70_RH_Rej_Cyl_status : INT;
+OP70_HMI_LH_Rej_Cyl_Home_PB : BOOL;
+OP70_HMI_LH_Rej_Cyl_Work_PB : BOOL;
+OP70_HMI_RH_Rej_Cyl_Home_PB : BOOL;
+OP70_HMI_RH_Rej_Cyl_Work_PB : BOOL;
+
+//conveyor
+OP70_pick_ready: BOOL;
+OP70_pick_done : BOOL;
+
+//Schunk
+OP70_Gripper_LH : FB_Schunk;
+OP70_Gripper_LH_Manual_Axis: stManualModeAxis; 
+OP70_Gripper_LH_Gripper_ctrl: Servo_Control; 
+  
+OP70_Gripper_Current     : REAL;
+OP70_Gripper_Acceleration: REAL;
+OP70_Gripper_Jerk        : REAL;
+
+OP70_Gripper_RH : FB_Schunk;
+OP70_Gripper_RH_Manual_Axis: stManualModeAxis;
+OP70_Gripper_RH_Gripper_ctrl: Servo_Control; 
+
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	OP70_Gripper_LH_Open  : BOOL;
+    OP70_Gripper_LH_Close : BOOL;
+    OP70_Gripper_LH_State : BOOL;  //1-- Open 0--Close
+ 
+    OP70_Gripper_RH_Open  : BOOL;
+    OP70_Gripper_RH_Close : BOOL;
+    OP70_Gripper_RH_State : BOOL;
+
+
+    OP70_VERT_SERVO_POS_DONE	    	: BOOL;
+    OP70_VERT_SERVO_ON_SFE_WRK			: BOOL;
+    OP70_VERT_SERVO_ON_WRK_PICK			: BOOL;
+	OP70_VERT_SERVO_ON_WRK_PLACE		: BOOL;
+    OP70_VERT_SERVO_ON_HOME				: BOOL;
+	  
+	OP70_VERT_SERVO_POSITION		: LREAL ;
+	OP70_VERT_SERVO_HME_POS			: REAL := 0;  				
+	OP70_VERT_SERVO_SFE_WRK_POS		: REAL := 100;		
+	OP70_VERT_SERVO_PICK_POS		: REAL := 400;	
+	OP70_VERT_SERVO_PLACE_POS		: REAL := 200;
+
+    OP70_HORI_SERVO_POS_DONE	    	: BOOL;
+    OP70_HORI_SERVO_ON_SFE_WRK			: BOOL;
+    OP70_HORI_SERVO_ON_WRK_PICK			: BOOL;
+	OP70_HORI_SERVO_ON_WRK_PLACE		: BOOL;
+    OP70_HORI_SERVO_ON_HOME				: BOOL;
+	  
+	OP70_HORI_SERVO_POSITION		: LREAL ;
+	OP70_HORI_SERVO_HME_POS			: REAL := 0;  				
+	OP70_HORI_SERVO_SFE_WRK_POS		: REAL := 700;		
+	OP70_HORI_SERVO_PICK_POS		: REAL := 400;	
+	OP70_HORI_SERVO_PLACE_POS		: REAL := 200;
+	
+    OP70_CONV_SERVO_POS_DONE	    	: BOOL;
+    OP70_CONV_SERVO_ON_SFE_WRK			: BOOL;
+    OP70_CONV_SERVO_ON_WRK				: BOOL;
+    OP70_CONV_SERVO_ON_HOME				: BOOL;
+	
+	OP70_CONV_SERVO_POSITION		: LREAL ;
+	OP70_CONV_SERVO_HME_POS			: REAL;// := 0;  				
+	OP70_CONV_SERVO_SFE_WRK_POS		: REAL ;//:= 40;		
+	OP70_CONV_SERVO_WRK_POS			: REAL;// := 200;
+
+//Error
+OP70_ErrorWord_0: DINT;
+OP70_ErrorWord_1: DINT;
+OP70_ErrorWord_2: DINT;	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

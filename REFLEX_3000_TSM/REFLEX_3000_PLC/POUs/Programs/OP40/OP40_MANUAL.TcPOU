@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP40_MANUAL" Id="{3a45fd08-94f4-435a-a69f-40aa1bb2b0d8}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP40_MANUAL
+VAR
+	
+    temp_safe:BOOL;
+	enable:BOOL;
+	reset:bool;
+	OP40_Enable: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// IF MANUAL IS SELECTED 
+
+//SR40_Vert_servo_ctrl.ABSmove_Start:=OP40_VERT_SERVO_STRT;
+OP40_SERVO_POS_DONE:= SR40_Vert_servo_ctrl.pos_done;
+
+IF In_Range(SR40_Vert_servo_status.actualPosition,OP40_VERT_SERVO_SFE_WRK_POS,1) THEN
+	OP40_SERVO_ON_SFE_WRK := TRUE;
+ELSE
+	OP40_SERVO_ON_SFE_WRK := FALSE;
+END_IF
+
+IF In_Range(SR40_Vert_servo_status.actualPosition,OP40_VERT_SERVO_HME_POS,1) THEN
+	OP40_SERVO_ON_HOME := TRUE;
+ELSE
+	OP40_SERVO_ON_HOME := FALSE;
+END_IF
+
+IF In_Range(SR40_Vert_servo_status.actualPosition,OP40_VERT_SERVO_WRK_POS_1,1) THEN
+	OP40_SERVO_ON_WRK_1 := TRUE;
+ELSE
+	OP40_SERVO_ON_WRK_1 := FALSE;
+END_IF
+
+IF In_Range(SR40_Vert_servo_status.actualPosition,OP40_VERT_SERVO_WRK_POS_2,1) THEN
+	OP40_SERVO_ON_WRK_2 := TRUE;
+ELSE
+	OP40_SERVO_ON_WRK_2 := FALSE;
+END_IF
+
+SR40_Vert_servo(
+	bAxis1_Ref_Switch:= , 
+	bInit:= , 
+	bErrorReset:= OP40_HMI_Reset OR Servo_Reset , 
+	bEnable:=Servo_Enable , 
+	bMoveVelocity:= , 
+	bHalt:=  , 
+	bManualMode:= MANUAL_SELECTED, 
+	fHomePos:= , 
+	fOverride:= , 
+	fTargetPosition:= SR40_Vert_servo_ctrl.Position, 
+	fTargetVelocity:= SR40_Vert_servo_ctrl.Velocity, 
+	fAcc:= , 
+	fDec:= , 
+	Safe_move_Conditions:= Servo_Safety, 
+	Axis:= SR40_Vert_servo_Axis, 
+	HME_WRITE_ADD:= 16#5004,
+	bHome:= SR40_Vert_servo_ctrl.Bsethome , 
+	bSetPosition:= SR40_Vert_servo_ctrl.Bsetpos  , 
+	bMoveAbsolute:= SR40_Vert_servo_ctrl.ABSmove_Start, 
+	bMoveRelative:= SR40_Vert_servo_ctrl.RELmove_Start, 
+	bMoveTorque:= SR40_Vert_servo_ctrl.Torque_mode_Start, 
+	stManualModeAxis:= SR40_Vert_servo_status , 
+	bmove_home:= SR40_Vert_servo_ctrl.Axis_Home_Cmd , 
+	sAxisState=> SR40_Vert_servo_ctrl.Axis_State , 
+	bAxis_ready=> SR40_Vert_servo_ctrl.Axis_ready , 
+	bAxisInPosition=> SR40_Vert_servo_ctrl.Axis_In_Pos , 
+	bAxisError=> SR40_Vert_servo_ctrl.Axis_Error , 
+	bAxisEnabled=> SR40_Vert_servo_ctrl.Axis_Enabled, 
+	bAxisHomed=> SR40_Vert_servo_ctrl.Axis_reference , 
+	bSetPositionDone=> , 
+	bHaltDone=>  SR40_Vert_servo_ctrl.Axis_Halted , 
+	bSTOPDone=> , 
+	bHomeDone=> , 
+	bDone=> , 
+	bTorqueReached=> , 
+	bsafe_to_move=> , 
+	baxis_in_home_pos=> SR40_Vert_servo_ctrl.Axis_In_Home , 
+	bABS_Pos_done=>SR40_Vert_servo_ctrl.pos_done , 
+	Actual_position=>SR40_Vert_servo_ctrl.Actual_Position ,  
+	Actual_velocity=>SR40_Vert_servo_ctrl.Actual_Velocity , 
+	Actual_Torque=> SR40_Vert_servo_ctrl.Actual_Torque);
+	
+IF MANUAL_SELECTED THEN	
+SR40_Vert_servo_status.targetVelocity:=50;	
+END_IF
+
+OP40_LH_LVDT_VALUE := DINT_TO_REAL(OP40_LH)/10000;
+OP40_RH_LVDT_VALUE := DINT_TO_REAL(OP40_RH)/10000;]]></ST>
+    </Implementation>
+    <LineIds Name="OP40_MANUAL">
+      <LineId Id="3" Count="45" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="49" Count="24" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="95" Count="1" />
+      <LineId Id="94" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

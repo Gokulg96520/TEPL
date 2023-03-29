@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{7c5f3048-e54c-486b-88b4-53750162eef6}</ProjectGuid>
+    <AssemblyName>REFLEX_3000_SCOPE</AssemblyName>
+    <Name>REFLEX_3000_SCOPE</Name>
+    <RootNamespace>REFLEX_3000_SCOPE</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="YT Scope Project.tcscopex">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+</Project>

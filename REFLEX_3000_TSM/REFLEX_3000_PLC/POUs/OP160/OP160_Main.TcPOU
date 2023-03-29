@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_Main" Id="{6863b1ca-e17d-4a5b-a399-2c690296f1af}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_Main
+VAR
+	
+	OP160_RFID_TOOL: FB_RFID;
+	OP160_RFID_FIX: FB_RFID;
+	
+	OP160_Tool_RFID_Read: BOOL;
+	OP160_Tool_RFID_Write: BOOL;
+	OP160_Tool_RFID_Quit: BOOL;
+	OP160_HD_wrd_Num: INT;
+	OP160_HD_wrd_Add: WORD;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP160_RFID_TOOL(
+	I_T_Timeout:= , 
+	I_b_Head1SingleEnhanced:=TRUE , 
+	I_b_Head1DataFixcode:= , 
+	I_b_Head1SpecialFixcode:= , 
+	I_b_Head1SpecialCommand:= , 
+	I_b_Head1Read:=OP160_Tool_RFID_Read , 
+	I_b_Head1Write:=OP160_Tool_RFID_Write , 
+	I_b_Head1Quit:=OP160_Tool_RFID_Quit , 
+	I_i_Head1WordNum:=OP160_HD_wrd_Num , 
+	I_w_Head1WordAddress:=OP160_HD_wrd_Add , 
+	I_w_Head1TagType:= , 
+	HwIn:= , 
+	IO_b_SetRestart:= , 
+	IO_b_InitFinish:= , 
+	Head1Data:= , 
+	head1:= , 
+	Memory:= , 
+	O_b_Head1Busy=> , 
+	O_b_Head1Done=> , 
+	O_b_Head1NoDataCarrier=> , 
+	O_b_Head1Error=> , 
+	O_B_Head1Status=> , 
+	O_B_Head1ReplyCounter=> , 
+	HwOut=> );]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_Main">
+      <LineId Id="11" Count="23" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

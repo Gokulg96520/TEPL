@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP80_Recipe" Id="{18507f13-f861-49c1-8174-ae6aadbfcb02}">
+    <Declaration><![CDATA[//{attribute 'qualified_only'}
+VAR_GLOBAL
+	OP80_DLY_BEF_MEAS : INT;
+	OP80_VERT_SERVO_WORK_POS : REAL;
+	OP80_VERT_SERVO_SFE_WORK_POS : REAL;	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

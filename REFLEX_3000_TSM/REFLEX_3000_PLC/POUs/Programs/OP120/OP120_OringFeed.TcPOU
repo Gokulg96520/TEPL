@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP120_OringFeed" Id="{84451fed-7a3e-45a1-88d8-e37d7a3fa703}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK OP120_OringFeed
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	OP120_Bowl_Auto: BOOL;
+	OP120_Bowl_Manual:BOOL;
+	Conveyor_Ready_to_Pick:BOOL;
+	
+	Trial_Run : BOOL;
+	
+	OP120_Bowl_ON_Timer: TON;
+	OP120_Bowl_Off_Timer: TON;
+	First_Cycle: BOOL;
+	con_step_no : INT;
+	cam_trig : BOOL;
+	cam_ok : BOOL;
+	go : BOOL;
+	t1: ton;
+	t2: ton;
+	t3: ton;
+	t4: ton;
+	
+	temp: BOOL;
+	check:BOOL;
+	check1:ton;
+	fwd_time : INT :=500;
+	count_nok :INT;
+	forward: BOOL;
+	reverse: BOOL;
+	//please delete
+	pick_ready:BOOL;
+	 pick_done:bool;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(*
+IF (NOT OP120_GVL.OP120_AutoSelected OR OP120_GVL.OP120_ErrorActive) THEN
+	OP120_GVL.OP120_AutoRunning:= FALSE;
+	OP120_GVL.SR130_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+	forward:=FALSE;
+	reverse:=FALSE;
+	con_step_no:= 10;
+END_IF	*)
+
+CASE con_step_no OF
+		10: IF (OP120_GVL.OP120_AutoSelected) THEN		// Check Automode Selected
+				con_step_no:=20;
+	        END_IF
+		
+	    20:IF (NOT OP120_GVL.OP120_ErrorActive) THEN		//Check No error
+		       con_step_no:=50;
+      	   END_IF
+		   
+      	50:IF ( NOT OP120_GVL.OP120_OperationCompleted) THEN		// Check Operation Completed Reset
+      		   con_step_no:=60;
+      	   END_IF
+		   
+		60:IF ( OP120_GVL.OP120_AutoRunning   OR (OP120_GVL.OP120_HMI_CycleStart_PB )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+				con_step_no:= 65;
+				OP120_GVL.OP120_AutoRunning:=TRUE;
+		   END_IF
+		   
+        65:	 SR120_Oring_Feed_Servo_Control.Velocity:= 500;
+		//	fwd_time:=4000;			
+			forward:=TRUE;
+			SR120_Oring_Feed_Servo_Control.VELmove_Start:=TRUE;	
+			IF t2.Q THEN
+    			forward:=FALSE;
+				OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+				con_step_no:= 70;
+			END_IF
+		  
+		70: IF NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start THEN
+			  cam_trig :=TRUE;
+			  IF t1.Q THEN
+				con_step_no:= 75;
+			  END_IF
+			END_IF	
+					
+		75:	IF cam_ok AND NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start AND OP120_GVL.SR120_Oring_Feed_Servo_Control.Axis_ready THEN
+				IF t4.Q THEN
+				 con_step_no:= 90;
+				 count_nok:=0;	
+				END_IF
+			ELSIF NOT cam_ok AND count_nok<5 AND NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start THEN
+				count_nok := count_nok +1;
+				fwd_time:=1000;
+				con_step_no:= 80;
+			ELSIF NOT cam_ok AND count_nok>=5 AND NOT OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start THEN
+				count_nok:=0;
+				fwd_time:=5000;
+				con_step_no:= 80;
+			END_IF
+			
+		80: 	 OP120_GVL.SR120_Oring_Feed_Servo_Control.Velocity:= 500;				
+				forward:=TRUE;
+				OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=TRUE;	
+				IF t2.Q THEN
+    				forward:=FALSE;
+					OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+					con_step_no:= 70;
+				END_IF
+		
+		90: 	 OP120_GVL.SR120_Oring_Feed_Servo_Control.Velocity:= -100;
+				reverse:=TRUE;
+				OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=TRUE;
+				IF t3.Q THEN
+ 					reverse:=FALSE;
+					OP120_GVL.SR120_Oring_Feed_Servo_Control.VELmove_Start:=FALSE;
+					con_step_no:= 100;
+				END_IF		
+				
+		100: pick_ready:=TRUE;
+			 IF pick_done THEN
+				 pick_ready :=FALSE;
+				 pick_done:=FALSE;
+				 con_step_no:= 80;
+			 END_IF
+			 		
+				
+END_CASE
+
+t1(IN:=cam_trig ,PT:=T#500MS);
+IF cam_trig AND con_step_no=70  THEN
+	cam_ok:=FALSE;
+END_IF
+IF t1.Q THEN
+	cam_ok:=temp;
+	cam_trig :=FALSE;
+END_IF
+
+t2(IN:=forward ,PT:=INT_TO_TIME(fwd_time));
+t3(IN:=reverse ,PT:=T#500MS);
+t4(IN:=cam_ok,PT:=T#1S);
+
+
+
+
+
+
+	]]></ST>
+    </Implementation>
+    <LineIds Name="OP120_OringFeed">
+      <LineId Id="3" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="4" Count="102" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP10_VARIABLE" Id="{260548e2-f0e9-4408-afba-f471bf03d2ef}">
+    <Declaration><![CDATA[VAR_GLOBAL
+// FUNCTIONAL BLOCK
+									(*CYLINDER*)
+	OP10A_HORZ_CYL									: Cylinder_Block_HOMING;
+	OP10A_VERT_CYL									: Cylinder_Block_HOMING;	
+	OP10A_DEGREE_CYL								: Cylinder_Block_HOMING;
+	OP10A_LH_GRP									: Cylinder_Block_HOMING;
+	OP10A_RH_GRP                                    : Cylinder_Block_HOMING;
+	OP10A_LH_PUSH                                   : Cylinder_Block_HOMING;
+	OP10A_RH_PUSH									: Cylinder_Block_HOMING;
+	OP10B_HORZ_CYL									: Cylinder_Block_HOMING;
+	OP10B_VERT_CYL									: Cylinder_Block_HOMING;	
+	OP10B_DEGREE_CYL								: Cylinder_Block_HOMING;
+	OP10B_LH_GRP									: Cylinder_Block_HOMING;
+	OP10B_RH_GRP                                    : Cylinder_Block_HOMING;
+	OP10B_LH_PUSH                                   : Cylinder_Block_HOMING;
+	OP10B_RH_PUSH									: Cylinder_Block_HOMING;
+	OP10B_LH_REJ                                    : Cylinder_Block_HOMING;
+	OP10B_RH_REJ									: Cylinder_Block_HOMING;	
+	OP10A_LH_REJ                                    : Cylinder_Block_HOMING;
+	OP10A_RH_REJ									: Cylinder_Block_HOMING;
+	OP10_BDY_SING_FRT                               : Cylinder_Block_HOMING;
+	OP10_BDY_SING_SEC								: Cylinder_Block_HOMING;	
+	
+									(*SERVO*)
+									(*OP10*)
+	OP10_SRV_FRST_PCKBDY_CNT						: Servo_Control;
+	OP10_SRV_SCND_PCKBDY_CNT						: Servo_Control;
+	OP10_SRV_FRST_PCKBDY_STUS						: stManualModeAxis;
+	OP10_SRV_SCND_PCKBDY_STUS						: stManualModeAxis;
+	OP10_FRT_BDY_GPR								: FB_Axis_FESTO;
+	OP10_SEC_BDY_GPR								: FB_Axis_FESTO;	
+/////////////////
+	OP10A_LH_ROTY									: FB_Axis_FESTO;
+	OP10A_RH_ROTY									: FB_Axis_FESTO;
+	OP10A_LH_GRIPR									: FB_Axis_FESTO;
+	OP10A_RH_GRIPR									: FB_Axis_FESTO;
+	OP10A_CONVEYOR									: FB_Axis;	
+	OP10A_SRV_LH_BDYANG_CNT							: SERVO_Control;
+	OP10A_SRV_RH_BDYANG_CNT                     	: SERVO_Control;
+	OP10A_SRV_LH_BDYGRP_CNT                     	: SERVO_Control;
+	OP10A_SRV_RH_BDYGRP_CNT                     	: SERVO_Control;
+	OP10A_SRV_O_CNVY_CNT                        	: SERVO_Control;
+	OP10A_SRV_LH_BDYANG_STUS						: stManualModeAxis;	
+	OP10A_SRV_RH_BDYANG_STUS                    	: stManualModeAxis;	
+	OP10A_SRV_LH_BDYGRP_STUS                    	: stManualModeAxis;	
+	OP10A_SRV_RH_BDYGRP_STUS                    	: stManualModeAxis;	
+	OP10A_SRV_O_CNVY_STUS	                    	: stManualModeAxis;	
+/////////////////
+	OP10B_LH_ROTY									: FB_Axis_FESTO;
+	OP10B_RH_ROTY									: FB_Axis_FESTO;
+	OP10B_LH_GRIPR									: FB_Axis_FESTO;
+	OP10B_RH_GRIPR									: FB_Axis_FESTO;
+	OP10B_CONVEYOR									: FB_Axis;	                            	
+	OP10B_SRV_LH_BDYANG_CNT							: SERVO_Control;
+	OP10B_SRV_RH_BDYANG_CNT                     	: SERVO_Control;
+	OP10B_SRV_LH_BDYGRP_CNT                     	: SERVO_Control;
+	OP10B_SRV_RH_BDYGRP_CNT                     	: SERVO_Control;
+	OP10B_SRV_O_CNVY_CNT                            : SERVO_Control;
+	OP10B_SRV_LH_BDYANG_STUS						: stManualModeAxis;	
+	OP10B_SRV_RH_BDYANG_STUS                    	: stManualModeAxis;	
+	OP10B_SRV_LH_BDYGRP_STUS                    	: stManualModeAxis;	
+	OP10B_SRV_RH_BDYGRP_STUS                    	: stManualModeAxis;	
+	OP10B_SRV_O_CNVY_STUS	                        : stManualModeAxis;
+	
+// HOMING	
+	OP10A_O_LHGRIP_HMG1: BOOL;
+	OP10A_O_RHGRIP_HMG1: BOOL;
+	OP10A_O_LHPUSH_HMG1: BOOL;
+	OP10A_O_RHPUSH_HMG1: BOOL;
+	OP10A_O_VERT_HMG1: BOOL;
+	OP10A_O_DEGRE_HMG1: BOOL;
+	OP10A_O_HORZ_HMG1: BOOL;
+	OP10B_O_LHGRIP_HMG1: BOOL;
+	OP10B_O_RHGRIP_HMG1: BOOL;
+	OP10B_O_LHPUSH_HMG1: BOOL;
+	OP10B_O_RHPUSH_HMG1: BOOL;
+	OP10B_O_VERT_HMG1: BOOL;
+	OP10B_O_DEGRE_HMG1: BOOL;
+	OP10B_O_HORZ_HMG1: BOOL;
+									(*OP10A*)
+	OP10A_ALL_HOME									: BOOL;
+	OP10A_ROBO_SFE_HME								: BOOL;	
+	OP10A_ROBO_SFE_HME_FB							: BOOL;	
+	OP10A_HME_1_5									: INT	:= 5;
+	OP10A_HME_5_10									: INT 	:= 10;	
+	OP10A_HME_10_15									: INT	:= 15;
+	OP10A_HME_15_20									: INT	:= 20;
+	OP10A_HME_20_25									: INT	:= 25;
+	OP10A_HME_25_30									: INT	:= 30;	
+									(*OP10B*)
+	OP10B_ALL_HOME									: BOOL;	
+	OP10B_ROBO_SFE_HME								: BOOL;
+	OP10B_ROBO_SFE_HME_FB							: BOOL;	
+	OP10B_HME_1_5									: INT	:= 5;
+	OP10B_HME_5_10									: INT 	:= 10;	
+	OP10B_HME_10_15									: INT	:= 15;
+	OP10B_HME_15_20									: INT	:= 20;
+	OP10B_HME_20_25									: INT	:= 25;
+	OP10B_HME_25_30									: INT	:= 30;	
+	
+	
+// MANUAL
+
+									(*OP10A*)	
+	OP10A_O_CNVY_JOG_P								: BOOL;
+	OP10A_O_CNVY_JOG_N								: BOOL;
+	OP10B_O_CNVY_JOG_P								: BOOL;
+	OP10B_O_CNVY_JOG_N								: BOOL;
+	OP10A_LH_GRP_JOG_P								: BOOL;
+	OP10A_LH_GRP_JOG_N								: BOOL;
+	OP10A_RH_GRP_JOG_N								: BOOL;
+	OP10A_RH_GRP_JOG_P								: BOOL;	
+	OP10A_LH_ROTRY_JOG_N							: BOOL;
+	OP10A_LH_ROTRY_JOG_P							: BOOL;
+	OP10A_RH_ROTRY_JOG_P							: BOOL;
+	OP10A_RH_ROTRY_JOG_N							: BOOL;
+	OP10B_LH_GRP_JOG_P								: BOOL;
+	OP10B_LH_GRP_JOG_N								: BOOL;
+	OP10B_RH_GRP_JOG_P								: BOOL;
+	OP10B_RH_GRP_JOG_N								: BOOL;
+	OP10B_LH_ROTRY_JOG_P							: BOOL;
+	OP10B_LH_ROTRY_JOG_N							: BOOL;
+	OP10B_RH_ROTRY_JOG_P							: BOOL;
+	OP10B_RH_ROTRY_JOG_N							: BOOL;
+	OP10_FRST_BDY_GRP_JOG_N							: BOOL;
+	OP10_FRST_BDY_GRP_JOG_P							: BOOL;
+	OP10_SEC_BDY_GRP_JOG_P							: BOOL;
+	OP10_SEC_BDY_GRP_JOG_N							: BOOL;
+	
+                                            		
+// AUTO                                     		
+                            (*CYLINDER*)
+							  (*OP10*)
+	OP10_SRV_ALL_HOME								: BOOL;
+							 (*OP10A*)	
+	OP10A_ALL_CYL_HOME_FB							: BOOL;
+	OP10A_SRV_ALL_HOME								: BOOL;
+	OP10A_O_0DEGRE_AUTOCMD1							: BOOL;
+	OP10A_O_180DEGRE_AUTOCMD2						: BOOL;
+	OP10A_O_HORZ_AUTOCMD1							: BOOL;
+	OP10A_O_HORZ_AUTOCMD2							: BOOL;
+	OP10A_A_O_LHGRIP_ONOFF							: BOOL;
+	OP10A_A_O_LHPUSH_CYL							: BOOL;
+	OP10A_A_LH_REJ_HOME								: BOOL;
+	OP10A_A_LH_REJ_WRK								: BOOL;
+	OP10A_A_O_RHGRIP_ONOFF							: BOOL;
+	OP10A_A_O_RHPUSH_CYL							: BOOL;
+	OP10A_A_RH_REJ_HOME								: BOOL;
+	OP10A_A_RH_REJ_WRK								: BOOL;
+	OP10A_O_VERT_AUTOCMD1							: BOOL;
+	OP10A_O_VERT_AUTOCMD2							: BOOL;
+							 (*OP10B*)
+	OP10B_ALL_CYL_HOME_FB							: BOOL;
+	OP10B_SRV_ALL_HOME								: BOOL;
+	OP10B_O_0DEGRE_AUTOCMD1							: BOOL;
+	OP10B_O_180DEGRE_AUTOCMD2						: BOOL;
+	OP10B_O_HORZ_AUTOCMD1							: BOOL;
+	OP10B_O_HORZ_AUTOCMD2							: BOOL;
+	OP10B_A_O_LHGRIP_ONOFF							: BOOL;
+	OP10B_A_O_LHPUSH_CYL							: BOOL;
+	OP10B_A_LH_REJ_HOME								: BOOL;
+	OP10B_A_LH_REJ_WRK								: BOOL;
+	OP10B_A_O_RHGRIP_ONOFF							: BOOL;
+	OP10B_A_O_RHPUSH_CYL							: BOOL;
+	OP10B_A_RH_REJ_HOME								: BOOL;
+	OP10B_A_RH_REJ_WRK								: BOOL;
+	OP10B_O_VERT_AUTOCMD1							: BOOL;
+	OP10B_O_VERT_AUTOCMD2							: BOOL;  
+
+/////////////////////////////////////////////////////////////////////////////////////              		
+							(*SERVO_OP10*)       	
+	OP10_A_SRV_FST_BDYPCK_WRK						: BOOL;
+	OP10_A_SRV_FST_BDYPCK_HME						: BOOL;
+	OP10_A_SRV_SCND_BDYPCK_WRK						: BOOL;
+	OP10_A_SRV_SCND_BDYPCK_HME						: BOOL;
+	
+							(*SERVO_OP10A*)
+	OP10A_A_SRV_LH_GRPWRK							: BOOL;
+	OP10A_A_SRV_LH_GRPHME							: BOOL;
+	OP10A_A_SRV_RH_GRPWRK							: BOOL;
+	OP10A_A_SRV_RH_GRPHME							: BOOL;
+	OP10A_SRV_LH_BDYANG_HME							: BOOL;	
+	OP10A_SRV_LH_BDYANG_WRK							: BOOL;
+	OP10A_SRV_RH_BDYANG_HME							: BOOL;
+	OP10A_SRV_RH_BDYANG_WRK							: BOOL;
+	OP10B_A_SRV_LH_GRPWRK							: BOOL;
+	OP10B_A_SRV_LH_GRPHME							: BOOL;
+	OP10B_A_SRV_RH_GRPWRK							: BOOL;
+	OP10B_A_SRV_RH_GRPHME							: BOOL;
+	OP10B_SRV_LH_BDYANG_HME							: BOOL;
+	OP10B_SRV_LH_BDYANG_WRK							: BOOL;
+	OP10B_SRV_RH_BDYANG_HME							: BOOL;
+	OP10B_SRV_RH_BDYANG_WRK							: BOOL;
+                              		
+							(*SERVO_OP10B*)                                            		
+	OP10_SRV_FRST_PCKBDY_WRK_FB						: BOOL;
+	OP10_SRV_FRST_PCKBDY_HME_FB						: BOOL;
+	OP10_SRV_SCND_PCKBDY_WRK_FB						: BOOL;	
+	OP10_SRV_SCND_PCKBDY_HME_FB						: BOOL;	
+	OP10A_A_SRV_RH_GRPWRK_FB						: BOOL;	
+	OP10A_A_SRV_LH_GRPWRK_FB						: BOOL;	
+	OP10A_A_SRV_RH_GRPHME_FB						: BOOL;
+	OP10A_A_SRV_LH_GRPHME_FB						: BOOL;	
+	OP10A_SRV_LH_BDYANG_HME_FB						: BOOL;
+	OP10A_SRV_RH_BDYANG_HME_FB						: BOOL;	
+	OP10A_SRV_LH_BDYANG_WRK_FB						: BOOL;	
+	OP10B_A_SRV_LH_GRPWRK_FB						: BOOL;
+	OP10B_A_SRV_LH_GRPHME_FB						: BOOL;
+	OP10B_A_SRV_RH_GRPWRK_FB						: BOOL;
+	OP10B_A_SRV_RH_GRPHME_FB						: BOOL;
+	OP10B_SRV_LH_BDYANG_HME_FB						: BOOL;
+	OP10B_SRV_LH_BDYANG_WRK_FB						: BOOL;
+	OP10B_SRV_RH_BDYANG_HME_FB						: BOOL;	
+	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Servo_Control" Id="{166e9449-9350-4185-981e-79b7c106948c}">
+    <Declaration><![CDATA[TYPE Servo_Control :
+STRUCT
+	//input
+	Reference_Start:BOOL;
+	Reference_Position:LREAL;
+	ABSmove_Start:BOOL;
+	RELmove_Start:BOOL;
+	VELmove_Start:BOOL;
+	Torque_mode_Start:BOOL;
+	Velocity:LREAL;		//Target velocity
+	Position : LREAL; //target position
+	BsetPos:BOOL;
+	Bsethome : BOOL;
+	Axis_Home_Cmd:BOOL;	
+	Safety_cond : BOOL; //interlocks
+	//Output
+	Axis_State:STRING;
+	Axis_ready:BOOL;
+	Axis_In_Pos:BOOL;
+	Axis_Error:BOOL;
+	Axis_Enabled:BOOL;
+	Axis_reference:BOOL;
+	Axis_In_Home: BOOL;
+	Axis_Stopped:BOOL;
+	Axis_Halted:BOOL;
+	Safe_To_Move:BOOL;
+	pos_done : BOOL;
+	Trq_reached : BOOL;
+	Actual_Position : LREAL;
+	Actual_Velocity : LREAL;
+	Actual_Torque : LREAL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

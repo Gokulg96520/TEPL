@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP20_Initialization_Seq" Id="{2f457049-50ca-4b09-a07b-b2ff5b987092}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP20_Initialization_Seq
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (SR20_Vert_servo_ctrl.Axis_In_Home)THEN
+OP20_Temp_hmeOK:=TRUE;
+OP20_HomeRunning:=FALSE;
+OP20_Homing_Seq:=0;
+ELSE
+	OP20_Temp_hmeOK:=FALSE;	
+END_IF
+
+CASE OP20_Homing_Seq OF
+	0: IF (OP20_AutoSelected AND NOT OP20_HomeRunning AND NOT OP20_ErrorActive AND NOT OP20_AutoRunning AND NOT OP20_StepRunning AND NOT OP20_Temp_hmeOK) THEN
+		OP20_HomeRunning:=TRUE;
+		OP20_Homing_Seq:=10;	
+	   END_IF
+	10:IF (OP20_HomeRunning AND OP20_HMI_Homing)THEN 
+		IF (SR20_Vert_servo_ctrl.Axis_In_Home) THEN 
+			//OP20_Homing_Seq:=20;
+			SR20_Vert_servo_ctrl.Axis_Home_Cmd:=FALSE;
+		ELSE
+			SR20_Vert_servo_ctrl.Axis_Home_Cmd:=TRUE;
+	    END_IF
+		OP20_Homing_Seq:=20;
+	   END_IF		
+	20:	OP20_Homing_Seq:=0;
+		OP20_HomeRunning:=FALSE;
+		OP20_HMI_Homing:=FALSE;
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP20_Initialization_Seq">
+      <LineId Id="3" Count="24" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
