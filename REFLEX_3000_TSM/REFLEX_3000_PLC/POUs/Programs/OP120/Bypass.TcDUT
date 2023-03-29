@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <DUT Name="Bypass" Id="{02d29601-9f89-434b-9e8b-34509c4d443c}">
+  <DUT Name="Bypass" Id="{ab41cdcc-47d2-4bb9-b966-6b8bab0f28ff}">
     <Declaration><![CDATA[TYPE Bypass :
 STRUCT
 OP120_Bypass_1:		BOOL;

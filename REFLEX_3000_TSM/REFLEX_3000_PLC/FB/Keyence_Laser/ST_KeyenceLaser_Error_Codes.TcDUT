@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Error_Codes" Id="{e9b98721-8d8a-490f-a9ca-c7718a08d12f}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Error_Codes :
+STRUCT
+Error_Code_1				: WORD ;
+Error_Code_2				: WORD ;
+Command_Send_Error_Status	: WORD ;
+ReserveWord_4				: WORD ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

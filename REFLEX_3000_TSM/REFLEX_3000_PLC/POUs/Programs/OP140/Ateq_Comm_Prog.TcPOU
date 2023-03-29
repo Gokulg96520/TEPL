@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Ateq_Comm_Prog" Id="{629008d7-3a31-4b07-a3d3-c0d97bd124eb}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Ateq_Comm_Prog
+VAR
+	
+	Pcom_In_All AT %I*: ARRAY[1..6] OF EL6inData22B;
+	Pcom_Out_All AT %Q*: ARRAY[1..6] OF EL6outData22B;	
+	sReceived_Data_All: ARRAY[1..6] OF STRING(255);
+	BioMetric_Data	  : STRING(255);
+	
+	Ateq_1:SerialLineControl;
+	Ateq_2:SerialLineControl;
+	Ateq_3:SerialLineControl;
+	Ateq_4:SerialLineControl;
+	Ateq_5:SerialLineControl;
+	Ateq_6:SerialLineControl;
+	
+	Ateq_data_1:ReceiveString255;
+	Ateq_data_2:ReceiveString255;
+	Ateq_data_3:ReceiveString255;
+	Ateq_data_4:ReceiveString255;
+	Ateq_data_5:ReceiveString255;
+	Ateq_data_6:ReceiveString255;	
+	BioMetric_data_FB :ReceiveString255;
+	
+	
+	TxBuffer_1: COMbuffer;
+	TxBuffer_2: COMbuffer;
+	TxBuffer_3: COMbuffer;
+	TxBuffer_4: COMbuffer;
+	TxBuffer_5: COMbuffer;
+	TxBuffer_6: COMbuffer;		
+	
+	RxBuffer_1: COMbuffer;
+	RxBuffer_2: COMbuffer;
+	RxBuffer_3: COMbuffer;
+	RxBuffer_4: COMbuffer;
+	RxBuffer_5: COMbuffer;
+	RxBuffer_6: COMbuffer;	
+	
+	
+	iError_ID_1: ComError_t;
+    iError_ID_2: ComError_t;
+	iError_ID_3: ComError_t;
+	iError_ID_4: ComError_t;
+	iError_ID_5: ComError_t;
+	iError_ID_6: ComError_t;	
+	
+	
+	bError_1: BOOL;
+	bError_2: BOOL;
+    bError_3: BOOL;
+	bError_4: BOOL;		
+	bError_5: BOOL;
+	bError_6: BOOL;	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[////////////////////////////////	
+
+Ateq_1(
+	Mode:= , 
+	pComIn:=(ADR(Pcom_In_All[1])) , 
+	pComOut:=(ADR(Pcom_Out_All[1])) , 
+	SizeComIn:=SIZEOF(Pcom_In_All[1]) , 
+	Error=> bError_1, 
+	ErrorID=>iError_ID_1 , 
+	TxBuffer:= TxBuffer_1, 
+	RxBuffer:=RxBuffer_1 );
+
+Ateq_data_1(
+	Prefix:='', 
+	Suffix:='' , 
+	Timeout:= T#1S, 
+	Reset:= (Pulse_Block.Q1Hz AND NOT Ateq_data_1.Busy) , 
+	StringReceived=> , 
+	Busy=> , 
+	Error=> , 
+	RxTimeout=> , 
+	ReceivedString:= sReceived_Data_All[1], 
+	RXbuffer:= RxBuffer_1);	
+
+Ateq_2(
+	Mode:= , 
+	pComIn:=(ADR(Pcom_In_All[2])) , 
+	pComOut:=(ADR(Pcom_Out_All[2])) , 
+	SizeComIn:=SIZEOF(Pcom_In_All[2]) , 
+	Error=> bError_2, 
+	ErrorID=>iError_ID_2 , 
+	TxBuffer:= TxBuffer_2, 
+	RxBuffer:=RxBuffer_2 );
+
+Ateq_data_2(
+	Prefix:='', 
+	Suffix:='' , 
+	Timeout:= T#1S, 
+	Reset:= (Pulse_Block.Q1Hz AND NOT Ateq_data_2.Busy) , 
+	StringReceived=> , 
+	Busy=> , 
+	Error=> , 
+	RxTimeout=> , 
+	ReceivedString:= sReceived_Data_All[2], 
+	RXbuffer:= RxBuffer_2);	
+	
+Ateq_3(
+	Mode:= , 
+	pComIn:=(ADR(Pcom_In_All[3])) , 
+	pComOut:=(ADR(Pcom_Out_All[3])) , 
+	SizeComIn:=SIZEOF(Pcom_In_All[3]) , 
+	Error=> bError_3, 
+	ErrorID=>iError_ID_3 , 
+	TxBuffer:= TxBuffer_3, 
+	RxBuffer:=RxBuffer_3 );
+
+Ateq_data_3(
+	Prefix:='', 
+	Suffix:='' , 
+	Timeout:= T#1S, 
+	Reset:= (Pulse_Block.Q1Hz AND NOT Ateq_data_3.Busy) , 
+	StringReceived=> , 
+	Busy=> , 
+	Error=> , 
+	RxTimeout=> , 
+	ReceivedString:= sReceived_Data_All[3], 
+	RXbuffer:= RxBuffer_3);	
+
+
+Ateq_4(
+	Mode:= , 
+	pComIn:=(ADR(Pcom_In_All[4])) , 
+	pComOut:=(ADR(Pcom_Out_All[4])) , 
+	SizeComIn:=SIZEOF(Pcom_In_All[4]) , 
+	Error=> bError_4, 
+	ErrorID=>iError_ID_4 , 
+	TxBuffer:= TxBuffer_4, 
+	RxBuffer:=RxBuffer_4 );
+
+Ateq_data_4(
+	Prefix:='', 
+	Suffix:='' , 
+	Timeout:= T#1S, 
+	Reset:= (Pulse_Block.Q1Hz AND NOT Ateq_data_4.Busy) , 
+	StringReceived=> , 
+	Busy=> , 
+	Error=> , 
+	RxTimeout=> , 
+	ReceivedString:= sReceived_Data_All[4], 
+	RXbuffer:= RxBuffer_4);
+
+Ateq_5(
+	Mode:= , 
+	pComIn:=(ADR(Pcom_In_All[5])) , 
+	pComOut:=(ADR(Pcom_Out_All[5])) , 
+	SizeComIn:=SIZEOF(Pcom_In_All[5]) , 
+	Error=> bError_5, 
+	ErrorID=>iError_ID_5 , 
+	TxBuffer:= TxBuffer_5, 
+	RxBuffer:=RxBuffer_5 );
+
+Ateq_data_5(
+	Prefix:='', 
+	Suffix:='' , 
+	Timeout:= T#1S, 
+	Reset:= (Pulse_Block.Q1Hz AND NOT Ateq_data_5.Busy) , 
+	StringReceived=> , 
+	Busy=> , 
+	Error=> , 
+	RxTimeout=> , 
+	ReceivedString:= sReceived_Data_All[5], 
+	RXbuffer:= RxBuffer_5);	
+
+
+Ateq_6(
+	Mode:= , 
+	pComIn:=(ADR(Pcom_In_All[6])) , 
+	pComOut:=(ADR(Pcom_Out_All[6])) , 
+	SizeComIn:=SIZEOF(Pcom_In_All[6]) , 
+	Error=> bError_6, 
+	ErrorID=>iError_ID_6 , 
+	TxBuffer:= TxBuffer_6, 
+	RxBuffer:=RxBuffer_6 );
+
+Ateq_data_6(
+	Prefix:='', 
+	Suffix:='' , 
+	Timeout:= T#1S, 
+	Reset:= (Pulse_Block.Q1Hz AND NOT Ateq_data_6.Busy) , 
+	StringReceived=> , 
+	Busy=> , 
+	Error=> , 
+	RxTimeout=> , 
+	ReceivedString:= sReceived_Data_All[6], 
+	RXbuffer:= RxBuffer_6);		
+	
+	
+BioMetric_data_FB(
+	Prefix:='', 
+	Suffix:='', 
+	Timeout:= T#1S, 
+	Reset:= (Pulse_Block.Q1Hz AND NOT BioMetric_data_FB.Busy) , 
+	StringReceived=> , 
+	Busy=> , 
+	Error=> , 
+	RxTimeout=> , 
+	ReceivedString:= BioMetric_Data, 
+	RXbuffer:= SerialComm.RxBuffer_1);		]]></ST>
+    </Implementation>
+    <LineIds Name="Ateq_Comm_Prog">
+      <LineId Id="3" Count="0" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="4" Count="131" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="189" Count="1" />
+      <LineId Id="192" Count="9" />
+      <LineId Id="191" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="IO_OP10_JB_IO" Id="{88e7a83b-dfaa-4a60-a6dd-fe8b3552e62f}">
+  <GVL Name="IO_OP10_JB_IO" Id="{59f98860-d8be-46df-97b8-50b3405a4510}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 	
@@ -24,8 +24,8 @@ VAR_GLOBAL
 	I10A_LNR_TRK1_CHO_MOD2_I102_1   :bool;
 	I10A_LNR_TRK2_CHO_MOD1_I102_2   :bool;
 	I10A_LNR_TRK2_CHO_MOD2_I102_3   :bool;
-	I10A_LNR_TRK3_CHO_MOD1_I102_4   :bool;
-	I10A_LNR_TRK3_CHO_MOD2_I102_5   :bool;
+	I10A_SPARE_I102_4               :BOOL;
+	I10A_SPARE_I102_5               :BOOL;
 	I10A_LH_BDY_CONT_FB_I102_6      :bool;
 	I10A_RH_BDY_CONT_FB_I102_7      :bool;
 	I10A_SPARE_I103_0               :bool;
@@ -90,8 +90,8 @@ VAR_GLOBAL
 	I10B_LNR_TRK1_CHO_MOD2_I202_1      :BOOL;
 	I10B_LNR_TRK2_CHO_MOD1_I202_2      :BOOL;
 	I10B_LNR_TRK2_CHO_MOD2_I202_3      :BOOL;
-	I10B_LNR_TRK3_CHO_MOD1_I202_4      :BOOL;
-	I10B_LNR_TRK3_CHO_MOD2_I202_5      :BOOL;
+	I10B_SPARE_I202_4                  :BOOL;
+	I10B_SPARE_I202_5     		       :BOOL;
 	I10B_SPARE_I202_6           :BOOL;
 	I10B_SPARE_I202_7           :BOOL;
 	I10B_SPARE_I203_0           :BOOL;

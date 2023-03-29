@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP20_Initialization_Seq" Id="{2f457049-50ca-4b09-a07b-b2ff5b987092}" SpecialFunc="None">
+  <POU Name="OP20_Initialization_Seq" Id="{1637b520-7386-4833-96db-078875051f70}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP20_Initialization_Seq
 VAR
 END_VAR
@@ -19,14 +19,19 @@ CASE OP20_Homing_Seq OF
 		OP20_HomeRunning:=TRUE;
 		OP20_Homing_Seq:=10;	
 	   END_IF
-	10:IF (OP20_HomeRunning AND OP20_HMI_Homing)THEN 
-		IF (SR20_Vert_servo_ctrl.Axis_In_Home) THEN 
-			//OP20_Homing_Seq:=20;
-			SR20_Vert_servo_ctrl.Axis_Home_Cmd:=FALSE;
-		ELSE
-			SR20_Vert_servo_ctrl.Axis_Home_Cmd:=TRUE;
-	    END_IF
-		OP20_Homing_Seq:=20;
+	10:IF (OP20_HomeRunning AND (OP20_HMI_Homing OR HMI_Reset))THEN 
+			IF (SR20_Vert_servo_ctrl.Axis_In_Home) THEN 
+				//OP20_Homing_Seq:=20;
+				SR20_Vert_servo_ctrl.Axis_Home_Cmd:=FALSE;
+			ELSE
+				SR20_Vert_servo_ctrl.Position:=0;
+				SR20_Vert_servo_ctrl.Velocity:=100;
+				SR20_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+				SR20_Vert_servo_ctrl.Axis_Home_Cmd:=TRUE;
+	    	END_IF
+			IF SR20_Vert_servo_ctrl.Axis_In_Home THEN
+			  OP20_Homing_Seq:=20;			
+			END_IF
 	   END_IF		
 	20:	OP20_Homing_Seq:=0;
 		OP20_HomeRunning:=FALSE;
@@ -34,7 +39,7 @@ CASE OP20_Homing_Seq OF
 END_CASE]]></ST>
     </Implementation>
     <LineIds Name="OP20_Initialization_Seq">
-      <LineId Id="3" Count="24" />
+      <LineId Id="3" Count="29" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

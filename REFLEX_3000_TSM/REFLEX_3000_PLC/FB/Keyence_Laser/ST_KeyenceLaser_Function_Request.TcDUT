@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Function_Request" Id="{8b105329-6d45-4ea1-a29e-f6344e3aead2}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Function_Request :
+STRUCT
+Trigger_Lock_Request	: BIT ;
+Operation_Stop_Request	: BIT ;
+Laser_Stop_Request		: BIT ;
+Date_Hold_Request		: BIT ;
+A_Reserve_24			: BIT ;
+A_Reserve_25			: BIT ;
+A_Reserve_26			: BIT ;
+A_Reserve_27			: BIT ;
+//
+A_ReserveByte_4			: Byte ;
+A_ReserveWord1			: Word ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

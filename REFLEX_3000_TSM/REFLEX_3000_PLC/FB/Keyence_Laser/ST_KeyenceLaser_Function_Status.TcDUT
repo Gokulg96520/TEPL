@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Function_Status" Id="{aeef21b4-0a34-4350-8c64-fb4826ddc601}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Function_Status :
+STRUCT
+Trigger_Lock_Status				: BIT ;
+Operation_Stop_Status			: BIT ;
+Laser_Control_Status			: BIT ;
+DATE_Hold_Status				: BIT ;
+Reserve_10						: BIT ;
+Reserve_11						: BIT ;
+Reserve_12						: BIT ;
+Reserve_13						: BIT ;
+//
+DATE_Attach_Status				: BIT ;
+Counter_End1_Status				: BIT ;
+Counter_End2_Status				: BIT ;
+Counter_End3_Status				: BIT ;
+Counter_End4_Status				: BIT ;
+Mark_Check_TwoDC_Read_OK_Status	: BIT ;//Mark_Check_2DC_Read_OK_Status
+Mark_Check_TwoDC_Read_NG_Status	: BIT ;//Mark_Check_2DC_Read_NG_Status
+Reserve_14						: BIT ;
+//
+ReserveWord_1					: WORD ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

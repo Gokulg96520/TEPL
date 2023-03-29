@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Bowl_Control" Id="{66a0b2e4-5b79-4294-964f-1938e314f5b4}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Bowl_Control
+VAR
+	OP10A_Bowl: ModbusRtuMasterV2_KL6x22B;
+	Write_Reg: UINT;
+	Read: UINT;
+	W_Trig	: BOOL;
+	Read_Reg : UINT;
+	R_Trig	: BOOL;
+	Rsad:BOOL;
+	Trigger: BOOL;
+	R_Edge	: R_TRIG;
+	reg: WORD;
+	writereg: WORD;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//R_Edge(CLK:=W_Trig);
+
+OP10A_Bowl.WriteSingleRegister(
+	UnitID:= 1, 
+	Quantity:=1 , 
+	MBAddr:= writereg, 
+	cbLength:= SIZEOF(Write_Reg), 
+	pMemoryAddr:= ADR(Write_Reg), 
+	AuxQuantity:= , 
+	AuxMBAddr:= , 
+	AuxcbLength:= , 
+	pAuxMemoryAddr:= , 
+	Execute:=W_Trig,//R_Edge.Q , 
+	Timeout:= , 
+	BUSY=> , 
+	Error=> , 
+	ErrorId=> , 
+	cbRead=> );
+
+
+OP10A_Bowl.ReadInputRegs(
+	UnitID:= 1, 
+	Quantity:=1 , 
+	MBAddr:= reg, 
+	cbLength:= SIZEOF(Read), 
+	pMemoryAddr:= ADR(Read), 
+	AuxQuantity:= , 
+	AuxMBAddr:= , 
+	AuxcbLength:= , 
+	pAuxMemoryAddr:= , 
+	Execute:=Rsad,//R_Edge.Q , 
+	Timeout:= , 
+	BUSY=> , 
+	Error=> , 
+	ErrorId=> , 
+	cbRead=> );
+		
+	
+OP10A_Bowl.ReadInputRegs(
+	UnitID:= 1, 
+	Quantity:=1 , 
+	MBAddr:= 16#01, 
+	cbLength:= SIZEOF(Read_Reg), 
+	pMemoryAddr:= ADR(Read_Reg), 
+	AuxQuantity:= , 
+	AuxMBAddr:= , 
+	AuxcbLength:= , 
+	pAuxMemoryAddr:= , 
+	Execute:= R_Trig, 
+	Timeout:= , 
+	BUSY=> , 
+	Error=> , 
+	ErrorId=> , 
+	cbRead=> );]]></ST>
+    </Implementation>
+    <LineIds Name="Bowl_Control">
+      <LineId Id="57" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="7" Count="14" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="69" Count="17" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="25" Count="14" />
+      <LineId Id="24" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

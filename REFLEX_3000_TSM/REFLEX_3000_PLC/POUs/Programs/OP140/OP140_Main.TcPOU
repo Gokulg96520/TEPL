@@ -1,20 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP140_Main" Id="{3675002c-8a06-400d-b3f0-dda334e3b4b2}" SpecialFunc="None">
+  <POU Name="OP140_Main" Id="{3b624aac-2baf-456b-813b-9db3b2cbcfd8}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP140_Main
 VAR
 	OP140_ModeSelection_FB: Mode_Selection_Block1;
 	//OP140_Leak_1: OP140_LeakTesting;
-	OP140_LH_ATEQ_FB: ATEQ_FB;
-	OP140_RH_ATEQ_FB: ATEQ_FB;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[//MOdeselection From HMI
-//OP140_AutoSequence();
-//OP140_Error();
+OP140_AutoSequence_1();
+OP140_AutoSequence_2();
+OP140_AutoSequence_3();
+OP140_Error();
 OP140_Manual();
-//OP140_Initialization_Seq();
+Ateq_Comm_Prog();
+OP140_Initialization_Seq();
+op140_tool_change(); 
+op140_ateq_fb();
 
 
 IF (OP140_HMI_AutoMode AND NOT OP140_HMI_ManualMOde AND NOT OP140_HMI_StepMode) THEN
@@ -34,7 +37,7 @@ OP140_ModeSelection_FB(
 	HomeConditionOK:=OP140_HomeConditionOK , 
 	OperationEnable:= OperationEnable, 
 	StartPB:=OP140_HMI_CycleStart , 
-	SafetyAndNOError:= , 
+	SafetyAndNOError:=OperationEnable , 
 	ModeAck:=TRUE , 
 	HomingINProgress:= , 
 	TempHomeOK:=OP140_Temp_Home_Ok , 
@@ -49,103 +52,55 @@ OP140_ModeSelection_FB(
 	StartEnable:=OP140_StartEnable , 
 	MachineStop:=OP140_Machine_Stop );
 	
+	IF OP140_AutoSelected THEN
+		OP140_Auto:=TRUE;
+		ELSE
+			OP140_Auto:=FALSE;
+		END_IF
+		
+	IF 	OP140_StartEnable THEN 
+		op140_startenable_1 :=TRUE;
+		op140_startenable_2 :=TRUE;
+		op140_startenable_3 :=TRUE;
+	ELSE
+		op140_startenable_1 :=FALSE;
+		op140_startenable_2 :=FALSE;
+		op140_startenable_3 :=false;
+	END_IF
+
+// temp need to be deleted
+//IF OP140_STN_ENABLE_1 THEN
+//	OP140_STN_ENABLE_2:=TRUE;
+//	OP140_STN_ENABLE_3:=TRUE;
+//END_IF
+
+
 	
 	
-	//Leak Test FB
-	
-	(* OP140_Leak_1(
-	Seq_Start:= , 
-	Horz_Cyl_Pos1:=OP140_Manual.CR140_Horz_Cyl_1.Position1 , 
-	Horz_Cyl_Pos2:=OP140_Manual.CR140_Horz_Cyl_1.Position2 , 
-	Vert_Cyl_Pos1:=OP140_Manual.CR140_Vert_Cyl_1.Position1, 
-	Vert_Cyl_Pos2:=OP140_Manual.CR140_Vert_Cyl_1.Position2 , 
-	StartEnable:=OP140_StartEnable , 
-	Home_pos_IP:= , 
-	Home_Vel_IP:= , 
-	Work_Pos_IP:=OP140_Recipe.SR140_vert_Servo_WorkPos , 
-	Work_Vel_IP:= , 
-	Axis_In_Pos:= , 
-	Axis_In_Home:= , 
-	ATEQ_LH_Completed:= , 
-	Ateq_LH_Pass:= , 
-	Ateq_LH_Fail:= , 
-	ATEQ_RH_Completed:= , 
-	Ateq_RH_Pass:= , 
-	Ateq_RH_Fail:= , 
-	Prev_Stat_LH_OK:= , 
-	Prev_Stat_RH_OK:= , 
-	Seq_Completed=> , 
-	Horz_Cyl_Auto1=> , 
-	Horz_Cyl_Auto2=> , 
-	Vert_Cyl_Auto1=> , 
-	Vert_Cyl_Auto2=> , 
-	Servo_Pos_OP=> , 
-	Servo_Vel_OP=> , 
-	ABS_Move_Start=> , 
-	Home_Cmd=> , 
-	LH_Ateq_Prog_No=> , 
-	LH_Ateq_Start=> , 
-	RH_Ateq_Prog_No=> , 
-	RH_Ateq_Start=> , 
-	Result_read_Cmd_RH=> , 
-	Result_read_Cmd_LH=> , 
-	LH_Comp_OK=> , 
-	LH_Comp_NOK=> , 
-	RH_Comp_OK=> , 
-	RH_Comp_NOK=> , 
-	Test1_OK_RH=> , 
-	Test2_OK_RH=> , 
-	Test1_NOK_RH=> , 
-	Test2_NOK_RH=> , 
-	Test1_OK_LH=> , 
-	Test2_OK_LH=> , 
-	Test1_NOK_LH=> , 
-	Test2_NOK_LH=> , 
-	Servo_Pos_Error=> , 
-	Servo_HomePos_Error=> , 
-	Step_No:=OP140_Leak_1.Step_No , 
-	LH_ATEQ_FB:=OP140_LH_ATEQ_FB , 
-	RH_ATEQ_FB:= OP140_RH_ATEQ_FB);
-	
-	
-	
-	//LH ATEQ FB
-	OP140_LH_ATEQ_FB(
-	ATEQ_FB_Start_IP:= , 
-	ATEQ_FB_Prog_NO_IP:= , 
-	ATEQ_FB_Pass:= , 
-	ATEQ_FB_Fail:= , 
-	ATEQ_FB_EOP:= , 
-	ATEQ_FB_Start_OP=>O140_LK_TST1_STRT , 
-	Result_OK=> , 
-	Result_NOK=> , 
-	Result_Error=> , 
-	ATEQ_FB_Prog_NO_OP=> , 
-	Read_Result=> , 
-	Result_Completed:= OP140_LH_ATEQ_Result_Completed);
-	
-	//RH_ATEQ_FB
-	OP140_RH_ATEQ_FB(
-	ATEQ_FB_Start_IP:= , 
-	ATEQ_FB_Prog_NO_IP:= , 
-	ATEQ_FB_Pass:= , 
-	ATEQ_FB_Fail:= , 
-	ATEQ_FB_EOP:= , 
-	ATEQ_FB_Start_OP=>O140_LK_TST2_STRT , 
-	Result_OK=> , 
-	Result_NOK=> , 
-	Result_Error=> , 
-	ATEQ_FB_Prog_NO_OP=> , 
-	Read_Result=> , 
-	Result_Completed:= OP140_RH_ATEQ_Result_Completed); *)
+
 	]]></ST>
     </Implementation>
     <LineIds Name="OP140_Main">
       <LineId Id="3" Count="1" />
-      <LineId Id="135" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="137" Count="1" />
-      <LineId Id="6" Count="121" />
+      <LineId Id="157" Count="1" />
+      <LineId Id="5" Count="3" />
+      <LineId Id="164" Count="0" />
+      <LineId Id="170" Count="0" />
+      <LineId Id="9" Count="38" />
+      <LineId Id="142" Count="2" />
+      <LineId Id="146" Count="2" />
+      <LineId Id="150" Count="1" />
+      <LineId Id="149" Count="0" />
+      <LineId Id="176" Count="1" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="179" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="184" Count="0" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="180" Count="1" />
+      <LineId Id="178" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="136" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

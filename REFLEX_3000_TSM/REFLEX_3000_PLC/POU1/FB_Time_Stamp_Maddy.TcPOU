@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_Time_Stamp_Maddy" Id="{88e64ae8-8f93-44be-abef-d4b915669270}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Time_Stamp_Maddy
+VAR_INPUT
+	Start       : BOOL;
+	Stop		: BOOL;
+END_VAR
+VAR_OUTPUT
+	Running_Timer 		: STRING;
+	Time_Difference_ms  : WORD; 
+END_VAR
+VAR_IN_OUT
+	Time_Struct : TIMESTRUCT;
+END_VAR
+VAR
+	Txt1 : STRING;
+	Colon : STRING :=':';
+	Txt2 : STRING;
+	Txt3 : STRING;
+	Txt4 : STRING;
+	Txt5 : STRING;
+	Txt6 : STRING;
+	Start_trig :R_TRIG;
+	Stop_trig  :R_TRIG;
+END_VAR
+
+VAR PERSISTENT
+	START_TIME : TIMESTRUCT;
+	STOP_TIME  : TIMESTRUCT;
+END_VAR
+
+
+
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Start_trig(CLK:=Start );
+Stop_trig(CLK:=Stop );
+IF Start_trig.Q THEN
+	START_TIME:=Time_Struct;
+END_IF
+IF Stop_trig.Q THEN
+	STOP_TIME:=Time_Struct;
+END_IF
+
+Txt1:=CONCAT(WORD_TO_STRING(Time_Struct.wHour),Colon);
+Txt2:=CONCAT(Txt1,WORD_TO_STRING(Time_Struct.wMinute));
+Txt3:=CONCAT(Txt2,Colon);
+Txt4:=CONCAT(Txt3,WORD_TO_STRING(Time_Struct.wSecond));
+Txt5:=CONCAT(Txt4,Colon);
+Txt6:=CONCAT(Txt5,WORD_TO_STRING(Time_Struct.wMilliseconds));
+
+Running_Timer:=Txt6;
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Time_Stamp_Maddy">
+      <LineId Id="58" Count="1" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="56" Count="1" />
+      <LineId Id="60" Count="1" />
+      <LineId Id="54" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="24" Count="3" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="50" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

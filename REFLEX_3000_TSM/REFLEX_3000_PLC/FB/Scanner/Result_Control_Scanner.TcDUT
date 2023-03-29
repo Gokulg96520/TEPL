@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Result_Control_Scanner" Id="{d3f9ce9b-9465-4c41-a78b-172e047fb6db}">
+    <Declaration><![CDATA[TYPE Result_Control_Scanner :
+STRUCT
+	Enable_Result_Buffering : BOOL;
+	Result_Acknowledge		: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

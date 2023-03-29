@@ -1,0 +1,265 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_Robot" Id="{45e1727f-dc4d-4d8e-8fca-dc3321186a9e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Robot
+VAR_INPUT
+	
+	i_b_Operation_Enable_Feedback 		: BOOL;				// IO Enabled Feedback		
+	i_b_Auto_Enable_Feedback 			: BOOL;				// Auto Enabled Feedback
+	i_b_Servo_On_Feedback 				: BOOL;				// Servo On Feedback		
+	i_b_Servo_Off_Feedback 				: BOOL;				// Servo Off Feedback		
+	i_b_Error_Feedback					: BOOL;				// Error Feedback		
+	i_b_Program_Start_Enable_Feedback 	: BOOL;				// Program Start Enable		
+	i_b_Robo_Stopping_Feedback 			: BOOL;				// Robo Stopping Feedback		          		 
+	i_b_Emergency_Pressed_Feedback 		: BOOL;				// Emergency Pressed Feedback		
+	i_b_Auto_Mode_Feedback 				: BOOL;				// Auto Mode Feedback		bRoboAutoManual
+
+	i_b_Reset							: BOOL;
+	i_b_RobotAutoManual					: BOOL;
+	i_b_ProgramReset					: BOOL;
+	
+END_VAR
+VAR_OUTPUT
+	
+	o_b_Operation_Enable_Cmd 			: BOOL;				// IO Enable Command
+	o_b_Auto_Enable_Cmd					: BOOL;				// Auto Enable Command
+	o_b_Servo_On_Cmd					: BOOL;				// Servo On Command		
+	o_b_Servo_Off_Cmd					: BOOL;				// Servo Off Command		
+	o_b_Error_Reset_Cmd					: BOOL;				// Error Reset Command	
+	o_b_Program_Reset_Cmd				: BOOL;				// Program Reset Command
+	o_b_Program_Start_Cmd				: BOOL;				// Program Start Command					
+	o_b_Program_Stop_Cmd				: BOOL;				// Program Stop Command	
+	
+	o_b_RobotAutoManual					: BOOL;
+	o_b_Error							: BOOL;
+END_VAR
+
+VAR
+
+	iState								: E_State_RobotGeneral;
+	tonStateTimeOut						: TON;
+	tonAutoManual						: ton;
+	bRobotAutoManual					: BOOL;
+	
+	
+END_VAR		
+
+VAR_TEMP
+	
+	bTIN								: BOOL;	
+	bTIN2								: BOOL;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[	// Auto Manual
+	o_b_RobotAutoManual:= i_b_Auto_Enable_Feedback AND NOT bRobotAutoManual;
+
+CASE iState OF 
+	
+
+E_State_RobotGeneral.Init:
+
+		o_b_Operation_Enable_Cmd	:= FALSE;
+		o_b_Auto_Enable_Cmd			:= false;
+		o_b_Servo_On_Cmd			:= false;
+		o_b_Servo_Off_Cmd			:= false;
+		o_b_Error_Reset_Cmd			:= false;
+		o_b_Program_Reset_Cmd		:= false;
+		o_b_Program_Start_Cmd		:= false;
+		o_b_Program_Stop_Cmd		:= FALSE;
+		
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;
+		ELSIF NOT i_b_Auto_Enable_Feedback THEN
+			iState:=E_State_RobotGeneral.AutoEnable;	
+		END_IF
+
+E_State_RobotGeneral.AutoEnable:
+
+		o_b_Operation_Enable_Cmd	:= FALSE;
+		o_b_Auto_Enable_Cmd			:= TRUE;
+		o_b_Servo_On_Cmd			:= false;
+		o_b_Servo_Off_Cmd			:= false;
+		o_b_Error_Reset_Cmd			:= false;
+		o_b_Program_Reset_Cmd		:= false;
+		o_b_Program_Start_Cmd		:= false;
+		o_b_Program_Stop_Cmd		:= FALSE;
+
+		bTIN:= i_b_RobotAutoManual;//TRUE;
+
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;		
+		ELSIF i_b_Auto_Enable_Feedback AND i_b_RobotAutoManual THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.OperationEnable;
+		ELSIF tonStateTimeOut.Q THEN 
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.Init;
+		END_IF
+		
+		tonStateTimeOut(IN:=bTIN,PT:=T#1S);
+
+E_State_RobotGeneral.OperationEnable:
+
+		o_b_Operation_Enable_Cmd	:= TRUE;
+
+		bTIN:= i_b_RobotAutoManual;//TRUE;
+
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;		
+		ELSIF  i_b_Error_Feedback THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.Error;
+		ELSIF NOT i_b_RobotAutoManual THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.AutoEnable;
+		ELSIF i_b_Operation_Enable_Feedback OR i_b_Auto_Enable_Feedback THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.ServoOn;
+		ELSIF tonStateTimeOut.Q THEN 
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.Error;
+		END_IF
+		
+		tonStateTimeOut(IN:=bTIN,PT:=T#1S);
+
+E_State_RobotGeneral.Error:
+
+		o_b_Operation_Enable_Cmd	:= FALSE;
+		o_b_Auto_Enable_Cmd			:= TRUE;
+		o_b_Servo_On_Cmd			:= FALSE;
+		o_b_Servo_Off_Cmd			:= false;
+		o_b_Error_Reset_Cmd			:= false;
+		o_b_Program_Reset_Cmd		:= false;
+		o_b_Program_Start_Cmd		:= false;
+		o_b_Program_Stop_Cmd		:= FALSE;
+
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;
+		ELSIF i_b_reset THEN
+		iState:=E_State_RobotGeneral.ErrorReset;	
+		END_IF
+		
+E_State_RobotGeneral.ErrorReset:
+
+		o_b_Auto_Enable_Cmd			:= TRUE;
+		o_b_Servo_On_Cmd			:= FALSE;
+		o_b_Servo_Off_Cmd			:= false;
+		o_b_Error_Reset_Cmd			:= TRUE;
+		o_b_Program_Reset_Cmd		:= false;
+		o_b_Program_Start_Cmd		:= false;
+		o_b_Program_Stop_Cmd		:= FALSE;
+
+		bTIN:= TRUE;
+
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;		
+		ELSIF NOT i_b_Error_Feedback THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.AutoEnable;	
+		ELSIF tonStateTimeOut.Q THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.Error;
+		END_IF
+
+		tonStateTimeOut(IN:=bTIN,PT:=T#1S);
+
+E_State_RobotGeneral.ServoOn:
+
+		o_b_Servo_On_Cmd			:= TRUE;
+		
+		bTIN:= TRUE;
+
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;		
+		ELSIF  i_b_Error_Feedback THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.Error;
+		ELSIF NOT i_b_RobotAutoManual THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.AutoEnable;
+		ELSIF i_b_Servo_On_Feedback THEN
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.Start;
+		ELSIF tonStateTimeOut.Q THEN	
+			bTIN:= FALSE;
+			iState:=E_State_RobotGeneral.AutoEnable; // AutoEnable;
+		END_IF
+		
+		tonStateTimeOut(IN:=bTIN,PT:=T#1S);
+
+E_State_RobotGeneral.Start:
+
+		o_b_Program_Start_Cmd		:= TRUE;
+
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;	
+		ELSIF  i_b_Error_Feedback THEN
+			iState:=E_State_RobotGeneral.Error;
+		ELSIF NOT i_b_RobotAutoManual THEN
+			iState:=E_State_RobotGeneral.AutoEnable;
+		ELSIF  NOT i_b_Auto_Enable_Feedback OR NOT i_b_Servo_On_Feedback THEN
+			iState:=E_State_RobotGeneral.AutoEnable;
+		ELSIF i_b_Program_Start_Enable_Feedback THEN
+			iState:=E_State_RobotGeneral.Started;
+		END_IF
+		
+E_State_RobotGeneral.Started:
+
+		IF i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.ProgramReset;	
+		ELSIF  i_b_Error_Feedback THEN
+			iState:=E_State_RobotGeneral.Error;
+		ELSIF NOT i_b_RobotAutoManual THEN
+			iState:=E_State_RobotGeneral.AutoEnable;
+		ELSIF  NOT i_b_Auto_Enable_Feedback OR NOT i_b_Servo_On_Feedback OR NOT i_b_Program_Start_Enable_Feedback THEN
+			iState:=E_State_RobotGeneral.AutoEnable;
+		END_IF		
+		
+E_State_RobotGeneral.ProgramReset: 
+
+		o_b_Operation_Enable_Cmd	:= TRUE;
+		o_b_Auto_Enable_Cmd			:= TRUE;
+		o_b_Servo_On_Cmd			:= false;
+		o_b_Servo_Off_Cmd			:= false;
+		o_b_Error_Reset_Cmd			:= TRUE;
+		o_b_Program_Reset_Cmd		:= FALSE;
+		o_b_Program_Start_Cmd		:= false;
+		o_b_Program_Stop_Cmd		:= TRUE;
+		
+	IF NOT i_b_Error_Feedback THEN
+		o_b_Error_Reset_Cmd			:= FALSE;
+		o_b_Program_Reset_Cmd			:= TRUE;
+	END_IF	
+	
+		bTIN2:= TRUE;
+		
+		
+	// Auto Manual
+		IF tonAutoManual.Q THEN
+		bRobotAutoManual:= TRUE;
+		END_IF
+		
+		IF NOT i_b_ProgramReset THEN
+			iState:=E_State_RobotGeneral.AutoEnable;
+			bTIN2:= FALSE;
+			bRobotAutoManual:= FALSE;
+		END_IF
+		
+		
+
+ END_CASE
+ tonAutoManual(IN:=bTIN2 , PT:= T#5S , Q=> , ET=> );
+ o_b_Error:= (iState=E_State_RobotGeneral.Error) OR (iState=E_State_RobotGeneral.ErrorReset);]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Robot">
+      <LineId Id="3" Count="174" />
+      <LineId Id="246" Count="1" />
+      <LineId Id="178" Count="0" />
+      <LineId Id="248" Count="2" />
+      <LineId Id="179" Count="17" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

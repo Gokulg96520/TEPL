@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP130_LH_Auto" Id="{1e122e74-de06-421e-ba0c-ccb876313e74}" SpecialFunc="None">
+  <POU Name="OP130_LH_Auto" Id="{07c888b9-abf3-414e-9fbe-2377212607a7}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP130_LH_Auto
 VAR
 	OP130_Torque_Monitor_Dly: TON;
+	Temp1:BOOL;
+	act_torque:LREAL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -15,114 +17,159 @@ END_VAR
 			OP130_LH_AutoSeq:=180;
 		END_IF
 	
-	20:IF (TRUE) AND OP130_StartEnable THEN	// Check Mover Presence in Station
-		OP130_LH_AutoSeq:=30;
+	20:IF  OP130_StartEnable THEN	// Check Mover Presence in Station
+		   OP130_LH_AutoSeq:=30;
 	   END_IF
+	   
 	30:IF (OP130_GVL.SR130_LH_Servo_Control.Axis_Enabled=TRUE OR OP130_Dry_Run) AND OP130_StartEnable THEN // Check Servo Axis Enabled
-		OP130_LH_AutoSeq:=40;
+		   OP130_LH_AutoSeq:=40;
 		END_IF
-	40:IF (I130_LH_ROTRY_0_DEGI1300_0 =TRUE OR OP130_Dry_Run) AND OP130_StartEnable THEN  // Check Rotary Cyl In Zero Deg
-		OP130_LH_AutoSeq:=50;
-		END_IF
+		
+	40:IF  OP130_StartEnable THEN  // Check Rotary Cyl In Zero Deg
+		   OP130_LH_AutoSeq:=50;
+	   END_IF
+	   
 	50:IF OP130_StartEnable THEN 		//Move Work Position Value to Servo
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=OP130_GVL.SR130_HMI_LH_Servo_Work_Position;
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=OP130_GVL.SR130_HMI_LH_Servo_Work_Velocity;
+		//  OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=SR130_HMI_Servo_Work_Position;
+		//  OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=SR130_HMI_Servo_Work_Velocity;
+		SR130_LH_Servo_Control.Position:=SR130_HMI_Servo_Work_Position;
+		SR130_LH_Servo_Control.Velocity:=SR130_HMI_Servo_Work_Velocity;
 		OP130_LH_AutoSeq:=60;
 		END_IF
 		
 	60:IF OP130_StartEnable THEN 	//Move Cmd to Servo
-		OP130_GVL.SR130_LH_Servo_Control.ABSmove_Start:=TRUE;
+		//SR130_LH_Abs_Move_Start:=TRUE;
+		SR130_LH_Servo_Control.ABSmove_Start:=TRUE;
 		OP130_LH_AutoSeq:=70;
 		END_IF
+		
 	70:IF OP130_StartEnable AND OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos THEN // Check Servo in Target Pos
-		OP130_LH_AutoSeq:=80;
+		//SR130_LH_Abs_Move_Start:=FALSE;
+		SR130_LH_Servo_Control.ABSmove_Start:=FALSE;
+		OP130_LH_AutoSeq:=90;
 		END_IF
-	80:IF OP130_StartEnable THEN		//Move Rotary Cyl to 180 Deg
-		  OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd2:=TRUE;
-		  OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd1:=FALSE;
-		  IF (OP130_GVL.CR130_LH_Rot_Cyl.Position2=TRUE) THEN
-			  OP130_LH_AutoSeq:=90;
-			  END_IF
-			  
-		  END_IF
+	
 	90:IF OP130_StartEnable THEN		//Move Lock Position Value to Servo
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=OP130_GVL.SR130_HMI_LH_Servo_Lock_Position;
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=OP130_GVL.SR130_HMI_LH_Servo_Lock_Velocity;
-		  
+		//OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=SR130_HMI_Servo_Lock_Position;
+		//OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=SR130_HMI_Servo_Lock_Velocity;
+	     SR130_LH_Servo_Control.Position:=SR130_HMI_Servo_Lock_Position;
+		 SR130_LH_Servo_Control.Velocity:=SR130_HMI_Servo_Lock_Velocity;
 		 OP130_LH_AutoSeq:=100;
 		 END_IF
+		 
 	100:IF OP130_StartEnable THEN		// MOve Cmd to Servo
+		//SR130_LH_Abs_Move_Start:=TRUE;
+		   SR130_LH_Servo_Control.ABSmove_Start :=TRUE;
+		   OP130_LH_AutoSeq:=110;
+		END_IF
 		
-		OP130_GVL.SR130_LH_Servo_Control.ABSmove_Start:=TRUE;
-		 OP130_LH_AutoSeq:=110;
+    110:IF OP130_StartEnable  THEN		//Check Servo In Target Pos
+		IF SR130_LH_Servo_Control.Axis_In_Pos AND SR130_LH_Servo_Control.Actual_Torque < OP130_HMI_Pull_Torque_Limit THEN
+			act_torque:=SR130_LH_Servo_Control.Actual_Torque;
+			SR130_LH_Vert_Servo.bHalt:=TRUE;
+			OP130_LH_Comp_OK:=TRUE;
+			OP130_LH_Comp_NOK:= FALSE;
+	//	SR130_LH_Abs_Move_Start:=FALSE;
+		SR130_LH_Servo_Control.ABSmove_Start:=FALSE;
 		END_IF
-    110:IF OP130_StartEnable AND OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos THEN		//Check Servo In Target Pos
-		 OP130_LH_AutoSeq:=140;
+		IF SR130_LH_Servo_Control.Axis_In_Pos AND SR130_LH_Servo_Control.Actual_Torque > OP130_HMI_Pull_Torque_Limit THEN
+			OP130_LH_Comp_NOK:=TRUE;
+			OP130_LH_Comp_OK:= FALSE;
+			//SR130_LH_Abs_Move_Start:=FALSE;
+			SR130_LH_Servo_Control.ABSmove_Start:=FALSE;
 		END_IF
+	    IF SR130_LH_Servo_Control.Axis_Halted OR SR130_LH_Servo_Control.Axis_In_Pos AND (OP130_LH_Comp_OK OR OP130_LH_Comp_NOK) THEN
+	    //SR130_LH_Abs_Move_Start:=FALSE;
+		SR130_LH_Servo_Control.ABSmove_Start:=FALSE;
+        OP130_LH_AutoSeq:=180;
+	    END_IF
+        END_IF
 	
 		
-	140: IF OP130_StartEnable THEN // Change Servo TO Torque Mode
-          //Change TO Torque Mode
-		  OP130_LH_AutoSeq:=150;
-		  
-		  END_IF
-	
-	150:IF OP130_StartEnable THEN		// Move Torque Value to Servo
-		 OP130_LH_AutoSeq:=160;  
-		  END_IF
-	160:IF OP130_StartEnable THEN		// Move Cmd To Servo
-		OP130_GVL.SR130_LH_Servo_Control.ABSmove_Start:=TRUE;
-		 OP130_LH_AutoSeq:=170;  
-		  END_IF
-	170:IF (OP130_StartEnable AND OP130_Torque_Monitor_Dly.q ) THEN  // Torque Monitor After 200ms
-		IF (OP130_GVL.SR130_LH_Vert_Servo_Axis.NcToPlc.ActTorque >OP130_GVL.SR130_HMI_LH_Servo_Torque_Low_Limit) AND (OP130_GVL.SR130_LH_Vert_Servo_Axis.NcToPlc.ActTorque <OP130_GVL.SR130_HMI_LH_Servo_Torque_High_Limit) THEN
-					OP130_LH_Comp_OK:=TRUE;
-					OP130_LH_Comp_NOK:= FALSE;
-		ELSIF (OP130_GVL.SR130_LH_Vert_Servo_Axis.NcToPlc.ActTorque <OP130_GVL.SR130_HMI_LH_Servo_Torque_Low_Limit) OR (OP130_GVL.SR130_LH_Vert_Servo_Axis.NcToPlc.ActTorque >OP130_GVL.SR130_HMI_LH_Servo_Torque_High_Limit) THEN
-					OP130_LH_Comp_OK:=FALSE;
-					OP130_LH_Comp_NOK:= TRUE;
-					END_IF 
-		IF(OP130_LH_Comp_OK OR OP130_LH_Comp_NOK) THEN
-					 OP130_LH_AutoSeq:=180;	
-					 END_IF
-		END_IF
+
 	
 	180:IF (OP130_StartEnable) THEN   // Move Work Pos Values to Servo
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=OP130_GVL.SR130_HMI_LH_Servo_Work_Position;
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=OP130_GVL.SR130_HMI_LH_Servo_Work_Velocity;
-		OP130_LH_AutoSeq:=190;
+		//OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=SR130_HMI_Servo_CylWork_Position;
+       // OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=SR130_HMI_Servo_CylWork_Velocity;
+		SR130_LH_Servo_Control.position:=SR130_HMI_Servo_CylWork_Position;
+		SR130_LH_Servo_Control.velocity:=SR130_HMI_Servo_CylWork_Velocity;
+		SR130_LH_Vert_Servo.bHalt:=FALSE;
+        MOVER_CMP_STATUS[OP130_STN_MOVER][1]:=130;
+        OP130_LH_AutoSeq:=190;
 	   END_IF
+	   
 	 190: IF(OP130_StartEnable) THEN		//move Cmd to Servo
-		 OP130_GVL.SR130_LH_Servo_Control.ABSmove_Start:= TRUE;
+		// SR130_LH_Abs_Move_Start:= TRUE;
+		 SR130_LH_Servo_Control.ABSmove_Start := TRUE;
 		 OP130_LH_AutoSeq:=200;
 	 END_IF
+	 
 	200:IF (OP130_StartEnable) AND OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos THEN		//Check Servo In Target Pos
-		OP130_LH_AutoSeq:=210;
+	       //SR130_LH_Abs_Move_Start:= FALSE;	
+		   SR130_LH_Servo_Control.ABSmove_Start := FALSE;
+           OP130_LH_AutoSeq:=210;
 	    END_IF
+		
 	210:IF  (OP130_StartEnable) THEN		//Move Rotary Cyl to Zero Deg
-		OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd1:=TRUE;
-		  OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd2:=FALSE;
-		  IF (OP130_GVL.CR130_LH_Rot_Cyl.Position1=TRUE) THEN
-			  OP130_LH_AutoSeq:=220;
-			  END_IF
-	END_IF
+		    OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd2:=TRUE;
+		    OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd1:=FALSE;
+		    IF (OP130_GVL.CR130_LH_Rot_Cyl.Position2=TRUE) THEN
+			   OP130_LH_AutoSeq:=220;
+			   END_IF
+	    END_IF
+		
 	220: IF  (OP130_StartEnable) THEN		//move Home Pos to Servo
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=SR130_LH_Servo_Home_Position;
-		OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=SR130_LH_Servo_Home_Velocity;
-		 OP130_LH_AutoSeq:=230;
-	END_IF
+		    // OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=SR130_HMI_Servo_Rotation_Position;
+		    // OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=SR130_HMI_Servo_Rotation_Velocity;
+			 SR130_LH_Servo_Control.Position :=SR130_HMI_Servo_Rotation_Position;
+			 SR130_LH_Servo_Control.Velocity :=SR130_HMI_Servo_Rotation_Velocity;
+		     OP130_LH_AutoSeq:=230;
+	      END_IF
+	
 	230: IF (OP130_StartEnable) THEN 		//Move Cmd TO Servo
-		OP130_GVL.SR130_LH_Servo_Control.ABSmove_Start:= TRUE ;
-		 OP130_LH_AutoSeq:=240;
-	END_IF
+		   // SR130_LH_Abs_Move_Start:= TRUE ;
+			SR130_LH_Servo_Control.ABSmove_Start:= TRUE;
+		    OP130_LH_AutoSeq:=240;
+	     END_IF
 	
 	240: IF (OP130_StartEnable) AND OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos THEN 	//Check Servo In Target Pos
-		 OP130_LH_AutoSeq:=250;
-	END_IF
-	 250:IF (OP130_StartEnable) THEN		//LH Operation completed
-		 OP130_LH_Operation_Completed:= TRUE;
-		  OP130_LH_AutoSeq:=260;
-	 END_IF
+		    //SR130_LH_Abs_Move_Start:= FALSE ;
+			SR130_LH_Servo_Control.ABSmove_Start:= FALSE;
+			OP130_LH_AutoSeq:=250;
+	     END_IF
+	
+	250:IF  (OP130_StartEnable) THEN		//Move Rotary Cyl to Zero Deg
+		    OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd1:=TRUE;
+		    OP130_GVL.CR130_LH_Rot_Cyl.AutoCmd2:=FALSE;
+		   IF (OP130_GVL.CR130_LH_Rot_Cyl.Position1=TRUE) THEN
+			  OP130_LH_AutoSeq:=260;
+		   END_IF
+	    END_IF
+		
+	260: IF  (OP130_StartEnable) THEN		//move Home Pos to Servo
+		     //OP130_GVL.SR130_LH_Vert_Servo.fTargetPosition:=SR130_Servo_Home_Position;
+		    // OP130_GVL.SR130_LH_Vert_Servo.fTargetVelocity:=SR130_Servo_Home_Velocity;
+			 SR130_LH_Servo_Control.Position := SR130_Servo_Home_Position;
+			 SR130_LH_Servo_Control.Velocity := SR130_Servo_Home_Velocity;
+		     OP130_LH_AutoSeq:=270;
+	     END_IF
+		 
+	270: IF (OP130_StartEnable) THEN 		//Move Cmd TO Servo
+		   // SR130_LH_Abs_Move_Start:= TRUE ;
+			SR130_LH_Servo_Control.ABSmove_Start := TRUE;
+		    OP130_LH_AutoSeq:=280;
+	     END_IF
+	
+	280: IF (OP130_StartEnable) AND OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos THEN 	//Check Servo In Target Pos
+		   // SR130_LH_Abs_Move_Start:= FALSE ;
+			SR130_LH_Servo_Control.ABSmove_Start := FALSE;
+			OP130_LH_AutoSeq:=290;
+	     END_IF
+		 
+	 290:IF (OP130_StartEnable) THEN		//LH Operation completed
+		    OP130_LH_Operation_Completed:= TRUE;
+		    OP130_LH_AutoSeq:=300;
+	     END_IF
 
 	   
 END_CASE
@@ -130,7 +177,77 @@ END_CASE
 OP130_Torque_Monitor_Dly(IN:=OP130_LH_AutoSeq=170 , PT:=T#200MS , Q=> , ET=> );]]></ST>
     </Implementation>
     <LineIds Name="OP130_LH_Auto">
-      <LineId Id="3" Count="119" />
+      <LineId Id="3" Count="10" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="14" Count="2" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="17" Count="2" />
+      <LineId Id="185" Count="0" />
+      <LineId Id="20" Count="2" />
+      <LineId Id="153" Count="1" />
+      <LineId Id="23" Count="4" />
+      <LineId Id="156" Count="0" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="188" Count="0" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="157" Count="0" />
+      <LineId Id="32" Count="6" />
+      <LineId Id="158" Count="0" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="44" Count="1" />
+      <LineId Id="189" Count="0" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="146" Count="0" />
+      <LineId Id="48" Count="3" />
+      <LineId Id="162" Count="0" />
+      <LineId Id="52" Count="4" />
+      <LineId Id="163" Count="0" />
+      <LineId Id="57" Count="2" />
+      <LineId Id="164" Count="0" />
+      <LineId Id="60" Count="8" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="166" Count="1" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="72" Count="1" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="74" Count="1" />
+      <LineId Id="168" Count="0" />
+      <LineId Id="76" Count="1" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="78" Count="1" />
+      <LineId Id="169" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="170" Count="0" />
+      <LineId Id="82" Count="6" />
+      <LineId Id="171" Count="0" />
+      <LineId Id="89" Count="2" />
+      <LineId Id="173" Count="1" />
+      <LineId Id="92" Count="1" />
+      <LineId Id="172" Count="0" />
+      <LineId Id="94" Count="1" />
+      <LineId Id="175" Count="0" />
+      <LineId Id="96" Count="4" />
+      <LineId Id="176" Count="0" />
+      <LineId Id="101" Count="1" />
+      <LineId Id="177" Count="0" />
+      <LineId Id="103" Count="6" />
+      <LineId Id="178" Count="0" />
+      <LineId Id="110" Count="2" />
+      <LineId Id="181" Count="1" />
+      <LineId Id="113" Count="1" />
+      <LineId Id="179" Count="0" />
+      <LineId Id="115" Count="1" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="117" Count="4" />
+      <LineId Id="184" Count="0" />
+      <LineId Id="122" Count="1" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="124" Count="7" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP40_MANUAL" Id="{3a45fd08-94f4-435a-a69f-40aa1bb2b0d8}" SpecialFunc="None">
+  <POU Name="OP40_MANUAL" Id="{102efef0-fc87-46a7-a172-2b3040d440f6}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP40_MANUAL
 VAR
 	
@@ -15,7 +15,11 @@ END_VAR
 // IF MANUAL IS SELECTED 
 
 //SR40_Vert_servo_ctrl.ABSmove_Start:=OP40_VERT_SERVO_STRT;
-OP40_SERVO_POS_DONE:= SR40_Vert_servo_ctrl.pos_done;
+OP40_SERVO_POS_DONE			  :=  SR40_Vert_servo_ctrl.pos_done;
+OP40_VERT_SERVO_SFE_WRK_POS   :=  OP40_HMI_Safe_Work;
+OP40_VERT_SERVO_HME_POS       :=  OP40_HMI_Safe_Home;
+OP40_VERT_SERVO_WRK_POS_2     :=  OP40_VERT_SERVO_WORK_POS;
+OP40_VERT_SERVO_WRK_POS_1     := (OP40_VERT_SERVO_WORK_POS - OP40_HMI_Servo_Pos_Offset);
 
 IF In_Range(SR40_Vert_servo_status.actualPosition,OP40_VERT_SERVO_SFE_WRK_POS,1) THEN
 	OP40_SERVO_ON_SFE_WRK := TRUE;
@@ -48,13 +52,16 @@ SR40_Vert_servo(
 	bEnable:=Servo_Enable , 
 	bMoveVelocity:= , 
 	bHalt:=  , 
-	bManualMode:= MANUAL_SELECTED, 
+	bManualMode:= MANUAL_SELECTED AND OP40_ManualSelected, 
 	fHomePos:= , 
 	fOverride:= , 
 	fTargetPosition:= SR40_Vert_servo_ctrl.Position, 
 	fTargetVelocity:= SR40_Vert_servo_ctrl.Velocity, 
 	fAcc:= , 
 	fDec:= , 
+	Servo_High_Limit:= OP40_HMI_High_Limit,	
+	Servo_Low_Limit:=  OP40_HMI_Low_Limit,
+	WARNING_LIMIT:=1,	
 	Safe_move_Conditions:= Servo_Safety, 
 	Axis:= SR40_Vert_servo_Axis, 
 	HME_WRITE_ADD:= 16#5004,
@@ -84,23 +91,16 @@ SR40_Vert_servo(
 	Actual_velocity=>SR40_Vert_servo_ctrl.Actual_Velocity , 
 	Actual_Torque=> SR40_Vert_servo_ctrl.Actual_Torque);
 	
-IF MANUAL_SELECTED THEN	
-SR40_Vert_servo_status.targetVelocity:=50;	
+IF MANUAL_SELECTED AND OP40_ManualSelected THEN	
+	SR40_Vert_servo_status.targetVelocity:=50;	
 END_IF
 
 OP40_LH_LVDT_VALUE := DINT_TO_REAL(OP40_LH)/10000;
 OP40_RH_LVDT_VALUE := DINT_TO_REAL(OP40_RH)/10000;]]></ST>
     </Implementation>
     <LineIds Name="OP40_MANUAL">
-      <LineId Id="3" Count="45" />
-      <LineId Id="83" Count="0" />
-      <LineId Id="49" Count="24" />
-      <LineId Id="85" Count="0" />
-      <LineId Id="74" Count="0" />
+      <LineId Id="3" Count="84" />
       <LineId Id="2" Count="0" />
-      <LineId Id="84" Count="0" />
-      <LineId Id="95" Count="1" />
-      <LineId Id="94" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,0 +1,409 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP140_AutoSequence_2" Id="{045fdb00-c4bf-4891-954b-33bc4eda7949}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP140_AutoSequence_2
+VAR 
+    OP140_STN_MOVER_2: INT;
+	OP140_AutoSeq_2:INT;
+	Leak2_FB: OP140_LeakTesting;
+	LK2_TS1_Seq_Start: BOOL;
+	LK2_TS1_Seq_Completed: BOOL;
+	LK2_TS1_tst1_OK: BOOL;
+	LK2_TS1_tst1_NOK: BOOL;
+	LK2_TS1_tst2_OK: BOOL;
+	LK2_TS1_tst2_NOK: BOOL;
+	LK2_TS1_tst1_Result: STRING;
+	LK2_TS1_tst2_Result: STRING;
+	LK2_TS1_CompOK: BOOL;
+	LK2_TS1_CompNOK: BOOL;
+	LK2_TS2_Seq_Start: BOOL;
+	LK2_TS2_Seq_Completed: BOOL;
+	LK2_TS2_tst1_OK: BOOL;
+	LK2_TS2_tst1_NOK: BOOL;
+	LK2_TS2_tst2_OK: BOOL;
+	LK2_TS2_tst2_NOK: BOOL;
+	LK2_TS2_tst1_Result: STRING;
+	LK2_TS2_tst2_Result: STRING;
+	LK2_TS2_CompOK: BOOL;
+	LK2_TS2_CompNOK: BOOL;
+	OP140_Leak2_TS2_result_OK: BOOL;
+	OP140_Leak2_TS2_result_NOK: BOOL;
+	OP140_Leak2_TS2_Result_Data: STRING;
+	OP140_DoneDly_2 : TON;
+	OP140_STN_MOVER_2_1: INT;
+	OP140_RH_AutoSeq_1: INT;
+	CR140_Horz_Cyl_: INT;
+	fix_lh_2: INT ;
+	fix_rh_2:INT;
+	Dry_run : BOOL;
+	PRC_DONE	:TON;
+END_VAR
+VAR
+	OP140_Leak2_TS1_result_OK: BOOL;
+	OP140_Leak2_TS1_Result_NOK: BOOL;
+	OP140_Leak2_TS1_Result_Data: STRING;
+	OP1140_LK2_LH_OK: BOOL;
+	OP1140_LK2_LH_NOK: BOOL;
+	OP1140_LK2_RH_OK: BOOL;
+	OP1140_LK2_RH_NOK: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (NOT OP140_Auto OR  OP140_ErrorActive OR OP140_HomeRunning OR OP140_Machine_Stop ) THEN
+	
+	OP140_AutoRunning:= FALSE;
+	OP140_ComponentOk:=FALSE;
+	OP140_ComponentNok:=FALSE;
+	OP140_Leak2_Seq_Completed:=FALSE;
+	OP140_Leak2_Seq_Start:=FALSE;
+	OP140A2_Prev_LH_COMP_OK:=FALSE;
+	OP140A2_Prev_RH_COMP_OK:=FALSE;
+	OP140_AutoSeq_2:= 10;
+	OP140_ATEQ5_ResultOK :=FALSE;
+	OP140_ATEQ5_ResultNOK :=FALSE;
+	OP140_ATEQ2_ResultOK :=FALSE;
+	OP140_ATEQ2_ResultNOK :=FALSE;
+	
+END_IF
+
+CASE OP140_AutoSeq_2 OF 
+	
+	10:IF (OP140_Auto) THEN		// Check Automode Selected
+		OP140_AutoSeq_2 :=20;
+	   END_IF
+		
+	20:IF ( NOT OP140_ErrorActive) THEN		//Check No error
+		OP140_AutoSeq_2:=30;
+	   END_IF
+	   
+	30:IF (NOT OP140_HomeRunning) THEN		//Check No Homerunning
+		OP140_AutoSeq_2 :=40;
+	   END_IF
+		
+    40:IF ( OP140_Temp_Home_Ok)THEN	//Check Machine in Home
+		OP140_AutoSeq_2:= 50;
+		END_IF
+		
+	50:IF ( NOT OP140_OperationCompleted) AND NOT OP140_TOOL_CHANGE_MODE_SELECTED THEN		// Check Operation Completed Reset
+		OP140_AutoSeq_2:=60;
+		END_IF
+		
+	60:IF (NOT OP140_ComponentOk) THEN		// Check Component Ok Reset
+		OP140_AutoSeq_2:=70;
+		END_IF
+		
+	70:IF (NOT OP140_ComponentNok) THEN 	// Check Component NOk Reset
+		OP140_AutoSeq_2:= 120;
+		END_IF
+		
+    120:IF  ( OP140_HMI_Cycle_Start ) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		     OP140_HomeConditionOK:=TRUE;
+	 		 IF( OP140_HomeConditionOK AND OP140_AutoSelected) THEN
+				OP140_AutoRunning:=TRUE;
+				OP140_StepRunning:= FALSE;
+				
+		     ELSIF ( OP140_HomeConditionOK AND OP140_StepSelected) THEN
+					OP140_AutoRunning:=FALSE;
+					OP140_StepRunning:= TRUE;
+			 END_IF;
+		 END_IF
+		 
+		 IF ((OP140_AutoRunning OR OP140_StepRunning) AND OP140_StartEnable_2)AND  (OP140_DryRun OR OP140_HMI_Cycle_Start)   THEN
+              OP140_AutoSeq_2:= 130;
+		 END_IF
+		 
+	130:IF  OP140_STN_ENABLE_2 THEN 
+ 			OP140_AutoSeq_2:= 140;
+		END_IF
+		
+	140: IF fix_lh_2 <> 130 AND fix_rh_2 <> 130 THEN
+		    OP140_AutoSeq_2 := 200;
+		 ELSE 
+			IF fix_lh_2 =130 AND fix_rh_2 =130 THEN
+			   OP140A2_Prev_LH_COMP_OK := TRUE;
+	           OP140A2_Prev_RH_COMP_OK := TRUE;
+			   OP140_AutoSeq_2 := 150;
+			   
+			ELSIF fix_lh_2 =130 AND fix_rh_2 =131 THEN
+				OP140A2_Prev_LH_COMP_OK := TRUE;
+	            OP140A2_Prev_RH_COMP_OK := FALSE;
+				OP140_AutoSeq_2 := 150;
+				
+			ELSIF fix_lh_2 =131 AND fix_rh_2 =130 THEN
+				OP140A2_Prev_LH_COMP_OK := FALSE;
+	            OP140A2_Prev_RH_COMP_OK :=TRUE ;	
+				OP140_AutoSeq_2 := 150;
+			END_IF
+		END_IF
+		
+			
+	150:IF OP140_StartEnable_2  THEN
+		 OP140_Leak2_Seq_Start:=TRUE;	
+		 OP140_AutoSeq_2:= 160;
+		END_IF
+		 
+		 
+	160:IF OP140_Leak2_Seq_Completed=TRUE  AND In_Range(SR140_Vert_Servo_Ctrl_2.Actual_Position,40,1) THEN
+		  OP140A2_LH_Comp_OK:=OP1140_LK2_LH_OK;
+		  OP140A2_LH_Comp_NOK:=OP1140_LK2_LH_NOK;
+		  OP140A2_RH_Comp_OK:=OP1140_LK2_RH_OK;
+		  OP140A2_RH_Comp_NOK:=OP1140_LK2_RH_NOK;
+		  OP140_AutoSeq_2:= 170;		
+	    END_IF
+		OP140_P2_CURR_MVR			:= OP140_STN_MOVER_2;
+		
+	170: IF OP140_DoneDly_2.q AND OP140_StartEnable THEN
+		    
+            IF OP140A2_LH_Comp_OK AND OP140A2_RH_Comp_OK THEN
+		       MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]:=142;
+		       MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]:=142;		
+			   
+		       IF MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]=142 AND MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]=142 THEN
+				 STATION_DONE[OP140_P2_CURR_MVR][OP140_XTS_POS_NO]			:= TRUE;
+				  OP140_AutoSeq_2:= 180;
+		       END_IF 	
+				
+             ELSIF OP140A2_LH_Comp_NOK AND OP140A2_RH_Comp_NOK  THEN
+				   MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]:=143;
+		           MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]:=143;
+		
+		         IF MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]=143 AND MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]=143 THEN
+				STATION_DONE[OP140_P2_CURR_MVR][OP140_XTS_POS_NO]			:= TRUE;
+				    OP140_AutoSeq_2:= 180;
+		         END_IF 
+				
+             ELSIF OP140A2_LH_Comp_OK AND OP140A2_RH_Comp_NOK  THEN
+				   MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]:=142;
+		           MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]:=143;	
+	
+		           IF MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]=142 AND MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]=143 THEN
+				 STATION_DONE[OP140_P2_CURR_MVR][OP140_XTS_POS_NO]			:= TRUE;
+				      OP140_AutoSeq_2:= 180;
+		           END_IF 	
+				
+			ELSIF OP140A2_LH_Comp_NOK AND OP140A2_RH_Comp_OK  THEN
+				  MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]:=143;
+		          MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]:=142;		
+		         IF MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]=143 AND MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]=142 THEN
+				STATION_DONE[OP140_P2_CURR_MVR][OP140_XTS_POS_NO]			:= TRUE;
+				    OP140_AutoSeq_2:= 180;
+		        END_IF 		
+		    END_IF		
+	     END_IF
+	
+	180:// Reset All Bits
+	
+		OP140_Leak2_Seq_Completed:=FALSE;					
+        OP140A2_LH_Comp_OK:=FALSE;
+        OP140A2_LH_Comp_NOK:=FALSE;
+        OP140A2_RH_Comp_OK:=FALSE;
+        OP140A2_RH_Comp_NOK:=FALSE;
+        OP140_ATEQ5_ResultOK :=FALSE;
+		OP140_ATEQ5_ResultNOK :=FALSE;
+		OP140_ATEQ2_ResultOK :=FALSE;
+		OP140_ATEQ2_ResultNOK :=FALSE;
+		OP140_STN_ENABLE_2:=0;
+		OP140_AutoSeq_2:= 130;	
+
+	200:MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]:=143;
+		MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]:=143;
+		
+		IF MOVER_CMP_STATUS[OP140_P2_CURR_MVR][1]=143 AND MOVER_CMP_STATUS[OP140_P2_CURR_MVR][2]=143 THEN
+		STATION_DONE[OP140_STN_MOVER_2][OP140_XTS_POS_NO]			:= TRUE;
+		   OP140_AutoSeq_2:= 180;
+		END_IF		
+
+END_CASE
+
+
+
+
+Leak2_FB(
+	Horz_Cyl_Pos1            := CR140_Horz_Cyl_2.Position1, 
+	Horz_Cyl_Pos2            :=CR140_Horz_Cyl_2.Position2 , 
+	Vert_Cyl_Pos1            := CR140_Vert_Cyl_2.Position1, 
+	Vert_Cyl_Pos2            := CR140_Vert_Cyl_2.Position2, 
+	StartEnable              :=OP140_StartEnable_2 , 
+	Home_pos_IP              :=OP140_HMI_Vert_Home_Pos, 
+	Home_Vel_IP              := OP140_HMI_Vert_Home_Vel,
+	SafeHome_Pos_IP          :=OP140_HMI_Vert_SafeHome_Pos,
+	SafeHome_Vel_Ip          :=OP140_HMI_Vert_SafeHome_Vel, 
+	SafeWork_Pos_IP          :=OP140_HMI_Vert_SafeWork_Pos,
+	SafeWork_Vel_IP          :=OP140_HMI_Vert1_SafeWork_Vel,
+	Work_Pos_IP              :=OP140_HMI_Vert2_Work_Pos , 
+	Work_Vel_IP              :=OP140_HMI_Vert2_Work_Vel , 
+	Axis_In_WorkPos          :=SR140_Vert_Servo_Ctrl_2.Axis_In_Pos , 
+	Axis_In_Home             :=SR140_Vert_Servo_Ctrl_2.Axis_In_Home , 
+	axis_in_position         :=SR140_Vert_Servo_Ctrl_2.Axis_In_Pos,
+	servo_actual_pos         :=SR140_Vert_Servo_Ctrl_2.Actual_Position,
+	Prev_Stat_LH_OK          :=OP140A2_Prev_LH_COMP_OK , 
+	Prev_Stat_RH_OK          :=OP140A2_Prev_RH_COMP_OK , 
+	TS1_Test1_ProgNO         :=OP140_ATEQ_Test_Prog1_No , 
+	TS1_Test2_ProgNO         :=OP140_ATEQ_Test_Prog2_No , 
+	TS1_TestOk               :=OP140_ATEQ2_ResultOK , 
+	TS1_TestNOK              :=OP140_ATEQ2_ResultNOK , 
+	TS1_StartEnable          := OP140_StartEnable_2, 
+	TS1_ResultIN             := OP140_ATEQ2_Result , 
+	TS2_Test1_ProgNO         :=OP140_ATEQ_Test_Prog1_No , 
+	TS2_Test2_ProgNO         :=OP140_ATEQ_Test_Prog2_No , 
+	TS2_TestOk               :=OP140_ATEQ5_ResultOK , 
+	TS2_TestNOK              :=OP140_ATEQ5_ResultNOK , 
+	TS2_StartEnable          :=OP140_StartEnable_2 , 
+	TS2_ResultIN             :=OP140_ATEQ5_Result , 
+	Horz_Cyl_Auto1            =>CR140_Horz_Cyl_2.AutoCmd1 , 
+	Horz_Cyl_Auto2            =>CR140_Horz_Cyl_2.AutoCmd2 , 
+	Vert_Cyl_Auto1            =>CR140_Vert_Cyl_2.AutoCmd1 , 
+	Vert_Cyl_Auto2            =>CR140_Vert_Cyl_2.AutoCmd2 , 
+	Servo_Pos_Error           => , 
+	Servo_HomePos_Error       => , 
+	TS1_StartOP               => OP140_ATEQ2_Auto_Start , 
+	TS1_Test_ProgNO           => OP140_ATEQ2_Auto_Prog_No_out , 
+	TS2_StartOP               =>OP140_ATEQ5_Auto_Start , 
+	TS2_Test_ProgNO           => OP140_ATEQ5_Auto_Prog_No_out , 
+	Seq_Start                 := OP140_Leak2_Seq_Start, 
+	Seq_Completed             :=OP140_Leak2_Seq_Completed , 
+	TS1_SeqStart              :=LK2_TS1_Seq_Start , 
+	TS1_SeqCompleted          := LK2_TS1_Seq_Completed, 
+	TS1_ATEQCompleted         :=  OP140_ATEQ2_ResultCompleted, 
+	TS1_Test1OK               :=LK2_TS2_tst1_OK , 
+	TS1_Test1NOK              := LK2_TS1_tst1_NOK, 
+	TS1_Test2Ok               :=LK2_TS1_tst2_OK , 
+	TS1_Test2NOK              :=LK2_TS1_tst2_NOK , 
+	TS1_Test1Result           := LK2_TS1_tst1_Result, 
+	TS1_Test2Result           :=LK2_TS1_tst2_Result , 
+	TS1_CompOK                :=LK2_TS1_CompOK , 
+	TS1_CompNOK               := LK2_TS1_CompNOK, 
+	TS1_ResultOK              :=OP140_Leak2_TS1_result_OK , 
+	TS1_ResultNOK             := OP140_Leak2_TS1_Result_NOK, 
+	TS1_Result_Data           :=OP140_Leak2_TS1_Result_Data , 
+	LH_CompOK                 :=OP1140_LK2_LH_OK , 
+	LH_CompNOK                :=OP1140_LK2_LH_NOK , 
+	RH_CompOK                 :=OP1140_LK2_RH_OK , 
+	RH_CompNOK                :=OP1140_LK2_RH_NOK , 
+	TS2_SeqStart              :=LK2_TS2_Seq_Start , 
+	TS2_SeqCompleted          := LK2_TS2_Seq_Completed , 
+	TS2_ATEQCompleted         :=OP140_ATEQ5_ResultCompleted , 
+	TS2_Test1OK               :=LK2_TS2_tst1_OK , 
+	TS2_Test1NOK              :=LK2_TS2_tst1_NOK  , 
+	TS2_Test2Ok               :=LK2_TS2_tst2_OK , 
+	TS2_Test2NOK              :=LK2_TS2_tst2_NOK , 
+	TS2_Test1Result           := LK2_TS2_tst1_Result , 
+	TS2_Test2Result           :=LK2_TS2_tst2_Result , 
+	TS2_CompOK                :=LK2_TS2_CompOK , 
+	TS2_CompNOK               :=LK2_TS2_CompNOK , 
+	TS2_ResultOK              := OP140_Leak2_TS2_result_OK, 
+	TS2_ResultNOK             :=OP140_Leak2_TS2_result_NOK , 
+	TS2_Result_Data           :=OP140_Leak2_TS2_Result_Data ,
+    Servo_Pos_OP              :=SR140_Vert_Servo_Ctrl_2.Position,
+    Servo_Vel_OP              :=SR140_Vert_Servo_Ctrl_2.Velocity,
+    ABS_Move_Start            :=SR140_Vert_Servo_Ctrl_2.ABSmove_Start);
+
+OP140_DoneDly_2(IN:=OP140_Leak2_Seq_Completed , PT:=T#500MS , Q=> , ET=> );
+dry_run:=All_Station_Dry_Run;	
+IF Dry_Run THEN
+	fix_lh_2:=130;	
+    fix_rh_2:=130;
+ELSE
+	fix_lh_2:=MOVER_CMP_STATUS[OP140_STN_MOVER_2][1];	
+    fix_rh_2:=MOVER_CMP_STATUS[OP140_STN_MOVER_2][2];	
+END_IF
+	
+
+//############################		OP140 STATION ENABLE CONDITION		##########################
+
+OP140_STN_MOVER_2					:= MOVER_POSITION[OP140_P2_XTS_POS_NO];
+
+IF AUTO_WITH_XTS THEN
+IF OP140_STN_MOVER_2>0 THEN
+IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP140_STN_MOVER_2][1]=5 AND MOVER_CMP_STATUS[OP140_STN_MOVER_2][2]=5)THEN
+OP140_STN_ENABLE_2					:= MOVER_POS_RECHED[OP140_STN_MOVER_2] AND ((MOVER_CMP_STATUS[OP140_STN_MOVER_2][1]=130)OR 
+									(MOVER_CMP_STATUS[OP140_STN_MOVER_2][2]=130))AND STATION_ENABLE_CONTROL;
+ELSE
+	STATION_DONE[OP140_STN_MOVER_2][OP140_XTS_POS_NO]			:= TRUE;
+END_IF
+ELSE
+OP140_STN_ENABLE_2					:= FALSE;
+END_IF	
+END_IF
+
+	
+	
+	]]></ST>
+    </Implementation>
+    <LineIds Name="OP140_AutoSequence_2">
+      <LineId Id="855" Count="0" />
+      <LineId Id="1052" Count="0" />
+      <LineId Id="856" Count="2" />
+      <LineId Id="860" Count="1" />
+      <LineId Id="864" Count="1" />
+      <LineId Id="1053" Count="0" />
+      <LineId Id="1291" Count="4" />
+      <LineId Id="866" Count="2" />
+      <LineId Id="1341" Count="0" />
+      <LineId Id="869" Count="2" />
+      <LineId Id="1342" Count="0" />
+      <LineId Id="872" Count="2" />
+      <LineId Id="1343" Count="0" />
+      <LineId Id="875" Count="2" />
+      <LineId Id="1344" Count="0" />
+      <LineId Id="878" Count="2" />
+      <LineId Id="1345" Count="0" />
+      <LineId Id="881" Count="2" />
+      <LineId Id="1346" Count="0" />
+      <LineId Id="884" Count="2" />
+      <LineId Id="1347" Count="0" />
+      <LineId Id="887" Count="2" />
+      <LineId Id="1348" Count="0" />
+      <LineId Id="890" Count="4" />
+      <LineId Id="1349" Count="0" />
+      <LineId Id="896" Count="4" />
+      <LineId Id="1350" Count="0" />
+      <LineId Id="901" Count="2" />
+      <LineId Id="1351" Count="0" />
+      <LineId Id="904" Count="10" />
+      <LineId Id="1358" Count="0" />
+      <LineId Id="915" Count="3" />
+      <LineId Id="1359" Count="0" />
+      <LineId Id="919" Count="2" />
+      <LineId Id="1357" Count="0" />
+      <LineId Id="922" Count="0" />
+      <LineId Id="926" Count="15" />
+      <LineId Id="1520" Count="0" />
+      <LineId Id="942" Count="0" />
+      <LineId Id="1361" Count="0" />
+      <LineId Id="944" Count="0" />
+      <LineId Id="1362" Count="0" />
+      <LineId Id="945" Count="1" />
+      <LineId Id="1352" Count="0" />
+      <LineId Id="947" Count="7" />
+      <LineId Id="1353" Count="0" />
+      <LineId Id="955" Count="7" />
+      <LineId Id="1354" Count="0" />
+      <LineId Id="963" Count="15" />
+      <LineId Id="1355" Count="0" />
+      <LineId Id="979" Count="0" />
+      <LineId Id="981" Count="4" />
+      <LineId Id="1288" Count="2" />
+      <LineId Id="987" Count="4" />
+      <LineId Id="1363" Count="0" />
+      <LineId Id="992" Count="4" />
+      <LineId Id="854" Count="0" />
+      <LineId Id="103" Count="19" />
+      <LineId Id="1240" Count="0" />
+      <LineId Id="1242" Count="0" />
+      <LineId Id="123" Count="17" />
+      <LineId Id="144" Count="5" />
+      <LineId Id="152" Count="29" />
+      <LineId Id="1011" Count="0" />
+      <LineId Id="183" Count="5" />
+      <LineId Id="445" Count="2" />
+      <LineId Id="1004" Count="5" />
+      <LineId Id="1000" Count="0" />
+      <LineId Id="444" Count="0" />
+      <LineId Id="1001" Count="0" />
+      <LineId Id="1459" Count="15" />
+      <LineId Id="347" Count="0" />
+      <LineId Id="352" Count="0" />
+      <LineId Id="432" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

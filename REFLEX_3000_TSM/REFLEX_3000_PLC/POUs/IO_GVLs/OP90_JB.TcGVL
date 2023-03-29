@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP90_JB" Id="{a25cdf26-b5b9-44f0-aa9b-b512986ea26f}">
+  <GVL Name="OP90_JB" Id="{b4461c4e-abaf-4b11-8d5d-031f2385ce44}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 I90_SPARE_I500_0                     :BOOL;

@@ -1,91 +1,301 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP140_Initialization_Seq" Id="{1920a043-951f-40c7-a195-9f4b76d01e0f}" SpecialFunc="None">
+  <POU Name="OP140_Initialization_Seq" Id="{53df99d0-20eb-4fcb-823b-f49d4678b5ee}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP140_Initialization_Seq
 VAR
+	ateq_reseted :bool;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF (SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home AND CR140_Horz_Cyl_1.Position1 AND  CR140_Horz_Cyl_2.Position1 AND  CR140_Horz_Cyl_3.Position1 AND  CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1)THEN
-OP140_Temp_Home_Ok:=TRUE;
-OP140_HomeRunning:=FALSE;
-OP140_Homing_Seq:=0;
-ELSE
+      <ST><![CDATA[IF ( SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home AND CR140_Horz_Cyl_1.Position1 
+    AND  CR140_Horz_Cyl_2.Position1 AND  CR140_Horz_Cyl_3.Position1  AND  CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND ateq_reseted
+    AND  CR140_Vert_Cyl_3.Position1 AND CR140_Top_Wipe_Cyl_1.Position1 AND CR140_Top_Wipe_Cyl_2.Position1 AND CR140_Top_Wipe_Cyl_3.Position1 )THEN
+   
+    OP140_Temp_Home_Ok:=TRUE;
+    OP140_HomeRunning:=FALSE;
+    OP140_Homing_Seq:=0;
+	
+    ELSE
 	OP140_Temp_Home_Ok:=FALSE;
+	ateq_reseted := FALSE;
 	
 END_IF
 
 CASE OP140_Homing_Seq OF
-	0: IF (OP140_Auto AND NOT OP140_HomeRunning AND  NOT OP140_ErrorActive AND  NOT OP140_AutoRunning AND NOT OP140_StepRunning	 AND NOT OP140_Temp_Home_Ok) THEN
-		OP140_HomeRunning:=TRUE;
-		OP140_Homing_Seq:=10;	
-	   END_IF
-	10:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
+	
+	   0: IF (OP140_Auto AND NOT OP140_HomeRunning AND  NOT OP140_ErrorActive AND  NOT OP140_AutoRunning AND NOT OP140_StepRunning	 AND NOT OP140_Temp_Home_Ok) THEN
+		      OP140_HomeRunning:=TRUE;
+		      OP140_Homing_Seq:=10;	
+	      END_IF
+	   
+	   10:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN   /// waiting for hmi homing feedback
+             OP140_ATEQ1_Auto_Start:=FALSE;
+			 OP140_ATEQ2_Auto_Start:=FALSE;
+			 OP140_ATEQ3_Auto_Start:=FALSE;
+			 OP140_ATEQ4_Auto_Start:=FALSE;
+			 OP140_ATEQ5_Auto_Start:=FALSE;
+			 OP140_ATEQ6_Auto_Start:=FALSE;
+			 OP140_ATEQ_Reset :=TRUE;
+			 OP140_Homing_Seq:=20;
+		  END_IF 
+			
+	  20:	CR140_Top_Wipe_Cyl_1.HomingCmd1:= TRUE; 
+			CR140_Top_Wipe_Cyl_2.HomingCmd1:= TRUE; 
+			CR140_Top_Wipe_Cyl_3.HomingCmd1:= TRUE; 
+			
+			IF CR140_Top_Wipe_Cyl_1.position1 AND CR140_Top_Wipe_Cyl_2.Position1 AND  CR140_Top_Wipe_Cyl_3.Position1=TRUE THEN
+			   CR140_Top_Wipe_Cyl_1.HomingCmd1:= FALSE;
+			   CR140_Top_Wipe_Cyl_2.HomingCmd1:= FALSE;
+			   CR140_Top_Wipe_Cyl_3.HomingCmd1:= FALSE;
+			   OP140_Homing_Seq:=30;
+			END_IF
+			
+	 30:  SR140_Vert_Servo_Ctrl_1.Position:=0.0;
+		  SR140_Vert_Servo_Ctrl_1.Velocity:=50;
+		  SR140_Vert_Servo_Ctrl_2.Position:=0.0;
+		  SR140_Vert_Servo_Ctrl_2.Velocity:=50;
+		  SR140_Vert_Servo_Ctrl_3.Position:=0.0;
+		  SR140_Vert_Servo_Ctrl_3.Velocity:=50;
+		  SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:=TRUE;
+		  SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:=TRUE;
+		  SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:=TRUE; 
+		  
+		  IF (SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home)=TRUE THEN
+			 SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:=FALSE;
+			 SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:=FALSE;
+			 SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:=FALSE;
+			 OP140_Homing_Seq:=40;
+		END_IF	
+	
+    40:	CR140_Vert_Cyl_1.HomingCmd1:= TRUE;	
+		CR140_Vert_Cyl_2.HomingCmd1:= TRUE;	
+		CR140_Vert_Cyl_3.HomingCmd1:= TRUE;	
+		IF CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1=TRUE THEN
+		   CR140_Vert_Cyl_1.HomingCmd1:= FALSE;
+		   CR140_Vert_Cyl_2.HomingCmd1:= FALSE;
+		   CR140_Vert_Cyl_3.HomingCmd1:= FALSE;
+           OP140_Homing_Seq:=50;
+		END_IF
+		
+	50:	CR140_Horz_Cyl_1.HomingCmd1:= TRUE;
+		CR140_Horz_Cyl_2.HomingCmd1:= TRUE;
+		CR140_Horz_Cyl_3.HomingCmd1:= TRUE;
+		IF CR140_Horz_Cyl_1.Position1 AND  CR140_Horz_Cyl_2.Position1 AND CR140_Horz_Cyl_3.Position1 THEN
+		   CR140_Horz_Cyl_1.HomingCmd1:= FALSE;
+		   CR140_Horz_Cyl_2.HomingCmd1:= FALSE;
+		   CR140_Horz_Cyl_3.HomingCmd1:= FALSE;
+		   OP140_Homing_Seq:=60;
+	    END_IF
+	
+    60:  OP140_ATEQ_Reset :=FALSE;
+	     IF NOT  OP140_ATEQ_Reset  THEN
+		    OP140_HomeRunning:=FALSE;
+			OP140_ATEQ1_Auto_Start:=TRUE;
+			OP140_ATEQ2_Auto_Start:=TRUE;
+			OP140_ATEQ3_Auto_Start:=TRUE;
+			OP140_ATEQ4_Auto_Start:=TRUE;
+			OP140_ATEQ5_Auto_Start:=TRUE;
+			OP140_ATEQ6_Auto_Start:=TRUE;
+			ateq_reseted := TRUE;
+			IF ateq_reseted THEN
+			   OP140_ATEQ1_Auto_Start:=FALSE;
+			   OP140_ATEQ2_Auto_Start:=FALSE;
+			   OP140_ATEQ3_Auto_Start:=FALSE;
+			   OP140_ATEQ4_Auto_Start:=FALSE;
+			   OP140_ATEQ5_Auto_Start:=FALSE;
+			   OP140_ATEQ6_Auto_Start:=FALSE;
+               OP140_Homing_Seq:=0;
+			END_IF
+		 END_IF	
+			
+END_CASE		
+
+IF NOT OP140_HomeRunning THEN
+	
+	CR140_Horz_Cyl_1.HomingCmd1:= FALSE;
+	CR140_Horz_Cyl_2.HomingCmd1:= FALSE;
+	CR140_Horz_Cyl_3.HomingCmd1:= FALSE;
+	CR140_Vert_Cyl_1.HomingCmd1:= FALSE;
+	CR140_Vert_Cyl_2.HomingCmd1:= FALSE;
+	CR140_Vert_Cyl_3.HomingCmd1:= FALSE;
+	CR140_Top_Wipe_Cyl_1.HomingCmd1:= FALSE;
+	CR140_Top_Wipe_Cyl_2.HomingCmd1:= FALSE;
+	CR140_Top_Wipe_Cyl_3.HomingCmd1:= FALSE;
+	
+END_IF
+		
+		
+			
+			
+			
+    (*       IF ( CR140_Top_Wipe_Cyl_1.Position1 AND CR140_Top_Wipe_Cyl_2.Position1 AND  CR140_Top_Wipe_Cyl_3.Position1=TRUE ) THEN
+			    OP140_Homing_Seq:=20;
+			    ELSE
+				CR140_Top_Wipe_Cyl_1.HomingCmd1:= TRUE;
+				CR140_Top_Wipe_Cyl_2.HomingCmd1:= TRUE;
+				CR140_Top_Wipe_Cyl_3.HomingCmd1:= TRUE;
+				
+				IF   CR140_Top_Wipe_Cyl_1.position1 AND CR140_Top_Wipe_Cyl_2.Position1 AND  CR140_Top_Wipe_Cyl_3.Position1=TRUE THEN
+				     CR140_Top_Wipe_Cyl_1.HomingCmd1:= FALSE;
+				     CR140_Top_Wipe_Cyl_2.HomingCmd1:= FALSE;
+				     CR140_Top_Wipe_Cyl_3.HomingCmd1:= FALSE;
+				     OP140_Homing_Seq:=30;
+				END_IF
+			END_IF
+		END_IF
+		
+	20:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
         IF (SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home)=TRUE THEN
 			OP140_Homing_Seq:=30;
 			ELSE
-				SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:= TRUE;
-				SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:= TRUE;
-				SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:= TRUE;
+				SR140_Vert_Servo_Ctrl_1.Position:=0.0;
+				SR140_Vert_Servo_Ctrl_1.Velocity:=50;
+				SR140_Vert_Servo_Ctrl_2.Position:=0.0;
+				SR140_Vert_Servo_Ctrl_2.Velocity:=50;
+				SR140_Vert_Servo_Ctrl_3.Position:=0.0;
+				SR140_Vert_Servo_Ctrl_3.Velocity:=50;
+				SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:=TRUE;
+				SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:=TRUE;
+				SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:=TRUE;
+				
+				
 				IF (SR140_Vert_Servo_Ctrl_1.Axis_In_Home AND SR140_Vert_Servo_Ctrl_2.Axis_In_Home AND SR140_Vert_Servo_Ctrl_3.Axis_In_Home)=TRUE THEN
+				
+					SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:=FALSE;
+				SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:=FALSE;
+				SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:=FALSE;
 				OP140_Homing_Seq:=30;
-				SR140_Vert_Servo_Ctrl_1.Axis_Home_Cmd:= FALSE;
-				SR140_Vert_Servo_Ctrl_2.Axis_Home_Cmd:= FALSE;
-				SR140_Vert_Servo_Ctrl_3.Axis_Home_Cmd:= FALSE;
 				END_IF
 				
 				END_IF
 				END_IF
-	20:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
+	30:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
         IF ( CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1=TRUE ) THEN
-			OP140_Homing_Seq:=30;
+			OP140_Homing_Seq:=40;
 			ELSE
 	
 				CR140_Vert_Cyl_1.HomingCmd1:= TRUE;
 				CR140_Vert_Cyl_2.HomingCmd1:= TRUE;
 				CR140_Vert_Cyl_3.HomingCmd1:= TRUE;
 				
-				IF   CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1=TRUE THEN
-				OP140_Homing_Seq:=30;
-				
-				CR140_Vert_Cyl_1.HomingCmd1:= FALSE;
-				CR140_Vert_Cyl_2.HomingCmd1:= FALSE;
-				CR140_Vert_Cyl_3.HomingCmd1:= FALSE;
-				
-				END_IF
+				IF   CR140_Vert_Cyl_1.Position1 AND CR140_Vert_Cyl_2.Position1 AND  CR140_Vert_Cyl_3.Position1=TRUE THEn
+				    CR140_Vert_Cyl_1.HomingCmd1:= FALSE;
+				    CR140_Vert_Cyl_2.HomingCmd1:= FALSE;
+				    CR140_Vert_Cyl_3.HomingCmd1:= FALSE;
+				    OP140_Homing_Seq:=40;
+			   END_IF
 				
 				END_IF
 				END_IF
-		30:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
-        IF ( CR140_Horz_Cyl_1.Position1 AND CR140_Horz_Cyl_2.Position1 AND  CR140_Horz_Cyl_3.Position1=TRUE ) THEN
-			OP140_Homing_Seq:=30;
-			ELSE
-	
-				CR140_Horz_Cyl_1.HomingCmd1:= TRUE;
-			CR140_Horz_Cyl_2.HomingCmd1:= TRUE;
-			CR140_Horz_Cyl_3.HomingCmd1:= TRUE;
+		40:IF (OP140_HomeRunning AND OP140_HMI_Homing)THEN 
+              IF ( CR140_Horz_Cyl_1.Position1 AND CR140_Horz_Cyl_2.Position1 AND  CR140_Horz_Cyl_3.Position1=TRUE ) THEN
+			     OP140_Homing_Seq:=40;
+			  ELSE
+	             CR140_Horz_Cyl_1.HomingCmd1:= TRUE;
+			     CR140_Horz_Cyl_2.HomingCmd1:= TRUE;
+			     CR140_Horz_Cyl_3.HomingCmd1:= TRUE;
+			  IF CR140_Horz_Cyl_1.Position1 AND  CR140_Horz_Cyl_2.Position1 AND CR140_Horz_Cyl_3.Position1 THEN
+				 CR140_Horz_Cyl_1.HomingCmd1:= FALSE;
+				 CR140_Horz_Cyl_2.HomingCmd1:= FALSE;
+			     CR140_Horz_Cyl_3.HomingCmd1:= FALSE;
+			     OP140_Homing_Seq:=50;
+			  END_IF
 				
-				IF CR140_Horz_Cyl_1.Position1 AND  CR140_Horz_Cyl_2.Position1 AND CR140_Horz_Cyl_3.Position1 THEN
-				OP140_Homing_Seq:=30;
-				
-				CR140_Horz_Cyl_1.HomingCmd1:= FALSE;
-				CR140_Horz_Cyl_2.HomingCmd1:= FALSE;
-			CR140_Horz_Cyl_3.HomingCmd1:= FALSE;
-				
-				END_IF
-				
-				END_IF
-				END_IF
-				
-			40:	
-			OP140_Homing_Seq:=0;
-			OP140_HomeRunning:=FALSE;
-	
-END_CASE]]></ST>
+			END_IF
+		END_IF
+			
+  50:  OP140_ATEQ_Reset :=FALSE;
+     IF NOT  OP140_ATEQ_Reset  THEN
+	   OP140_HomeRunning:=FALSE;
+	   OP140_Homing_Seq:=0;
+	   END_IF*)
+
+
+
+
+
+
+]]></ST>
     </Implementation>
     <LineIds Name="OP140_Initialization_Seq">
-      <LineId Id="3" Count="74" />
+      <LineId Id="3" Count="0" />
+      <LineId Id="257" Count="0" />
+      <LineId Id="254" Count="0" />
+      <LineId Id="4" Count="0" />
+      <LineId Id="256" Count="0" />
+      <LineId Id="5" Count="1" />
+      <LineId Id="258" Count="0" />
+      <LineId Id="260" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="251" Count="0" />
+      <LineId Id="9" Count="3" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="13" Count="3" />
+      <LineId Id="146" Count="0" />
+      <LineId Id="149" Count="0" />
+      <LineId Id="158" Count="5" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="164" Count="0" />
+      <LineId Id="173" Count="0" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="169" Count="2" />
+      <LineId Id="248" Count="0" />
+      <LineId Id="182" Count="4" />
+      <LineId Id="174" Count="0" />
+      <LineId Id="189" Count="0" />
+      <LineId Id="188" Count="0" />
+      <LineId Id="175" Count="6" />
+      <LineId Id="172" Count="0" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="200" Count="3" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="195" Count="1" />
+      <LineId Id="209" Count="3" />
+      <LineId Id="270" Count="0" />
+      <LineId Id="205" Count="0" />
+      <LineId Id="215" Count="0" />
+      <LineId Id="214" Count="0" />
+      <LineId Id="206" Count="1" />
+      <LineId Id="219" Count="4" />
+      <LineId Id="208" Count="0" />
+      <LineId Id="224" Count="0" />
+      <LineId Id="226" Count="2" />
+      <LineId Id="271" Count="8" />
+      <LineId Id="282" Count="4" />
+      <LineId Id="281" Count="0" />
+      <LineId Id="280" Count="0" />
+      <LineId Id="225" Count="0" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="216" Count="0" />
+      <LineId Id="232" Count="0" />
+      <LineId Id="234" Count="11" />
+      <LineId Id="233" Count="0" />
+      <LineId Id="217" Count="1" />
+      <LineId Id="191" Count="2" />
+      <LineId Id="150" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="22" Count="4" />
+      <LineId Id="29" Count="3" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="147" Count="0" />
+      <LineId Id="38" Count="34" />
+      <LineId Id="75" Count="3" />
+      <LineId Id="80" Count="8" />
+      <LineId Id="90" Count="2" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="97" Count="3" />
+      <LineId Id="102" Count="3" />
+      <LineId Id="134" Count="2" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="137" Count="0" />
       <LineId Id="2" Count="0" />
+      <LineId Id="128" Count="3" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="115" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

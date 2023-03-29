@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_General_Request" Id="{1be56a0d-0468-45f1-91b7-456b4f164b19}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_General_Request :
+STRUCT
+Start_Marking_Request			: BIT ;
+Guide_Laser_Request				: BIT ;
+Stop_Marking_Request			: BIT ;
+Error_Clear_Request				: BIT ;
+TwoD_C_Read_Request				: BIT ;//2DC_Read_Request
+A_Reserve_1						: BIT ;
+A_Reserve_2						: BIT ;
+A_Reserve_3						: BIT ;
+//
+Program_Edit_Start_Request		: BIT ;
+A_Reserve_4						: BIT ;
+A_Reserve_5						: BIT ;
+A_Reserve_6						: BIT ;
+A_Reserve_7						: BIT ;
+A_Reserve_8						: BIT ;
+A_Reserve_9						: BIT ;
+A_Reserve_10					: BIT ;
+//
+Program_Change_Request			: BIT ;
+Rank_Change_Request				: BIT ;
+Counter_No_Change_Request		: BIT ;
+Counter_Value_Change_Request	: BIT ;
+Counter_Up_Request				: BIT ;
+Counter_Down_Request			: BIT ;
+Counter_Reset_Request			: BIT ;
+A_Reserve_11					: BIT ;
+//
+A_ReserveByte_1					: BYTE ;
+//
+A_ReserveByte_2					: BYTE ;
+//
+Setting_String_Read_Request		: BIT ;
+Marked_String_Read_Request		: BIT ;
+STRING_Change_Request			: BIT ;
+A_Reserve_12					: BIT ;
+A_Reserve_13					: BIT ;
+A_Reserve_14					: BIT ;
+A_Reserve_15					: BIT ;
+A_Reserve_16					: BIT ;
+//
+A_ReserveByte_3					: Byte ;
+//
+Command_Send_Request			: BIT ;
+A_Reserve_17					: BIT ;
+A_Reserve_18					: BIT ;
+A_Reserve_19					: BIT ;
+A_Reserve_20					: BIT ;
+A_Reserve_21					: BIT ;
+A_Reserve_22					: BIT ;
+A_Reserve_23					: BIT ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

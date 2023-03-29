@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Control_Status" Id="{af2b41f3-54df-4be6-8c72-e4dffe13f183}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Control_Status :
+STRUCT
+Data_Hold							: BIT;
+Counter_End_1						: BIT;
+Counter_End_2						: BIT;
+Counter_End_3						: BIT;
+Counter_End_4						: BIT;
+TwoD_Code_Read_OK					: BIT;
+TwoD_Code_Read_NG					: BIT;
+Marking_Complete_1					: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

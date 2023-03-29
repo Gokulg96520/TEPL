@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP50_Error" Id="{7d73610a-f094-4d8f-8e3b-551c0adaa556}" SpecialFunc="None">
+  <POU Name="OP50_Error" Id="{ea26b7af-7960-4a44-8087-9a8f72ce12ec}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP50_Error
 VAR
 	OP50_Step_Err_1: TON;
@@ -9,6 +9,8 @@ VAR
 	OP50_Step_Err_4: TON;
 	OP50_Step_Err_5: TON;
 	OP50_Step_Err_6: TON;
+	
+	Gripper_ERR_Timer : TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -18,7 +20,7 @@ IF ((OP50_GVL.OP50_ErrorWord_0<>0) OR (OP50_GVL.OP50_ErrorWord_1<>0) OR (OP50_GV
 END_IF
 
 //Reset ErrorActive
-IF OP50_HMI_Reset THEN 
+IF OP50_HMI_Reset or HMI_Reset THEN 
 	OP50_GVL.OP50_ErrorActive:= FALSE;
 	OP50_GVL.OP50_ErrorWord_0:= 0;
 	OP50_GVL.OP50_ErrorWord_1:= 0;
@@ -86,11 +88,22 @@ END_IF
 OP50_Step_Err_3(IN:=OP50_GVL.OP50_AutoSeq=240 , PT:=T#5S , Q=> , ET=> );
 IF (OP50_GVL.OP50_AutoSeq=240 AND OP50_Step_Err_3.Q) THEN
 	OP50_GVL.OP50_ErrorWord_0.9:=TRUE;
-END_IF]]></ST>
+END_IF
+
+IF Gripper_ERR_Timer.Q THEN
+	OP50_GVL.OP50_ErrorWord_0.10:=TRUE;
+END_IF
+
+Gripper_ERR_Timer(IN:=I50_LH_GRIP_CLSE_I1101_7 OR I50_RH_GRIP_CLSE_I1110_1,PT:=T#500MS);]]></ST>
     </Implementation>
     <LineIds Name="OP50_Error">
       <LineId Id="3" Count="73" />
       <LineId Id="2" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="88" Count="1" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="92" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

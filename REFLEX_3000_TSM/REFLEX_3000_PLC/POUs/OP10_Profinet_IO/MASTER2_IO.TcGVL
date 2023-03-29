@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="MASTER2_IO" Id="{931644ce-41c2-402e-aa0f-308d4c176b5a}">
+  <GVL Name="MASTER2_IO" Id="{f012dd65-a3ec-4e98-8089-0b1a0397fc27}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 	//port1
@@ -10,8 +10,8 @@ I30_LH_REJ_CYL_FWD_I1100_2                       : BOOL;
 I30_LH_REJ_CYL_REV_I1100_3                       : BOOL;
 I30_RH_REJ_CYL_FWD_I1100_4                       : BOOL;
 I30_RH_REJ_CYL_REV_I1100_5                       : BOOL;
-I30_SPARE_I1100_6                                : BOOL;
-I30_SPARE_I1100_7                                : BOOL;
+I30_TOP_REJ_BIN_PRSNCE_I1100_6                   : BOOL;
+I30_BOT_REJ_BIN_PRSNCE_I1100_7                   : BOOL;
 
 I50_DRUM_FEED_CONV1_OVERFLW_I1101_0              : BOOL;
 I50_DRUM_FEED_CONV2_OVERFLW_I1101_1              : BOOL;
@@ -32,10 +32,10 @@ I70_LH_REJ_CYL_REV_I1110_5                       : BOOL;
 I70_RH_REJ_CYL_FWD_I1110_6                       : BOOL;
 I70_RH_REJ_CYL_REV_I1110_7                       : BOOL;
 
-I70_SPARE_I1111_0                                : BOOL;
-I70_SPARE_I1111_1                                : BOOL;
-I70_SPARE_I1111_2                                : BOOL;
-I70_SPARE_I1111_3                                : BOOL;
+I50_TOP_REJ_BIN_PRSNCE_I1111_0                   : BOOL;
+I50_BOT_REJ_BIN_PRSNCE_I1111_1                   : BOOL;
+I70_TOP_REJ_BIN_PRSNCE_I1111_2                   : BOOL;
+I70_BOT_REJ_BIN_PRSNCE_I1111_3                   : BOOL;
 I70_SPARE_I1111_4                                : BOOL;
 I70_SPARE_I1111_5                                : BOOL;
 I70_SPARE_I1111_6                                : BOOL;

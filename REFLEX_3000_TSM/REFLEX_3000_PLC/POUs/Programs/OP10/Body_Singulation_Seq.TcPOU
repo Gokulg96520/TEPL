@@ -1,0 +1,496 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Body_Singulation_Seq" Id="{da39c19d-d669-4212-bf0d-08af3831640b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Body_Singulation_Seq
+VAR
+
+	AFT_GRP_HME_10A			: TON;
+	AFT_SRV_WRK_10A			: TON;
+	AFT_GRP_WRK_10A			: TON;
+	Part_Presnce_Delay_10A  : TON;
+	AFT_GRP_HME_10B			: TON;
+	AFT_SRV_WRK_10B			: TON;
+	AFT_GRP_WRK_10B			: TON;
+	Part_Presnce_Delay_10B  : TON;
+
+	
+	Toggle_Pos_LH_Empty : R_TRIG;
+	Toggle_Neg_LH_Empty : F_TRIG;
+	Toggle_Pos_RH_Empty : R_TRIG;
+	Toggle_Neg_RH_Empty : F_TRIG;	
+	OP10B_Empty_Cam_Completed : BOOL;
+	OP10A_Empty_Cam_Completed : BOOL;	
+	Singulation_Seq_Start_manual     : BOOL;
+	
+	Bowl_A_ON_Timer		: TON;
+	Bowl_A_OFF_Timer	: TON;
+	Bowl_B_ON_Timer		: TON;
+	Bowl_B_OFF_Timer	: TON;	
+	
+	
+END_VAR
+
+VAR PERSISTENT
+	Str_variant 			: BOOL;
+	OP10A_Camera_Bypass     : BOOL;
+	OP10A_angle_Bypass      : BOOL;
+	OP10A_singulation_Bypass: BOOL;
+
+	OP10B_Camera_Bypass     : BOOL;
+	OP10B_angle_Bypass      : BOOL;
+	OP10B_singulation_Bypass: BOOL;	
+	
+	AFT_GRP_HME_TIME			: TIME ;
+	AFT_SRV_WRK_TIME			: TIME ;
+	AFT_GRP_WRK_TIME			: TIME ;
+	AFT_Part_Prsnce_TIME		: TIME;	
+	
+	OP10A_Bowl_On_time			: TIME;
+	OP10A_Bowl_OFF_time			: TIME;
+	
+	OP10B_Bowl_On_time			: TIME;
+	OP10B_Bowl_OFF_time			: TIME;
+END_VAR	
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF OP10A_ERR OR OP10B_ERR THEN
+	OP10A_Sing_Seq:=10;	
+    OP10B_Sing_Seq:=10;
+		//OP10_A_SRV_FST_BDYPCK_WRK		:= FALSE;//((NOT CHECK) OR 
+		//OP10_A_SRV_SCND_BDYPCK_WRK		:= FALSE;
+		OP10_A_FRT_BDY_SING_HME			:= FALSE; 
+		OP10_A_SEC_BDY_SING_HME			:= FALSE; 
+		OP10_A_FRT_BDY_SING_WRK			:= FALSE;
+		OP10_A_SEC_BDY_SING_WRK			:= FALSE;
+		OP10_LH_CMP_RDY_PCK				:= FALSE;
+		OP10_RH_CMP_RDY_PCK				:= FALSE;
+		OP10_A_SRV_FST_BDYPCK_WRK		:= FALSE;
+		OP10_A_SRV_FST_BDYPCK_HME       := FALSE;
+		OP10_A_SRV_SCND_BDYPCK_WRK      := FALSE;
+		OP10_A_SRV_SCND_BDYPCK_HME      := FALSE;
+		//OP10_A_SRV_SCND_BDYPCK_HME		:= FALSE;	
+		//OP10_A_SRV_FST_BDYPCK_HME		:= FALSE;	
+END_IF
+
+//NOT Singulation_Seq_Start_manual AND
+
+Toggle_Pos_RH_Empty(CLK:=OP10A_Camera_FB.OP10A_Empty_Cam_1_Inspection_Status.Inspection_Completed);
+Toggle_Neg_RH_Empty(CLK:=OP10A_Camera_FB.OP10A_Empty_Cam_1_Inspection_Status.Inspection_Completed);
+IF Toggle_Pos_RH_Empty.Q OR Toggle_Pos_RH_Empty.Q THEN
+	OP10A_Empty_Cam_Completed:=1;	
+END_IF
+
+Toggle_Pos_LH_Empty(CLK:=OP10B_Camera_FB.OP10B_Empty_Cam_2_Inspection_Status.Inspection_Completed);
+Toggle_Neg_LH_Empty(CLK:=OP10B_Camera_FB.OP10B_Empty_Cam_2_Inspection_Status.Inspection_Completed);
+IF Toggle_Pos_LH_Empty.Q OR Toggle_Pos_LH_Empty.Q THEN
+	OP10B_Empty_Cam_Completed:=1;	
+END_IF
+
+AFT_GRP_HME_10A(IN:=OP10_BDY_SING_FRT.Sensor1,PT:=AFT_GRP_HME_TIME);
+AFT_SRV_WRK_10A(IN:=OP10_SRV_FRST_PCKBDY_WRK_FB,PT:=AFT_SRV_WRK_TIME);
+AFT_GRP_WRK_10A(IN:=OP10_BDY_SING_FRT.Sensor2,PT:=AFT_GRP_WRK_TIME);
+Part_Presnce_Delay_10A(IN:= I10_RH_LNR_TRK_BDY_PRSN_I1000_6,PT:=AFT_Part_Prsnce_TIME );
+
+AFT_GRP_HME_10B(IN:=OP10_BDY_SING_SEC.Sensor1,PT:=AFT_GRP_HME_TIME);
+AFT_SRV_WRK_10B(IN:=OP10_SRV_SCND_PCKBDY_WRK_FB,PT:=AFT_SRV_WRK_TIME);
+AFT_GRP_WRK_10B(IN:=OP10_BDY_SING_SEC.Sensor2,PT:=AFT_GRP_WRK_TIME);
+Part_Presnce_Delay_10B(IN:= I10_LH_LNR_TRK_BDY_PRSN_I1000_5,PT:=AFT_Part_Prsnce_TIME );
+
+CASE OP10A_Sing_Seq OF
+	10: IF ( (OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING) OR (OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING)) AND NOT OP10A_singulation_Bypass THEN
+		   OP10A_Sing_Seq:=15;
+		ELSIF OP10A_singulation_Bypass THEN
+    	   OP10A_Sing_Seq:=180;
+		END_IF
+		
+	15:	IF OP10_COMP_PICKED_1 THEN
+		    OP10A_Sing_Seq:=120;
+		ELSE
+			OP10A_Sing_Seq:=20;	
+		END_IF
+	
+	20: OP10_A_FRT_BDY_SING_HME	:=1;
+		OP10_A_FRT_BDY_SING_WRK :=0;
+		OP10_A_SRV_FST_BDYPCK_HME := TRUE;	   
+		IF OP10_BDY_SING_FRT.Sensor1 AND OP10_SRV_FRST_PCKBDY_HME_FB THEN
+			OP10_A_FRT_BDY_SING_HME	:=0;
+			IF AFT_GRP_HME_10A.Q THEN
+				OP10A_Sing_Seq:=40;
+			END_IF	
+		END_IF		
+		
+	40: IF Part_Presnce_Delay_10A. Q AND NOT OP10B_Rbt_In_Pick_Zone AND NOT OP10A_Rbt_In_Pick_Zone THEN 
+			OP10A_Sing_Seq:=60;
+		END_IF
+	
+	60: OP10_A_SRV_FST_BDYPCK_WRK		:= TRUE;
+		IF AFT_SRV_WRK_10A.Q THEN
+			OP10A_Sing_Seq:=80;
+		END_IF
+		
+   80: OP10_A_FRT_BDY_SING_WRK  :=1;
+   	   OP10_A_FRT_BDY_SING_HME	:=0;
+   	   IF AFT_GRP_WRK_10A.Q THEN
+		   OP10_A_FRT_BDY_SING_WRK :=0;
+		   OP10A_Sing_Seq:=100;
+	   END_IF
+ 
+  100: OP10_A_SRV_FST_BDYPCK_HME := TRUE;
+	   IF OP10_SRV_FRST_PCKBDY_HME_FB THEN
+		   OP10A_Sing_Seq:=120;
+	   END_IF
+	   
+ 120: 	OP10A_Empty_Cam_Completed:=0;  
+		OP10A_Body_OK	         :=0;	
+		OP10A_Body_NOK			 :=0;
+		OP10A_Body_Window_0Deg	 :=0;
+		OP10A_Body_Window_90Deg	 :=0;
+	 	OP10A_Sing_Seq:=130; 
+	  
+ 130: OP10A_Empty_Cam_1_Camera_Trigger:=Pulse_Block.Q10Hz;
+	  IF OP10A_Empty_Cam_Completed AND NOT OP10A_Camera_Bypass THEN
+	 	OP10A_Sing_Seq:=140;
+	  ELSIF OP10A_Empty_Cam_Completed AND OP10A_Camera_Bypass THEN
+		OP10A_Body_OK			:=1;
+		OP10A_Body_Window_0Deg  :=1;
+		OP10A_Sing_Seq:=180;	
+ 	  END_IF
+		  
+ 140: IF OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[1]=1 THEN
+	 	OP10A_Body_OK:=1;
+		OP10A_Sing_Seq:=160;
+	  ELSIF OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[1]=0 THEN	
+		OP10A_Body_NOK    :=1;
+		OP10_COMP_PICKED_1:=0;
+		OP10A_Sing_Seq    :=10;
+ 	  END_IF
+			     	   
+ 160: IF OP10A_Body_OK AND OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[0]=1 AND NOT OP10A_angle_Bypass AND Str_variant THEN
+	 	OP10A_Body_Window_0Deg := 1;
+		OP10A_Sing_Seq		   :=180;
+	  ELSIF OP10A_Body_OK AND OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[0]=2 AND NOT OP10A_angle_Bypass AND Str_variant THEN
+	 	OP10A_Body_Window_90Deg := 1;
+		OP10A_Sing_Seq		    :=180; 	
+	  ELSIF OP10A_angle_Bypass OR (NOT Str_variant) THEN
+		OP10A_Body_Window_0Deg := 1;
+		OP10A_Sing_Seq		   :=180;
+	  END_IF	
+	
+  180:   OP10_RH_CMP_RDY_PCK:=1;    
+	     OP10_COMP_PICKED_1 :=1; 
+	     OP10A_Sing_Seq	 :=200;
+	  
+  200:  IF ((OP10A_A_SRV_RH_GRPWRK_FB OR OP10A_BDY2_PCK_BYPAS) AND (OP10A_A_SRV_LH_GRPWRK_FB OR OP10A_BDY1_PCK_BYPAS) AND OP10A_Rbt_In_Pick_Zone) 
+			OR ((OP10B_A_SRV_LH_GRPWRK_FB OR OP10B_BDY1_PCK_BYPAS) AND (OP10B_A_SRV_RH_GRPWRK_FB OR OP10B_BDY2_PCK_BYPAS) AND OP10B_Rbt_In_Pick_Zone) THEN
+	  	   OP10_A_FRT_BDY_SING_HME	:=1;
+		   OP10_A_FRT_BDY_SING_WRK :=0;
+		   OP10_RH_CMP_RDY_PCK :=0; 
+		   IF OP10_BDY_SING_FRT.Sensor1 THEN
+				OP10_A_FRT_BDY_SING_HME	:=0;
+				IF AFT_GRP_HME_10A.Q THEN
+		 			 OP10A_Sing_Seq :=220;
+				END_IF	
+	   	   END_IF
+ 		 END_IF		
+
+  220:  IF (NOT OP10B_Rbt_In_Pick_Zone AND NOT OP10A_Rbt_In_Pick_Zone) THEN  
+		  OP10_COMP_PICKED_1  :=0;
+		  OP10A_Sing_Seq      :=10;
+	    END_IF	 
+	  
+END_CASE
+
+CASE OP10B_Sing_Seq OF
+	10: IF((OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING) OR (OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING)) AND NOT OP10B_singulation_Bypass THEN
+		   OP10B_Sing_Seq:=15;
+		ELSIF OP10B_singulation_Bypass THEN
+    	   OP10B_Sing_Seq:=180;
+		END_IF
+	
+	15: IF OP10_COMP_PICKED_2 THEN
+		    OP10B_Sing_Seq:=120;
+		ELSE
+			OP10B_Sing_Seq:=20;
+		END_IF
+		
+	20: OP10_A_SEC_BDY_SING_HME	:=1;
+		OP10_A_SEC_BDY_SING_WRK :=0;
+		OP10_A_SRV_SCND_BDYPCK_HME := TRUE;
+		IF OP10_BDY_SING_SEC.Sensor1 AND OP10_SRV_SCND_PCKBDY_HME_FB THEN
+			OP10_A_SEC_BDY_SING_HME	:=0;
+			IF AFT_GRP_HME_10B.Q THEN
+				OP10B_Sing_Seq:=40;
+			END_IF	
+		END_IF		
+		
+	40: IF Part_Presnce_Delay_10B. Q AND NOT OP10B_Rbt_In_Pick_Zone AND NOT OP10A_Rbt_In_Pick_Zone THEN 
+			OP10B_Sing_Seq:=60;
+		END_IF
+	
+	60: OP10_A_SRV_SCND_BDYPCK_WRK	:= TRUE;
+		IF AFT_SRV_WRK_10B.Q THEN
+			OP10B_Sing_Seq:=80;
+		END_IF
+		
+   80: OP10_A_SEC_BDY_SING_WRK  :=1;
+   	   OP10_A_SEC_BDY_SING_HME	:=0;
+   	   IF AFT_GRP_WRK_10B.Q THEN
+		  OP10_A_SEC_BDY_SING_WRK :=0;
+		  OP10B_Sing_Seq:=100;
+	   END_IF
+ 
+  100: OP10_A_SRV_SCND_BDYPCK_HME := TRUE;
+	   IF OP10_SRV_SCND_PCKBDY_HME_FB THEN
+		   OP10B_Sing_Seq:=120;
+	   END_IF
+	   
+ 120: 	OP10B_Empty_Cam_Completed:=0;  
+		OP10B_Body_OK	         :=0;	
+		OP10B_Body_NOK			 :=0;
+		OP10B_Body_Window_0Deg	 :=0;
+		OP10B_Body_Window_90Deg	 :=0;
+	 	OP10B_Sing_Seq			 :=130; 
+	  
+ 130: OP10B_Empty_Cam_2_Camera_Trigger:=Pulse_Block.Q10Hz;
+	  IF OP10B_Empty_Cam_Completed AND NOT OP10B_Camera_Bypass THEN
+	 	OP10B_Sing_Seq			:=140;
+	  ELSIF OP10B_Empty_Cam_Completed AND OP10B_Camera_Bypass THEN
+		OP10B_Body_OK			:=1;
+		OP10B_Body_Window_0Deg  :=1;
+		OP10B_Sing_Seq	        :=180;	
+ 	  END_IF
+		  
+ 140: IF OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[1]=1 THEN
+	 	OP10B_Body_OK  :=1;
+		OP10B_Sing_Seq :=160;
+	  ELSIF OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[1]=0 THEN	
+		OP10B_Body_NOK     :=1;
+		OP10_COMP_PICKED_2 :=0;
+		OP10B_Sing_Seq     :=10;
+ 	  END_IF
+			     	   
+ 160: IF OP10B_Body_OK AND OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[0]=1 AND NOT OP10B_angle_Bypass AND Str_variant THEN
+	 	OP10B_Body_Window_0Deg  := 1;
+		OP10B_Sing_Seq		    :=180;
+	  ELSIF OP10B_Body_OK AND OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[0]=2 AND NOT OP10B_angle_Bypass AND Str_variant THEN
+	 	OP10B_Body_Window_90Deg := 1;
+		OP10B_Sing_Seq		    :=180; 	
+	  ELSIF OP10B_angle_Bypass OR (NOT Str_variant) THEN
+		OP10B_Body_Window_0Deg  := 1;
+		OP10B_Sing_Seq		    :=180;
+	  END_IF	
+	
+   180: OP10_LH_CMP_RDY_PCK:=1;  
+ 	  	OP10_COMP_PICKED_2:=1;
+	    OP10B_Sing_Seq    :=200;
+	  
+   200: IF ((OP10A_A_SRV_RH_GRPWRK_FB OR OP10A_BDY2_PCK_BYPAS) AND (OP10A_A_SRV_LH_GRPWRK_FB OR OP10A_BDY1_PCK_BYPAS) AND OP10A_Rbt_In_Pick_Zone) 
+			OR ((OP10B_A_SRV_LH_GRPWRK_FB OR OP10B_BDY1_PCK_BYPAS) AND (OP10B_A_SRV_RH_GRPWRK_FB OR OP10B_BDY2_PCK_BYPAS) AND OP10B_Rbt_In_Pick_Zone) THEN	   		OP10_A_SEC_BDY_SING_HME :=1;
+   	   		OP10_A_SEC_BDY_SING_WRK	:=0;
+			OP10_A_SEC_BDY_SING_HME :=1;
+		 	OP10_LH_CMP_RDY_PCK:=0;		
+			IF AFT_GRP_HME_10B.Q THEN
+		 		OP10_A_SEC_BDY_SING_HME :=0;
+		  		OP10B_Sing_Seq:=220;
+	        END_IF
+   		END_IF
+	  
+   220:	IF (NOT OP10B_Rbt_In_Pick_Zone AND NOT OP10A_Rbt_In_Pick_Zone) THEN
+
+		  OP10_COMP_PICKED_2:=0;
+		  OP10B_Sing_Seq    :=10;
+	  	END_IF 
+		
+END_CASE
+
+O10A_BDY_LNR1_AIR_PURGE_Q101_3:=I10A_BDY_BWL_RUN_I101_3;
+O10A_BDY_LNR2_AIR_PURGE_Q101_4:=I10A_BDY_BWL_RUN_I101_3;
+O10B_BDY_LNR1_AIR_PURGE_Q201_3:=I10B_BDY_BWL_RUN_I201_3;
+O10B_BDY_LNR2_AIR_PURGE_Q201_4:=I10B_BDY_BWL_RUN_I201_3;
+
+O10A_HPR_MTR_FWD_Q100_0			:=I10A_HPR_OFF_ON_I100_4;
+O10A_HPR_TWR_LMP_GREEN_Q100_6	:=I10A_HPR_OFF_ON_I100_4;
+//O10A_BDY_BOWL_ON_Q101_0			:=I10A_BDY_BOWL_OFF_ON_I100_5;
+O10A_BDY_LNR_FEED1_ON_Q101_1	:=I10A_BDY_LNR1_OFF_ON_I100_6 OR I10A_BDY_LNR2_OFF_ON_I100_7;
+O10A_BDY_LNR_FEED2_ON_Q101_2    :=I10A_BDY_LNR1_OFF_ON_I100_6 OR I10A_BDY_LNR2_OFF_ON_I100_7;
+
+O10B_HPR_MTR_FWD_Q200_0		   := I10B_HPR_OFF_ON_I200_4;
+O10B_HPR_TWR_LMP_GREEN_Q200_6  := I10B_HPR_OFF_ON_I200_4;
+//O10B_BDY_BOWL_ON_Q201_0        := I10B_BDY_BOWL_OFF_ON_I200_5;
+O10B_BDY_LNR_FEED1_ON_Q201_1   := I10B_BDY_LNR1_OFF_ON_I200_6 OR I10B_BDY_LNR2_OFF_ON_I200_7;
+O10B_BDY_LNR_FEED2_ON_Q201_2   := I10B_BDY_LNR1_OFF_ON_I200_6 OR I10B_BDY_LNR2_OFF_ON_I200_7;
+
+Bowl_A_ON_Timer(IN:= NOT I10A_BDY_LNR_FEED1_OVRFLW_I101_6,PT:=OP10A_Bowl_On_time);
+Bowl_A_OFF_Timer(IN:= I10A_BDY_LNR_FEED1_OVRFLW_I101_6,PT:=OP10A_Bowl_OFF_time);
+
+Bowl_B_ON_Timer(IN:= NOT I10B_BDY_LNR_FEED1_OVRFLW_I201_6,PT:=OP10B_Bowl_On_time);
+Bowl_B_OFF_Timer(IN:=I10B_BDY_LNR_FEED1_OVRFLW_I201_6,PT:=OP10B_Bowl_OFF_time);
+
+//Bowl_A_ON_Timer(IN:= NOT I10A_BDY_LNR_FEED2_OVRFLW_I101_7,PT:=T#2S);
+//Bowl_A_OFF_Timer(IN:= I10A_BDY_LNR_FEED1_OVRFLW_I101_6,PT:=T#2S);
+//
+//Bowl_B_ON_Timer(IN:= NOT I10B_BDY_LNR_FEED2_OVRFLW_I201_7,PT:=T#2S);
+//Bowl_B_OFF_Timer(IN:=I10B_BDY_LNR_FEED1_OVRFLW_I201_6,PT:=T#2S);
+
+IF I10A_BDY_BOWL_OFF_ON_I100_5 THEN
+	IF 	Bowl_A_OFF_Timer.Q THEN
+		O10A_BDY_BOWL_ON_Q101_0:=1;
+	END_IF
+	IF Bowl_A_ON_Timer.Q THEN
+		O10A_BDY_BOWL_ON_Q101_0:=0;
+	END_IF
+ELSE
+	O10A_BDY_BOWL_ON_Q101_0:=1;
+END_IF
+
+IF I10B_BDY_BOWL_OFF_ON_I200_5 THEN
+	IF 	Bowl_B_OFF_Timer.Q THEN
+		O10B_BDY_BOWL_ON_Q201_0:=1;
+	END_IF
+	IF Bowl_B_ON_Timer.Q THEN
+		O10B_BDY_BOWL_ON_Q201_0:=0;
+	END_IF
+ELSE
+	O10B_BDY_BOWL_ON_Q201_0:=1;	
+END_IF	]]></ST>
+    </Implementation>
+    <LineIds Name="Body_Singulation_Seq">
+      <LineId Id="551" Count="1" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="542" Count="5" />
+      <LineId Id="553" Count="1" />
+      <LineId Id="663" Count="3" />
+      <LineId Id="548" Count="0" />
+      <LineId Id="541" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="661" Count="0" />
+      <LineId Id="549" Count="0" />
+      <LineId Id="79" Count="1" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="81" Count="1" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="159" Count="1" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="163" Count="1" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="151" Count="0" />
+      <LineId Id="289" Count="0" />
+      <LineId Id="291" Count="2" />
+      <LineId Id="290" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="147" Count="1" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="358" Count="2" />
+      <LineId Id="362" Count="1" />
+      <LineId Id="361" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="101" Count="1" />
+      <LineId Id="425" Count="0" />
+      <LineId Id="103" Count="4" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="21" Count="2" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="51" Count="3" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="62" Count="1" />
+      <LineId Id="65" Count="2" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="86" Count="2" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="139" Count="1" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="96" Count="1" />
+      <LineId Id="428" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="123" Count="1" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="143" Count="2" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="357" Count="0" />
+      <LineId Id="430" Count="2" />
+      <LineId Id="484" Count="0" />
+      <LineId Id="434" Count="0" />
+      <LineId Id="482" Count="0" />
+      <LineId Id="606" Count="0" />
+      <LineId Id="468" Count="4" />
+      <LineId Id="437" Count="0" />
+      <LineId Id="435" Count="0" />
+      <LineId Id="447" Count="1" />
+      <LineId Id="450" Count="0" />
+      <LineId Id="452" Count="0" />
+      <LineId Id="446" Count="0" />
+      <LineId Id="433" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="206" Count="7" />
+      <LineId Id="366" Count="0" />
+      <LineId Id="370" Count="0" />
+      <LineId Id="367" Count="0" />
+      <LineId Id="369" Count="0" />
+      <LineId Id="368" Count="0" />
+      <LineId Id="365" Count="0" />
+      <LineId Id="214" Count="1" />
+      <LineId Id="427" Count="0" />
+      <LineId Id="216" Count="48" />
+      <LineId Id="429" Count="0" />
+      <LineId Id="265" Count="14" />
+      <LineId Id="372" Count="0" />
+      <LineId Id="284" Count="0" />
+      <LineId Id="455" Count="0" />
+      <LineId Id="485" Count="0" />
+      <LineId Id="458" Count="0" />
+      <LineId Id="467" Count="0" />
+      <LineId Id="609" Count="0" />
+      <LineId Id="608" Count="0" />
+      <LineId Id="474" Count="2" />
+      <LineId Id="473" Count="0" />
+      <LineId Id="459" Count="0" />
+      <LineId Id="457" Count="0" />
+      <LineId Id="477" Count="2" />
+      <LineId Id="481" Count="0" />
+      <LineId Id="460" Count="1" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="301" Count="15" />
+      <LineId Id="300" Count="0" />
+      <LineId Id="318" Count="0" />
+      <LineId Id="350" Count="0" />
+      <LineId Id="352" Count="1" />
+      <LineId Id="351" Count="0" />
+      <LineId Id="319" Count="0" />
+      <LineId Id="354" Count="0" />
+      <LineId Id="320" Count="25" />
+      <LineId Id="317" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,16 +1,313 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP10_MAIN" Id="{ba500af3-f48e-4f53-84e9-52ee6a87004f}" SpecialFunc="None">
+  <POU Name="OP10_MAIN" Id="{bcc66190-f60b-4f1c-8759-8e19c5ed7fde}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP10_MAIN
 VAR
+
+	OP10A_ROBO_MANUL_TRG: R_TRIG;
+	OP10A_ROBO_AUTO_TRG	: R_TRIG;
+	Bowl_A_ON_Timer		: TON;
+	Bowl_A_OFF_Timer	: TON;
+	Bowl_B_ON_Timer		: TON;
+	Bowl_B_OFF_Timer	: TON;
+	OP10A_ROBO_ERR		: TON;
+	OP10B_ROBO_ERR		: TON;
+	SRV_HOME			: BOOL;	
+	OP10_ROBO			: INT;
+	OP10A_ROBO_MANUAL	: INT;
+	OP10A_ROBO_AUTO		: INT;
+	// TEMP
+	TEMP_40				: BOOL;
+
+	
+
+	
+	OP10B_ROBO_MANUL_TRG: R_TRIG;
+	OP10B_ROBO_AUTO_TRG: R_TRIG;
+	OP10B_ROBO_MANUAL: INT;
+	OP10B_ROBO_AUTO: INT;
 END_VAR
-]]></Declaration>
+
+VAR PERSISTENT
+	OP10A_ROBO_ERR_TIME	: TIME;
+	OP10B_ROBO_ERR_TIME	: TIME;
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[OP10_MANUAL();
-OP10_SERVO();]]></ST>
+OP10_SERVO();
+OP10_HOMING();
+OP10A_AUTO();
+OP10B_AUTO();
+//OP10_AUTO();
+Bowl_Control();
+OP10A_Camera_FB();
+OP10B_Camera_FB();
+OP10A_OP10B_DRUM_FEEDER();
+OP10B_Conveyor_Prog();
+OP10A_Conveyor_Prog();
+//OP10_Body_Camera_Seq();
+Body_Singulation_Seq();
+
+OP10A_MODE_BLOCK(
+	ModeWord:= OP10A_MODE_WORD, 
+	HomeConditionOK:= OP10A_ALL_HOME,//OP10A_ALL_HOME, 
+	OperationEnable:= OperationEnable, 
+	StartPB:= OP10A_STRT_PB, 
+	SafetyAndNOError:= NOT OP10A_ERR,//(NOT OP10A_ERR), 
+	ModeAck:= 1, 
+	HomingINProgress:= , 
+	TempHomeOK:=  , 
+	ResetPB:= Servo_Reset, 
+	AutoSelected=> OP10A_AUTO_SELECTED, 
+	ManualSelected=> OP10A_MANUAL_SELECTED, 
+	StepSelected=> OP10A_STEP_SELECTED, 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP10A_AUTO_RUNNING, 
+	StepRunning:=OP10A_STEP_RUNNING , 
+	StartEnable:=OP10A_START_ENABLE , 
+	MachineStop:=OP10A_MACHINE_STOP );
+	
+	
+	OP10A_ROBO_MANUL_TRG(CLK:=OP10A_MANUAL_SELECTED , Q=> );
+	OP10A_ROBO_AUTO_TRG(CLK:=NOT OP10A_MANUAL_SELECTED , Q=> );
+	
+IF OP10A_ROBO_MANUL_TRG.Q THEN
+	OP10A_ROBO_MANUAL	:= 1;
+END_IF
+
+IF OP10A_ROBO_AUTO_TRG.Q THEN
+	OP10A_ROBO_AUTO		:= 1;
+END_IF
+
+
+CASE OP10A_ROBO_MANUAL OF 
+	1: OP10A_ROBO_PRGM_RST				:= TRUE;
+		OP10A_ROBO_MANUAL				:= 5;
+		
+	5: IF (OP10A_ROBO_PRGM_RST =TRUE) AND (NOT OP10A_Program_Execute) THEN
+		OP10A_ROBO_PRGM_RST				:= FALSE;
+		O10A_ROB_MAN_AUTO_MODE_Q709_2	:= FALSE;
+		OP10A_ROBO_MANUAL				:= 10;
+		END_IF
+END_CASE
+
+CASE OP10A_ROBO_AUTO OF 
+	1: OP10A_ROBO_PRGM_RST				:= TRUE;
+		OP10A_ROBO_AUTO					:= 5;
+
+	5: IF (OP10A_ROBO_PRGM_RST =TRUE) AND (NOT OP10A_Program_Execute) THEN
+		OP10A_ROBO_PRGM_RST				:= FALSE;
+		O10A_ROB_MAN_AUTO_MODE_Q709_2	:= TRUE;
+		OP10A_ROBO_AUTO					:= 10;
+		END_IF
+END_CASE
+
+
+OP10A_ROBO_ERR(IN:=	NOT(OP10A_Auto_Operation_Enable AND OP10A_Mirror_Auto_enable AND OP10A_Servo_ON_OFF_Status) , PT:=OP10A_ROBO_ERR_TIME, Q=> , ET=> );
+			
+IF (OP10A_AUTO_SELECTED AND NOT OP10A_ROBO_PRGM_RST AND OP10A_ROBO_ERR.Q) OR OP10A_H_Error OR OP10A_L_Error OR 
+		OP10_SRV_FRST_PCKBDY_CNT.Axis_Error OR OP10_SRV_SCND_PCKBDY_CNT.Axis_Error OR(OP10A_CYLINDER_ERR<>0) OR 
+			(OP10A_SRV_LH_BDYANG_CNT.Axis_Error AND NOT OP10A_BDY1_PCK_BYPAS) OR (OP10A_SRV_RH_BDYANG_CNT.Axis_Error AND 
+				NOT OP10A_BDY2_PCK_BYPAS) OR (OP10A_SRV_LH_BDYGRP_CNT.Axis_Error  AND NOT OP10A_BDY1_PCK_BYPAS) OR 
+					(OP10A_SRV_RH_BDYGRP_CNT.Axis_Error AND NOT OP10A_BDY2_PCK_BYPAS)  THEN
+//OP10A_ERR		:= TRUE;
+ELSE
+OP10A_ERR		:= FALSE;	
+END_IF
+
+IF SRV_HOME	THEN
+IF OP10A_Rbt_In_Home AND OP10B_Rbt_In_Home THEN
+OP10_A_SRV_FST_BDYPCK_HME	:=1;
+OP10_A_SRV_SCND_BDYPCK_HME	:=1;	
+END_IF
+OP10A_A_SRV_LH_GRPHME       :=1;
+OP10A_A_SRV_RH_GRPHME       :=1;
+OP10A_SRV_LH_BDYANG_HME     :=1;
+OP10A_SRV_RH_BDYANG_HME     :=1;
+IF OP10A_ALL_HOME THEN
+OP10_A_SRV_FST_BDYPCK_HME	:=0;
+OP10_A_SRV_SCND_BDYPCK_HME	:=0;
+OP10A_A_SRV_LH_GRPHME       :=0;
+OP10A_A_SRV_RH_GRPHME       :=0;
+OP10A_SRV_LH_BDYANG_HME     :=0;
+OP10A_SRV_RH_BDYANG_HME     :=0;	
+SRV_HOME					:=0;
+END_IF	
+END_IF
+(*
+O10A_BDY_LNR1_AIR_PURGE_Q101_3:=I10A_BDY_BWL_RUN_I101_3;
+O10A_BDY_LNR2_AIR_PURGE_Q101_4:=I10A_BDY_BWL_RUN_I101_3;
+O10B_BDY_LNR1_AIR_PURGE_Q201_3:=I10B_BDY_BWL_RUN_I201_3;
+O10B_BDY_LNR2_AIR_PURGE_Q201_4:=I10B_BDY_BWL_RUN_I201_3;
+
+O10A_HPR_MTR_FWD_Q100_0			:=I10A_HPR_OFF_ON_I100_4;
+O10A_HPR_TWR_LMP_GREEN_Q100_6	:=I10A_HPR_OFF_ON_I100_4;
+//O10A_BDY_BOWL_ON_Q101_0			:=I10A_BDY_BOWL_OFF_ON_I100_5;
+O10A_BDY_LNR_FEED1_ON_Q101_1	:=I10A_BDY_LNR1_OFF_ON_I100_6 OR I10A_BDY_LNR2_OFF_ON_I100_7;
+O10A_BDY_LNR_FEED2_ON_Q101_2    :=I10A_BDY_LNR1_OFF_ON_I100_6 OR I10A_BDY_LNR2_OFF_ON_I100_7;
+
+O10B_HPR_MTR_FWD_Q200_0		   := I10B_HPR_OFF_ON_I200_4;
+O10B_HPR_TWR_LMP_GREEN_Q200_6  := I10B_HPR_OFF_ON_I200_4;
+//O10B_BDY_BOWL_ON_Q201_0        := I10B_BDY_BOWL_OFF_ON_I200_5;
+O10B_BDY_LNR_FEED1_ON_Q201_1   := I10B_BDY_LNR1_OFF_ON_I200_6 OR I10B_BDY_LNR2_OFF_ON_I200_7;
+O10B_BDY_LNR_FEED2_ON_Q201_2   := I10B_BDY_LNR1_OFF_ON_I200_6 OR I10B_BDY_LNR2_OFF_ON_I200_7;
+
+
+Bowl_A_ON_Timer(IN:= NOT I10A_BDY_LNR_FEED2_OVRFLW_I101_7,PT:=T#2S);
+Bowl_A_OFF_Timer(IN:= I10A_BDY_LNR_FEED1_OVRFLW_I101_6,PT:=T#2S);
+
+Bowl_B_ON_Timer(IN:= NOT I10B_BDY_LNR_FEED2_OVRFLW_I201_7,PT:=T#2S);
+Bowl_B_OFF_Timer(IN:=I10B_BDY_LNR_FEED1_OVRFLW_I201_6,PT:=T#2S);
+
+IF I10A_BDY_BOWL_OFF_ON_I100_5 THEN
+	IF 	Bowl_A_OFF_Timer.Q THEN
+		O10A_BDY_BOWL_ON_Q101_0:=1;
+	END_IF
+	IF Bowl_A_ON_Timer.Q THEN
+		O10A_BDY_BOWL_ON_Q101_0:=0;
+	END_IF
+ELSE
+	O10A_BDY_BOWL_ON_Q101_0:=1;
+END_IF
+
+IF I10B_BDY_BOWL_OFF_ON_I200_5 THEN
+	IF 	Bowl_B_OFF_Timer.Q THEN
+		O10B_BDY_BOWL_ON_Q201_0:=1;
+	END_IF
+	IF Bowl_B_ON_Timer.Q THEN
+		O10B_BDY_BOWL_ON_Q201_0:=0;
+	END_IF
+ELSE
+	O10B_BDY_BOWL_ON_Q201_0:=1;	
+END_IF	*)
+
+	OP10B_MODE_BLOCK(
+	ModeWord:= OP10B_MODE_WORD, 
+	HomeConditionOK:= 1,//OP10B_ALL_HOME,
+	OperationEnable:= OperationEnable, 
+	StartPB:= OP10B_STRT_PB, 
+	SafetyAndNOError:= NOT OP10B_ERR, 
+	ModeAck:= 1, 
+	HomingINProgress:= , 
+	TempHomeOK:=  , 
+	ResetPB:= Servo_Reset, 
+	AutoSelected=> OP10B_AUTO_SELECTED, 
+	ManualSelected=> OP10B_MANUAL_SELECTED, 
+	StepSelected=> OP10B_STEP_SELECTED, 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP10B_AUTO_RUNNING, 
+	StepRunning:=OP10B_STEP_RUNNING , 
+	StartEnable:=OP10B_START_ENABLE , 
+	MachineStop:=OP10B_MACHINE_STOP ); 
+
+////////////////
+
+OP10B_ROBO_MANUL_TRG(CLK:=OP10B_MANUAL_SELECTED , Q=> );
+	OP10B_ROBO_AUTO_TRG(CLK:=NOT OP10B_MANUAL_SELECTED , Q=> );
+	
+IF OP10B_ROBO_MANUL_TRG.Q THEN
+	OP10B_ROBO_MANUAL	:= 1;
+END_IF
+
+IF OP10B_ROBO_AUTO_TRG.Q THEN
+	OP10B_ROBO_AUTO		:= 1;
+END_IF
+
+
+CASE OP10B_ROBO_MANUAL OF 
+	1: OP10B_ROBO_PRGM_RST				:= TRUE;
+		OP10B_ROBO_MANUAL				:= 5;
+		
+	5: IF (OP10B_ROBO_PRGM_RST =TRUE) AND (NOT OP10B_Program_Execute) THEN
+		OP10B_ROBO_PRGM_RST				:= FALSE;
+		O10B_ROB_MAN_AUTO_MODE_Q709_3	:= FALSE;
+		OP10B_ROBO_MANUAL				:= 10;
+		END_IF
+END_CASE
+
+CASE OP10B_ROBO_AUTO OF 
+	1: OP10B_ROBO_PRGM_RST				:= TRUE;
+		OP10B_ROBO_AUTO					:= 5;
+
+	5: IF (OP10B_ROBO_PRGM_RST =TRUE) AND (NOT OP10B_Program_Execute) THEN
+		OP10B_ROBO_PRGM_RST				:= FALSE;
+		O10B_ROB_MAN_AUTO_MODE_Q709_3	:= TRUE;
+		OP10B_ROBO_AUTO					:= 10;
+		END_IF
+END_CASE
+
+
+//#####################		OP10B_ERROR		########################
+
+OP10B_ROBO_ERR(IN:= NOT(OP10B_Auto_Operation_Enable AND OP10B_Mirror_Auto_enable AND OP10B_Servo_ON_OFF_Status), PT:=OP10B_ROBO_ERR_TIME, Q=> , ET=> );	
+
+IF (OP10B_AUTO_SELECTED AND NOT OP10B_ROBO_PRGM_RST AND OP10B_ROBO_ERR.Q) OR OP10B_H_Error OR OP10B_L_Error OR 
+		OP10_SRV_FRST_PCKBDY_CNT.Axis_Error OR OP10_SRV_SCND_PCKBDY_CNT.Axis_Error OR (OP10B_CYLINDER_ERR<>0) OR 
+			(OP10B_SRV_LH_BDYANG_CNT.Axis_Error AND NOT OP10B_BDY1_PCK_BYPAS) OR (OP10B_SRV_RH_BDYANG_CNT.Axis_Error AND 
+				NOT OP10B_BDY2_PCK_BYPAS) OR (OP10B_SRV_LH_BDYGRP_CNT.Axis_Error AND NOT OP10B_BDY1_PCK_BYPAS) OR 
+				(OP10B_SRV_RH_BDYGRP_CNT.Axis_Error AND NOT OP10B_BDY2_PCK_BYPAS)THEN 
+OP10B_ERR		:= TRUE;
+ELSE
+OP10B_ERR		:= FALSE;	
+END_IF
+
+
+
+					
+					
+					
+	
+					]]></ST>
     </Implementation>
     <LineIds Name="OP10_MAIN">
-      <LineId Id="3" Count="0" />
+      <LineId Id="3" Count="11" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="233" Count="0" />
+      <LineId Id="15" Count="21" />
+      <LineId Id="256" Count="0" />
+      <LineId Id="268" Count="0" />
+      <LineId Id="305" Count="0" />
+      <LineId Id="257" Count="0" />
+      <LineId Id="261" Count="1" />
+      <LineId Id="303" Count="0" />
+      <LineId Id="308" Count="1" />
+      <LineId Id="306" Count="1" />
+      <LineId Id="304" Count="0" />
+      <LineId Id="258" Count="0" />
+      <LineId Id="266" Count="0" />
+      <LineId Id="271" Count="3" />
+      <LineId Id="276" Count="0" />
+      <LineId Id="415" Count="0" />
+      <LineId Id="275" Count="0" />
+      <LineId Id="267" Count="0" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="277" Count="0" />
+      <LineId Id="312" Count="0" />
+      <LineId Id="315" Count="4" />
+      <LineId Id="448" Count="0" />
+      <LineId Id="314" Count="0" />
+      <LineId Id="313" Count="0" />
+      <LineId Id="278" Count="0" />
+      <LineId Id="44" Count="3" />
+      <LineId Id="208" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="212" Count="0" />
+      <LineId Id="51" Count="90" />
+      <LineId Id="347" Count="0" />
+      <LineId Id="353" Count="19" />
+      <LineId Id="416" Count="0" />
+      <LineId Id="373" Count="9" />
+      <LineId Id="447" Count="0" />
+      <LineId Id="383" Count="1" />
+      <LineId Id="348" Count="0" />
+      <LineId Id="147" Count="5" />
+      <LineId Id="210" Count="0" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="211" Count="0" />
+      <LineId Id="155" Count="11" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

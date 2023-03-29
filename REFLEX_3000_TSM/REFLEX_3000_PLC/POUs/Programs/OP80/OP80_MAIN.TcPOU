@@ -1,14 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP80_MAIN" Id="{cfd391fd-bb5a-45e3-a734-8fe92b975d55}" SpecialFunc="None">
+  <POU Name="OP80_MAIN" Id="{f4a3dfa7-b6e2-4276-bb93-f87258547da2}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP80_MAIN
 VAR
 	OP80_Modeselection_FB: Mode_Selection_Block1;	
 //	OP80_Cycle_Time: Cycle_Time_FB;
-	TP_100ms: TP;
-	Pulse_100ms: BOOL;
-	Times: LREAL;
 	reset: BOOL;
+	Gen_Timer: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -18,7 +16,7 @@ OP80_Manual();
 OP80_AUTOSEQUENCE();
 OP80_Error();
 OP80_Initialization_Seq();
-
+op80_toolchangeover ();
 //MOdeselection From HMI
 
 IF (OP80_HMI_AutoMode AND NOT OP80_HMI_ManualMOde AND NOT OP80_HMI_StepMode) THEN
@@ -34,9 +32,9 @@ OP80_Modeselection_FB(
 	ModeWord:= , 
 	HomeConditionOK:=OP80_HomeConditionOK , 
 	OperationEnable:=OP80_AutoSelected, 
-	StartPB:=OP80_HMI_Cycle_Start , 
+	StartPB:=OP80_HMI_CycleStart , 
 	SafetyAndNOError:= OP80_Safety_OK, 
-	ModeAck:=OP80_Mode_Ack , 
+	ModeAck:=TRUE , 
 	HomingINProgress:=OP80_HomeRunning , 
 	TempHomeOK:=OP80_Temp_hmeOK , 
 	ResetPB:= , 
@@ -49,33 +47,37 @@ OP80_Modeselection_FB(
 	StepRunning:=OP80_StepRunning , 
 	StartEnable:=OP80_StartEnable  , 
 	MachineStop:=OP80_Machine_Stop );
-(*
+
+OP80_Safety_OK:=OperationEnable;	
+	
 IF OP80_AutoSelected OR OP80_ManualSelected AND NOT ( OP80_ErrorActive OR OP80_Safety_OK) THEN
 	SR60_Vert_servo.bEnable:=TRUE;
 ELSE
 	SR60_Vert_servo.bEnable:=FALSE;
 END_IF
 
-IF OP80_GVL.SR80_Vert_servo.bAxisError OR NOT OP80_Safety_OK  THEN
+IF SR80_Vert_servo.bAxisError OR NOT OP80_Safety_OK  THEN
 	OP80_ErrorActive:=TRUE;
 END_IF
 
-IF NOT SR60_Vert_servo.bAxisHomed THEN
-	SR60_Vert_servo_not_Home:=TRUE;
-ELSE
-	SR60_Vert_servo_not_Home:=FALSE;
-END_IF
-*)
-	//Cycle Time Block
-//	OP80_Cycle_Time(Cycle_Start_Bit:= , Pulse_100ms:=Pulse_100ms , Time_In_Sec=>Times , CT_Running=> );
+OP80_Safety_OK:=OperationEnable;
 
-	
-	
-	//Pulse Generation 100ms
-	TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#100MS , Q=>Pulse_100ms, ET=> );]]></ST>
+IF OP80_Stop_Request AND NOT OP80_STN_ENABLE THEN
+	OP80_Machine_Stop:=1;
+END_IF
+Gen_Timer(IN:=OP80_Machine_Stop,PT:=T#5S);
+IF Gen_Timer.Q THEN
+	OP80_Machine_Stop:=0;
+END_IF
+]]></ST>
     </Implementation>
     <LineIds Name="OP80_MAIN">
-      <LineId Id="3" Count="59" />
+      <LineId Id="3" Count="44" />
+      <LineId Id="70" Count="2" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="48" Count="2" />
+      <LineId Id="73" Count="5" />
+      <LineId Id="56" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

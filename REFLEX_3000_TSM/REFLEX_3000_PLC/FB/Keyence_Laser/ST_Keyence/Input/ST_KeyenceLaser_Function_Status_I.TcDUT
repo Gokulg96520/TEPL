@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Function_Status_I" Id="{9534f942-b8ac-4115-b9f3-c28552fffed2}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Function_Status_I :
+STRUCT
+Trigger_Inhibit_Function_Status							: BIT;
+Machinery_Operation_Mode_Disable_Function_Status		: BIT;
+Marking_Laser_Control_Function_Status					: BIT;
+Data_Hold_Function_Status								: BIT;
+Reserve_0												: BIT;
+Reserve_1												: BIT;
+Reserve_2												: BIT;
+Reserve_3												: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -10,25 +10,25 @@
     <RootNamespace>REFLEX_3000_DM2</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Box 54 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 54 (AMI8000-0100)_OP20_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 55 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 55 (AMI8000-0100)_OP10A_CONVEYR.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 56 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 56 (AMI8000-0100)_OP10B_CONVEYOR.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 57 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 57 (AMI8000-0100)_OP40_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 59 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 59 (AMI8000-0100)_OP30_HORIZONTAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Box 60 (AMI8000-0100)_OP30_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 61 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 61 (AMI8000-0100)_OP30_CONVEYOR.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
     <Content Include="Box 63 (AMI8000-0100)_OP50_HORIZANTAL.tcdmdrv">
@@ -37,49 +37,49 @@
     <Content Include="Box 64 (AMI8000-0100)_OP50_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 65 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 65 (AMI8000-0100)_OP50_CONVEYOR.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 67 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 67 (AMI8000-0100)_OP70_HORIZONTAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 68 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 68 (AMI8000-0100)_OP70_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 69 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 69 (AMI8000-0100)_OP70_CONVEYOR.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 71 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 71 (AMI8000-0100)_OP110_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 72 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 72 (AMI8000-0100)_OP80_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 73 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 73 (AMI8000-0100)_OP90_CONVEYOR1.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 74 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 74 (AMI8000-0100)_OP90_CONVEYOR2.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 76 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 76 (AMI8000-0100)_OP130_PULL1.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 77 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 77 (AMI8000-0100)_OP130_PULL2.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 79 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 79 (AMI8000-0100)_OP140_VERTICAL2.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 80 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 80 (AMI8000-0100)_OP140_VERTICAL3.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 82 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 82 (AMI8000-0100)_OP140_VERTICAL1.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 83 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 83 (AMI8000-0100)_OP120_CONVEYOR.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="Box 84 %28AMI8000-0100%29.tcdmdrv">
+    <Content Include="Box 84 (AMI8000-0100)_OP60_VERTICAL.tcdmdrv">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>

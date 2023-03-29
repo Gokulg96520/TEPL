@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Machine_Status" Id="{cea3794a-fe81-425b-b6fc-2d620cb7ca0a}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Machine_Status :
+STRUCT
+Ready_Status						: BIT ;
+Error_Status						: BIT ;
+Warning_Status						: BIT ;
+Error_Warning_Status				: BIT ;
+Shutter_Status						: BIT ;
+Network_Status						: BIT ;
+Reserve_1							: BIT ;
+Reserve_2							: BIT ;
+//
+Laser_Emitted_Status				: BIT ;
+Shutter_Control_Status				: BIT ;
+Remote_Interlock_Status				: BIT ;
+Contacter_Status					: BIT ;
+Reserve_3							: BIT ;
+Reserve_4							: BIT ;
+Reserve_5							: BIT ;
+Reserve_6							: BIT ;
+//
+Busy_Status							: BIT ;
+Marking_Busy_Status					: BIT ;
+Guide_Laser_Busy_Status				: BIT ;
+PROGRAM_Change_Busy_Status			: BIT ;
+Communication_Prioirty_Error_Status	: BIT ;
+PROGRAM_Edit_Busy_Status			: BIT ;
+Mark_Check_TwoDC_Read_Busy_Status	: BIT ;//Mark_Check_/2DC_Read_Busy_Status
+Reserve_7							: BIT ;
+//
+ReserveByte_1						: BYTE ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

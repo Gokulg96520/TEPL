@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP110_MAIN" Id="{6704bc0e-4b9b-45a9-997e-147c2356ee79}" SpecialFunc="None">
+  <POU Name="OP110_MAIN" Id="{97c6907a-de33-4884-8db3-52c8c3f60c45}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP110_MAIN
 VAR
 	OP110_Modeselection_FB: Mode_Selection_Block1;
@@ -10,6 +10,7 @@ VAR
 	Pulse_100ms: BOOL;
 	Times: LREAL;
 	Start: BOOL;
+	Gen_Timer: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -36,9 +37,9 @@ OP110_Modeselection_FB(
 	ModeWord:= , 
 	HomeConditionOK:=OP110_HomeConditionOK , 
 	OperationEnable:=OP110_AutoSelected, 
-	StartPB:=OP110_HMI_Cycle_Start , 
+	StartPB:=OP110_HMI_CycleStart , 
 	SafetyAndNOError:= OP110_Safety_OK, 
-	ModeAck:=OP110_Mode_Ack , 
+	ModeAck:=TRUE, 
 	HomingINProgress:=OP110_HomeRunning , 
 	TempHomeOK:=OP110_Temp_hmeOK , 
 	ResetPB:= , 
@@ -55,6 +56,7 @@ OP110_Modeselection_FB(
 //IF OP110_AutoSelected OR OP110_ManualSelected THEN
 //	SR110_Vert_servo.bEnable:=TRUE;
 //END_IF
+OP110_Safety_OK:=OperationEnable;
 
 IF NOT SR110_Vert_servo.bAxisHomed THEN
 	SR110_Vert_servo_not_Home:=TRUE;
@@ -66,20 +68,17 @@ IF OP110_GVL.SR110_Vert_servo.bAxisError  THEN
 	OP110_ErrorActive:=TRUE;
 END_IF
 
-//IF OP110_ErrorActive OR NOT OP110_Safety_OK THEN
-//	SR110_Vert_servo.bEnable:=FALSE;	
-//END_IF
-	
-	//Cycle Time Block
-//	OP110_Cycle_Time(Cycle_Start_Bit:= , Pulse_100ms:=Pulse_100ms , Time_In_Sec=>Times , CT_Running=> );
-//	OP110_Cycle_Time.Cycle_Start_Bit:=Start;
-	
-	
-	//Pulse Generation 100ms
-	TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#100MS , Q=>Pulse_100ms, ET=> );]]></ST>
+IF OP110_Stop_Request AND NOT OP110_STN_ENABLE THEN
+	OP110_Machine_Stop:=1;
+END_IF
+Gen_Timer(IN:=OP110_Machine_Stop,PT:=T#5S);
+IF Gen_Timer.Q THEN
+	OP110_Machine_Stop:=0;
+END_IF]]></ST>
     </Implementation>
     <LineIds Name="OP110_MAIN">
-      <LineId Id="3" Count="62" />
+      <LineId Id="3" Count="53" />
+      <LineId Id="77" Count="5" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

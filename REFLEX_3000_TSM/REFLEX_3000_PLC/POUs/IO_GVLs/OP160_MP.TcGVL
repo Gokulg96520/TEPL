@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP160_MP" Id="{22031ba7-4e43-43ee-8e80-f9e7b2f814d0}">
+  <GVL Name="OP160_MP" Id="{18a16eba-a6f7-41be-a121-628e6e089342}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 I130_LH_ATC_DECLAMP_FBI700_0				:BOOL;
@@ -107,8 +107,6 @@ I160_ATC1_SLAVE_TOOL1I711_4                :BOOL;
 I160_ATC1_SLAVE_TOOL2I711_5                :BOOL;
 I160_FIXT_LH_COMP_PP_GRPR_CLSEI711_6       :BOOL;
 I160_FIXT_LH_COMP_PP_GRPR_OPNI711_7        :BOOL;
-
-
 I160_RH_COMP_PP_GRPR_CLSEI712_0            :BOOL;
 I160_RH_COMP_PP_GRPR_OPNI712_1             :BOOL;
 I160_AUTOBAG_READYI712_2                   :BOOL;

@@ -1,17 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP20_MAIN" Id="{5263888b-69c4-40ed-94ed-8dd5692a3ec1}" SpecialFunc="None">
+  <POU Name="OP20_MAIN" Id="{9b9ff568-3bd7-48da-84c5-244d37dc63dc}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP20_MAIN
 VAR
 	OP20_Modeselection_FB: Mode_Selection_Block1;
-	
-//	OP20_Cycle_Time: Cycle_Time_FB;
-	TP_100ms: TP;
-	Pulse_100ms: BOOL;
-	Times: LREAL;
 	Start: BOOL;
-	SR40_Vert_servo_not_Home: BOOL;
 	Pause: BOOL;
+	Gen_Timer: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -34,11 +29,13 @@ IF (OP20_GVL.OP20_HMI_AutoMode AND NOT OP20_GVL.OP20_HMI_ManualMOde AND NOT OP20
 		OP20_Modeselection_FB.ModeWord:=0;
 END_IF
 	
+OP20_Safety_OK:=OperationEnable;
+
 OP20_Modeselection_FB(
 	ModeWord:= , 
 	HomeConditionOK:=OP20_HomeConditionOK , 
 	OperationEnable:=OP20_AutoSelected AND OP20_Safety_OK , 
-	StartPB:=OP20_HMI_Cycle_Start , 
+	StartPB:=OP20_HMI_CycleStart , 
 	SafetyAndNOError:= OP20_Safety_OK, 
 	ModeAck:=TRUE , 
 	HomingINProgress:=OP20_HomeRunning , 
@@ -54,36 +51,26 @@ OP20_Modeselection_FB(
 	StartEnable:=OP20_StartEnable  , 
 	MachineStop:=OP20_Machine_Stop );
 
-(*
-IF (OP20_AutoSelected OR OP20_ManualSelected) AND ( NOT OP20_ErrorActive) AND OP20_Safety_OK THEN
-	SR20_Vert_servo.bEnable:=TRUE;
-ELSE
-	SR20_Vert_servo.bEnable:=FALSE;
-END_IF
 
-IF NOT SR20_Vert_servo.bAxisHomed THEN
-	SR40_Vert_servo_not_Home:=TRUE;
-ELSE
-	SR40_Vert_servo_not_Home:=FALSE;
-END_IF
+//IF (OP20_AutoSelected OR OP20_ManualSelected) AND ( NOT OP20_ErrorActive) AND OP20_Safety_OK THEN
+//	SR20_Vert_servo.bEnable:=TRUE;
+//ELSE
+//	SR20_Vert_servo.bEnable:=FALSE;
+//END_IF
 
-IF OP20_ErrorActive OR NOT OP20_Safety_OK THEN
-	SR20_Vert_servo.bEnable:=FALSE;	
+IF OP20_Stop_Request AND NOT OP20_STN_ENABLE THEN
+	OP20_Machine_Stop:=1;
 END_IF
-	*)
-	
-	
-	//Cycle Time Block
-//	OP20_Cycle_Time(Cycle_Start_Bit:= , Pulse_100ms:=Pulse_100ms , Time_In_Sec=>Times , CT_Running=> );
-//	OP20_Cycle_Time.Cycle_Start_Bit:=Start;
-	
-	
-	//Pulse Generation 100ms
-	TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#100MS , Q=>Pulse_100ms, ET=> );]]></ST>
+Gen_Timer(IN:=OP20_Machine_Stop,PT:=T#5S);
+IF Gen_Timer.Q THEN
+	OP20_Machine_Stop:=0;
+END_IF
+	]]></ST>
     </Implementation>
     <LineIds Name="OP20_MAIN">
-      <LineId Id="3" Count="63" />
-      <LineId Id="2" Count="0" />
+      <LineId Id="3" Count="47" />
+      <LineId Id="81" Count="5" />
+      <LineId Id="60" Count="1" />
     </LineIds>
   </POU>
 </TcPlcObject>

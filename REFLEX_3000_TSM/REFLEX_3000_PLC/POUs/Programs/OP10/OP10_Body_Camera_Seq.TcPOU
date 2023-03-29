@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP10_Body_Camera_Seq" Id="{5028556b-88d7-489e-a23b-5bd9d2c73a8e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP10_Body_Camera_Seq
+VAR
+	Toggle_Pos_LH_Empty : R_TRIG;
+	Toggle_Neg_LH_Empty : F_TRIG;
+	Toggle_Pos_RH_Empty : R_TRIG;
+	Toggle_Neg_RH_Empty : F_TRIG;
+	LH_Empty_Cam_Completed : BOOL;
+	RH_Empty_Cam_Completed : BOOL;
+	Body_Singulation_Cam_Seq: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Toggle_Pos_LH_Empty(CLK:=OP10A_Camera_FB.OP10A_Empty_Cam_1_Inspection_Status.Inspection_Completed);
+Toggle_Neg_LH_Empty(CLK:=OP10A_Camera_FB.OP10A_Empty_Cam_1_Inspection_Status.Inspection_Completed);
+Toggle_Pos_RH_Empty(CLK:=OP10B_Camera_FB.OP10B_Empty_Cam_2_Inspection_Status.Inspection_Completed);
+Toggle_Neg_RH_Empty(CLK:=OP10B_Camera_FB.OP10B_Empty_Cam_2_Inspection_Status.Inspection_Completed);
+
+IF Toggle_Pos_LH_Empty.Q OR Toggle_Pos_LH_Empty.Q THEN
+	LH_Empty_Cam_Completed:=1;	
+END_IF
+IF Toggle_Pos_RH_Empty.Q OR Toggle_Pos_RH_Empty.Q THEN
+	RH_Empty_Cam_Completed:=1;	
+END_IF
+
+IF OP10A_AUTO_RUNNING AND Body_Singulation_Cam_Seq=0 OR (NOT OP10A_Empty_Cam_1_Camera_Online OR NOT OP10B_Empty_Cam_2_Camera_Online) THEN
+	Body_Singulation_Cam_Seq:=10;
+END_IF  
+
+CASE Body_Singulation_Cam_Seq OF
+	10: 	OP10A_Body_OK			  := 0;
+            OP10A_Body_NOK			  := 0;
+            OP10B_Body_OK			  := 0;
+            OP10B_Body_NOK			  := 0;
+            OP10A_Body_Window_OK	  := 0;
+            OP10A_Body_Window_NOK	  := 0;
+            OP10B_Body_Window_OK	  := 0;
+            OP10B_Body_Window_NOK	  := 0;	
+			LH_Empty_Cam_Completed    :=0;
+			RH_Empty_Cam_Completed    :=0;		
+			OP10_Body_Empty_Cam_Done  :=0;
+			OP10_Body_Gripping_Done   :=0;
+			Body_Singulation_Cam_Seq	  :=11;	
+	
+	11: IF (OP10_Empty_Camera_Trigger AND (NOT OP10_Body_Empty_Cam_Done)) THEN
+			OP10A_Empty_Cam_1_Camera_Trigger:=1;
+			OP10B_Empty_Cam_2_Camera_Trigger:=1;
+			Body_Singulation_Cam_Seq	:=15;	
+		END_IF
+
+	15:	IF LH_Empty_Cam_Completed AND RH_Empty_Cam_Completed THEN
+			OP10A_Empty_Cam_1_Camera_Trigger :=0;
+			OP10B_Empty_Cam_2_Camera_Trigger :=0;
+			OP10_Empty_Camera_Trigger :=0;
+			Body_Singulation_Cam_Seq  :=25;
+		END_IF  
+	   
+	25: IF OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[0]=1 AND OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[0]=1 THEN
+			OP10A_Body_Window_OK 		:=1;
+			OP10B_Body_Window_OK		:=1;
+			OP10_Body_Empty_Cam_Done    :=1;
+			Body_Singulation_Cam_Seq 	:=30;
+		ELSIF OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[0]<>1 AND OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[0]=1 THEN	
+			OP10A_Body_Window_NOK 		:=1;
+			OP10B_Body_Window_OK		:=1;
+			OP10_Body_Empty_Cam_Done    :=1;
+			Body_Singulation_Cam_Seq    :=30;
+		ELSIF OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[0]=1 AND OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[0]<>1 THEN			
+			OP10A_Body_Window_OK 		:=1;
+			OP10B_Body_Window_NOK		:=1;
+			OP10_Body_Empty_Cam_Done    :=1;
+			Body_Singulation_Cam_Seq    :=30;			
+		ELSIF  OP10A_Camera_FB.OP10A_Empty_Cam_1_Result[0]<>1 AND OP10B_Camera_FB.OP10B_Empty_Cam_2_Result[0]<>1 THEN
+			OP10A_Body_Window_NOK 		:=1;
+			OP10B_Body_Window_NOK		:=1;
+			OP10_Body_Empty_Cam_Done    :=1;
+			Body_Singulation_Cam_Seq    :=30;	
+		END_IF	
+			
+   30:  IF OP10_Body_Gripping_Done THEN
+			Body_Singulation_Cam_Seq   :=10;
+		END_IF	
+   	    
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="OP10_Body_Camera_Seq">
+      <LineId Id="3" Count="69" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Operating_Request_Completion_Clear" Id="{1b92bd9d-38a4-4a8d-ba4f-ec7343e0ddaa}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Operating_Request_Completion_Clear :
+STRUCT
+Program_Change_Complete_Clear			: BIT;
+Rank_Value_Change_Complete_Clear		: BIT;
+Counter_Number_Change_Complete_Clear	: BIT;
+Counter_Value_Change_Complete_Clear		: BIT;
+Counter_Up_Complete_Clear				: BIT;
+Counter_Down_Complete_Clear				: BIT;
+Counter_Reset_Complete_Clear			: BIT;
+Reserve									: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

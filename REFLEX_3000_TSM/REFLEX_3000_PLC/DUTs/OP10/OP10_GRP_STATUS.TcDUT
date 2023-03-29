@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="OP10_GRP_STATUS" Id="{ad873601-26f3-467c-ab93-27d027d42fa7}">
+    <Declaration><![CDATA[TYPE OP10_GRP_STATUS :
+STRUCT
+	LH_BDY_GRP_WRK_FB				: BOOL;
+	LH_BDY_GRP_HOM_FB				: BOOL;	
+	RH_BDY_GRP_WRK_FB				: BOOL;
+	RH_BDY_GRP_HME_FB				: BOOL;
+	LH_BDY_ROTRY_WRK_FB				: BOOL;
+	LH_BDY_RTRY_FITEE_FB			: BOOL;	
+	LH_BDY_ROTRY_CMR_FB				: BOOL;		
+	LH_BDY_ROTRY_HOM_FB				: BOOL;	
+	RH_BDY_ROTRY_WRK_FB				: BOOL;
+	RH_BDY_RTRY_FITEE_FB			: BOOL;	
+	RH_BDY_ROTRY_CMR_FB				: BOOL;			
+	RH_BDY_ROTRY_HME_FB				: BOOL;
+	LH_BDY_ROTRY_ZERO_FB			: BOOL;
+	RH_BDY_ROTRY_ZERO_FB			: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

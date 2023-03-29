@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Request_Completion_Clear" Id="{cc5bd596-724d-4014-ac83-034416639b1b}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Request_Completion_Clear :
+STRUCT
+Marking_Complete_BIT_Clear					: BIT ;
+Guide_Laser_Complete_Bit_Clear				: BIT ;
+Stop_Marking_Complete_Bit_Clear				: BIT ;
+Error_Clear_Complete_Bit_Clear				: BIT ;
+TwoDC_Read_Complete_Bit_Clear				: BIT ;//2DC_Read_Complete_Bit_Clear	
+A_Reserve_28								: BIT ;
+A_Reserve_29								: BIT ;
+A_Reserve_30								: BIT ;
+//
+Program_Edit_Complete_Bit_Clear				: BIT ;
+A_Reserve_31								: BIT ;
+A_Reserve_32								: BIT ;
+A_Reserve_33								: BIT ;
+A_Reserve_34								: BIT ;
+A_Reserve_35								: BIT ;
+A_Reserve_36								: BIT ;
+A_Reserve_37								: BIT ;
+//
+Program_Change_Complete_Bit_Clear			: BIT ;
+Rank_Change_Complete_Bit_Clear				: BIT ;
+Counter_No_Change_Complete_Bit_Clear		: BIT ;
+Counter_Value_Change_Complete_Bit_Clear		: BIT ;
+Count_Up_Complete_Bit_Clear					: BIT ;
+Count_Down_Complete_Bit_Clear				: BIT ;
+Counter_Reset_Complete_Bit_Clear			: BIT ;
+A_Reserve_38								: BIT ;
+//
+A_ReserveByte_5								: Byte ;
+//
+Setting_String_Read_Complete_Bit_Clear		: BIT ;
+Marked_String_Read_Complete_Bit_Clear		: BIT ;
+String_Change_Complete_Bit_Clear			: BIT ;
+A_Reserve_39								: BIT ;
+A_Reserve_40								: BIT ;
+A_Reserve_41								: BIT ;
+A_Reserve_42								: BIT ;
+A_Reserve_43								: BIT ;
+//
+A_ReserveByte_6								: Byte ;
+//
+A_ReserveByte_7								: Byte ;
+//
+Command_Send_Complete_Bit_Clear				: BIT ;
+A_Reserve_44								: BIT ;
+A_Reserve_45								: BIT ;
+A_Reserve_46								: BIT ;
+A_Reserve_47								: BIT ;
+A_Reserve_48								: BIT ;
+A_Reserve_49								: BIT ;
+A_Reserve_50								: BIT ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

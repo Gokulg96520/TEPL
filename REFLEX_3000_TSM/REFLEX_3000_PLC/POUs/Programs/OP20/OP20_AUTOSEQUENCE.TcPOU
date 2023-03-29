@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP20_AUTOSEQUENCE" Id="{8d70fbef-f382-4b25-839e-627aae7d5e75}" SpecialFunc="None">
+  <POU Name="OP20_AUTOSEQUENCE" Id="{be4145a2-22fd-4fb4-88b9-496f82871b4b}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP20_AUTOSEQUENCE
 VAR	
 //BOOL
@@ -9,30 +9,46 @@ VAR
 	OP20_RH_A_OIL_Dispense			: BOOL;
 	OP20_RH_A_OIL_SPIN 				: BOOL;
 	OP20_LH_A_OIL_SPIN				: BOOL;
-	OP20_LH_OIL_DONE				: BOOL;
-	OP20_RH_OIL_DONE				: BOOL;
-	
-//TON
-	OP20_AFT_SFE_WRK				: TON;
-	OP20_AFT_SPN_STRT				: TON;
-	OP20_AFT_OIL_STRT				: TON;
-	OP20_AFT_SPN_OFF				: TON;
+	OP20_Oil_Range					: BOOL;
 
-	Timer: ton;
-	Servo_down: TIME;
-	Servo_UP: TIME;
-	Cycle_time : TIME;
-	check: BOOL;
+//TON
+	OP20_Oiling_Timer				: TON;
+	MOVER_POS_RECHED_R				: R_trig;
+	OP20_STN_MOVER: INT;
+	Dry_Run : BOOL;
+	OP20_Cycle_Time_FB : FB_Cycletime;	
+	OP20_WRK_DELAY : TON;
+	WRK_DELAY	: INT :=500;
+
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
+      <ST><![CDATA[IF OP20_AutoSelected AND NOT OP20_ErrorActive AND OperationEnable THEN
+    SR20_Vert_servo_ctrl.Velocity := OP20_HMI_Servo_Speed;
+	O20_LH_OIL_DISPN_ON_Q1150_0:=TRUE ;
+	O20_RH_OIL_DISPN_ON_Q1150_2:=TRUE ;
+	O20_LH_OIL_DISPN_FRL_VLVE_ON_Q401_7:=OP20_LH_A_OIL_Dispense;
+	O20_RH_OIL_DISPN_FRL_VLVE_ON_Q401_5:=OP20_RH_A_OIL_Dispense;
+	O20_LH_OIL_SPIN_ON_Q1150_1:=OP20_RH_A_OIL_SPIN ;
+	O20_RH_OIL_SPIN_ON_Q1150_3:=OP20_LH_A_OIL_SPIN;
+END_IF
+
+OP20_OIL_TIMER:=OP20_OIL_TIMER; //OP20_DLY_OIL_ON;
 // AUTO MODE
-IF (NOT OP20_AutoSelected OR  OP20_ErrorActive OR OP20_HomeRunning ) THEN
-	OP20_GVL.OP20_AutoRunning:= FALSE;
+IF (NOT OP20_AutoSelected OR OP20_ErrorActive OR OP20_HomeRunning OR NOT  OperationEnable ) THEN
+	OP20_AutoRunning:= FALSE;
 	OP20_AutoSeq:= 10;
+	OP20_STN_ENABLE:=FALSE;
+	OP20_STN_RUNNING:=FALSE;
 END_IF	
-																									
+		
+IF (OP20_ErrorActive OR OP20_HomeRunning OR NOT OperationEnable) THEN
+	O20_LH_OIL_DISPN_ON_Q1150_0 :=0;
+	O20_RH_OIL_DISPN_ON_Q1150_2 :=0;
+	O20_LH_OIL_SPIN_ON_Q1150_1  :=0;
+	O20_RH_OIL_SPIN_ON_Q1150_3  :=0;
+END_IF	
+																							
 CASE OP20_AutoSeq OF
 		
 		10: IF (OP20_AutoSelected) THEN		// Check Automode Selected
@@ -51,120 +67,163 @@ CASE OP20_AutoSeq OF
       		   OP20_AutoSeq:= 50;
       	   END_IF
 		   
-      	50:IF ( NOT OP20_OperationCompleted) THEN		// Check Operation Completed Reset
-      		   OP20_AutoSeq:=60;
+      	50:IF ( OP20_STN_ENABLE AND OP20_STN_RUNNING ) THEN		// Check Operation Completed Reset
+      		   OP20_AutoSeq:=70;
+		   ELSE
+	   		   OP20_AutoSeq:=60;
       	   END_IF
 		   
-      	70:  // SERVO POSITION SAFE CHECK
-	       IF (OP20_GVL.OP20_SERVO_ON_SFE_WRK OR OP20_GVL.OP20_SERVO_ON_HOME)AND OP20_GVL.OP20_SERVO_POS_DONE AND NOT SR20_Vert_servo_ctrl.ABSmove_Start THEN 
-	        SR20_Vert_servo.fTargetPosition:=OP20_GVL.OP20_VERT_SERVO_WRK_POS;
-			IF SR20_Vert_servo.fTargetPosition=OP20_GVL.OP20_VERT_SERVO_WRK_POS THEN
- 				OP20_AutoSeq:=75;
-			END_IF	
-	       END_IF
-		   
-	   60:IF  ( AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP20_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
-		    OP20_GVL.OP20_HomeConditionOK:=TRUE;
+	   60:IF  (AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP20_HMI_CycleStart)) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		    OP20_HomeConditionOK:=TRUE;
 	 			IF( OP20_Main.OP20_Modeselection_FB.HomeConditionOK AND OP20_AutoSelected) THEN
-					OP20_GVL.OP20_AutoRunning:=TRUE;
-					OP20_GVL.OP20_StepRunning:= FALSE;
+					OP20_AutoRunning:=TRUE;
+					OP20_StepRunning:= FALSE;
 				
 				ELSIF (OP20_Main.OP20_Modeselection_FB.HomeConditionOK AND OP20_StepSelected) THEN
-					OP20_GVL.OP20_AutoRunning:=FALSE;
-					OP20_GVL.OP20_StepRunning:= TRUE;
+					OP20_AutoRunning:=FALSE;
+					OP20_StepRunning:= TRUE;
 				END_IF;
 		  END_IF
-		   IF ((OP20_GVL.OP20_AutoRunning OR OP20_GVL.OP20_StepRunning) AND OP20_GVL.OP20_StartEnable) THEN
+		   IF ((OP20_AutoRunning OR OP20_StepRunning) AND OP20_StartEnable) THEN
 				OP20_AutoSeq:= 70;
-		   END_IF	
-		   
+		   END_IF
+
+      	70:  // SERVO POSITION SAFE CHECK
+	       IF (OP20_SERVO_ON_SFE_WRK OR OP20_SERVO_ON_HOME)AND OP20_SERVO_POS_DONE AND NOT SR20_Vert_servo_ctrl.ABSmove_Start THEN 
+	         SR20_Vert_servo_ctrl.Position := OP20_VERT_SERVO_WRK_POS;
+			 IF SR20_Vert_servo_ctrl.Position=OP20_VERT_SERVO_WRK_POS THEN
+ 				OP20_AutoSeq:=75;
+			 END_IF	
+	       END_IF
+			   
 		75: // WAITING FOR MOVER AND MOVING SERVO TO TARGET POSITION
-			IF OP20_GVL.OP20_STN_ENABLE THEN
-			 SR20_Vert_servo_ctrl.ABSmove_Start:=TRUE;
-			 OP20_AutoSeq:=80;
+			IF OP20_STN_ENABLE THEN
+			 	SR20_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+			 	OP20_STN_RUNNING :=1;
+			 	OP20_LH_OIL_OK:=FALSE;
+			 	OP20_RH_OIL_OK:=FALSE;
+			 	OP20_AutoSeq:=80;
 			END_IF
 			
-		80: // START THE SPINNER OK COMPONENT FIXTURE
-			IF OP20_GVL.OP20_SERVO_POS_DONE AND OP20_GVL.OP20_SERVO_ON_WRK THEN
-			 Servo_down:=Timer.ET;
-			 
-			 SR20_Vert_servo_ctrl.ABSmove_Start:=FALSE;	
+		80: // START THE SPINNER OK COMPONENT FIXTURE	 
+			 IF OP20_FIXTURE_1=10 AND OP20_FIXTURE_2<>10  THEN
+			   OP20_LH_A_OIL_Dispense:=1;
+			   OP20_AutoSeq:=100;			   
+			 ELSIF OP20_FIXTURE_2=10 AND OP20_FIXTURE_1<>10 THEN
+			   OP20_RH_A_OIL_Dispense:=1;
+			   OP20_AutoSeq:=100;			   
+			 ELSIF OP20_FIXTURE_1=10 AND OP20_FIXTURE_2=10 THEN  
+				OP20_LH_A_OIL_Dispense:=1;
+				OP20_RH_A_OIL_Dispense:=1;
+			    OP20_AutoSeq:=100;				
+			ELSIF OP20_FIXTURE_1<>10 AND OP20_FIXTURE_2<>10 THEN
+			 	OP20_AutoSeq:=120;	
 			END_IF
-			IF OP20_AFT_SFE_WRK.Q THEN			 
-			 IF OP20_FIXTURE_1=9999 THEN
-			  OP20_LH_A_OIL_SPIN:=TRUE;
-			 END_IF
-			 IF OP20_FIXTURE_2=9999 THEN
-			  OP20_RH_A_OIL_SPIN:=TRUE;
-			 END_IF			 
-			 IF Servo_down <> T#0S THEN
-				 OP20_AutoSeq:=100;
-			 END_IF
-		 	END_IF
-		  
+	  
 		100: //START THE OILLING UNIT 
-		    IF OP20_AFT_SPN_STRT.Q THEN
-			 OP20_LH_A_OIL_Dispense:=OP20_LH_A_OIL_SPIN;
-			 OP20_LH_OIL_DONE:=OP20_LH_A_OIL_SPIN;
-			 OP20_GVL.OP20_LH_OIL_NOK:=TRUE;
-			 OP20_RH_A_OIL_Dispense:=OP20_RH_A_OIL_SPIN;
-			 OP20_RH_OIL_DONE:=OP20_RH_A_OIL_SPIN;
-			 OP20_GVL.OP20_RH_OIL_NOK:=TRUE;
-			 OP20_AutoSeq:=120;			
-		    END_IF
+		     	IF OP20_Oiling_Timer.Q AND OP20_FIXTURE_1=10 AND OP20_FIXTURE_2=10 THEN
+					OP20_LH_OIL_OK:=TRUE;
+					OP20_RH_OIL_OK:=TRUE;
+					OP20_AutoSeq:=120;	
+			 	ELSIF OP20_Oiling_Timer.Q AND OP20_FIXTURE_1=10 THEN
+					OP20_LH_OIL_OK:=TRUE;	
+					OP20_AutoSeq:=120;	
+			 	ELSIF OP20_Oiling_Timer.Q AND OP20_FIXTURE_2=10 THEN
+					OP20_RH_OIL_OK:=TRUE;
+					OP20_AutoSeq:=120;	
+		     	END_IF
 				
-		120: //OFF THE SPINNER AND OILLING
-			 IF OP20_AFT_OIL_STRT.Q THEN
-		  	   IF OP20_LH_OIL_DONE THEN
-			    OP20_LH_A_OIL_Dispense:=FALSE;		
-			    OP20_GVL.OP20_LH_OIL_OK:=TRUE;
-				OP20_GVL.OP20_LH_OIL_NOK:=FALSE;
-			   END_IF
-			   IF OP20_RH_OIL_DONE THEN
-			    OP20_RH_A_OIL_Dispense:=FALSE;
-			    OP20_GVL.OP20_RH_OIL_OK:=TRUE; 
-				OP20_GVL.OP20_RH_OIL_NOK:=FALSE;
-			   END_IF	
-			   IF NOT SR20_Vert_servo_ctrl.ABSmove_Start THEN
-				   SR20_Vert_servo.fTargetPosition:=OP20_GVL.OP20_VERT_SERVO_SFE_WRK_POS;
-			   		OP20_AutoSeq:=140;	
-			   END_IF
-			   		
-			 END_IF
+			 				
+		120:    IF OP20_SERVO_ON_WRK AND (OP20_LH_OIL_OK OR OP20_RH_OIL_OK) THEN
+					OP20_RH_A_OIL_SPIN:=1;
+		            OP20_LH_A_OIL_SPIN:=1;
+				END_IF
+				SR20_Vert_servo_ctrl.Position:=OP20_VERT_SERVO_SFE_WRK_POS;
+				IF OP20_LH_OIL_OK THEN
+					MOVER_CMP_STATUS[OP20_STN_MOVER][1]	:=20;
+				ELSE
+					MOVER_CMP_STATUS[OP20_STN_MOVER][1]	:=20;				
+				END_IF
+				IF OP20_RH_OIL_OK THEN
+					MOVER_CMP_STATUS[OP20_STN_MOVER][2]	:=20;
+				ELSE                                 
+					MOVER_CMP_STATUS[OP20_STN_MOVER][2]	:=20;				
+				END_IF	
+				IF OP20_WRK_DELAY.Q THEN
+					OP20_AutoSeq:=140;		
+				END_IF	
 			
-		140: // SERVO MOVE TO SAFE WORK POSITION 
-			IF OP20_AFT_SPN_OFF.Q THEN
-			  OP20_RH_A_OIL_SPIN:=FALSE;
-			  OP20_LH_A_OIL_SPIN:=FALSE;
-			  SR20_Vert_servo_ctrl.ABSmove_Start:=TRUE;			  
-	     	  OP20_AutoSeq:=160;	  
-			END_IF
-			
+		140:  IF NOT SR20_Vert_servo_ctrl.ABSmove_Start AND OP20_SERVO_ON_WRK  THEN			 			 
+			   SR20_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+			   OP20_AutoSeq:=160;
+			 END_IF				  
+	     	  	  	
 		160: // SERVO DONE AND RESET THE DONE BITS
-			IF  OP20_GVL.OP20_SERVO_POS_DONE AND OP20_GVL.OP20_SERVO_ON_SFE_WRK THEN
-			 SR20_Vert_servo_ctrl.ABSmove_Start:=FALSE;
-			 OP20_GVL.OP20_RH_OIL_OK:=FALSE;
-			 OP20_GVL.OP20_LH_OIL_OK:=FALSE;
-			 OP20_AutoSeq:=70;
-			 Cycle_time:=Timer.ET;
-			 OP20_GVL.OP20_STN_ENABLE:=False;				
+			IF NOT In_Range(SR20_Vert_servo_status.actualPosition,OP20_VERT_SERVO_WRK_POS,Oil_Region) THEN
+					OP20_RH_A_OIL_SPIN:=0;
+		            OP20_LH_A_OIL_SPIN:=0;				
+			END_IF
+			IF NOT SR20_Vert_servo_ctrl.ABSmove_Start AND OP20_SERVO_ON_SFE_WRK THEN
+			  SR20_Vert_servo_ctrl.ABSmove_Start:=FALSE;
+			  OP20_STN_ENABLE	:=0;
+			  OP20_STN_RUNNING  :=0;
+			  IF (MOVER_CMP_STATUS[OP20_STN_MOVER][1]=21) AND (MOVER_CMP_STATUS[OP20_STN_MOVER][1]=21) THEN
+					MOVER_STP_NO[OP20_STN_MOVER]	:= (OP160_XTS_POS_NO*10);
+				ELSE
+				STATION_DONE[OP20_STN_MOVER][OP20_XTS_POS_NO]			:= TRUE;					
+			  END_IF
+	
+			  OP20_AutoSeq:=70;			
 			END_IF
 
 END_CASE	
+
+OP20_Cycle_Time_FB(i_b_startTime:=OP20_STN_ENABLE , i_b_stopTime:= NOT OP20_STN_ENABLE , o_t_StationTime=>OP20_Cycle_time );					
+
+
+OP20_WRK_DELAY(IN:=OP20_SERVO_ON_WRK,PT:=INT_TO_TIME(WRK_DELAY));
+
+Dry_Run:=All_Station_Dry_Run;
+
+IF Dry_Run THEN
+	OP20_FIXTURE_1:=10;
+	OP20_FIXTURE_2:=10;
+ELSE 
+	OP20_FIXTURE_1:=MOVER_CMP_STATUS[OP20_STN_MOVER][1];
+	OP20_FIXTURE_2:=MOVER_CMP_STATUS[OP20_STN_MOVER][2];	
+END_IF
+
 //Timers
-OP20_AFT_SFE_WRK(IN:=OP20_GVL.OP20_SERVO_ON_WRK AND (OP20_AutoSeq=80), PT:=INT_TO_TIME(OP20_GVL.OP20_DLY_AFT_SFE_WRK) , Q=> , ET=> );
-OP20_AFT_SPN_STRT(IN:=(OP20_AutoSeq=100), PT:=INT_TO_TIME(OP20_GVL.OP20_DLY_AFT_SPN_STRT) , Q=> , ET=> );
-OP20_AFT_OIL_STRT(IN:=(OP20_AutoSeq=120), PT:=INT_TO_TIME(OP20_GVL.OP20_DLY_AFT_OILNG_STRT) , Q=> , ET=> );
-OP20_AFT_SPN_OFF(IN:=(OP20_AutoSeq=140), PT:=T#100MS , Q=> , ET=> );
-Timer(IN:=OP20_STN_ENABLE,PT:=T#30S);
-//INT_TO_TIME(OP20_GVL.OP20_DLY_AFT_OILNG_FNISH)
-//temp(IN:=OP20_AutoSeq=140,PT:=T#100MS);
+OP20_Oiling_Timer(IN:=OP20_LH_A_OIL_Dispense OR OP20_RH_A_OIL_Dispense, PT:=INT_TO_TIME(OP20_OIL_TIMER));
+IF OP20_Oiling_Timer.Q THEN
+	OP20_LH_A_OIL_Dispense:=0;
+	OP20_RH_A_OIL_Dispense:=0;
+END_IF				
+////################################ STATION ENABLE CONTION    ############################
+
+	OP20_STN_MOVER					:= MOVER_POSITION[OP20_XTS_POS_NO];
+	IF AUTO_WITH_XTS THEN
+	IF OP20_STN_MOVER>0 THEN
+	IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP20_STN_MOVER][1]=5 AND MOVER_CMP_STATUS[OP20_STN_MOVER][2]=5)THEN
+	OP20_STN_ENABLE					:= MOVER_POS_RECHED[OP20_STN_MOVER] AND ((MOVER_CMP_STATUS[OP20_STN_MOVER][1]=10)OR
+											(MOVER_CMP_STATUS[OP20_STN_MOVER][2]=10)) AND STATION_ENABLE_CONTROL;
+	ELSE
+	STATION_DONE[OP20_STN_MOVER][OP20_XTS_POS_NO]			:= TRUE;		
+	END_IF
+	ELSE
+	OP20_STN_ENABLE										:= FALSE;
+	END_IF
+	END_IF
 
 
-]]></ST>
+	
+	
+																				
+						
+	]]></ST>
     </Implementation>
     <LineIds Name="OP20_AUTOSEQUENCE">
-      <LineId Id="3" Count="134" />
+      <LineId Id="3" Count="196" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

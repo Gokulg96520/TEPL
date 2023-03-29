@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="GENERAL_VARIABLE" Id="{a1c64eee-afe8-465e-8be8-26df17a3f1f3}">
+  <GVL Name="GENERAL_VARIABLE" Id="{d57af6be-fe48-4e24-a9c5-6fe446bb8ddc}">
     <Declaration><![CDATA[VAR_GLOBAL
+	STATION_ENABLE_CONTROL				: BOOL;
 	ManualMOde          :BOOL;
 	OperationEnable     :BOOL;
 	MODE_WORD			:INT;
@@ -21,19 +22,106 @@
 	ERROR_ACTIVE		:BOOL;
 	IO_Page_Number		: INT;
 	
-	HMI_AutoMode : BOOL;
+	HMI_AutoMode   : BOOL;
 	HMI_ManualMode : BOOL;
-	HMI_StepMode : BOOL;
+	HMI_StepMode   : BOOL;
+	HMI_Reset	   : BOOL;
 	
 	HMI_Target_Count : DINT;
 	HMI_Total_Count  : DINT;
 	HMI_OK_Count	 : DINT;
 	HMI_NOK_Count	 : DINT;
 	
+	All_Station_Dry_Run	: BOOL;
+	
 	Pulse_Block      : FB_SimClock;
-	Servo_Enable    : BOOL;
-    Servo_Safety    : BOOL;
-    Servo_Reset     : BOOL;
+	Servo_Enable     : BOOL;
+    Servo_Safety     : BOOL;
+    Servo_Reset      : BOOL;
+//////********************************
+
+    sNetID    : T_AmsNetID := '';
+    bEnable   : BOOL;
+    dwCycle   : DWORD(1..86400) := 5;
+    dwOpt     : DWORD := 1;
+    tTimeout  : TIME := DEFAULT_ADS_TIMEOUT;
+	
+	bValid     : BOOL;
+    systemTime : TIMESTRUCT;
+    tzID       : E_TimeZoneID := eTimeZoneID_Invalid;
+	
+    fbTime   : FB_LocalSystemTime := ( bEnable := TRUE, dwCycle := 1 );
+    logTimer : TON := ( IN := TRUE, PT := T#10MS );	
+	
+	wYear	: WORD ;
+	wMonth	: WORD ;
+	wDate   : WORD ;
+	wHour	: WORD ;
+	wMinute : WORD ;
+	wSecond : WORD ;
+	wMillisec: WORD;	
+//##############################		END_OF_CYCLE		##############################
+
+		END_OF_CYCLE					: BOOL;
+
+
+	
+//################################		TOOL  CHANGE OVER 	#########################
+
+		model_selected 					: INT;
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+
+		STN_BYPASS_ARAAY					: ARRAY[0..35] OF ARRAY[0..35]OF BOOL;
+		STN_BYPASS_ARRAY_HMI				: ARRAY[0..35] OF BOOL;					
+		ZERO_POS_XTS				        : LREAL :=0;
+		XTS_POSITION						: ARRAY[2..35] OF LREAL;
+		OP10A_BYPASS						: BOOL;
+		OP10B_BYPASS		                : BOOL;
+		OP20_BYPASS	                        : BOOL;
+		OP30_BYPASS		                    : BOOL;
+		OP40_BYPASS		                    : BOOL;
+		OP50_BYPASS		                    : BOOL;
+		OP60_BYPASS		                    : BOOL;
+		OP70_BYPASS		                    : BOOL;
+		OP80_BYPASS		                    : BOOL;
+		OP90_BYPASS		                    : BOOL;
+		OP110_BYPASS	                    : BOOL;
+		OP120_BYPASS                        : BOOL;
+		OP130_BYPASS                        : BOOL;
+		OP140_P1_BYPASS                     : BOOL;
+		OP140_P2_BYPASS                     : BOOL;
+		OP140_P3_BYPASS                     : BOOL;
+		OP150A_BYPASS                    	: BOOL;
+		OP150B_BYPASS                    	: BOOL;
+		OP150C_BYPASS                    	: BOOL;
+		OP160_BYPASS                        : BOOL;
+		Model								:STRING[80]:='6.3';
+				
+		OP10A_CURR_MOVER					: INT;
+		OP10B_CURR_MOVER					: INT;		
+		OP20_CURR_MOVER						: INT;
+		OP30_CURR_MOVER						: INT;
+		OP40_CURR_MOVER						: INT;
+		OP50_CURR_MOVER						: INT;
+		OP60_CURR_MOVER						: INT;
+		OP70_CURR_MOVER						: INT;
+		OP80_CURR_MOVER						: INT;		
+		OP90_CURR_MOVER						: INT;	
+		OP110_CURR_MOVER					: INT;
+		OP120_CURR_MOVER					: INT;
+		OP130_CURR_MOVER					: INT;
+		OP140_P1_CURR_MVR					: INT;
+		OP140_P2_CURR_MVR					: INT;
+		OP140_P3_CURR_MVR					: INT;
+//		OP150A_LH_CURR_MVR					: INT;
+//		OP150A_RH_CURR_MVR					: INT;
+//		OP150B_LH_CURR_MVR					: INT;
+//		OP150B_RH_CURR_MVR					: INT;		
+//		OP150C_LH_CURR_MVR					: INT;
+//		OP150C_RH_CURR_MVR					: INT;		
+//		OP160_CURR_MOVER					: INT;
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

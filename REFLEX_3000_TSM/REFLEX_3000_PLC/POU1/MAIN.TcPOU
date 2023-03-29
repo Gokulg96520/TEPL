@@ -7,33 +7,70 @@ VAR
 	bACK 		AT %Q* : BOOL;
 	bSafety_OK  AT %I* : BOOL;
 	bInit              : BOOL;
+	Initialize		   : R_TRIG;
+	Ack_Input		   : BOOL;
 	Safety_Timer       : TON;	
-	EMG_FALL		   : R_TRIG;
-	
+	SafeOP_Timer	   : TON;
+	EMG_Raise		   : R_TRIG;
 	OP10A_Robo_State AT %I* : USINT;
 	OP10B_Robo_State AT %I* : USINT;
+
+	SERVO_TORQUE	AT %Q*	:UINT := 10000;
 	
-	OP120_Light_Control: BOOL;
+	ALL_LIGHTS_ON: BOOL;
+	XTS_Lube_ON  : BOOL;
+	
+	All_Station_Auto_Mode     : BOOL;
+	All_Station_Cycle_Start   : BOOL;
+	All_Station_Cycle_Stop    : BOOL;
+	Station_Ctrl_Temp         : BOOL;
+	OP10_Lights_On			  : BOOL;
+	tower_lamp_green_on       :BOOL;
+	tower_lamp_red_on         :BOOL;
+	tower_lamp_orange_on: BOOL;
+	
+	FB_Timer : FB_Time_Stamp_Maddy;
+	Run_Time : STRING;
+	Start_timer : BOOL;
+	Stop_timer  : BOOL;
+	Reset_timer : BOOL;
+	Start_value : STRING;
+	Stop_value  : STRING;
+	Start_trig : R_TRIG;
+	Stop_Trig  : R_TRIG;
+	Reset_Trig : R_TRIG;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[//Axis_Position_Bias();
-IF NOT bInit THEN
- brun:=TRUE;
+      <ST><![CDATA[
+bACK			:= Pulse_Block.Q1Hz;
+
+//Axis_Position_Bias();
+O160_AUTOBAG_CNT_CMPLTD_Q707_4:=I10A_DRUM_OFF_ON_I714_2;
+Initialize(CLK:=NOT bInit);
+IF Initialize.Q THEN
+	Ack_Input:=1;
+	brun:=TRUE;
+END_IF
+SafeOP_Timer(IN:=Ack_Input,PT:=T#5S);
+IF SafeOP_Timer.Q THEN
  bACK:=TRUE;
+ Ack_Input:=0;
  bInit:=TRUE;
 END_IF
-Safety_Timer(IN:=bACK,PT:=T#1S);
+
+Safety_Timer(IN:=bACK,PT:=T#500MS);
 IF Safety_Timer.Q THEN
 	bACK:=FALSE;
 END_IF
 
-EMG_FALL(CLK:=bSafety_OK , Q=> );
-IF EMG_FALL.Q THEN
+EMG_Raise(CLK:=bSafety_OK , Q=> );
+IF EMG_Raise.Q THEN
    bACK:=TRUE;
 END_IF
 
-
+RFID();
+Error();
 OP10_MAIN();
 OP20_MAIN();
 OP30_MAIN();
@@ -47,6 +84,7 @@ OP110_MAIN();
 OP120_MAIN();
 OP130_MAIN();
 OP140_MAIN();
+OP160_MAIN();
 IO_Diag();
 IO_OP10_PANEL();
 IO_OP10A_10B_JB();
@@ -58,7 +96,9 @@ OP90_JB_IO();
 OP160_MP_IO();
 OP160_MASTER4_IO();
 OP120_JB_IO();
-
+OP150_Main();
+MAIN_1();
+EtherCatDiag();
 //MOdeselection From HMI
 IF (HMI_AutoMode AND NOT HMI_ManualMOde AND NOT HMI_StepMode) THEN
 		FB_MODE_BLOCK.ModeWord:=1;
@@ -98,8 +138,6 @@ FB_MODE_BLOCK(
 	StepRunning:=STEP_RUNNING , 
 	StartEnable:=START_ENABLE , 
 	MachineStop:=MACHINE_STOP);
-
-
 	
 Pulse_Block(
 	Q10Hz=> , 
@@ -107,25 +145,278 @@ Pulse_Block(
 	Q2_5Hz=> , 
 	Q2Hz=> , 
 	Q1_25Hz=> , 
-	Q1Hz=> , 
+	Q2Hz=> , 
 	Q0_625Hz=> , 
 	Q0_5Hz=> );	
 	
+IF ALL_LIGHTS_ON THEN				
+		O30_CAM_LGHT1_ON_Q305_1                  :=1;
+		O30_CAM_LGHT2_ON_Q305_2                  :=1;
+		O50_CAM_LGHT1_ON_Q306_3                  :=1;
+		O50_CAM_LGHT2_ON_Q306_4                  :=1;
+		O70_CAM_LGHT1_ON_Q307_6                  :=1;
+		O70_CAM_LGHT2_ON_Q307_7                  :=1;
+		O90_VISN_LGHT1_ON_Q400_0                 :=1;
+		O90_VISN_LGHT2_ON_Q400_1                 :=1;
+		O120_VISN_LGHT1_ON_Q402_4                :=1;
+		O120_VISN_LGHT2_ON_Q402_5                :=1;
+		O150_VISN_LGHT_ON_Q706_6                 :=1;
+		O160_CHECKER_LGHT_ON_Q707_1              :=1;
+ELSE		
+		O30_CAM_LGHT1_ON_Q305_1                  :=0;
+		O30_CAM_LGHT2_ON_Q305_2                  :=0;
+		O50_CAM_LGHT1_ON_Q306_3                  :=0;
+		O50_CAM_LGHT2_ON_Q306_4                  :=0;
+		O70_CAM_LGHT1_ON_Q307_6                  :=0;
+		O70_CAM_LGHT2_ON_Q307_7                  :=0;
+		O90_VISN_LGHT1_ON_Q400_0                 :=0;
+		O90_VISN_LGHT2_ON_Q400_1                 :=0;
+		O120_VISN_LGHT1_ON_Q402_4                :=0;
+		O120_VISN_LGHT2_ON_Q402_5                :=0;
+		O150_VISN_LGHT_ON_Q706_6                 :=0;
+		O160_CHECKER_LGHT_ON_Q707_1              :=0;	
+END_IF
 
-O120_VISN_LGHT1_ON_Q402_4 :=OP120_Light_Control;
-O120_VISN_LGHT2_ON_Q402_5 :=OP120_Light_Control;]]></ST>
+IF OP10_Lights_On THEN
+		O10A_BDY_EMPT_CAM_LGHT1_ON_Q301_0        :=1; 
+		O10A_BDY_EMPT_CAM_LGHT2_ON_Q301_1        :=1;
+//		O10A_FIRTREE_ORING_CAM_LGHT1_ON_Q301_2   :=1;
+//		O10A_FIRTREE_ORING_CAM_LGHT2_ON_Q301_3   :=1;
+		O10A_ORING_CAM_LGHT1_ON_Q301_4           :=1;
+		O10A_ORING_CAM_LGHT2_ON_Q301_5           :=1;
+//		O10A_FIRTREE_ORING_CAMBAR_LGHT1_ON_Q301_6:=1;
+//		O10B_FIRTREE_ORING_CAM_LGHT1_ON_Q303_2   :=1;
+//		O10B_FIRTREE_ORING_CAM_LGHT2_ON_Q303_3   :=1;
+		O10B_ORING_CAM_LGHT1_ON_Q303_4           :=1;
+		O10B_ORING_CAM_LGHT2_ON_Q303_5           :=1;
+//		O10B_FIRTREE_ORING_CAMBAR_LGHT1_ON_Q303_6:=1;
+ELSE
+		O10A_BDY_EMPT_CAM_LGHT1_ON_Q301_0        :=0; 
+		O10A_BDY_EMPT_CAM_LGHT2_ON_Q301_1        :=0;
+		O10A_FIRTREE_ORING_CAM_LGHT1_ON_Q301_2   :=0;
+		O10A_FIRTREE_ORING_CAM_LGHT2_ON_Q301_3   :=0;
+		O10A_ORING_CAM_LGHT1_ON_Q301_4           :=0;
+		O10A_ORING_CAM_LGHT2_ON_Q301_5           :=0;
+		O10A_FIRTREE_ORING_CAMBAR_LGHT1_ON_Q301_6:=0;
+		O10B_FIRTREE_ORING_CAM_LGHT1_ON_Q303_2   :=0;
+		O10B_FIRTREE_ORING_CAM_LGHT2_ON_Q303_3   :=0;
+		O10B_ORING_CAM_LGHT1_ON_Q303_4           :=0;
+		O10B_ORING_CAM_LGHT2_ON_Q303_5           :=0;
+		O10B_FIRTREE_ORING_CAMBAR_LGHT1_ON_Q303_6:=0;	
+END_IF
+		
+		
+IF XTS_Lube_ON THEN
+	O10_XTS_GREASE_VALVE_ON_Q300_0:=Pulse_Block.Q0_5Hz;
+ELSE	
+	O10_XTS_GREASE_VALVE_ON_Q300_0:=0;
+END_IF
+		
+O150_BARLIGHT_OP1_Q706_7 :=	Pulse_Block.Q2_5Hz;
+O150_BARLIGHT_OP2_Q707_0 := Pulse_Block.Q1Hz;	
+                                                      
+O10_TWR_LMP_RD_Q302_5   := Pulse_Block.Q1Hz AND tower_lamp_green_on;                         
+O10_TWR_LMP_GN_Q302_6   := Pulse_Block.Q1Hz AND tower_lamp_red_on;                        
+O10_TWR_LMP_YELW_Q302_7 := Pulse_Block.Q1Hz AND tower_lamp_orange_on;
+O120_TWR_LMP_GN_Q403_1   := Pulse_Block.Q1Hz AND tower_lamp_green_on;
+O120_TWR_LMP_YELW_Q403_2 := Pulse_Block.Q1Hz AND tower_lamp_orange_on ;
+O120_TWR_LMP_RD_Q403_0   := Pulse_Block.Q1Hz AND tower_lamp_red_on;	
+
+O10_BARLIGHT_OP1_Q300_6  := Pulse_Block.Q1Hz;
+O10_BARLIGHT_OP2_Q300_7  := Pulse_Block.Q1_25Hz;	
+
+IF NOT OperationEnable THEN
+	OP20_ErrorActive:=1;
+	OP30_ErrorActive:=1;
+	OP40_ErrorActive:=1;
+	OP50_ErrorActive:=1;
+	OP60_ErrorActive:=1;
+	OP70_ErrorActive:=1;
+	OP80_ErrorActive:=1;
+	OP110_ErrorActive:=1;
+	OP120_ErrorActive:=1;
+	OP130_ErrorActive:=1;
+	OP140_ErrorActive:=1;
+	OP160_ErrorActive:=1;
+END_IF
+
+IF AUTO_WITH_XTS AND Station_Ctrl_Temp THEN
+
+	IF All_Station_Auto_Mode THEN
+		OP20_HMI_AutoMode:=1;
+		OP30_HMI_AutoMode:=1;
+		OP40_HMI_AutoMode:=1;
+		OP50_HMI_AutoMode:=1;
+		OP60_HMI_AutoMode:=1;
+		OP70_HMI_AutoMode:=1;
+		OP80_HMI_AutoMode:=1;	
+		OP110_HMI_AutoMode:=1;	
+        OP120_HMI_AutoMode:=1;
+		OP130_HMI_AutoMode:=1;	
+	//	OP140_HMI_AutoMode:=1;
+        OP160_HMI_AutoMode:=1;			
+	END_IF
+	IF All_Station_Cycle_Start THEN
+		OP20_HMI_CycleStart	:=1;
+		OP30_HMI_Cycle_Start:=1;
+		OP40_HMI_Cycle_Start:=1;
+		OP50_HMI_Cycle_Start:=1;
+		OP60_HMI_CycleStart	:=1;
+		OP70_HMI_Cycle_Start:=1;
+		OP80_HMI_CycleStart	:=1;
+		OP110_HMI_CycleStart:=1;
+		OP120_HMI_CycleStart_PB:=1;
+		OP130_HMI_CycleStart:=1;
+	//	OP140_HMI_CycleStart:=1;
+		OP160_HMI_CycleStart:=1;
+	ELSE
+		OP20_HMI_CycleStart	:=0;
+		OP30_HMI_Cycle_Start:=0;
+		OP40_HMI_Cycle_Start:=0;
+		OP50_HMI_Cycle_Start:=0;
+		OP60_HMI_CycleStart	:=0;
+		OP70_HMI_Cycle_Start:=0;
+		OP80_HMI_CycleStart	:=0;
+		OP110_HMI_CycleStart:=0;	
+		OP120_HMI_CycleStart_PB:=0;
+		OP130_HMI_CycleStart:=0;
+	//	OP140_HMI_CycleStart:=0;
+		OP160_HMI_CycleStart:=0;		
+	END_IF
+	IF All_Station_Cycle_Stop THEN
+		 OP20_Stop_Request  :=1;
+ 		 OP30_Stop_Request  :=1;
+ 		 OP40_Stop_Request  :=1;
+ 		 OP50_Stop_Request  :=1;
+ 		 OP60_Stop_Request  :=1;
+ 		 OP70_Stop_Request  :=1;
+ 		 OP80_Stop_Request  :=1;
+ 		 OP110_Stop_Request :=1;
+		 OP120_Machine_Stop :=1;
+		 OP130_Machine_Stop	:=1;
+		// OP140_Machine_Stop :=1;
+		 OP160_Machine_Stop	:=1;
+	ELSE
+		 OP20_Stop_Request  :=0;
+ 		 OP30_Stop_Request  :=0;
+ 		 OP40_Stop_Request  :=0;
+ 		 OP50_Stop_Request  :=0;
+ 		 OP60_Stop_Request  :=0;
+ 		 OP70_Stop_Request  :=0;
+ 		 OP80_Stop_Request  :=0;
+ 		 OP110_Stop_Request :=0;
+		 OP120_Machine_Stop :=0;
+		 OP130_Machine_Stop	:=0;
+		// OP140_Machine_Stop :=0;
+		 OP160_Machine_Stop	:=0;	 
+	END_IF
+END_IF	
+
+
+////// tower lamp ////////////////////
+IF OP10A_AUTO_RUNNING AND  OP160_AutoRunning AND  OP140_AutoRunning AND 
+   OP130_AutoRunning AND OP110_AutoRunning AND OP120_AutoRunning  AND 
+   OP90_AUTO_RUNNING AND OP80_AutoRunning AND OP70_AutoRunning AND 
+   OP60_AutoRunning AND  OP50_AutoRunning AND OP40_AutoRunning AND 
+   OP30_AutoRunning AND OP20_AutoRunning THEN
+   tower_lamp_green_on := TRUE;
+   tower_lamp_red_on   := FALSE;
+   tower_lamp_orange_on:=FALSE;	
+END_IF
+
+IF NOT (OP160_AutoRunning AND  OP140_AutoRunning AND  OP130_AutoRunning AND 
+        OP10A_AUTO_RUNNING AND OP110_AutoRunning AND OP120_AutoRunning AND
+        OP90_AUTO_RUNNING AND OP80_AutoRunning AND OP70_AutoRunning AND
+        OP60_AutoRunning AND OP50_AutoRunning AND OP40_AutoRunning AND
+        OP30_AutoRunning AND OP20_AutoRunning) THEN
+	    tower_lamp_green_on :=FALSE ;
+	    tower_lamp_red_on   := FALSE;
+        tower_lamp_orange_on:=TRUE;	
+END_IF
+
+IF  OP10A_ERR OR OP10B_ERR OR OP110_ErrorActive OR OP120_ErrorActive OR OP130_ErrorActive OR OP140_ErrorActive
+    OR OP160_ErrorActive OR OP90_ERR OR OP80_ErrorActive OR OP70_ErrorActive OR OP60_ErrorActive OR
+	OP50_ErrorActive OR OP40_ErrorActive OR OP30_ErrorActive OR OP20_ErrorActive THEN
+        tower_lamp_green_on :=FALSE ;
+		tower_lamp_red_on   := TRUE;
+		tower_lamp_orange_on:=FALSE;	
+END_IF			
+		
+//////////////////
+
+fbTime();
+
+logTimer( IN := fbTime.bValid );
+IF logTimer.Q THEN
+    logTimer( IN := FALSE );
+	logTimer( IN := fbTime.bValid );
+    ADSLOGSTR( ADSLOG_MSGTYPE_HINT OR ADSLOG_MSGTYPE_LOG, 'Local System Time:%s', SYSTEMTIME_TO_STRING(fbTime.systemTime));
+END_IF	
+
+	wYear	:= fbTime.systemTime.wYear;
+	wMonth	:= fbTime.systemTime.wMonth;
+	wDate   := fbTime.systemTime.wDay;
+	wHour	:= fbTime.systemTime.wHour;
+	wMinute := fbTime.systemTime.wMinute;
+	wSecond := fbTime.systemTime.wSecond;
+	wMillisec:= fbTime.systemTime.wMilliseconds;
+	
+FB_Timer(
+	Start:= , 
+	Stop:= , 
+	Running_Timer=> Run_Time, 
+	Time_Difference_ms=> , 
+	Time_Struct:=fbTime.systemTime );	
+	
+Start_trig(CLK:=Start_timer);	
+Stop_trig(CLK :=Stop_timer);
+Reset_Trig(CLK:=Reset_timer);	
+	
+IF Start_trig.Q THEN
+	Start_value:=Run_Time;
+END_IF
+IF Stop_trig.Q THEN
+	Stop_value:=Run_Time;
+END_IF
+IF Reset_Trig.Q THEN
+	Start_value:=' ';
+	Stop_value:=' ';
+END_IF
+
+	
+	
+	
+]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
+      <LineId Id="592" Count="1" />
+      <LineId Id="598" Count="0" />
       <LineId Id="2" Count="0" />
-      <LineId Id="11" Count="7" />
+      <LineId Id="207" Count="1" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="212" Count="0" />
+      <LineId Id="210" Count="0" />
+      <LineId Id="203" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="213" Count="0" />
+      <LineId Id="14" Count="1" />
+      <LineId Id="202" Count="0" />
+      <LineId Id="16" Count="2" />
       <LineId Id="9" Count="0" />
       <LineId Id="128" Count="1" />
       <LineId Id="133" Count="0" />
       <LineId Id="130" Count="0" />
       <LineId Id="134" Count="0" />
+      <LineId Id="167" Count="0" />
       <LineId Id="131" Count="0" />
       <LineId Id="33" Count="0" />
-      <LineId Id="35" Count="23" />
+      <LineId Id="35" Count="12" />
+      <LineId Id="276" Count="0" />
+      <LineId Id="48" Count="10" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="231" Count="0" />
       <LineId Id="62" Count="10" />
       <LineId Id="110" Count="0" />
       <LineId Id="112" Count="0" />
@@ -135,13 +426,98 @@ O120_VISN_LGHT2_ON_Q402_5 :=OP120_Light_Control;]]></ST>
       <LineId Id="115" Count="0" />
       <LineId Id="117" Count="1" />
       <LineId Id="116" Count="0" />
-      <LineId Id="73" Count="19" />
-      <LineId Id="149" Count="1" />
-      <LineId Id="93" Count="0" />
+      <LineId Id="73" Count="20" />
       <LineId Id="96" Count="9" />
+      <LineId Id="320" Count="0" />
+      <LineId Id="333" Count="12" />
+      <LineId Id="358" Count="11" />
+      <LineId Id="317" Count="0" />
+      <LineId Id="624" Count="1" />
+      <LineId Id="627" Count="10" />
+      <LineId Id="626" Count="0" />
+      <LineId Id="638" Count="0" />
+      <LineId Id="642" Count="10" />
+      <LineId Id="640" Count="1" />
+      <LineId Id="395" Count="0" />
+      <LineId Id="639" Count="0" />
+      <LineId Id="396" Count="0" />
+      <LineId Id="399" Count="0" />
+      <LineId Id="397" Count="0" />
+      <LineId Id="400" Count="0" />
+      <LineId Id="398" Count="0" />
+      <LineId Id="232" Count="0" />
       <LineId Id="34" Count="0" />
-      <LineId Id="31" Count="0" />
+      <LineId Id="233" Count="0" />
+      <LineId Id="252" Count="0" />
+      <LineId Id="254" Count="1" />
+      <LineId Id="253" Count="0" />
+      <LineId Id="374" Count="1" />
+      <LineId Id="371" Count="0" />
+      <LineId Id="827" Count="0" />
+      <LineId Id="256" Count="0" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="258" Count="0" />
       <LineId Id="147" Count="0" />
+      <LineId Id="422" Count="5" />
+      <LineId Id="420" Count="0" />
+      <LineId Id="428" Count="0" />
+      <LineId Id="543" Count="3" />
+      <LineId Id="421" Count="0" />
+      <LineId Id="456" Count="0" />
+      <LineId Id="453" Count="0" />
+      <LineId Id="509" Count="0" />
+      <LineId Id="452" Count="0" />
+      <LineId Id="459" Count="7" />
+      <LineId Id="547" Count="3" />
+      <LineId Id="455" Count="0" />
+      <LineId Id="467" Count="1" />
+      <LineId Id="470" Count="6" />
+      <LineId Id="551" Count="3" />
+      <LineId Id="487" Count="0" />
+      <LineId Id="489" Count="6" />
+      <LineId Id="488" Count="0" />
+      <LineId Id="556" Count="2" />
+      <LineId Id="555" Count="0" />
+      <LineId Id="469" Count="0" />
+      <LineId Id="477" Count="0" />
+      <LineId Id="480" Count="6" />
+      <LineId Id="478" Count="0" />
+      <LineId Id="559" Count="3" />
+      <LineId Id="496" Count="0" />
+      <LineId Id="498" Count="6" />
+      <LineId Id="497" Count="0" />
+      <LineId Id="564" Count="2" />
+      <LineId Id="563" Count="0" />
+      <LineId Id="479" Count="0" />
+      <LineId Id="457" Count="0" />
+      <LineId Id="706" Count="1" />
+      <LineId Id="800" Count="26" />
+      <LineId Id="770" Count="1" />
+      <LineId Id="870" Count="6" />
+      <LineId Id="921" Count="0" />
+      <LineId Id="877" Count="0" />
+      <LineId Id="856" Count="0" />
+      <LineId Id="879" Count="4" />
+      <LineId Id="878" Count="0" />
+      <LineId Id="884" Count="1" />
+      <LineId Id="927" Count="0" />
+      <LineId Id="1047" Count="4" />
+      <LineId Id="1045" Count="0" />
+      <LineId Id="1059" Count="0" />
+      <LineId Id="1070" Count="1" />
+      <LineId Id="1074" Count="0" />
+      <LineId Id="1072" Count="0" />
+      <LineId Id="1060" Count="0" />
+      <LineId Id="1063" Count="1" />
+      <LineId Id="1066" Count="2" />
+      <LineId Id="1075" Count="1" />
+      <LineId Id="1078" Count="0" />
+      <LineId Id="1077" Count="0" />
+      <LineId Id="1065" Count="0" />
+      <LineId Id="1062" Count="0" />
+      <LineId Id="1061" Count="0" />
+      <LineId Id="1046" Count="0" />
+      <LineId Id="924" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

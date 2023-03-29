@@ -57,7 +57,7 @@ END_IF
  
 // ManualMode Selected
 
-IF ModeWord = 2 AND ModeAck AND Status = 0 THEN 
+IF ModeWord = 2 AND ModeAck AND Status = 0 AND NOT (AutoRunning OR StepRunning)THEN 
 	 AutoSelected :=0;
 	 ManualSelected :=1;
 	 StepSelected :=0;

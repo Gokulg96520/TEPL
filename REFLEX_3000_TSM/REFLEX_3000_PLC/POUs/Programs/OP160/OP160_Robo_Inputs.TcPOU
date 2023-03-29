@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_Robo_Inputs" Id="{87549a13-b2fe-4a6d-9123-a92d3c3cb64c}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_Robo_Inputs
+VAR
+	Robo_Enable_err: TON;
+	Counter: R_TRIG;
+	sampling_request_set :BOOL;
+	sampling_count_reset : r_trig;
+	Counter_reset        : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// Safe to Pick
+IF OP160_Moverpresent  THEN
+	OP160_SI_Pick_Zone_Safe:=TRUE;
+	 
+	ELSE
+		OP160_SI_Pick_Zone_Safe:=FALSE;
+	END_IF
+	
+// Safe To Place
+IF OP160_PartPicked THEN
+	OP160_SI_Place_Zone_Safe:=TRUE;
+	OP160_SI_Insert_Cylinder_Home := TRUE;
+	ELSE
+		OP160_SI_Place_Zone_Safe:=FALSE;
+		OP160_SI_Insert_Cylinder_Home :=FALSE;
+	END_IF
+	
+/// component status //	
+
+	IF OP160_PartPicked THEN
+       OP160_EI_Spare21 :=  op160_comp_rh_nok_to_rbt;
+	   OP160_EI_Spare22  :=  op160_comp_lh_nok_to_rbt;
+	END_IF   
+	
+////// robot go to pick ///////////////////////	
+IF OP160_Moverpresent AND NOT OP160_PartPicked THEN
+   OP160_EI_Rdy_Pick_QC:=TRUE;
+   ELSE
+   OP160_EI_Rdy_Pick_QC:=FALSE;
+END_IF
+
+/////// robot go to place /////////////////////////////
+IF OP160_PartPicked AND ( op160_place_both_component_ok OR op160_go_to_place) THEN
+	OP160_EI_Rdy_Place_QC:=TRUE;
+ELSE
+	OP160_EI_Rdy_Place_QC:=FALSE;
+END_IF
+	
+///////////////////// robot go to rejection ///////////////
+IF OP160_PartPicked AND ( op160_place_1_ok_1_nok OR op160_place_both_component_rej) THEN
+   OP160_EI_Rdy_Place_Reject := TRUE;
+ELSE
+   OP160_EI_Rdy_Place_Reject := FALSE;
+END_IF   
+
+
+///////////////////////////////// production count ///////////////////////////////////////////////////
+	
+IF Counter_reset THEN
+	Componenets_Produced:=0;
+END_IF
+
+IF Counter.Q AND NOT sampling_request_set THEN
+	Componenets_Produced:=Componenets_Produced+1;
+ELSIF Counter.Q AND  sampling_request_set THEN
+	sampling_quantity := sampling_quantity+1;
+END_IF
+
+IF sampling_request  OR ((Componenets_Produced MOD sampling_interval)=0 AND (Componenets_Produced > 1)) THEN
+   sampling_request_set:=TRUE; 
+ELSIF NOT sampling_request OR sampling_quantity = sampling_request_qty THEN
+   sampling_request_set:=FALSE;
+END_IF
+
+IF sampling_count_reset.Q THEN
+   sampling_quantity:=0;
+END_IF
+
+
+sampling_count_reset(CLK:= sampling_request_set, Q=> );
+Counter(CLK:=OP160_EO_QC_Place_Completed );	]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_Robo_Inputs">
+      <LineId Id="5" Count="3" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="9" Count="4" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="16" Count="1" />
+      <LineId Id="106" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="99" Count="3" />
+      <LineId Id="19" Count="5" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="25" Count="4" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="81" Count="4" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="86" Count="2" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="116" Count="2" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="56" Count="1" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="63" Count="1" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="47" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Camera_Job_Change" Id="{ea8b41d2-4625-4087-8707-b0db3fbb90a9}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Camera_Job_Change
+VAR_INPUT
+	Target_Job_ID	: UINT;
+	Block_Reset		: BOOL;
+END_VAR
+VAR_OUTPUT
+	Job_Change_Completed	: BOOL;
+	Job_Change_Error		: BOOL;
+END_VAR
+VAR_IN_OUT
+	Job_Change_Start_FB		: BOOL;
+	Job_Change_Error_FB		: BOOL;
+	Job_Change_Completed_FB	: BOOL;
+	Camera_Error_FB			: BOOL;
+	Camera_Online_FB		: BOOL;
+	Loaded_Job_ID_FB		: UINT;	
+	Target_Job_ID_FB		: UINT;
+	Job_Change_Start		: BOOL;
+END_VAR
+
+VAR
+	Job_Change_Step_no		: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT Job_Change_Start OR NOT Camera_Online_FB OR Camera_Error_FB OR Block_Reset THEN
+	Job_Change_Step_no:=1;
+END_IF
+
+CASE Job_Change_Step_no OF
+	
+	1: IF Job_Change_Start THEN
+		Job_Change_Completed:=0;
+		Job_Change_Error:=0;
+		Job_Change_Step_no:=10;
+	   END_IF
+	   
+	10: IF Target_Job_ID <> Loaded_Job_ID_FB THEN
+			Target_Job_ID_FB:=Target_Job_ID;
+			Job_Change_Step_no:=20;
+		ELSE
+			Job_Change_Completed:=1;
+			Job_Change_Start:=0;
+			Job_Change_Step_no:=1;
+	    END_IF
+		
+	20: Job_Change_Start_FB:=Job_Change_Start;	
+		IF Job_Change_Completed_FB AND NOT (Job_Change_Error_FB OR Camera_Error_FB) THEN
+			Job_Change_Completed:=Job_Change_Completed_FB;
+			Job_Change_Start	:=0;
+			Job_Change_Start_FB :=0;
+			Job_Change_Step_no	:=1;
+		ELSIF Job_Change_Error_FB THEN	
+			Job_Change_Error	:=1;
+			Job_Change_Start	:=0;
+			Job_Change_Start_FB :=0;
+			Job_Change_Step_no  :=1;			
+		END_IF	
+		
+END_CASE
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="Camera_Job_Change">
+      <LineId Id="3" Count="27" />
+      <LineId Id="32" Count="7" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

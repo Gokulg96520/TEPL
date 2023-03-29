@@ -1,0 +1,342 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="op140_ateq_fb" Id="{ee7a30c5-7a23-4e9c-89ae-bd82bd50d49d}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM op140_ateq_fb
+VAR
+	 OP140_ATEQ1_Manual_Start:BOOL;
+	 OP140_ATEQ2_Manual_Start:BOOL;
+	 OP140_ATEQ3_Manual_Start:BOOL;
+	 OP140_ATEQ4_Manual_Start:BOOL;
+	 OP140_ATEQ5_Manual_Start:BOOL;
+	 OP140_ATEQ6_Manual_Start:BOOL;
+	 OP140_ATEQ1_Manual_Prog_No:INT;
+	 OP140_ATEQ2_Manual_Prog_No:INT;
+	 OP140_ATEQ3_Manual_Prog_No:INT;
+	 OP140_ATEQ4_Manual_Prog_No:INT;
+	 OP140_ATEQ5_Manual_Prog_No:INT;
+	 OP140_ATEQ6_Manual_Prog_No:INT;
+	 OP140_ATEQ1_Reset:BOOL;
+	 OP140_ATEQ2_Reset:BOOL;
+	 OP140_ATEQ3_Reset:BOOL;
+	 OP140_ATEQ4_Reset:BOOL;
+	 OP140_ATEQ5_Reset:BOOL;
+	 OP140_ATEQ6_Reset:BOOL;
+	 OP140_ATEQ1_FB:ATEQ_LEAK;
+	 OP140_ATEQ2_FB:ATEQ_LEAK;
+	 OP140_ATEQ3_FB:ATEQ_LEAK;
+	 OP140_ATEQ4_FB:ATEQ_LEAK;
+	 OP140_ATEQ5_FB:ATEQ_LEAK;
+	 OP140_ATEQ6_FB:ATEQ_LEAK;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//HMI Sel ATEQ
+CASE OP140_ATEQ_SEL_NO of
+	1:
+			 OP140_ATEQ1_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ1_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ1_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+	2:
+			 OP140_ATEQ2_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ2_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ2_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	3:       
+			 OP140_ATEQ3_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ3_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ3_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	4:
+	
+				 OP140_ATEQ4_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ4_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ4_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	5:			
+				 OP140_ATEQ5_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ5_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ5_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+			  
+	6:
+	
+				OP140_ATEQ6_Manual_Start:=OP140_ATEQ_Start;
+			  OP140_ATEQ6_Reset:=OP140_ATEQ_Reset;
+			  OP140_ATEQ6_Manual_Prog_No:=OP140_ATEQ_Prog_No;
+	
+END_CASE
+IF OP140_AutoSelected THEN
+   OP140_ATEQ_Start:=FALSE	;
+   OP140_ATEQ1_Manual_Start:=FALSE;
+   OP140_ATEQ2_Manual_Start:=FALSE;
+   OP140_ATEQ3_Manual_Start:=FALSE;
+   OP140_ATEQ4_Manual_Start:=FALSE;
+   OP140_ATEQ5_Manual_Start:=FALSE;
+   OP140_ATEQ6_Manual_Start:=FALSE;
+END_IF
+
+//ATEQ Manual Actuation
+ OP140_ATEQ1_FB(
+	AutoSelected:=OP140_AutoSelected , 
+	ManualSelected:=OP140_ManualSelected  , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:=OP140_ATEQ1_Auto_Start, 
+	Erroractive:=OP140_ErrorActive , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ1_Manual_Prog_No , 
+	Auto_Prog_No:=OP140_ATEQ1_Auto_Prog_No_out , 
+	Testpass:= I140_LK_TST_1_PASI703_3, 
+	Testfail:=I140_LK_TST_1_FLI703_4 , 
+	Reffail:=I140_LK_TST_1_REF_PRT_FLI703_5 , 
+	Alarm:=I140_LK_TST_1_WARNGI703_6 , 
+	Endofcycle:=I140_LK_TST_1_END_CYCI703_7,
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST1_STRT_Q700_1 , 
+	ResetOP=>O140_LK_TST1_RST_Q700_0 , 
+	
+	Receive_String := Ateq_Comm_Prog.sReceived_Data_All[1] ,
+	result_Ateq=> OP140_ATEQ1_Result,
+	Prg_num=> OP140_ATEQ1_Prgrm_Num,	
+    status=> OP140_ATEQ1_Status,
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST1_SEL1_Q700_2 , 
+	ProgSel2=>O140_LK_TST1_SEL2_Q700_3 , 
+	ProgSel3=> O140_LK_TST1_SEL3_Q700_4, 
+	ProgSel4=> O140_LK_TST1_SEL4_Q700_5, 
+	ProgSel5=>O140_LK_TST1_SEL5_Q700_6 , 
+	ProgSel6=> O140_LK_TST1_SEL6_Q700_7, 
+	ProgSel7=>O140_LK_TST1_SEL7_Q701_0 , 
+	ProgSel8=>,
+	Result_Completed:=OP140_ATEQ1_ResultCompleted ,
+    ResultOK  :=OP140_ATEQ1_ResultOK , 
+	ResultNOK := OP140_ATEQ1_ResultNOK );
+
+//ATEQ 2
+
+OP140_ATEQ2_FB(
+	AutoSelected:=OP140_AutoSelected , 
+	ManualSelected:=OP140_ManualSelected  , 
+	Manual_Start:= OP140_ATEQ2_Manual_Start , 
+	Auto_Start:=  OP140_ATEQ2_Auto_Start, 
+	Erroractive:=OP140_ErrorActive , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ2_Manual_Prog_No , 
+	Auto_Prog_No:=OP140_ATEQ2_Auto_Prog_No_out , 
+	Testpass:= I140_LK_TST_2_PASI704_1, 
+	Testfail:=I140_LK_TST_2_FLI704_2 , 
+	Reffail:=I140_LK_TST_2_REF_PRT_FLI704_3 , 
+	Alarm:=I140_LK_TST_2_WARNGI704_4 , 
+	Endofcycle:=I140_LK_TST_2_END_CYCI704_5,
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST2_STRT_Q701_2 , 
+	ResetOP=>O140_LK_TST2_RST_Q701_1 ,  
+	Receive_String := Ateq_Comm_Prog.sReceived_Data_All[2] ,
+	result_Ateq=> OP140_ATEQ2_Result,
+	Prg_num=> OP140_ATEQ2_Prgrm_Num,	
+    status=> OP140_ATEQ2_Status,	
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST2_SEL1_Q701_3 , 
+	ProgSel2=>O140_LK_TST2_SEL2_Q701_4 , 
+	ProgSel3=> O140_LK_TST2_SEL3_Q701_5, 
+	ProgSel4=> O140_LK_TST2_SEL4_Q701_6, 
+	ProgSel5=>O140_LK_TST2_SEL5_Q701_7 , 
+	ProgSel6=> O140_LK_TST2_SEL6_Q702_0, 
+	ProgSel7=>O140_LK_TST2_SEL7_Q702_1 , 
+	ProgSel8=>,
+	Result_Completed:=OP140_ATEQ2_ResultCompleted ,
+    ResultOK:=OP140_ATEQ2_ResultOK , 
+	ResultNOK:= OP140_ATEQ2_ResultNOK );
+//ATEQ 3
+
+OP140_ATEQ3_FB(
+	AutoSelected:=OP140_AutoSelected , 
+	ManualSelected:=OP140_ManualSelected  , 
+	Manual_Start:= OP140_ATEQ3_Manual_Start , 
+	Auto_Start:= OP140_ATEQ3_Auto_Start , 
+	Erroractive:=OP140_ErrorActive , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ3_Manual_Prog_No , 
+	Auto_Prog_No:=OP140_ATEQ3_Auto_Prog_No_out , 
+	Testpass:= I140_LK_TST_3_PASI706_1, 
+	Testfail:=I140_LK_TST_3_FLI706_2 , 
+	Reffail:=I140_LK_TST_3_REF_PRT_FLI706_3 , 
+	Alarm:=I140_LK_TST_3_WARNGI706_4 ,
+	Endofcycle:=I140_LK_TST_3_END_CYCI706_5, 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST3_STRT_Q702_3 , 
+	ResetOP=>O140_LK_TST3_RST_Q702_2 , 
+	
+	Receive_String := Ateq_Comm_Prog.sReceived_Data_All[3] ,
+	result_Ateq=> OP140_ATEQ3_Result,
+	Prg_num=> OP140_ATEQ3_Prgrm_Num,	
+    status=> OP140_ATEQ3_Status,	
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST3_SEL1_Q702_4 , 
+	ProgSel2=>O140_LK_TST3_SEL2_Q702_5 , 
+	ProgSel3=> O140_LK_TST3_SEL3_Q702_6, 
+	ProgSel4=> O140_LK_TST3_SEL4_Q702_7, 
+	ProgSel5=>O140_LK_TST3_SEL5_Q703_0 , 
+	ProgSel6=> O140_LK_TST3_SEL6_Q703_1, 
+	ProgSel7=>O140_LK_TST3_SEL7_Q703_2 , 
+	ProgSel8=>,
+	Result_Completed:=OP140_ATEQ3_ResultCompleted ,
+    ResultOK:=OP140_ATEQ3_ResultOK , 
+	ResultNOK:= OP140_ATEQ3_ResultNOK );
+
+
+	//ATEQ 4
+	
+OP140_ATEQ4_FB(
+	AutoSelected:=OP140_AutoSelected , 
+	ManualSelected:=OP140_ManualSelected , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:= OP140_ATEQ4_Auto_Start, 
+	Erroractive:=OP140_ErrorActive , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ4_Manual_Prog_No , 
+	Auto_Prog_No:= OP140_ATEQ4_Auto_Prog_No_out, 
+	Testpass:= I140_LK_TST_4_PASI707_1, 
+	Testfail:=I140_LK_TST_4_FLI707_2 , 
+	Reffail:=I140_LK_TST_4_REF_PRT_FLI707_3 , 
+	Alarm:=I140_LK_TST_4_WARNGI707_4 , 
+	Endofcycle:=I140_LK_TST_4_END_CYCI707_5,
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST4_STRT_Q703_4 , 
+	ResetOP=>O140_LK_TST4_RST_Q703_3 , 
+	Receive_String := Ateq_Comm_Prog.sReceived_Data_All[4] ,
+	result_Ateq=>OP140_ATEQ4_Result,
+	Prg_num=> OP140_ATEQ4_Prgrm_Num,	
+    status=> OP140_ATEQ4_Status,	
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=>O140_LK_TST4_SEL1_Q703_5 , 
+	ProgSel2=>O140_LK_TST4_SEL2_Q703_6 , 
+	ProgSel3=> O140_LK_TST4_SEL3_Q703_7, 
+	ProgSel4=> O140_LK_TST4_SEL4_Q704_0, 
+	ProgSel5=>O140_LK_TST4_SEL5_Q704_1 , 
+	ProgSel6=> O140_LK_TST4_SEL6_Q704_2, 
+	ProgSel7=>O140_LK_TST4_SEL7_Q704_3 , 
+	ProgSel8=>,
+	Result_Completed:=OP140_ATEQ4_ResultCompleted,
+    ResultOK:=OP140_ATEQ4_ResultOK , 
+	ResultNOK:= OP140_ATEQ4_ResultNOK );
+	
+	
+	//ATEQ 5
+	
+OP140_ATEQ5_FB(
+	AutoSelected:=OP140_AutoSelected , 
+	ManualSelected:=OP140_ManualSelected  , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:=OP140_ATEQ5_Auto_Start , 
+	Erroractive:=OP140_ErrorActive , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ5_Manual_Prog_No , 
+	Auto_Prog_No:=OP140_ATEQ5_Auto_Prog_No_out , 
+	Testpass:= I140_LK_TST_5_PASI709_3, 
+	Testfail:=I140_LK_TST_5_FLI709_4 , 
+	Reffail:=I140_LK_TST_5_REF_PRT_FLI709_5 , 
+	Alarm:=I140_LK_TST_5_WARNGI709_6 ,
+	Endofcycle:=I140_LK_TST_5_END_CYCI709_7,
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST5_STRT_Q704_5 , 
+	ResetOP=>O140_LK_TST5_RST_Q704_4 ,  
+	Receive_String := Ateq_Comm_Prog.sReceived_Data_All[5] ,
+	result_Ateq=>OP140_ATEQ5_Result,
+	Prg_num=>  OP140_ATEQ5_Prgrm_Num,	
+    status=>  OP140_ATEQ5_Status,	
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=> O140_LK_TST5_SEL1_Q704_6 , 
+	ProgSel2=> O140_LK_TST5_SEL2_Q704_7 , 
+	ProgSel3=> O140_LK_TST5_SEL3_Q705_0, 
+	ProgSel4=> O140_LK_TST5_SEL4_Q705_1, 
+	ProgSel5=> O140_LK_TST5_SEL5_Q705_2 , 
+	ProgSel6=> O140_LK_TST5_SEL6_Q705_3, 
+	ProgSel7=> O140_LK_TST5_SEL7_Q705_4 , 
+	ProgSel8=> ,
+	Result_Completed:=OP140_ATEQ5_ResultCompleted,
+    ResultOK:=OP140_ATEQ5_ResultOK , 
+	ResultNOK:= OP140_ATEQ5_ResultNOK );
+
+	//ATEQ 6
+	
+OP140_ATEQ6_FB(
+	AutoSelected:=OP140_AutoSelected , 
+	ManualSelected:=OP140_ManualSelected  , 
+	Manual_Start:= OP140_ATEQ1_Manual_Start , 
+	Auto_Start:=OP140_ATEQ6_Auto_Start , 
+	Erroractive:=OP140_ErrorActive , 
+	Start:= , 
+	Reset:=OP140_ATEQ_Reset  , 
+	Manual_Prog_No:=  OP140_ATEQ6_Manual_Prog_No , 
+	Auto_Prog_No:=OP140_ATEQ6_Auto_Prog_No_out , 
+	Testpass:= I140_LK_TST_6_PASI710_1, 
+	Testfail:=I140_LK_TST_6_FLI710_2 , 
+	Reffail:=I140_LK_TST_6_REF_PRT_FLI710_3 , 
+	Alarm:=I140_LK_TST_6_WARNGI710_4 ,
+	Endofcycle:=I140_LK_TST_6_END_CYCI710_5, 
+	StartRSTDly:= , 
+	StartOP=>O140_LK_TST6_STRT_Q705_6 , 
+	ResetOP=>O140_LK_TST6_RST_Q705_5 , 
+	Receive_String := Ateq_Comm_Prog.sReceived_Data_All[6] ,
+	result_Ateq=>OP140_ATEQ6_Result,
+	Prg_num=>  OP140_ATEQ6_Prgrm_Num,	
+    status=>   OP140_ATEQ6_Status,	
+	Error1=> , 
+	Error2=> , 
+	Error3=> , 
+	ProgSel1=> O140_LK_TST6_SEL1_Q705_7 , 
+	ProgSel2=> O140_LK_TST6_SEL2_Q706_0 , 
+	ProgSel3=> O140_LK_TST6_SEL3_Q706_1, 
+	ProgSel4=> O140_LK_TST6_SEL4_Q706_2, 
+	ProgSel5=> O140_LK_TST6_SEL5_Q706_3 , 
+	ProgSel6=> O140_LK_TST6_SEL6_Q706_4, 
+	ProgSel7=> O140_LK_TST6_SEL7_Q706_5 , 
+	ProgSel8=>,
+	Result_Completed:= OP140_ATEQ6_ResultCompleted,
+    ResultOK:=OP140_ATEQ6_ResultOK , 
+	ResultNOK:= OP140_ATEQ6_ResultNOK                                               );]]></ST>
+    </Implementation>
+    <LineIds Name="op140_ateq_fb">
+      <LineId Id="6" Count="34" />
+      <LineId Id="319" Count="0" />
+      <LineId Id="321" Count="5" />
+      <LineId Id="320" Count="0" />
+      <LineId Id="41" Count="20" />
+      <LineId Id="63" Count="15" />
+      <LineId Id="301" Count="1" />
+      <LineId Id="79" Count="20" />
+      <LineId Id="102" Count="14" />
+      <LineId Id="303" Count="0" />
+      <LineId Id="307" Count="1" />
+      <LineId Id="118" Count="20" />
+      <LineId Id="140" Count="15" />
+      <LineId Id="310" Count="1" />
+      <LineId Id="309" Count="0" />
+      <LineId Id="156" Count="20" />
+      <LineId Id="179" Count="15" />
+      <LineId Id="313" Count="1" />
+      <LineId Id="195" Count="18" />
+      <LineId Id="215" Count="2" />
+      <LineId Id="220" Count="15" />
+      <LineId Id="315" Count="1" />
+      <LineId Id="236" Count="20" />
+      <LineId Id="259" Count="14" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="317" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -10,13 +10,19 @@ VAR_INPUT
 	bMoveVelocity 		 : BOOL;
 	bHalt				 : BOOL;//Stop Absolute or Relative movement
 	bManualMode			 : BOOL;
+	bmove_home			 : BOOL;
 	fHomePos 			 : LREAL := 0.0;
 	fOverride 			 : LREAL ;//:= 100.0;
 	fTargetPosition 	 : LREAL ;//:=  10.0;
 	fTargetVelocity 	 : LREAL ; //:= 100.0;
 	fAcc				 : LREAL; //:= 100.0;
 	fDec				 : LREAL; //:= 100.0;
+	Servo_High_Limit	 : LREAL;
+	Servo_Low_Limit	 	 : LREAL;
+	WARNING_LIMIT		 : LREAL;
 	Safe_move_Conditions : BOOL;
+	LIMIT_BYPASS		 : BOOL := TRUE;
+	TORQUE_APPLIED: LREAL;
 END_VAR
 VAR_IN_OUT
 	Axis 				: AXIS_REF;
@@ -48,7 +54,7 @@ VAR_OUTPUT
 	Actual_position		: LREAL;
 	Actual_velocity		: LREAL;
 	Actual_Torque		: LREAL;
-	
+    SERVO_LIMIT_WARNING	: BOOL;	
 	
 END_VAR
 VAR
@@ -113,6 +119,12 @@ VAR
 	act: BOOL;
 	id: UDINT;
 	AXIS_REF_TEMP: BOOL;
+	
+	LEG_LIMIT: BOOL;
+	POS_LIMIT: BOOL;
+	AUTO_TARGET_POSITION: LREAL;
+	MANUAL_TARGET_POSITION: LREAL;
+	ABS_BUSY: R_TRIG;
 END_VAR
 VAR_TEMP
  	//tmpVelocityDirection		: MC_Direction;
@@ -289,7 +301,7 @@ END_IF
 								END_IF
 	ENUM_Axis.Ready			: 	//Wait for command
 								bAxisInPosition := FALSE;
-								bHomeDone := FALSE;
+								//bHomeDone := FALSE;
 								bSetPositionDone := FALSE;
 								IF bInit THEN
 									iSchritt := ENUM_Axis.Init;
@@ -321,6 +333,7 @@ END_IF
 	ENUM_Axis.Homing		://Homing
 								IF NOT fbAxisHome.Busy THEN
 									bAxisHomeExecute := TRUE;
+									bHomeDone		:= FALSE;
 								END_IF;
 								IF bInit THEN
 									bAxisHomeExecute 	:= FALSE;
@@ -332,7 +345,7 @@ END_IF
 									bAxisHomeExecute:= FALSE;
 									iSchritt := ENUM_Axis.Error;
 								ELSIF fbAxisHome.Done THEN
-									bHomeDone := TRUE;
+									bHomeDone	:= TRUE;
 									bHome := FALSE;
 									stManualModeAxis.homing:= FALSE;
 									bAxisHomeExecute:= FALSE;
@@ -566,10 +579,10 @@ END_IF;
 
 
 IF bManualMode THEN
-	fHMTargetPosition:= stManualModeAxis.targetPositon;
+	fHMTargetPosition:= MANUAL_TARGET_POSITION;
 	fHMTargetVelocity:= stManualModeAxis.targetVelocity;
 ELSE
-	fHMTargetPosition:=fTargetPosition;
+	fHMTargetPosition:=AUTO_TARGET_POSITION;
 	fHMTargetVelocity:=fTargetVelocity;
 END_IF
 
@@ -612,8 +625,8 @@ fbAxisSetPosition(
 
 fbAxisJog(
 	Axis:= Axis, 
-	JogForward:=bAxisJogExecutePos , 
-	JogBackwards:= bAxisJogExecuteNeg, 
+	JogForward:=bAxisJogExecutePos AND (POS_LIMIT OR LIMIT_BYPASS),
+	JogBackwards:= bAxisJogExecuteNeg AND (LEG_LIMIT OR LIMIT_BYPASS),
 	//Mode:= MC_JOGMODE_STANDARD_SLOW, //MC_JOGMODE_STANDARD_SLOW, //MC_JOGMODE_STANDARD_FAST, //MC_JOGMODE_CONTINOUS, //MC_JOGMODE_INCHING, //MC_JOGMODE_INCHING_MODULO
 	//Position:= 0, 
 	Velocity:= stManualModeAxis.targetVelocity, 
@@ -644,7 +657,15 @@ fbAxisMoveAbsolute(
 	Error=> , 
 	ErrorID=> );
 
-bABS_Pos_done:=NOT (bABS_done);//fbAxisMoveAbsolute.Done;
+	ABS_BUSY(CLK:= bABS_done, Q=> );
+	IF ABS_BUSY.Q THEN
+	bABS_Pos_done			:= FALSE;	
+	END_IF
+	IF fbAxisMoveAbsolute.Done THEN
+	bABS_Pos_done			:= TRUE;	
+	END_IF
+	
+	
 	
 fbAxisMoveRelative(
 	Axis:= Axis, 
@@ -708,8 +729,8 @@ fbAxisTorqueControl	(
 	Axis:= Axis , 
 	Execute:=bAxisMoveTorqueExecute , 
 	Relative:= , 
-	Torque:= 2 , 
-	TorqueRamp:= 1, 
+	Torque:= TORQUE_APPLIED, 
+	TorqueRamp:= 50, 
 	VelocityLimitHigh:= 500, 
 	VelocityLimitLow:= -500, 
 	BufferMode:= , 
@@ -809,19 +830,75 @@ END_IF
 	END_CASE
 ELSE
 	moving_home:=0;
-END_IF*)	
+END_IF*)
 
 Actual_position:=stManualModeAxis.actualPosition;
 Actual_velocity:=stManualModeAxis.actualVelocity;
 
 
-bAxisEnabled:= NOT bAxisError AND fbAxisPower.Status;]]></ST>
+bAxisEnabled:= NOT bAxisError AND fbAxisPower.Status;
+
+//############################################################
+
+
+IF NOT LIMIT_BYPASS THEN
+
+IF (stManualModeAxis.actualPosition>=Servo_Low_Limit) THEN
+	LEG_LIMIT			:= TRUE;
+ELSE	
+	LEG_LIMIT			:= FALSE;
+END_IF;
+
+IF stManualModeAxis.actualPosition<=Servo_High_Limit THEN
+	POS_LIMIT			:= TRUE;	
+ELSE
+	POS_LIMIT			:= FALSE;
+END_IF
+ 
+IF (fTargetPosition<=Servo_High_Limit) AND (fTargetPosition>=Servo_Low_Limit) THEN
+	AUTO_TARGET_POSITION:=fTargetPosition;
+ELSIF (fTargetPosition>=Servo_High_Limit)THEN
+	AUTO_TARGET_POSITION:=Servo_High_Limit;
+ELSIF (fTargetPosition<=Servo_Low_Limit) AND (fTargetPosition<=Servo_High_Limit) THEN
+	AUTO_TARGET_POSITION:=Servo_Low_Limit;	
+END_IF
+
+IF (stManualModeAxis.targetPositon<=Servo_High_Limit) AND (stManualModeAxis.targetPositon>=Servo_Low_Limit) THEN
+	MANUAL_TARGET_POSITION:=stManualModeAxis.targetPositon;
+ELSIF (stManualModeAxis.targetPositon>=Servo_High_Limit)THEN
+	MANUAL_TARGET_POSITION:=Servo_High_Limit;
+ELSIF (stManualModeAxis.targetPositon<=Servo_Low_Limit) AND (stManualModeAxis.targetPositon<=Servo_High_Limit) THEN
+	MANUAL_TARGET_POSITION:=Servo_Low_Limit;	
+END_IF
+
+IF (stManualModeAxis.actualPosition-WARNING_LIMIT)<=Servo_Low_Limit AND (stManualModeAxis.actualPosition+WARNING_LIMIT)<=Servo_High_Limit THEN
+	SERVO_LIMIT_WARNING	:= TRUE;
+ELSE
+	SERVO_LIMIT_WARNING	:= FALSE;	
+END_IF
+
+ELSE	
+	AUTO_TARGET_POSITION			:=fTargetPosition;
+	MANUAL_TARGET_POSITION			:=stManualModeAxis.targetPositon;
+END_IF]]></ST>
     </Implementation>
     <LineIds Name="FB_Axis_FESTO">
-      <LineId Id="3" Count="690" />
+      <LineId Id="3" Count="199" />
+      <LineId Id="1031" Count="0" />
+      <LineId Id="203" Count="10" />
+      <LineId Id="1030" Count="0" />
+      <LineId Id="215" Count="278" />
+      <LineId Id="901" Count="0" />
+      <LineId Id="495" Count="29" />
+      <LineId Id="1161" Count="0" />
+      <LineId Id="525" Count="0" />
+      <LineId Id="1162" Count="0" />
+      <LineId Id="1164" Count="2" />
+      <LineId Id="1169" Count="1" />
+      <LineId Id="1167" Count="1" />
+      <LineId Id="527" Count="174" />
+      <LineId Id="861" Count="38" />
       <LineId Id="2" Count="0" />
-      <LineId Id="813" Count="1" />
-      <LineId Id="812" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

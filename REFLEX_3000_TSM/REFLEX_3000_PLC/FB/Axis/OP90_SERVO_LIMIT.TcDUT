@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="OP90_SERVO_LIMIT" Id="{becdac57-bd53-41c3-bd88-1c31506d12ff}">
+    <Declaration><![CDATA[TYPE OP90_SERVO_LIMIT :
+STRUCT
+OP90_HORZ_POS_LIMIT					: LREAL;
+OP90_HORZ_NEG_LIMIT                 : LREAL;
+OP90_LH_VERT_POS_LIMIT              : LREAL;
+OP90_LH_VERT_NEG_LIMIT              : LREAL;
+OP90_RH_VERT_POS_LIMIT              : LREAL;
+OP90_RH_VERT_NEG_LIMIT              : LREAL;
+OP90_GUIDE_POS_LIMIT                : LREAL;
+OP90_GUIDE_NEG_LIMIT                : LREAL;
+OP90_LH_ROTRY_POS_LIMIT				: LREAL;
+OP90_LH_ROTRY_NEG_LIMIT             : LREAL;
+OP90_RH_ROTRY_POS_LIMIT				: LREAL;
+OP90_RH_ROTRY_NEG_LIMIT             : LREAL;
+OP90_A_HORZ_VELOCITY				: LREAL;
+OP90_A_LH_VERT_VELOCITY             : LREAL;
+OP90_A_RH_VERT_VELOCITY             : LREAL;
+OP90_A_GUIDE_VELOCITY               : LREAL;
+OP90_A_LH_ROTRY_VELOCITY			: LREAL;
+OP90_A_RH_ROTRY_VELOCITY			: LREAL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

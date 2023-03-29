@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="FB_Keyence_Laser_Steuerung" Id="{35d9ba3b-f1a2-431d-9581-5a944661b827}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Keyence_Laser_Steuerung
+VAR_INPUT
+	//Kommunikationsdaten Laser IN
+	//stMachineStatus 						: ST_KeyenceLaser_Machine_Status;
+	//stFunctionStatus 						: ST_KeyenceLaser_Function_Status;
+	//stCompletionStatus 						: ST_KeyenceLaser_Completion_Status;
+	//stErrorStatus							: ST_KeyenceLaser_ErrorStatus;
+	//stErrorCodes							: ST_KeyenceLaser_Error_Codes;
+	//stOperateParametere						: ST_KeyenceLaser_Operate_Parameter;
+	//stTwoDCodeReadResult					: ST_KeyenceLaser_TwoD_Code_Read_Result;
+	//Count_Result_Data_Count_Result_Data 	: DWORD;
+	//Result_Data_128byte_Result_Data 		: STRING[128];
+	
+	
+//communication laser IN	
+	// machine status
+	stGeneralStatus										: ST_KeyenceLaser_General_Status;
+	stIOStatus											: ST_KeyenceLaser_IO_Status;
+	stRunningStatus										: ST_KeyenceLaser_Running_Status;
+	                                            
+	// function status                          
+	stFunctionStatus									: ST_KeyenceLaser_Function_Status_I;
+	stControlStatus										: ST_KeyenceLaser_Control_Status;
+	                                            
+	// completion status                        
+	stGeneralRequestCompletionStatus					: ST_KeyenceLaser_General_Request_Completion_Status;
+	stEditRequestCompletionStatus						: ST_KeyenceLaser_Edit_Request_Completion_Status;
+	stOperationRequestCompletionStatus					: ST_KeyenceLaser_Operation_Request_Completion_Status;
+	stBlockEditRequestCompletionStatus					: ST_KeyenceLaser_Block_Edit_Request_Completion_Status;
+	stCommandRequestCompletionStatus					: ST_KeyenceLaser_Command_Request_Completion_Status;
+	                                            
+	// Error Status                             
+	stGeneralRequestErrorStatus							: ST_KeyenceLaser_General_Request_Error_Status;
+	stEditRequestErrorStatus							: ST_KeyenceLaser_Edit_Request_Error_Status;
+	stOperationRequestErrorStatus						: ST_KeyenceLaser_Operation_Request_Error_Status;
+	stBlockEditRequestErrorStatus						: ST_KeyenceLaser_Block_Edit_Request_Error_Status;
+	stCommandRequestError								: ST_KeyenceLaser_Command_Request_Error;
+	                                            
+	// error code                               
+	iErrorCode0											: UINT;
+	iErrorCode1											: UINT;
+	                                            
+	// operate parametere                       
+	iCurrentProgramNumber								: UINT;
+	iCounterNumber										: UINT;
+	iCounterValue										: UDINT;
+	iRankValue											: UINT;
+	                                            
+	// 2D code read result                      
+	iISOIECTR29158Grade									: UINT;
+	iTwoDCCodeResultUpdateCount							: UINT;
+	                                            
+	// count result data                        
+	iPrintCount											: UDINT;
+	                                            
+	// result data 128byte                      
+	iResultDataSizet									: UINT;
+	aResultData											: ARRAY [0..127] OF BYTE;
+	
+	bLasermarking_Start 					: BOOL := 0;
+//Allgemeine Signale in
+	bClear_Error							: BOOL := 0;
+	
+	
+	iProgramNr 								: UDINT;
+	iBlockNr 								: UDINT;
+	sText 									: STRING;
+	bSafetyOK								: BOOL;
+END_VAR
+VAR_IN_OUT
+	//Trigger_Laser start
+	bProgramChange_Start 					: BOOL := 0;
+	bBlockChange_Start 						: BOOL := 0;
+END_VAR
+VAR_OUTPUT
+	//Kommunikationsdaten Laser OUT
+	//stGeneralRequest						: ST_KeyenceLaser_General_Request;
+	//stFunctionRequest						: ST_KeyenceLaser_Function_Request;
+	//stRequestCompletionClear				: ST_KeyenceLaser_Request_Completion_Clear;
+	//Request_Parameter_Request_No			: DWORD;
+	//Request_Data_128byte_Request_Data 	: STRING[128];
+	
+//communication laser OUT	
+	
+	// general request
+	stGeneralRequest									: ST_KeyenceLaser_General_Request_I;
+	stEditRequest										: ST_KeyenceLaser_Edit_Request;
+	stOperatingRequest									: ST_KeyenceLaser_Operating_Request;
+	stBlockEditRequest									: ST_KeyenceLaser_Block_Edit_Request;
+	stCommandRequest									: ST_KeyenceLaser_Command_Request;
+	                                            
+	// function request                         
+	stFunctionRequest									: ST_KeyenceLaser_Function_Request_I;
+	                                            
+	//  request completion clear                
+	stGeneralRequestCompletionClear						: ST_KeyenceLaser_General_Request_Completion_Clear;
+	stEditRequestCompletionClear						: ST_KeyenceLaser_Edit_Request_Completion_Clear;
+	stOperatingRequestCompletionClear					: ST_KeyenceLaser_Operating_Request_Completion_Clear;
+	stBlockEditRequestCompletionClear					: ST_KeyenceLaser_Block_Edit_Request_Completion_Clear;
+	stCommandRequestCompletionClear						: ST_KeyenceLaser_Command_Request_Completion_Clear;
+	                                            
+	// request parameter                        
+	                                            
+	iparameter											: UDINT;
+	                                            
+	// request data 128byte                     
+	                                            
+	iUserDataSize										: UINT;
+	aUserData											: ARRAY [0..127] OF BYTE;
+	nTemp									: WORD;
+	nTemp2ByteSwaped						: WORD;
+
+	
+//Allgemeine Signale out
+	bError									: BOOL := 0;
+	bLaserMarking_finished					: BOOL := 0;
+	bLaserMarking_failed 					: BOOL := 0;
+	bProgChangeComplete 					: BOOL := 0;
+	bBlockChangeComplete					: BOOL := 0;
+	bLaserReady								: BOOL := 0;	
+	bTXTSM_Laser_not_ready					: BOOL := 0;
+	bTXTSM_Laser_Error						: BOOL := 0;
+END_VAR
+
+VAR
+	RProgramChange							: R_Trig;
+	TONProgramChange						: TON;
+	RTONProgramChange						: R_Trig;
+	RProgramChangeComplete					: R_Trig;
+	TPProgramChangeComplete					: TP;
+	FNrogramChangeComplete					: F_Trig;
+	
+	RBlockChange							: R_Trig;
+	TONBlockChange							: TON;
+	RTONBlockChange							: R_Trig;
+	RBlockChangeComplete					: R_Trig;
+	TPBlockChangeComplete					: TP;
+	FNlockChangeComplete					: F_Trig;
+	bHMFPReset								: BOOL;
+	R_LaserStart							: R_TRIG;
+END_VAR
+VAR_TEMP
+	bFPReset								: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//#########################################################################
+//ErrorReset###############################################################
+//#########################################################################
+
+bError := stGeneralStatus.Error_Status;
+IF stGeneralStatus.Error_Status AND bClear_Error THEN
+	stGeneralRequest.Error_Clear_Request := TRUE;
+ELSE	
+	stGeneralRequest.Error_Clear_Request := FALSE;
+END_IF;
+
+
+
+//#########################################################################
+//Ausgabe Fehlermeldungen##################################################
+//#########################################################################
+
+bTXTSM_Laser_not_ready := NOT stGeneralStatus.Ready_Status AND bSafetyOK;
+bTXTSM_Laser_Error	 := (stCommandRequestError.Command_Request_Error
+						OR 	stOperationRequestErrorStatus.Counter_Down_Error
+						OR stOperationRequestErrorStatus.Counter_Number_Change_Error
+						OR stOperationRequestErrorStatus.Counter_Reset_Error
+						OR stOperationRequestErrorStatus.Counter_Up_Error
+						OR stOperationRequestErrorStatus.Counter_Value_Change_Error
+						OR stOperationRequestErrorStatus.Program_Change_error
+						OR stOperationRequestErrorStatus.Rank_Value_Change
+						OR stGeneralRequestErrorStatus.Print_Error
+						OR stGeneralRequestErrorStatus.Guide_Print_Error
+						OR stGeneralRequestErrorStatus.Error_Clear_Error
+						OR stGeneralRequestErrorStatus.Print_Stop_Error
+						OR stGeneralRequestErrorStatus.TwoDC_Read_Error
+						OR stEditRequestErrorStatus.Edit_Error
+						OR stBlockEditRequestErrorStatus.Character_String_Change_Error
+						OR stBlockEditRequestErrorStatus.Character_String_Printed_Read_Error
+						OR stBlockEditRequestErrorStatus.Character_String_Setting_Read_Error
+						OR stCommandRequestError.Command_Request_Error
+						OR iErrorCode0 <> 0
+						OR iErrorCode1 <> 0
+						)
+						AND bSafetyOK;
+
+IF bTXTSM_Laser_not_ready OR bTXTSM_Laser_Error THEN
+bLasermarking_finished := FALSE; //stCompletionStatus.Marking_Complete; //über Ablauf setzen!!!
+bLaserMarking_failed := FALSE; //über Ablauf setzen!!!
+END_IF
+
+// cancel program change 
+
+IF NOT bProgramChange_Start THEN
+stOperatingRequest.Program_Change_Request:= FALSE;
+bProgChangeComplete:= FALSE;
+END_IF
+
+
+
+// activate program change 
+
+RProgramChange(CLK:= bProgramChange_Start 
+				AND NOT bBlockChange_Start
+				AND NOT stOperatingRequest.Program_Change_Request
+				AND NOT	stBlockEditRequest.Character_String_Change_Request,
+				Q=> );
+
+IF RProgramChange.Q THEN
+iparameter:= (iProgramNr);
+END_IF
+
+	
+TONProgramChange(IN:= bProgramChange_Start
+					AND NOT bBlockChange_Start
+					AND NOT stOperatingRequest.Program_Change_Request
+					AND NOT	stBlockEditRequest.Character_String_Change_Request, 
+					PT:=T#10MS ,
+					Q=> , ET=> );
+					
+RTONProgramChange(CLK:=TONProgramChange.Q , Q=> );		
+
+IF RTONProgramChange.Q THEN
+	stOperatingRequest.Program_Change_Request:= TRUE;
+END_IF
+
+
+// complete program change
+
+RProgramChangeComplete(CLK:= stOperationRequestCompletionStatus.PROGRAM_Change_Complete , Q=> );
+
+stOperatingRequestCompletionClear.Program_Change_Complete_Clear:= RProgramChangeComplete.Q AND stOperatingRequest.Program_Change_Request;
+
+
+IF RProgramChangeComplete.Q AND stOperatingRequest.Program_Change_Request THEN
+	stOperatingRequest.Program_Change_Request:= FALSE;
+END_IF
+
+TPProgramChangeComplete(IN:= RProgramChangeComplete.Q , PT:= T#1MS, Q=> , ET=> );
+
+FNrogramChangeComplete(CLK:= TPProgramChangeComplete.Q, Q=> );
+
+IF FNrogramChangeComplete.Q THEN
+	bProgramChange_Start:= FALSE;
+	bProgChangeComplete:=TRUE;
+END_IF
+
+
+
+// cancel block change 
+
+IF NOT bBlockChange_Start THEN
+	stBlockEditRequest.Character_String_Change_Request:= FALSE;
+	bBlockChangeComplete:= FALSE;
+END_IF
+
+// activate block change 
+
+
+RBlockChange(CLK:= bBlockChange_Start 
+				AND NOT bProgramChange_Start
+				AND NOT stOperatingRequest.Program_Change_Request
+				AND NOT	stBlockEditRequest.Character_String_Change_Request,
+				Q=> );
+
+IF RBlockChange.Q THEN
+iparameter:= iBlockNr;
+nTemp := INT_TO_WORD(LEN(STR:=sText));
+////Test 1
+//nTemp2ByteSwaped := ROL(nTemp,8);
+//MEMCPY(destAddr:=ADR(aUserData) , srcAddr:=ADR(nTemp2ByteSwaped) , n:=SIZEOF(nTemp) );
+//MEMCPY(destAddr:=ADR(aUserData)+SIZEOF(nTemp) , srcAddr:=ADR(sText) , n:=SIZEOF(sText) );
+
+iUserDataSize := WORD_TO_UINT(nTemp);
+MEMCPY(destAddr:=ADR(aUserData), srcAddr:=ADR(sText) , n:=SIZEOF(sText) );
+
+END_IF
+
+	
+TONBlockChange(IN:= bBlockChange_Start
+					AND NOT bProgramChange_Start
+					AND NOT stOperatingRequest.Program_Change_Request
+					AND NOT	stBlockEditRequest.Character_String_Change_Request, 
+					PT:=T#10MS ,
+					Q=> , ET=> );
+					
+RTONBlockChange(CLK:=TONBlockChange.Q , Q=> );		
+
+IF RTONBlockChange.Q THEN
+	stBlockEditRequest.Character_String_Change_Request:= TRUE;
+END_IF
+
+
+// complete block change
+
+RBlockChangeComplete(CLK:= stBlockEditRequestCompletionStatus.Character_String_Change_Complete , Q=> );
+
+stBlockEditRequestCompletionClear.Character_String_Change_Complete_Clear:= RBlockChangeComplete.Q AND stBlockEditRequest.Character_String_Change_Request;
+
+
+IF RBlockChangeComplete.Q AND stBlockEditRequest.Character_String_Change_Request THEN
+	stBlockEditRequest.Character_String_Change_Request:= FALSE;
+END_IF
+
+TPBlockChangeComplete(IN:= RBlockChangeComplete.Q , PT:= T#1MS, Q=> , ET=> );
+
+FNlockChangeComplete(CLK:= TPBlockChangeComplete.Q, Q=> );
+
+IF FNlockChangeComplete.Q THEN
+	bBlockChange_Start:= FALSE;
+	bBlockChangeComplete:=TRUE;
+END_IF
+
+
+
+// start marking
+
+stGeneralRequest.Print_Start_Request:= bLasermarking_Start;
+
+R_LaserStart(CLK:=bLasermarking_Start);
+
+IF R_LaserStart.Q THEN
+	bLaserMarking_finished:= FALSE;
+END_IF
+// Laser ready
+
+bLaserReady:= stGeneralStatus.Ready_Status;
+
+// Output complete Marking
+
+IF stGeneralRequestCompletionStatus.Marking_Complete_2 THEN
+	bLasermarking_Start:= FALSE;
+	bLaserMarking_finished:= TRUE;
+END_IF	
+IF stRunningStatus.Print_Busy_Status THEN
+ 	bLaserMarking_finished:= FALSE;
+END_IF
+
+// reset error
+bFPReset:= bClear_Error AND NOT bHMFPReset;
+bHMFPReset:= bClear_Error;
+
+stGeneralRequest.Error_Clear_Request:=bFPReset;
+
+
+// Marking failed
+bLaserMarking_failed:= (bLasermarking_Start AND (bTXTSM_Laser_not_ready OR bTXTSM_Laser_Error)) OR stGeneralRequestErrorStatus.Print_Error;
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Keyence_Laser_Steuerung">
+      <LineId Id="3" Count="172" />
+      <LineId Id="348" Count="1" />
+      <LineId Id="351" Count="0" />
+      <LineId Id="350" Count="0" />
+      <LineId Id="176" Count="4" />
+      <LineId Id="183" Count="3" />
+      <LineId Id="346" Count="0" />
+      <LineId Id="187" Count="3" />
+      <LineId Id="192" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

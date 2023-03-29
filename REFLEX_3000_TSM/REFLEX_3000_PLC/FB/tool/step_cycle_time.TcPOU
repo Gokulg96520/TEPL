@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="step_cycle_time" Id="{46974e5c-4bc4-416f-b768-dfa95fcf8553}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK step_cycle_time
+VAR_INPUT
+step_numbers            :ARRAY [1..20] OF INT ;
+auto_step_no            :INT;
+END_VAR
+
+VAR_OUTPUT
+step_time               : ARRAY [1..20] OF UDINT;	
+END_VAR
+
+VAR
+help_var                : ARRAY [1..20] OF BOOL;
+step_startTime			: ARRAY [1..20] OF ULINT;
+step_time_seq           : INT:=10;
+Time_diff               : ARRAY [1..20] OF UDINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+(*IF step_numbers[j] <> auto_step_no THEN
+		IF step_numbers[j] = auto_step_no THEN
+   			help_var := TRUE;	
+   			IF help_var THEN
+	  			 step_startTime[j]:= F_GetSystemTime();
+				 j:=j+1;
+				 help_var:=0;	 
+   			END_IF
+		ELSE
+			j:=j+1;
+		END_IF
+END_IF	*)
+
+CASE step_time_seq OF
+
+10:	IF step_numbers[1] = auto_step_no THEN
+   help_var[1] := TRUE;	
+   IF help_var[1] THEN
+	   step_startTime[1]:= F_GetSystemTime();
+	   step_time_seq:=20;
+   END_IF
+END_IF
+
+20:IF step_numbers[2] = auto_step_no THEN
+   help_var[2] := TRUE;	
+   IF help_var[2] THEN
+	   step_startTime[2]:= F_GetSystemTime();
+	    step_time_seq:=30;
+   END_IF
+END_IF
+
+30:IF step_numbers[3] = auto_step_no THEN
+   help_var[3] := TRUE;	
+   IF help_var[3] THEN
+	   step_startTime[3]:= F_GetSystemTime();
+	    step_time_seq:=40;
+   END_IF
+END_IF
+
+40:IF step_numbers[4] = auto_step_no THEN
+   help_var[4] := TRUE;	
+   IF help_var[4] THEN
+	   step_startTime[4]:= F_GetSystemTime();
+	    step_time_seq:=50;
+   END_IF
+END_IF
+
+50:IF step_numbers[5] = auto_step_no THEN
+   help_var[5] := TRUE;	
+   IF help_var[5] THEN
+	   step_startTime[5]:= F_GetSystemTime();
+	    step_time_seq:=60;
+   END_IF
+END_IF
+
+60:IF step_numbers[6] = auto_step_no THEN
+   help_var[6] := TRUE;	
+   IF help_var[6] THEN
+	   step_startTime[6]:= F_GetSystemTime();
+	    step_time_seq:=70;
+   END_IF
+END_IF
+
+70:IF step_numbers[7] = auto_step_no THEN
+   help_var[7] := TRUE;	
+   IF help_var[7] THEN
+	   step_startTime[7]:= F_GetSystemTime();
+	    step_time_seq:=80;
+   END_IF
+END_IF
+
+80:IF step_numbers[8] = auto_step_no THEN
+   help_var[8] := TRUE;	
+   IF help_var[8] THEN
+	   step_startTime[8]:= F_GetSystemTime();
+	    step_time_seq:=90;
+   END_IF
+END_IF
+
+90:IF step_numbers[9] = auto_step_no THEN
+   help_var[9] := TRUE;	
+   IF help_var[9] THEN
+	  step_startTime[9]:= F_GetSystemTime();
+	   step_time_seq:=100;
+   END_IF
+END_IF
+
+100:IF step_numbers[10] = auto_step_no THEN
+   help_var[10] := TRUE;	
+   IF help_var[10] THEN
+	   step_startTime[10]:= F_GetSystemTime();
+	    step_time_seq:=200;
+   END_IF
+END_IF
+
+200 :IF step_numbers[10] <> auto_step_no THEN
+   help_var[11] := TRUE;	
+   IF help_var[11] THEN
+	   step_startTime[11]:= F_GetSystemTime();
+	    step_time_seq:=0;
+   END_IF
+END_IF
+END_CASE
+
+///// time update ///////
+ 
+Time_diff[1] := ULINT_TO_UDINT(step_startTime[2]-step_startTime[1])/10000;
+Time_diff[2] := ULINT_TO_UDINT(step_startTime[3]-step_startTime[2])/10000; 
+Time_diff[3] := ULINT_TO_UDINT(step_startTime[4]-step_startTime[3])/10000;
+Time_diff[4] := ULINT_TO_UDINT(step_startTime[5]-step_startTime[4])/10000;
+Time_diff[5] := ULINT_TO_UDINT(step_startTime[6]-step_startTime[5])/10000;
+Time_diff[6] := ULINT_TO_UDINT(step_startTime[7]-step_startTime[6])/10000;
+Time_diff[7] := ULINT_TO_UDINT(step_startTime[8]-step_startTime[7])/10000;
+Time_diff[8] := ULINT_TO_UDINT(step_startTime[9]-step_startTime[8])/10000;
+Time_diff[9] := ULINT_TO_UDINT(step_startTime[10]-step_startTime[9])/10000;
+Time_diff[10] := ULINT_TO_UDINT(step_startTime[11]-step_startTime[10])/10000;
+
+step_time := Time_diff;]]></ST>
+    </Implementation>
+    <LineIds Name="step_cycle_time">
+      <LineId Id="252" Count="11" />
+      <LineId Id="250" Count="0" />
+      <LineId Id="238" Count="0" />
+      <LineId Id="267" Count="1" />
+      <LineId Id="170" Count="3" />
+      <LineId Id="239" Count="0" />
+      <LineId Id="174" Count="6" />
+      <LineId Id="240" Count="0" />
+      <LineId Id="181" Count="6" />
+      <LineId Id="242" Count="0" />
+      <LineId Id="188" Count="6" />
+      <LineId Id="243" Count="0" />
+      <LineId Id="195" Count="6" />
+      <LineId Id="244" Count="0" />
+      <LineId Id="202" Count="6" />
+      <LineId Id="245" Count="0" />
+      <LineId Id="209" Count="6" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="216" Count="6" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="223" Count="6" />
+      <LineId Id="248" Count="0" />
+      <LineId Id="230" Count="6" />
+      <LineId Id="249" Count="0" />
+      <LineId Id="237" Count="0" />
+      <LineId Id="168" Count="0" />
+      <LineId Id="280" Count="6" />
+      <LineId Id="279" Count="0" />
+      <LineId Id="169" Count="0" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="294" Count="0" />
+      <LineId Id="269" Count="1" />
+      <LineId Id="272" Count="5" />
+      <LineId Id="287" Count="0" />
+      <LineId Id="162" Count="0" />
+      <LineId Id="296" Count="0" />
+      <LineId Id="295" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

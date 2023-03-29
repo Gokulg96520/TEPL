@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Operation_Request_Completion_Status" Id="{a528706d-c5da-4d1b-bc7b-e0b8efe55dbc}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Operation_Request_Completion_Status :
+STRUCT
+Program_Change_Complete				: BIT;
+Ranke_Value_Change_Complete			: BIT;
+Counter_Number_Change_Complete		: BIT;
+Counter_Value_Change_Complete		: BIT;
+Counter_Up_Complete					: BIT;
+Counter_Down_Complete				: BIT;
+Counter_Reset_Complete				: BIT;
+Reserve								: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

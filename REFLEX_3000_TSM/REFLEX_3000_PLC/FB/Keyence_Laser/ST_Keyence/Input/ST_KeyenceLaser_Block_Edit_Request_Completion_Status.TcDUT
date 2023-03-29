@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Block_Edit_Request_Completion_Status" Id="{d00f8679-a2a5-4a5d-acd3-fa0e11c56a7f}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Block_Edit_Request_Completion_Status :
+STRUCT
+Character_String_Setting_Read_Complete			: BIT;
+Character_String_Printed_Read_Complete			: BIT;
+Character_String_Change_Complete				: BIT;
+Reserve_0										: BIT;
+Reserve_1										: BIT;
+Reserve_2										: BIT;
+Reserve_3										: BIT;
+Reserve_4										: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

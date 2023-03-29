@@ -45,6 +45,7 @@ RTRIG_SetRestart:					R_TRIG;
 Head_1_InData: 						ARRAY [0..63] OF BYTE;
 Head_1_OutData:						ARRAY [0..63] OF BYTE;
 Watchdog1:							TON;
+temp								: BOOL;
 
 END_VAR
 ]]></Declaration>
@@ -497,13 +498,14 @@ IF IO_b_InitFinish THEN
                 END_IF;
             END_IF;
     END_CASE;
+	
+	
 END_IF;
 
 (* ***** Watchdog ***** *)
-Watchdog1(IN := Head1.TimeoutActive,
-           PT := I_T_Timeout);
+//Watchdog1(IN := Head1.TimeoutActive,PT := I_T_Timeout);
 
-IF Watchdog1.Q THEN
+IF (Watchdog1.Q AND temp) THEN
     Head1.TimeoutActive := FALSE;
     Head1.TimeoutOccurred := TRUE;
     Head1.SendOK := FALSE;
@@ -518,14 +520,17 @@ IF Watchdog1.Q THEN
     O_b_Head1Busy := FALSE;
     Head1.Done := TRUE;
     O_b_Head1Done := TRUE;
-END_IF;
+END_IF
 
 
 
 ]]></ST>
     </Implementation>
     <LineIds Name="FB_RFID">
-      <LineId Id="3" Count="472" />
+      <LineId Id="3" Count="447" />
+      <LineId Id="523" Count="1" />
+      <LineId Id="451" Count="3" />
+      <LineId Id="456" Count="19" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

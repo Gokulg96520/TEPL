@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP90_SERVO" Id="{d9ed4b47-3168-4358-aa57-e7142d77cbd2}" SpecialFunc="None">
+  <POU Name="OP90_SERVO" Id="{fb0eff0d-0bde-423e-88f7-6df657181ba9}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP90_SERVO
 VAR
 // STRING
@@ -15,50 +15,39 @@ VAR
 	FESTO_NOT_NEED						: BOOL;
 	Conv_Contrl: BOOL;
 	Conv_Contrl1: BOOL;
+	OP90_LH_ROTARY_STUTS: STRING;
+	OP90_RH_ROTARY_STUTS: STRING;
 END_VAR
 
 VAR PERSISTENT
-// LREAL
-	OP90_SRV_HORZ_WRK_MM				: LREAL;
-	OP90_SRV_HORZ_HME_MM				: LREAL;
-	OP90_SRV_VERT_LH_HME_MM				: LREAL;
-	OP90_SRV_VERT_LH_PCKWRK_MM			: LREAL;
-    OP90_SRV_VERT_LH_SPLCWRK_MM         : LREAL;
-    OP90_SRV_VERT_LH_PLCWRK_MM          : LREAL;
-	OP90_SRV_VERT_RH_HME_MM				: LREAL;
-	OP90_SRV_VERT_RH_PCKWRK_MM		    : LREAL;
-    OP90_SRV_VERT_RH_SPLCWRK_MM         : LREAL;
-    OP90_SRV_VERT_RH_PLCWRK_MM          : LREAL;
-	OP90_STP_ROTRY_LH_HME_MM			: LREAL;
-	OP90_STP_ROTRY_RH_HME_MM			: LREAL;
-	OP90_STP_ROTRY_LH_WRK_MM			: LREAL;
-	OP90_STP_ROTRY_RH_WRK_MM            : LREAL;
 	
-	
-	
-	
+
+	OP90_HORZ_WRK_SPD					: LREAL;
+	OP90_HORZ_HME_SPD					: LREAL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[//////////////////////////////////////OP90_HORZ WRK_HOME///////////////////////////////////
-IF OP90_A_SRV_HORZ_WRK AND OP90_SRV_LH_VRT_HME_FB AND OP90_SRV_RH_VRT_HME_FB THEN
+IF OP90_A_SRV_HORZ_WRK AND NOT OP90_A_SRV_HORZ_HME AND OP90_SRV_LH_VRT_HME_FB AND OP90_SRV_RH_VRT_HME_FB THEN
 	OP90_SRV_HORZ_CNTRL.ABSmove_Start		:= TRUE;
 	OP90_SRV_HORZ_CNTRL.Position			:= OP90_SRV_HORZ_WRK_MM ;
+	OP90_SRV_LIMIT.OP90_A_HORZ_VELOCITY		:= OP90_HORZ_WRK_SPD;
 IF OP90_SRV_HORZ_WRK_FB THEN
 	OP90_A_SRV_HORZ_WRK						:= FALSE;
 	OP90_SRV_HORZ_CNTRL.ABSmove_Start		:= FALSE;
 END_IF
 END_IF
 
-IF OP90_A_SRV_HORZ_HME AND OP90_SRV_LH_VRT_HME_FB AND OP90_SRV_RH_VRT_HME_FB THEN
+IF OP90_A_SRV_HORZ_HME AND NOT OP90_A_SRV_HORZ_WRK AND OP90_SRV_LH_VRT_HME_FB AND OP90_SRV_RH_VRT_HME_FB THEN
 	OP90_SRV_HORZ_CNTRL.ABSmove_Start		:= TRUE;
 	OP90_SRV_HORZ_CNTRL.Position			:= OP90_SRV_HORZ_HME_MM ;
+	OP90_SRV_LIMIT.OP90_A_HORZ_VELOCITY		:= OP90_HORZ_HME_SPD;
 IF OP90_SRV_HORZ_HME_FB THEN
 	OP90_A_SRV_HORZ_HME						:= FALSE;
 	OP90_SRV_HORZ_CNTRL.ABSmove_Start		:= FALSE;
 END_IF
 END_IF
 /////////////////////////////////////////OP90_LH VRT HMR WRK///////////////////////////////
-IF OP90_A_SRV_LHVERT_HME THEN
+IF OP90_A_SRV_LHVERT_HME AND NOT OP90_A_SRV_LHVERT_PCKWRK AND NOT OP90_A_SRV_LHVERT_SPLCWRK AND NOT OP90_A_SRV_LHVERT_PLCWRK THEN
 	OP90_SRV_LH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_LH_VERT_CNTRL.Position			:= OP90_SRV_VERT_LH_HME_MM ;
 IF OP90_SRV_LH_VRT_HME_FB THEN
@@ -67,34 +56,34 @@ IF OP90_SRV_LH_VRT_HME_FB THEN
 END_IF
 END_IF
 
-IF OP90_A_SRV_LHVERT_PCKWRK THEN
+IF OP90_A_SRV_LHVERT_PCKWRK AND NOT OP90_A_SRV_LHVERT_HME AND NOT OP90_A_SRV_LHVERT_SPLCWRK AND NOT OP90_A_SRV_LHVERT_PLCWRK THEN
 	OP90_SRV_LH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_LH_VERT_CNTRL.Position			:= OP90_SRV_VERT_LH_PCKWRK_MM ;
-IF OP90_SRV_LH_VRT_HME_FB THEN
+IF OP90_SRV_LH_VRT_PCKWRK_FB THEN
 	OP90_A_SRV_LHVERT_PCKWRK				:= FALSE;
 	OP90_SRV_LH_VERT_CNTRL.ABSmove_Start	:= FALSE;
 END_IF
 END_IF
 
-IF OP90_A_SRV_LHVERT_SPLCWRK THEN
+IF OP90_A_SRV_LHVERT_SPLCWRK AND NOT OP90_A_SRV_LHVERT_HME AND NOT OP90_A_SRV_LHVERT_PCKWRK AND NOT OP90_A_SRV_LHVERT_PLCWRK THEN
 	OP90_SRV_LH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_LH_VERT_CNTRL.Position			:= OP90_SRV_VERT_LH_SPLCWRK_MM ;
-IF OP90_SRV_LH_VRT_HME_FB THEN
+IF OP90_SRV_LH_VRT_SPLCWRK_FB THEN
 	OP90_SRV_LH_VERT_CNTRL.ABSmove_Start	:= FALSE;
 	OP90_A_SRV_LHVERT_SPLCWRK				:= FALSE;
 END_IF
 END_IF
 
-IF OP90_A_SRV_LHVERT_PLCWRK THEN
+IF OP90_A_SRV_LHVERT_PLCWRK AND NOT OP90_A_SRV_LHVERT_HME AND NOT OP90_A_SRV_LHVERT_PCKWRK AND NOT OP90_A_SRV_LHVERT_SPLCWRK THEN
 	OP90_SRV_LH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_LH_VERT_CNTRL.Position			:= OP90_SRV_VERT_LH_PLCWRK_MM ;
-IF OP90_SRV_LH_VRT_HME_FB THEN
+IF OP90_SRV_LH_VRT_PLCWRK_FB THEN
 	OP90_SRV_LH_VERT_CNTRL.ABSmove_Start	:= FALSE;
 	OP90_A_SRV_LHVERT_PLCWRK				:= FALSE;
 END_IF
 END_IF
 //////////////////////////////////////OP90_RH VRT HMR WRK//////////////////////////////////////////////
-IF OP90_A_SRV_RHVERT_HME THEN
+IF OP90_A_SRV_RHVERT_HME AND NOT OP90_A_SRV_RHVERT_PCKWRK AND NOT OP90_A_SRV_RHVERT_SPLCWRK AND NOT OP90_A_SRV_RHVERT_PLCWRK THEN
 	OP90_SRV_RH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_RH_VERT_CNTRL.Position			:= OP90_SRV_VERT_RH_HME_MM ;
 IF OP90_SRV_RH_VRT_HME_FB THEN
@@ -103,28 +92,28 @@ IF OP90_SRV_RH_VRT_HME_FB THEN
 END_IF
 END_IF
 
-IF OP90_A_SRV_RHVERT_PCKWRK THEN
+IF OP90_A_SRV_RHVERT_PCKWRK AND NOT OP90_A_SRV_RHVERT_HME AND NOT OP90_A_SRV_RHVERT_SPLCWRK AND NOT OP90_A_SRV_RHVERT_PLCWRK THEN
 	OP90_SRV_RH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_RH_VERT_CNTRL.Position			:= OP90_SRV_VERT_RH_PCKWRK_MM ;
-IF OP90_SRV_RH_VRT_HME_FB THEN
+IF OP90_SRV_RH_VRT_PCKWRK_FB THEN
 	OP90_SRV_RH_VERT_CNTRL.ABSmove_Start	:= FALSE;
 	OP90_A_SRV_RHVERT_PCKWRK				:= FALSE;
 END_IF
 END_IF
 
-IF OP90_A_SRV_RHVERT_SPLCWRK THEN
+IF OP90_A_SRV_RHVERT_SPLCWRK AND NOT OP90_A_SRV_RHVERT_HME AND NOT OP90_A_SRV_RHVERT_PCKWRK AND NOT OP90_A_SRV_RHVERT_PLCWRK THEN
 	OP90_SRV_RH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_RH_VERT_CNTRL.Position			:= OP90_SRV_VERT_RH_SPLCWRK_MM ;
-IF OP90_SRV_RH_VRT_HME_FB THEN
+IF OP90_SRV_RH_VRT_SPLCWRK_FB THEN
 	OP90_SRV_RH_VERT_CNTRL.ABSmove_Start	:= FALSE;
 	OP90_A_SRV_RHVERT_SPLCWRK				:= FALSE;
 END_IF
 END_IF
 
-IF OP90_A_SRV_RHVERT_PLCWRK THEN
+IF OP90_A_SRV_RHVERT_PLCWRK AND NOT OP90_A_SRV_RHVERT_HME AND NOT OP90_A_SRV_RHVERT_PCKWRK AND NOT OP90_A_SRV_RHVERT_SPLCWRK THEN
 	OP90_SRV_RH_VERT_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_SRV_RH_VERT_CNTRL.Position			:= OP90_SRV_VERT_RH_PLCWRK_MM ;
-IF OP90_SRV_RH_VRT_HME_FB THEN
+IF OP90_SRV_RH_VRT_PLCWRK_FB THEN
 	OP90_SRV_RH_VERT_CNTRL.ABSmove_Start	:= FALSE;
 	OP90_A_SRV_RHVERT_PLCWRK				:= FALSE;
 END_IF
@@ -132,7 +121,7 @@ END_IF
 
 ///////////////////////////////OP90 ROTARY STEPPER HME WRK///////////////////////////////////////////
 
-IF OP90_A_SRV_LH_ROTRY_HME THEN
+IF OP90_A_SRV_LH_ROTRY_HME AND NOT OP90_A_SRV_LH_ROTRY_WRK THEN
 	OP90_STP_LH_ROTRY_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_STP_LH_ROTRY_CNTRL.Position		:= OP90_STP_ROTRY_LH_HME_MM;
 IF OP90_STP_LH_ROTY_HME_FB THEN
@@ -141,7 +130,7 @@ IF OP90_STP_LH_ROTY_HME_FB THEN
 END_IF
 END_IF
 
-IF OP90_A_SRV_LH_ROTRY_WRK THEN
+IF OP90_A_SRV_LH_ROTRY_WRK AND NOT OP90_A_SRV_LH_ROTRY_HME THEN
 	OP90_STP_LH_ROTRY_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_STP_LH_ROTRY_CNTRL.Position		:= OP90_STP_ROTRY_LH_WRK_MM;
 IF OP90_STP_LH_ROTY_WRK_FB THEN
@@ -150,7 +139,7 @@ IF OP90_STP_LH_ROTY_WRK_FB THEN
 END_IF
 END_IF
 
-IF OP90_A_SRV_RH_ROTRY_HME THEN
+IF OP90_A_SRV_RH_ROTRY_HME AND NOT OP90_A_SRV_RH_ROTRY_WRK THEN
 	OP90_STP_RH_ROTRY_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_STP_RH_ROTRY_CNTRL.Position		:= OP90_STP_ROTRY_RH_HME_MM;
 IF OP90_STP_RH_ROTY_HME_FB THEN
@@ -159,7 +148,7 @@ IF OP90_STP_RH_ROTY_HME_FB THEN
 END_IF
 END_IF
 
-IF OP90_A_SRV_RH_ROTRY_WRK THEN
+IF OP90_A_SRV_RH_ROTRY_WRK AND NOT OP90_A_SRV_RH_ROTRY_HME THEN
 	OP90_STP_RH_ROTRY_CNTRL.ABSmove_Start	:= TRUE;
 	OP90_STP_RH_ROTRY_CNTRL.Position		:= OP90_STP_ROTRY_RH_WRK_MM;
 IF OP90_STP_RH_ROTY_WRK_FB THEN
@@ -172,9 +161,12 @@ END_IF
 // FEEDBACK CONDITION
 
 OP90_SRV_HORZ_HME_FB					:= OP90_SRV_HORZ_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_HORZ_STATUS.actualPosition, setvalue:=OP90_SRV_HORZ_HME_MM , tolerance:=0.2 );
+OP90_SRV_HORZ_ZERO_FB					:= OP90_SRV_HORZ_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_HORZ_STATUS.actualPosition, setvalue:=0, tolerance:=0.2 );
 OP90_SRV_HORZ_WRK_FB                    := OP90_SRV_HORZ_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_HORZ_STATUS.actualPosition, setvalue:=OP90_SRV_HORZ_WRK_MM , tolerance:=0.2 );
 OP90_SRV_LH_VRT_HME_FB                  := OP90_SRV_LH_VERT_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_LH_VERT_STATUS.actualPosition, setvalue:=OP90_SRV_VERT_LH_HME_MM , tolerance:=0.2 );
+OP90_SRV_LH_VRT_ZERO_FB                 := OP90_SRV_LH_VERT_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_LH_VERT_STATUS.actualPosition, setvalue:=0, tolerance:=0.2 );
 OP90_SRV_RH_VRT_HME_FB                  := OP90_SRV_RH_VERT_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_RH_VERT_STATUS.actualPosition, setvalue:=OP90_SRV_VERT_RH_HME_MM , tolerance:=0.2 );
+OP90_SRV_RH_VRT_ZERO_FB                 := OP90_SRV_RH_VERT_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_RH_VERT_STATUS.actualPosition, setvalue:=0, tolerance:=0.2 );
 OP90_SRV_LH_VRT_PCKWRK_FB               := OP90_SRV_LH_VERT_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_LH_VERT_STATUS.actualPosition, setvalue:=OP90_SRV_VERT_LH_PCKWRK_MM , tolerance:=0.2 );
 OP90_SRV_RH_VRT_PCKWRK_FB               := OP90_SRV_RH_VERT_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_RH_VERT_STATUS.actualPosition, setvalue:=OP90_SRV_VERT_RH_PCKWRK_MM , tolerance:=0.2 );
 OP90_SRV_LH_VRT_SPLCWRK_FB              := OP90_SRV_LH_VERT_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_SRV_LH_VERT_STATUS.actualPosition, setvalue:=OP90_SRV_VERT_LH_SPLCWRK_MM , tolerance:=0.2 );
@@ -185,26 +177,31 @@ OP90_STP_LH_ROTY_HME_FB					:= OP90_STP_LH_ROTRY_CNTRL.Axis_In_Pos AND In_Range(
 OP90_STP_LH_ROTY_WRK_FB					:= OP90_STP_LH_ROTRY_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_STP_LH_ROTRY_STATUS.actualPosition, setvalue:=OP90_STP_ROTRY_LH_WRK_MM , tolerance:=0.2 );; 
 OP90_STP_RH_ROTY_HME_FB                 := OP90_STP_RH_ROTRY_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_STP_RH_ROTRY_STATUS.actualPosition, setvalue:=OP90_STP_ROTRY_RH_HME_MM , tolerance:=0.2 );; 
 OP90_STP_RH_ROTY_WRK_FB                 := OP90_STP_RH_ROTRY_CNTRL.Axis_In_Pos AND In_Range(value:=OP90_STP_RH_ROTRY_STATUS.actualPosition, setvalue:=OP90_STP_ROTRY_RH_WRK_MM , tolerance:=0.2 );; 
-OP90_MOVER_SAFE							:= (OP90_SRV_LH_VERT_CNTRL.Axis_In_Pos AND (OP90_SRV_LH_VRT_HME_FB OR OP90_SRV_LH_VRT_SPLCWRK_FB)) AND (*AND  HORZ CYLINDER BACK*)
-											(OP90_SRV_RH_VERT_CNTRL.Axis_In_Pos AND (OP90_SRV_RH_VRT_HME_FB OR OP90_SRV_RH_VRT_SPLCWRK_FB)); 
+OP90_VERT_SRV_SAFE_ZONE					:=(OP90_SRV_VERT_LH_HME_MM<OP90_SRV_LH_VERT_STATUS.actualPosition AND OP90_SRV_LH_VERT_STATUS.actualPosition<OP90_SRV_VERT_LH_SPLCWRK_MM AND 
+											OP90_SRV_VERT_RH_HME_MM<OP90_SRV_RH_VERT_STATUS.actualPosition AND OP90_SRV_RH_VERT_STATUS.actualPosition<OP90_SRV_VERT_RH_SPLCWRK_MM ); 	
+
                                            
 ////////////////////////////FUNCTIONAL BLOCK/////////////////////////////
 
 OP90_SRV_HORZ(
 	bAxis1_Ref_Switch:= , 
 	bInit:= OP90_BLCK_INITZ, 
-	bErrorReset:= MACHINE_RST OR Servo_Reset, 
-	bEnable:=Servo_Enable , //AND NOT OP90_ERROR_ACTIVE, 
+	bErrorReset:= Servo_Reset , 														// ERROR RESET
+	bEnable:= Servo_Enable,
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= MACHINE_MANUAL OR MANUAL_SELECTED, 
+	bManualMode:= OP90_MANUAL_SELECTED, 
 	fHomePos:= , 
 	fOverride:= , 
 	fTargetPosition:= OP90_SRV_HORZ_CNTRL.Position, 
-	fTargetVelocity:= , 
+	fTargetVelocity:= OP90_SRV_LIMIT.OP90_A_HORZ_VELOCITY,
 	fAcc:= , 
-	fDec:= , 
-	Safe_move_Conditions:=Servo_Safety, 
+	fDec:= ,
+	Servo_High_Limit:=OP90_SRV_LIMIT.OP90_HORZ_POS_LIMIT,	
+	Servo_Low_Limit:=OP90_SRV_LIMIT.OP90_HORZ_NEG_LIMIT,	 	
+	WARNING_LIMIT:=1, 
+	Safe_move_Conditions:=Servo_Safety,
+	TORQUE_APPLIED := , 
 	Axis:= OP90_SRVO_HORZ, 
 	bHome:= OP90_SRV_HORZ_CNTRL.Axis_Home_Cmd, 
 	bSetPosition:= FESTO_NOT_NEED , 
@@ -234,18 +231,22 @@ OP90_SRV_HORZ(
 OP90_SRV_LH_VERT(
 	bAxis1_Ref_Switch:= , 
 	bInit:=  OP90_BLCK_INITZ, 
-	bErrorReset:= MACHINE_RST OR Servo_Reset, 
-	bEnable:=Servo_Enable AND  NOT OP90_ERROR_ACTIVE , 
+	bErrorReset:= Servo_Reset, 
+	bEnable:= Servo_Enable, 
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= MANUAL_SELECTED , 
+	bManualMode:= OP90_MANUAL_SELECTED, 
 	fHomePos:= , 
 	fOverride:= , 
 	fTargetPosition:= OP90_SRV_LH_VERT_CNTRL.Position	, 
-	fTargetVelocity:= , 
+	fTargetVelocity:= OP90_SRV_LIMIT.OP90_A_LH_VERT_VELOCITY, 
 	fAcc:= , 
-	fDec:= , 
-	Safe_move_Conditions:=Servo_Safety, 
+	fDec:= ,
+	Servo_High_Limit:= OP90_SRV_LIMIT.OP90_LH_VERT_POS_LIMIT,	
+	Servo_Low_Limit:=OP90_SRV_LIMIT.OP90_LH_VERT_NEG_LIMIT,	 	
+	WARNING_LIMIT:=1, 
+	Safe_move_Conditions:=Servo_Safety,
+	TORQUE_APPLIED := , 
 	Axis:= OP90_SRVO_LH_VERT, 
 	bHome:= OP90_SRV_LH_VERT_CNTRL.Axis_Home_Cmd, 
 	bSetPosition:= FESTO_NOT_NEED , 
@@ -270,24 +271,28 @@ OP90_SRV_LH_VERT(
 	bABS_Pos_done=>  OP90_SRV_LH_VERT_CNTRL.Axis_In_Pos, 
 	Actual_position=> , 
 	Actual_velocity=> , 
-	Actual_Torque=> );
+	Actual_Torque=> OP90_SRV_LH_VERT_CNTRL.Actual_Torque);
 	
 	
 OP90_SRV_RH_VERT(
 	bAxis1_Ref_Switch:= , 
 	bInit:=  OP90_BLCK_INITZ, 
-	bErrorReset:= MACHINE_RST OR Servo_Reset, 
-	bEnable:=Servo_Enable AND  NOT OP90_ERROR_ACTIVE, 
+	bErrorReset:= Servo_Reset, 
+	bEnable:= Servo_Enable, 
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= MACHINE_MANUAL OR MANUAL_SELECTED , 
+	bManualMode:=OP90_MANUAL_SELECTED , 
 	fHomePos:= , 
 	fOverride:= , 
 	fTargetPosition:= OP90_SRV_RH_VERT_CNTRL.Position, 
-	fTargetVelocity:= , 
+	fTargetVelocity:= OP90_SRV_LIMIT.OP90_A_RH_VERT_VELOCITY, 
 	fAcc:= , 
-	fDec:= , 
-	Safe_move_Conditions:=Servo_Safety , 
+	fDec:= ,
+	Servo_High_Limit:= OP90_SRV_LIMIT.OP90_RH_VERT_POS_LIMIT,	
+	Servo_Low_Limit:=OP90_SRV_LIMIT.OP90_RH_VERT_NEG_LIMIT,	 	
+	WARNING_LIMIT:=1, 
+	Safe_move_Conditions:=Servo_Safety,
+	TORQUE_APPLIED :=  , 
 	Axis:= OP90_SRVO_RH_VERT, 
 	bHome:= OP90_SRV_RH_VERT_CNTRL.Axis_Home_Cmd, 
 	bSetPosition:= FESTO_NOT_NEED , 
@@ -317,18 +322,22 @@ OP90_SRV_RH_VERT(
 OP90_GUIDE_SERVO(
 	bAxis1_Ref_Switch:= , 
 	bInit:= OP90_BLCK_INITZ, 
-	bErrorReset:= MACHINE_RST OR Servo_Reset, 
-	bEnable:= Servo_Enable AND NOT OP90_ERROR_ACTIVE, 
+	bErrorReset:= Servo_Reset, 
+	bEnable:= Servo_Enable, 
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= MACHINE_MANUAL OR MANUAL_SELECTED, 
+	bManualMode:=OP90_MANUAL_SELECTED, 
 	fHomePos:= , 
 	fOverride:= , 
 	fTargetPosition:= OP90_SERVO_GUIDE_CNTRL.Position, 
-	fTargetVelocity:= , 
+	fTargetVelocity:= OP90_SERVO_GUIDE_CNTRL.Velocity, 
 	fAcc:= , 
-	fDec:= , 
-	Safe_move_Conditions:= Servo_Safety, 
+	fDec:= ,
+	Servo_High_Limit:= OP90_SRV_LIMIT.OP90_GUIDE_POS_LIMIT,	
+	Servo_Low_Limit:=OP90_SRV_LIMIT.OP90_GUIDE_NEG_LIMIT,	 	
+	WARNING_LIMIT:=1, 
+	Safe_move_Conditions:= Servo_Safety,
+	TORQUE_APPLIED := , 
 	Axis:= OP90_GUID_SERV, 
 	bHome:= OP90_SERVO_GUIDE_CNTRL.Axis_Home_Cmd, 
 	bSetPosition:= FESTO_NOT_NEED, 
@@ -337,7 +346,7 @@ OP90_GUIDE_SERVO(
 	bMoveTorque:= NOT_REF, 
 	stManualModeAxis:= OP90_GIUDE_SER_STATUS, 
 	sAxisState=> OP90_SRV_GUID_STOPER_FB, 
-	bAxis_ready=> , 
+	bAxis_ready=>OP90_SERVO_GUIDE_CNTRL.Axis_ready , 
 	bAxisInPosition=> , 
 	bAxisError=> , 
 	bAxisEnabled=> , 
@@ -351,25 +360,29 @@ OP90_GUIDE_SERVO(
 	bsafe_to_move=> , 
 	baxis_in_home_pos=> , 
 	bABS_Pos_done=> OP90_SERVO_GUIDE_CNTRL.Axis_In_Pos, 
-	Actual_position=> , 
-	Actual_velocity=> , 
+	Actual_position=>OP90_SERVO_GUIDE_CNTRL.Actual_Position , 
+	Actual_velocity=>OP90_SERVO_GUIDE_CNTRL.Actual_Velocity , 
 	Actual_Torque=> );
 	
 OP90_LH_SRV_ROTRY(
 	bAxis1_Ref_Switch:= , 
 	bInit:= OP90_BLCK_INITZ, 
-	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bErrorReset:= Servo_Reset, 
 	bEnable:= Servo_Enable, 
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= MACHINE_MANUAL OR MANUAL_SELECTED, 
+	bManualMode:=OP90_MANUAL_SELECTED, 
 	fHomePos:= , 
 	fOverride:= , 
 	fTargetPosition:= OP90_STP_LH_ROTRY_CNTRL.Position, 
-	fTargetVelocity:= , 
+	fTargetVelocity:= OP90_SRV_LIMIT.OP90_A_LH_ROTRY_VELOCITY, 
 	fAcc:= , 
-	fDec:= , 
-	Safe_move_Conditions:= Servo_Safety, 
+	fDec:= ,
+	Servo_High_Limit:= OP90_SRV_LIMIT.OP90_LH_ROTRY_POS_LIMIT,	
+	Servo_Low_Limit:=OP90_SRV_LIMIT.OP90_LH_ROTRY_NEG_LIMIT,	 	
+	WARNING_LIMIT:=1, 
+	Safe_move_Conditions:= Servo_Safety,
+	TORQUE_APPLIED := , 
 	Axis:= OP90_STP_LH_ROTRY, 
 	bHome:= OP90_STP_LH_ROTRY_CNTRL.Axis_Home_Cmd, 
 	bSetPosition:= FESTO_NOT_NEED, 
@@ -377,7 +390,7 @@ OP90_LH_SRV_ROTRY(
 	bMoveRelative:= NOT_REF, 
 	bMoveTorque:= NOT_REF, 
 	stManualModeAxis:= OP90_STP_LH_ROTRY_STATUS, 
-	sAxisState=> , 
+	sAxisState=> OP90_LH_ROTARY_STUTS, 
 	bAxis_ready=> , 
 	bAxisInPosition=>, 
 	bAxisError=> , 
@@ -400,18 +413,22 @@ OP90_LH_SRV_ROTRY(
 OP90_RH_SRV_ROTRY(
 	bAxis1_Ref_Switch:= , 
 	bInit:= OP90_BLCK_INITZ, 
-	bErrorReset:= MACHINE_RST OR Servo_Reset, 
+	bErrorReset:=Servo_Reset, 
 	bEnable:= Servo_Enable, 
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= MACHINE_MANUAL OR MANUAL_SELECTED, 
+	bManualMode:=OP90_MANUAL_SELECTED, 
 	fHomePos:= , 
 	fOverride:= , 
 	fTargetPosition:= OP90_STP_RH_ROTRY_CNTRL.Position, 
-	fTargetVelocity:= , 
+	fTargetVelocity:= OP90_SRV_LIMIT.OP90_A_RH_ROTRY_VELOCITY, 
 	fAcc:= , 
-	fDec:= , 
-	Safe_move_Conditions:= Servo_Safety, 
+	fDec:= ,
+	Servo_High_Limit:= OP90_SRV_LIMIT.OP90_RH_ROTRY_POS_LIMIT,	
+	Servo_Low_Limit:=OP90_SRV_LIMIT.OP90_RH_ROTRY_NEG_LIMIT,	 	
+	WARNING_LIMIT:=1, 
+	Safe_move_Conditions:= Servo_Safety,
+	TORQUE_APPLIED := , 
 	Axis:= OP90_STP_RH_ROTRY, 
 	bHome:= OP90_STP_RH_ROTRY_CNTRL.Axis_Home_Cmd, 
 	bSetPosition:= FESTO_NOT_NEED, 
@@ -419,7 +436,7 @@ OP90_RH_SRV_ROTRY(
 	bMoveRelative:= NOT_REF, 
 	bMoveTorque:= NOT_REF, 
 	stManualModeAxis:= OP90_STP_RH_ROTRY_STATUS, 
-	sAxisState=> , 
+	sAxisState=> OP90_RH_ROTARY_STUTS, 
 	bAxis_ready=> , 
 	bAxisInPosition=>, 
 	bAxisError=> , 
@@ -439,25 +456,27 @@ OP90_RH_SRV_ROTRY(
 	Actual_Torque=> );	
 	
 
-OP90_SRV_LH_CNVY_STATUS.jogPos:=Conv_Contrl1;
-OP90_SRV_RH_CNVY_STATUS.jogNeg:=Conv_Contrl;	
 
 OP90_LH_CNVY(
 	bAxis1_Ref_Switch:= , 
 	bInit:= , 
 	bErrorReset:= Servo_Reset, 
 	bEnable:= Servo_Enable, 
-	bMoveVelocity:= , 
+	bMoveVelocity:=OP90_SRV_LH_CNVY_CNTRL.VELmove_Start , 
 	bHalt:= , 
-	bManualMode:= MANUAL_SELECTED , 
+	bManualMode:=OP90_MANUAL_SELECTED, 
 	fHomePos:= , 
 	fOverride:= , 
-	fTargetPosition:= , 
-	fTargetVelocity:= , 
+	fTargetPosition:=OP90_SRV_LH_CNVY_CNTRL.Position , 
+	fTargetVelocity:=OP90_SRV_LH_CNVY_CNTRL.Velocity , 
 	fAcc:= , 
-	fDec:= , 
+	fDec:= ,
+	LIMIT_BYPASS:=1, 
+	Servo_High_Limit:= 50,	
+	Servo_Low_Limit:=0,	 	
+	WARNING_LIMIT:=1, 
 	Safe_move_Conditions:=Servo_Safety , 
-	Axis:= OP90_SRV_CNVY_LH, 
+	Axis:= OP90_SRV_CNVY_RH, 
 	HME_WRITE_ADD:= 16#5010,	
 	bHome:= OP90_SRV_LH_CNVY_CNTRL.Bsethome, 
 	bSetPosition:= OP90_SRV_LH_CNVY_CNTRL.BsetPos ,
@@ -468,9 +487,9 @@ OP90_LH_CNVY(
 	stManualModeAxis:= OP90_SRV_LH_CNVY_STATUS, 
 	bmove_home:=OP90_SRV_LH_CNVY_CNTRL.Axis_Home_Cmd , 
 	sAxisState=> OP90_SRV_LH_CNVY_CNTRL.Axis_State, 
-	bAxis_ready=> , 
+	bAxis_ready=>OP90_SRV_LH_CNVY_CNTRL.Axis_ready , 
 	bAxisInPosition=> , 
-	bAxisError=> , 
+	bAxisError=> OP90_SRV_LH_CNVY_CNTRL.Axis_Error, 
 	bAxisEnabled=> , 
 	bAxisHomed=> OP90_SRV_LH_CNVY_CNTRL.Axis_reference, 
 	bSetPositionDone=> , 
@@ -491,17 +510,20 @@ OP90_RH_CNVY(
 	bInit:= , 
 	bErrorReset:= Servo_Reset, 
 	bEnable:= Servo_Enable, 
-	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= MANUAL_SELECTED , 
+	bManualMode:= OP90_MANUAL_SELECTED, 
 	fHomePos:= , 
 	fOverride:= , 
-	fTargetPosition:= , 
+	fTargetPosition:= OP90_SRV_RH_CNVY_CNTRL.Position, 
 	fTargetVelocity:= OP90_SRV_RH_CNVY_CNTRL.Velocity, 
 	fAcc:= , 
-	fDec:= , 
+	fDec:= ,
+	LIMIT_BYPASS:=1, 
+	Servo_High_Limit:= 50,	
+	Servo_Low_Limit:=0,	 	
+	WARNING_LIMIT:=1, 
 	Safe_move_Conditions:=Servo_Safety, 
-	Axis:= OP90_SRV_CNVY_RH, 
+	Axis:= OP90_SRV_CNVY_LH, 
 	HME_WRITE_ADD:= 16#5011,	
 	bHome:= OP90_SRV_RH_CNVY_CNTRL.Bsethome, 
 	bSetPosition:= OP90_SRV_RH_CNVY_CNTRL.BsetPos ,
@@ -512,9 +534,9 @@ OP90_RH_CNVY(
 	stManualModeAxis:= OP90_SRV_RH_CNVY_STATUS, 
 	bmove_home:=OP90_SRV_RH_CNVY_CNTRL.Axis_Home_Cmd , 
 	sAxisState=>OP90_SRV_RH_CNVY_CNTRL.Axis_State , 
-	bAxis_ready=> , 
+	bAxis_ready=>OP90_SRV_RH_CNVY_CNTRL.Axis_ready , 
 	bAxisInPosition=> , 
-	bAxisError=> , 
+	bAxisError=> OP90_SRV_RH_CNVY_CNTRL.Axis_Error, 
 	bAxisEnabled=> , 
 	bAxisHomed=> OP90_SRV_RH_CNVY_CNTRL.Axis_reference, 
 	bSetPositionDone=> , 
@@ -530,15 +552,15 @@ OP90_RH_CNVY(
 	Actual_velocity=> , 
 	Actual_Torque=> );
 	
-IF MANUAL_SELECTED THEN
-	OP90_SRV_HORZ_STATUS.targetVelocity:=5;
-	OP90_SRV_LH_VERT_STATUS.targetVelocity:=5;
-	OP90_SRV_RH_VERT_STATUS.targetVelocity:=5;
-	OP90_STP_LH_ROTRY_STATUS.targetVelocity:=5;
-	OP90_STP_RH_ROTRY_STATUS.targetVelocity:=5;
-	OP90_GIUDE_SER_STATUS.targetVelocity:=5;
-	OP90_SRV_LH_CNVY_STATUS.targetVelocity:=100;
-	OP90_SRV_RH_CNVY_STATUS.targetVelocity:=100; 	
+IF OP90_MANUAL_SELECTED THEN
+	OP90_SRV_HORZ_STATUS.targetVelocity:=50;
+	OP90_SRV_LH_VERT_STATUS.targetVelocity:=50;
+	OP90_SRV_RH_VERT_STATUS.targetVelocity:=50;
+	OP90_STP_LH_ROTRY_STATUS.targetVelocity:=50;
+	OP90_STP_RH_ROTRY_STATUS.targetVelocity:=50;
+	OP90_GIUDE_SER_STATUS.targetVelocity:=50;
+	//OP90_SRV_LH_CNVY_STATUS.targetVelocity:=100;
+	//OP90_SRV_RH_CNVY_STATUS.targetVelocity:=100; 	
 END_IF	
 	
 	
@@ -558,23 +580,37 @@ END_IF
 	]]></ST>
     </Implementation>
     <LineIds Name="OP90_SERVO">
-      <LineId Id="3" Count="398" />
-      <LineId Id="623" Count="1" />
-      <LineId Id="402" Count="0" />
-      <LineId Id="626" Count="0" />
-      <LineId Id="403" Count="15" />
+      <LineId Id="3" Count="3" />
+      <LineId Id="680" Count="0" />
+      <LineId Id="7" Count="8" />
+      <LineId Id="682" Count="0" />
+      <LineId Id="16" Count="135" />
+      <LineId Id="585" Count="0" />
       <LineId Id="587" Count="0" />
-      <LineId Id="419" Count="1" />
-      <LineId Id="663" Count="0" />
-      <LineId Id="421" Count="24" />
-      <LineId Id="546" Count="14" />
-      <LineId Id="588" Count="0" />
-      <LineId Id="561" Count="1" />
-      <LineId Id="665" Count="0" />
-      <LineId Id="563" Count="21" />
-      <LineId Id="486" Count="0" />
       <LineId Id="586" Count="0" />
-      <LineId Id="487" Count="24" />
+      <LineId Id="154" Count="5" />
+      <LineId Id="607" Count="0" />
+      <LineId Id="161" Count="13" />
+      <LineId Id="657" Count="0" />
+      <LineId Id="175" Count="43" />
+      <LineId Id="656" Count="0" />
+      <LineId Id="219" Count="44" />
+      <LineId Id="655" Count="0" />
+      <LineId Id="264" Count="43" />
+      <LineId Id="654" Count="0" />
+      <LineId Id="308" Count="43" />
+      <LineId Id="653" Count="0" />
+      <LineId Id="352" Count="30" />
+      <LineId Id="565" Count="0" />
+      <LineId Id="384" Count="12" />
+      <LineId Id="652" Count="0" />
+      <LineId Id="397" Count="25" />
+      <LineId Id="425" Count="15" />
+      <LineId Id="629" Count="0" />
+      <LineId Id="441" Count="37" />
+      <LineId Id="480" Count="7" />
+      <LineId Id="630" Count="0" />
+      <LineId Id="488" Count="57" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP50_Camera_FB" Id="{395ab304-5965-45aa-835a-3e4713da737b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP50_Camera_FB
+VAR
+	OP50_LH_Camera 			          : FB_Cognex_ProfiNET_1;
+
+	OP50_LH_Acquisition_Status AT %I*    :Acquisition_Status;
+	OP50_LH_Inspection_Status  AT %I*    :Inspection_Status;	
+	OP50_LH_Acquisition_ID     AT %I*    :UINT;
+	OP50_LH_Inspection_ID   	 AT %I*  :UINT;
+	OP50_LH_Error_code      	 AT %I*  :UINT;
+	OP50_LH_Current_Job_ID  	 AT %I*  :UINT;
+	OP50_LH_Result_code     	 AT %I*  :UINT;
+	OP50_LH_Cam_Result      	 AT %I*  :ARRAY[0..63] OF BYTE;	
+	OP50_LH_Acquisition_Control AT %Q*  : Acquisition_Control;
+	OP50_LH_Inspection_Control  AT %Q*  : Inspection_Control;
+	OP50_LH_Command_word		AT %Q*  : UINT;
+	OP50_LH_Union                       : UNION_64Byte;
+	OP50_LH_Trigger_OK					: BOOL;
+	
+	OP50_RH_Camera 			          : FB_Cognex_ProfiNET_1;
+	
+	OP50_RH_Acquisition_Status AT %I*    :Acquisition_Status;
+	OP50_RH_Inspection_Status  AT %I*    :Inspection_Status;	
+	OP50_RH_Acquisition_ID     AT %I*    :UINT;
+	OP50_RH_Inspection_ID   	 AT %I*  :UINT;
+	OP50_RH_Error_code      	 AT %I*  :UINT;
+	OP50_RH_Current_Job_ID  	 AT %I*  :UINT;
+	OP50_RH_Result_code     	 AT %I*  :UINT;
+	OP50_RH_Cam_Result      	 AT %I*  :ARRAY[0..63] OF BYTE;	
+	OP50_RH_Acquisition_Control AT %Q*  : Acquisition_Control;
+	OP50_RH_Inspection_Control  AT %Q*  : Inspection_Control;
+	OP50_RH_Command_word		AT %Q*  : UINT;
+	OP50_RH_Union                       : UNION_64Byte;
+	OP50_RH_Trigger_OK					: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP50_LH_Camera (
+	tTimeout:= , 
+	sJob_Name:= , 
+	camera_ready=> OP50_LH_Camera_Ready,
+	Camera_online=> OP50_LH_Camera_Online,
+	stCognex_record_status:=OP50_LH_Acquisition_Status, 
+	Acquisition_ID:=OP50_LH_Acquisition_ID , 
+	stCognex_Inspection_status:=OP50_LH_Inspection_Status, 
+	Error_Code:=OP50_LH_Error_code , 
+	wcommand_control_in:= OP50_LH_Current_Job_ID, 
+	aResults_64_Bytes:= OP50_LH_Cam_Result, 
+	number_of_inspections:=OP50_LH_Inspection_ID , 
+	iresult_code:= OP50_LH_Result_code, 
+	bTarget_job_ID:=OP50_LH_Target_Job_ID , 
+	Error_Status_message=> OP50_LH_Error_status, 
+	bError=> OP50_LH_Camera_Error, 
+	stCognex_record_control=>OP50_LH_Acquisition_Control , 
+	stCognex_inspection_control=>OP50_LH_Inspection_Control , 
+	wCommandControl_out=>OP50_LH_Command_word , 
+	aUser_data_64_Byte=> OP50_LH_Union.aArrayOfByte, 
+	bJob_loading_completed=>OP50_LH_Job_Change_Complete , 
+	bJob_load_failed=>OP50_LH_Job_Change_Error , 
+	bInspection_Result_IO=>  OP50_LH_Trigger_OK, 
+	bInspection_Result_NIO=> , 
+	bTXTSM_Error_Job_Change=> OP50_LH_Job_Change_Error, 
+	bPictureTakenComplete=> OP50_LH_Picture_Taken, 
+	Loaded_Job_ID=>OP50_LH_Loaded_Job_ID	 , 
+	bClear_Error:= HMI_Reset, 
+	bJob_change_start:= OP50_LH_Camera_Job_Change_start, 
+	TXTSM_camera_not_online=>OP50_LH_Camera_Error	 , 
+	bTrigger_start:= OP50_LH_Camera_Trigger );
+	
+OP50_RH_Camera (
+	tTimeout:= , 
+	sJob_Name:= , 
+	camera_ready=> OP50_RH_Camera_Ready,
+	Camera_online=> OP50_RH_Camera_Online,
+	stCognex_record_status:=OP50_RH_Acquisition_Status, 
+	Acquisition_ID:=OP50_RH_Acquisition_ID , 
+	stCognex_Inspection_status:=OP50_RH_Inspection_Status, 
+	Error_Code:=OP50_RH_Error_code , 
+	wcommand_control_in:= OP50_RH_Current_Job_ID, 
+	aResults_64_Bytes:= OP50_RH_Cam_Result, 
+	number_of_inspections:=OP50_RH_Inspection_ID , 
+	iresult_code:= OP50_RH_Result_code, 
+	bTarget_job_ID:=OP50_RH_Target_Job_ID , 
+	Error_Status_message=> OP50_RH_Error_status, 
+	bError=> OP50_RH_Camera_Error, 
+	stCognex_record_control=>OP50_RH_Acquisition_Control , 
+	stCognex_inspection_control=>OP50_RH_Inspection_Control , 
+	wCommandControl_out=>OP50_RH_Command_word , 
+	aUser_data_64_Byte=> OP50_RH_Union.aArrayOfByte, 
+	bJob_loading_completed=>OP50_RH_Job_Change_Complete , 
+	bJob_load_failed=>OP50_RH_Job_Change_Error , 
+	bInspection_Result_IO=> OP50_RH_Trigger_OK , 
+	bInspection_Result_NIO=> , 
+	bTXTSM_Error_Job_Change=> OP50_RH_Job_Change_Error, 
+	bPictureTakenComplete=> OP50_RH_Picture_Taken, 
+	Loaded_Job_ID=>OP50_RH_Loaded_Job_ID	 , 
+	bClear_Error:= HMI_Reset, 
+	bJob_change_start:= OP50_RH_Camera_Job_Change_start, 
+	TXTSM_camera_not_online=>OP50_RH_Camera_Error	 , 
+	bTrigger_start:= OP50_RH_Camera_Trigger );	
+	]]></ST>
+    </Implementation>
+    <LineIds Name="OP50_Camera_FB">
+      <LineId Id="31" Count="29" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="79" Count="29" />
+      <LineId Id="77" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

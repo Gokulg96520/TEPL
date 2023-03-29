@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="RFID" Id="{eb698bd6-d70a-4663-9484-e80e32a4a859}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM RFID
+VAR
+   in_1 AT %I*: ARRAY[0..63] OF BYTE;
+   out_1 AT %Q*: ARRAY[0..63] OF BYTE;
+
+   in_2 AT %I*: ARRAY[0..63] OF BYTE;
+   out_2 AT %Q*: ARRAY[0..63] OF BYTE;   
+   
+   data_1 : HeadData;
+   state_1 : head1;
+   channel_1 : Memory;
+   write_1 , quit_1 , restart_1 , finish_1: BOOL;
+   busy_1,done_1,notag_1,error_1 : BOOL;
+   status_1,counter_1 : BYTE;
+   ident_1: FB_RFID;
+   read_1: BOOL;
+   
+   data_2 : HeadData;
+   state_2 : head1;
+   channel_2 : Memory;
+   write_2 , quit_2 , restart_2 , finish_2: BOOL;
+   busy_2,done_2,notag_2,error_2 : BOOL;
+   status_2,counter_2 : BYTE;
+   ident_2: FB_RFID;
+   read_2: BOOL;
+
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[ident_1(
+	I_T_Timeout:=T#10S , 
+	I_b_Head1SingleEnhanced:= , 
+	I_b_Head1DataFixcode:= , 
+	I_b_Head1SpecialFixcode:= , 
+	I_b_Head1SpecialCommand:= , 
+	I_b_Head1Read:= read_1 , 
+	I_b_Head1Write:= write_1 , 
+	I_b_Head1Quit:= quit_1, 
+	I_i_Head1WordNum:= 1, 
+	I_w_Head1WordAddress:=  , 
+	I_w_Head1TagType:= 16#3033 , 
+	HwIn:= in_1, 
+	IO_b_SetRestart:= restart_1, 
+	IO_b_InitFinish:= finish_1, 
+	Head1Data:= data_1 ,
+	head1:= state_1,
+	Memory:= channel_1 , 
+	O_b_Head1Busy=> busy_1, 
+	O_b_Head1Done=> done_1, 
+	O_b_Head1NoDataCarrier=>notag_1 , 
+	O_b_Head1Error=> error_1, 
+	O_B_Head1Status=> status_1, 
+	O_B_Head1ReplyCounter=> counter_1, 
+	HwOut=> out_1 );
+
+ident_2(
+	I_T_Timeout:=T#10S , 
+	I_b_Head1SingleEnhanced:= , 
+	I_b_Head1DataFixcode:= , 
+	I_b_Head1SpecialFixcode:= , 
+	I_b_Head1SpecialCommand:= , 
+	I_b_Head1Read:= read_2 , 
+	I_b_Head1Write:= write_2 , 
+	I_b_Head1Quit:= quit_2, 
+	I_i_Head1WordNum:= 1, 
+	I_w_Head1WordAddress:=  , 
+	I_w_Head1TagType:= 16#3033 , 
+	HwIn:= in_2, 
+	IO_b_SetRestart:= restart_2, 
+	IO_b_InitFinish:= finish_2, 
+	Head1Data:= data_2 ,
+	head1:= state_2,
+	Memory:= channel_2 , 
+	O_b_Head1Busy=> busy_2, 
+	O_b_Head1Done=> done_2, 
+	O_b_Head1NoDataCarrier=>notag_2 , 
+	O_b_Head1Error=> error_2, 
+	O_B_Head1Status=> status_2, 
+	O_B_Head1ReplyCounter=> counter_2, 
+	HwOut=> out_2 );
+
+
+//IF notag_1 OR error_1 THEN
+//	restart_1:=TRUE;
+//ELSE
+//    restart_1:=FALSE;
+//END_IF	
+//
+//IF notag_2 OR error_2 THEN
+//	restart_2:=TRUE;
+//ELSE
+//    restart_2:=FALSE;
+//END_IF	
+]]></ST>
+    </Implementation>
+    <LineIds Name="RFID">
+      <LineId Id="34" Count="49" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="85" Count="5" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="94" Count="3" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="91" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

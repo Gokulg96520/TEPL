@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="MAIN_1" Id="{271b5ce1-d4e1-4c7f-9b0e-498480008bac}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN_1
+VAR
+	
+// BOOL
+	bInit							: BOOL;
+	xtsReady						: BOOL;
+	bStartMover1Detection			: BOOL;	
+	bMover1DetectionComplete		: BOOL;
+	bStartGrouping					: BOOL;
+	bAllAxesReset					: BOOL;
+	bAllAxesEnabled					: BOOL;
+	bXtsReadyForSequence			: BOOL;
+	bm1_staus_31					: BOOL;
+	bm1_staus_32					: BOOL;	
+	
+// INT
+	i								: UDINT;
+	
+// AXIS CONTROL
+	mc_AddAxisToGroup				: ARRAY[1..nNumberOfMovers] OF MC_AddAxisToGroup;
+	mc_Power						: ARRAY[1..nNumberOfMovers] OF MC_Power;
+	mc_Reset						: ARRAY[1..nNumberOfMovers] OF MC_Reset;
+
+// MC GROUP
+	mcGroupEnable					: Mc_GroupEnable;
+	mcGroupReset					: MC_GroupReset;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Cyclic call of  fbXTSenvironment.
+fbXTSEnvironment(bBusy=> , bDone=> , bError=> , ipResultMessage=> );
+
+// Initialize fbXTSenvironment.
+IF NOT bInit THEN
+	IF fbXTSEnvironment.Init(TRUE) THEN
+		fbXTSEnvironment.Init(FALSE);
+		bInit :=TRUE;
+	END_IF
+	RETURN;
+END_IF
+
+// Check for all Position valid, is Teaching valid and movers found
+IF fbXTSEnvironment.XpuTcIo(1).GetAreAllPositionsValid() AND
+	fbXTSEnvironment.XpuTcIo(1).GetIsTeachingValid() 	 AND
+	(fbXTSEnvironment.XpuTcIo(1).GetExpectedMoverCount() 	 =
+	 fbXTSEnvironment.XpuTcIo(1).GetDetectedMoverCount() ) THEN
+	 xtsReady	:=TRUE;
+	 ELSE
+	 	 xtsReady	:=FALSE;	 
+	     RETURN;
+END_IF
+
+// Check for Mover 1 configuration.
+IF fbXTSEnvironment.XpuTcIo(1).GetMoverIdDetectionMode() = MoverIdDetectionMode.Mover1 THEN
+	IF bStartMover1Detection AND NOT fbXTSEnvironment.XpuTcIo(1).GetIsMoverIdDetectionActive()AND NOT fbXTSEnvironment.XpuTcIo(1).GetIsMoverIdDetectionValid 	()	THEN
+		bStartMover1Detection	:=FALSE;
+		fbXTSEnvironment.XpuTcIo(1).TriggerMoverIdDetection();		
+	END_IF
+	// Check for error in mover 1
+	IF fbXTSEnvironment.XpuTcIo(1).GetIsMoverIdDetectionValid() THEN
+		bMover1DetectionComplete	:=TRUE;
+	ELSE
+		bMover1DetectionComplete	:=FALSE;
+		RETURN;	
+	END_IF
+END_IF
+
+// CA Group Handling
+(*IF nCAGroupState<> 50 THEN//AND Pulse_Block.Q5Hz THEN
+	bStartGrouping		:= TRUE;
+END_IF*)
+IF bStartGrouping THEN nCAGroupState:=0; END_IF
+CASE nCAGroupState OF  
+		0:// Groupling of CA
+		
+		IF bStartGrouping THEN
+			bStartGrouping := FALSE;
+			nCAGroupState := 10;
+		END_IF
+		
+		10: // Add axes in CA group
+		FOR i:= 1 TO  nNumberOfMovers BY 1 DO	
+
+		mc_AddAxisToGroup[i](
+			AxesGroup:= CAGroup , 
+			Axis:= Mover[i] ,
+			Execute:= FALSE , 
+			IdentInGroup:= udint_to_identingroup(i) , 
+			Done=> , 
+			Busy=> , 
+			Error=> , 
+			ErrorId=> );
+		END_FOR
+		nCAGroupState := 11;
+		
+		11://
+		FOR i:= 1 TO  nNumberOfMovers BY 1 DO	
+
+		mc_AddAxisToGroup[i](
+			AxesGroup:= CAGroup , 
+			Axis:= Mover[i] ,
+			Execute:= TRUE , 
+			IdentInGroup:= udint_to_identingroup(i) , 
+			Done=> , 
+			Busy=> , 
+			Error=> , 
+			ErrorId=> );
+		END_FOR
+		
+		IF CAGroup.NcToPlc.Common.GroupAxesCount = nNumberOfMovers THEN
+			nCAGroupState := 20;
+		END_IF
+		
+		20:// Rest Movers false
+		FOR i:= 1 TO  nNumberOfMovers BY 1 DO	
+			mc_Reset[i](
+				Axis:=Mover[i]  , 
+				Execute:= FALSE, 
+				Done=> , 
+				Busy=> , 
+				Error=> , 
+				ErrorID=> );			
+		END_FOR
+			nCAGroupState := 21;
+			
+			21:// Rest Movers True
+			bAllAxesReset:=TRUE;
+				FOR i:= 1 TO  nNumberOfMovers  DO	
+				mc_Reset[i](
+				Axis:=Mover[i]  , 
+				Execute:= TRUE, 
+				Done=> , 
+				Busy=> , 
+				Error=> , 
+				ErrorID=> );
+				IF mc_Reset[i].Done THEN
+				i:=i+1;
+				END_IF
+			END_FOR		
+				bAllAxesReset:=bAllAxesReset AND NOT Mover[i].NcToPlc.StateDWord.31;
+		IF bAllAxesReset THEN
+			nCAGroupState := 30;
+		END_IF
+		
+		30:// mover enable false
+		FOR i:= 1 TO  nNumberOfMovers BY 1 DO	
+		mc_Power[i](
+			Axis:= Mover[i] , 
+			Enable:= FALSE, 
+			Enable_Positive:= TRUE , 
+			Enable_Negative:= TRUE , 
+			Override:=100 , 
+			BufferMode:= , 
+			Options:= , 
+			Status=> , 
+			Busy=> , 
+			Active=> , 
+			Error=> , 
+			ErrorID=> );
+			END_FOR
+			nCAGroupState :=31;
+			
+			31:// mover enable
+			i:=0;
+		bAllAxesEnabled:=TRUE;
+		FOR i:= 1 TO  nNumberOfMovers BY 1 DO	
+		mc_Power[i](
+			Axis:= Mover[i] , 
+			Enable:= TRUE, 
+			Enable_Positive:= TRUE , 
+			Enable_Negative:= TRUE , 
+			Override:=100 , 
+			BufferMode:= , 
+			Options:= , 
+			Status=> , 
+			Busy=> , 
+			Active=> , 
+			Error=> , 
+			ErrorID=> );
+			bAllAxesEnabled:= bAllAxesEnabled AND Mover[i].NcToPlc.StateDWord.0;
+
+			END_FOR
+			
+			IF bAllAxesEnabled THEN 
+					nCAGroupState :=35;
+			END_IF
+			
+			35: // Disable group
+			mcGroupReset(
+				AxesGroup:= CAGroup, 
+				Execute:= TRUE , 
+				Done=> , 
+				Busy=> , 
+				Error=> , 
+				ErrorId=> );
+				IF mcGroupReset.Done THEN
+					nCAGroupState :=36;
+				END_IF
+			
+				36: // Disable False group
+				mcGroupReset(
+				AxesGroup:= CAGroup, 
+				Execute:= FALSE , 
+				Done=> , 
+				Busy=> , 
+				Error=> , 
+				ErrorId=> );				
+				nCAGroupState :=40;			
+			
+			40: //False Group
+			mcGroupEnable(
+				AxesGroup:=CAGroup , 
+				Execute:= FALSE, 
+				Done=> , 
+				Busy=> , 
+				Error=> , 
+				ErrorId=> );
+				nCAGroupState :=41;
+			
+			41: 	//Enable Group
+			mcGroupEnable(
+				AxesGroup:=CAGroup , 
+				Execute:= TRUE, 
+				Done=> , 
+				Busy=> , 
+				Error=> , 
+				ErrorId=> );
+			IF mcGroupEnable.Done THEN
+				nCAGroupState :=50;
+			END_IF
+						
+			50:	bXtsReadyForSequence :=TRUE;
+
+			//55: PRG_XTS_Sequence(); 									//bXtsReadyForSequence :=TRUE;	
+			
+END_CASE
+
+IF bXtsReadyForSequence THEN
+	PRG_XTS_Sequence();
+END_IF
+
+
+bm1_staus_31:=Mover[1].NcToPlc.StateDWord.31;
+bm1_staus_32:=Mover[2].NcToPlc.StateDWord.31;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN_1">
+      <LineId Id="3" Count="231" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

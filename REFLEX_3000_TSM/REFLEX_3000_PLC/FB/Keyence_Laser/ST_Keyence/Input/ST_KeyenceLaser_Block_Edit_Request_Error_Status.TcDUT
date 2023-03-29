@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Block_Edit_Request_Error_Status" Id="{1ba69be9-cc72-4631-9941-7ede75af7799}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Block_Edit_Request_Error_Status :
+STRUCT
+Character_String_Setting_Read_Error				: BIT;
+Character_String_Printed_Read_Error				: BIT;
+Character_String_Change_Error					: BIT;
+Reserve_0										: BIT;
+Reserve_1										: BIT;
+Reserve_2										: BIT;
+Reserve_3										: BIT;
+Reserve_4										: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

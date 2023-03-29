@@ -1,0 +1,318 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP150_C" Id="{2e2f768a-b881-46e2-8ac2-afb6bd9acdea}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP150_C
+VAR
+	OP150_Laser_Camera 			      : FB_Cognex_ProfiNET_1;
+	OP150_C_Camera_Trigger		      : BOOL;
+	OP150_C_Camera_Job_Change_start   : BOOL;
+	OP150_C_Camera_Error			  : BOOL;
+	OP150_C_Camera_Ready			  : BOOL;
+	OP150_C_Camera_Online			  : BOOL;	
+	
+	OP150_C_Acquisition_Status   AT %I*  :Acquisition_Status;
+	OP150_C_Inspection_Status    AT %I*  :Inspection_Status;	
+	OP150_C_Acquisition_ID       AT %I*  :UINT;
+	OP150_C_Inspection_ID   	 AT %I*  :UINT;
+	OP150_C_Error_code      	 AT %I*  :UINT;
+	OP150_C_Current_Job_ID  	 AT %I*  :UINT;
+	OP150_C_Result_code     	 AT %I*  :UINT;
+	OP150_C_Cam_Result      	 AT %I*  :ARRAY[0..63] OF BYTE;
+	
+	OP150_C_Acquisition_Control AT %Q*  : Acquisition_Control;
+	OP150_C_Inspection_Control  AT %Q*  : Inspection_Control;
+	OP150_C_Command_word		AT %Q*  : UINT;
+	Error_status				      : STRING;
+	OP150_C_Target_Job_ID				  : UINT;
+	OP150_C_Loaded_Job_ID		    	  : UINT;
+	OP150_C_Union                       : UNION_64Byte;
+	OP150_C_Job_Change_Complete		  : BOOL;
+	OP150_C_Job_Change_Error   		  : BOOL;
+	OP150_C_Picture_Taken      		  : BOOL;
+	B1 : BOOL;
+	B2 : BOOL;
+	
+	OP150C_STN_MOVER	: INT;
+
+	OP150C_LH_STN_MOVER : INT;
+	OP150C_RH_STN_MOVER : INT;
+    OP150C_LH_STN_ENABLE: BOOL;
+    OP150C_RH_STN_ENABLE: BOOL;		
+	Dry_run             : BOOL;
+	Complete_Delay      : TON;
+	Error_Delay	: TON;
+	tmp: BOOL;
+	
+	OP150c_Auto_Seq: INT;
+	Fixture_LH: INT;
+	Fixture_RH: INT;
+	Toggle_Pos : R_TRIG;
+	Toggle_Neg : F_TRIG;
+	LH_Cam_Completed : BOOL;	
+	OP150C_LH_CMP_OK : BOOL;
+	OP150C_RH_CMP_OK : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Toggle_Pos(CLK:=OP150_C.OP150_C_Inspection_Status.Inspection_Completed);
+Toggle_Neg(CLK:=OP150_C.OP150_C_Inspection_Status.Inspection_Completed);
+
+IF Toggle_Pos.Q OR Toggle_Neg.Q THEN
+	LH_Cam_Completed:=1;	
+END_IF			
+
+OP150_Laser_Camera(
+	tTimeout:= , 
+	sJob_Name:= , 
+	camera_ready=> OP150_C_Camera_Ready,
+	Camera_online=> OP150_C_Camera_Online,
+	stCognex_record_status:=OP150_C_Acquisition_Status, 
+	Acquisition_ID:=OP150_C_Acquisition_ID , 
+	stCognex_Inspection_status:=OP150_C_Inspection_Status, 
+	Error_Code:=OP150_C_Error_code , 
+	wcommand_control_in:= OP150_C_Current_Job_ID, 
+	aResults_64_Bytes:= OP150_C_Cam_Result, 
+	number_of_inspections:=OP150_C_Inspection_ID , 
+	iresult_code:= OP150_C_Result_code, 
+	bTarget_job_ID:=OP150_C_Target_Job_ID , 
+	Error_Status_message=> Error_status, 
+	bError=> OP150_C_Camera_Error, 
+	stCognex_record_control=>OP150_C_Acquisition_Control , 
+	stCognex_inspection_control=>OP150_C_Inspection_Control , 
+	wCommandControl_out=>OP150_C_Command_word , 
+	aUser_data_64_Byte=> OP150_C_Union.aArrayOfByte, 
+	bJob_loading_completed=>OP150_C_Job_Change_Complete, 
+	bJob_load_failed=>OP150_C_Job_Change_Error , 
+	bInspection_Result_IO=>  B1, 
+	bInspection_Result_NIO=> B2, 
+	bTXTSM_Error_Job_Change=> OP150_C_Job_Change_Error, 
+	bPictureTakenComplete=> OP150_C_Picture_Taken, 
+	Loaded_Job_ID=>OP150_C_Loaded_Job_ID	 , 
+	bClear_Error:= HMI_Reset, 
+	bJob_change_start:= OP150_C_Camera_Job_Change_start, 
+	TXTSM_camera_not_online=>OP150_C_Camera_Error	 , 
+	bTrigger_start:= OP150_C_Camera_Trigger );
+
+	
+IF HMI_Reset OR OP150_HMI_Reset THEN
+	OP150_C_ErrorActive:=0;
+END_IF	
+
+Error_Delay(IN:= NOT OP150_C_Camera_Online,PT:=T#10S);
+	
+IF Error_Delay.Q THEN
+	OP150_C_ErrorActive:=1;
+END_IF	
+
+IF OP150_C_ErrorActive OR NOT OperationEnable THEN
+	OP150C_Auto_Seq:=10;
+END_IF
+
+CASE OP150C_Auto_Seq OF
+	10: IF NOT OP150_C_ErrorActive THEN
+		 	OP150C_Auto_Seq :=20;
+		END_IF
+		
+	20: IF OP150_C_Camera_Online THEN
+			OP150C_Auto_Seq :=30;
+		END_IF
+		
+	30: IF OP150_C_Camera_Online THEN
+			OP150C_RH_CMP_OK	:= FALSE;
+			OP150C_LH_CMP_OK	:= FALSE;
+			OP150C_Auto_Seq :=40;
+		END_IF
+	
+	40: IF OP150C_LH_STN_ENABLE THEN
+			IF Fixture_LH=156 THEN
+				OP150C_Auto_Seq :=50;
+			ELSE
+				OP150C_Auto_Seq :=90;	
+			END_IF
+		ELSIF OP150C_RH_STN_ENABLE THEN
+			IF  Fixture_RH=156 THEN
+				OP150C_Auto_Seq :=100;
+			ELSE
+				OP150C_Auto_Seq :=90;	
+			END_IF
+		END_IF
+		
+	50: OP150_C_Camera_Trigger:=1;
+		IF LH_Cam_Completed THEN
+			OP150_C_Camera_Trigger:=0;
+			OP150C_Auto_Seq :=60;
+		END_IF	
+	
+	60: IF OP150_C_Cam_Result[0]=1  THEN
+			OP150C_Auto_Seq :=70;	
+		ELSIF OP150_C_Cam_Result[1]=1 THEN
+			OP150C_Auto_Seq :=76;
+		END_IF
+			
+	70:	OP150C_LH_CMP_OK	:= TRUE;
+		OP150C_Auto_Seq :=75;
+	
+	75: MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]:=158;
+		IF MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]=158 THEN
+			OP150C_Auto_Seq :=80;
+		END_IF
+
+	76: MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]	:=159;
+		IF MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1] =159 THEN
+			OP150C_Auto_Seq :=80;
+		END_IF	
+		
+	80: OP150C_LH_STN_ENABLE:=0;
+		LH_Cam_Completed:=0;
+		STATION_DONE[OP150C_RH_STN_MOVER][OP150C_LH_XTS_POS_NO]	:= TRUE;
+		OP150C_Auto_Seq :=30;
+		
+	90: OP150C_LH_STN_ENABLE:=0;
+		OP150C_RH_STN_ENABLE:=0;
+		STATION_DONE[OP150C_RH_STN_MOVER][OP150C_LH_XTS_POS_NO]	:= TRUE;
+		OP150C_Auto_Seq :=30;	
+		
+	100:  OP150_C_Camera_Trigger:=1;
+		IF LH_Cam_Completed THEN
+			OP150_C_Camera_Trigger:=0;
+			OP150C_Auto_Seq :=110;
+		END_IF	
+	
+	110: IF OP150_C_Cam_Result[0]=1  THEN
+			OP150C_Auto_Seq :=115;	
+		ELSIF OP150_C_Cam_Result[1]=1 THEN
+			OP150C_Auto_Seq :=126;
+		END_IF
+			
+	115:OP150C_RH_CMP_OK:= TRUE;
+		OP150C_Auto_Seq :=125;
+		
+	125: MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]:=158;
+		 IF MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]=158 THEN
+			OP150C_Auto_Seq :=130;
+		 END_IF
+
+	126:  MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]:=159;
+		 IF MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]=159 THEN
+			OP150C_Auto_Seq :=130;
+		 END_IF	
+
+	130: OP150C_RH_STN_ENABLE:=0;
+		 LH_Cam_Completed:=0;
+	 	 STATION_DONE[OP150C_RH_STN_MOVER][OP150C_RH_XTS_POS_NO]:= TRUE;
+		 OP150C_Auto_Seq :=30;	
+END_CASE
+
+IF Dry_run THEN	
+ Fixture_LH:=156;
+ Fixture_RH:=156;
+ELSE
+ Fixture_LH :=MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1];
+ Fixture_RH:= MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2];
+END_IF
+
+(*IF 	OP150A_LH_Start AND NOT OP150_C_ErrorActive AND OP150_C_Camera_Ready AND OP150_C_Camera_Online THEN
+ 	IF  MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]=156 THEN	
+		OP150_C_Camera_Trigger:=1;
+		tmp:=1;
+		IF OP150_C_Cam_Result[0]=1 AND Complete_Delay.Q THEN
+			OP150_C_Camera_Trigger:=0;
+			MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]:=160;
+			tmp:=1;
+			IF Complete_Delay.Q AND MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]=160 THEN
+//				ALL_STATION_DONE.POSITION_DONE[OP150C_LH_XTS_POS_NO]:= TRUE;
+				OP150C_LH_Start:=0;
+			END_IF
+		ELSIF OP150_C_Cam_Result[0]=2 AND Complete_Delay.Q THEN
+			OP150_C_Camera_Trigger:=0;
+			MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]:=161;
+			tmp:=1;
+			IF Complete_Delay.Q AND MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]=161 THEN
+//				ALL_STATION_DONE.POSITION_DONE[OP150C_LH_XTS_POS_NO]:= TRUE;
+				OP150C_LH_Start:=0;
+			END_IF	
+		END_IF
+ 	ELSIF MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]<>156 THEN
+		 	MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][2]:=161;
+//			ALL_STATION_DONE.POSITION_DONE[OP150C_LH_XTS_POS_NO]:= TRUE;
+			OP150C_LH_Start:=0;
+ 	END_IF	
+END_IF
+	
+IF 	OP150C_RH_Start AND NOT OP150_C_ErrorActive AND OP150_C_Camera_Ready AND OP150_C_Camera_Online THEN
+ 	IF  MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]=156 THEN	
+		OP150_C_Camera_Trigger:=1;
+		tmp:=1;
+		IF OP150_C_Cam_Result[0]=1 AND Complete_Delay.Q THEN
+			OP150_C_Camera_Trigger:=0;
+			MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]:=160;
+			tmp:=1;
+			IF Complete_Delay.Q AND MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]=160 THEN
+//				ALL_STATION_DONE.POSITION_DONE[OP150C_RH_XTS_POS_NO]:= TRUE;
+				OP150C_RH_Start:=0;
+			END_IF
+		ELSIF OP150_C_Cam_Result[0]=2 AND Complete_Delay.Q  THEN
+			OP150_C_Camera_Trigger:=0;
+			MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]:=161;
+			tmp:=1;
+			IF Complete_Delay.Q AND MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]=161 THEN
+//				ALL_STATION_DONE.POSITION_DONE[OP150C_RH_XTS_POS_NO]:= TRUE;
+				OP150C_RH_Start:=0;
+			END_IF	
+		END_IF
+ 	ELSIF MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]<>156 THEN
+		 	MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]:=161;
+//			ALL_STATION_DONE.POSITION_DONE[OP150C_RH_XTS_POS_NO]:= TRUE;
+			OP150C_RH_Start:=0;
+ 	END_IF	
+END_IF	
+*)
+
+
+//###########################################################################################################################################
+
+	
+OP150C_LH_STN_MOVER					:= MOVER_POSITION[OP150C_LH_XTS_POS_NO];
+OP150C_RH_STN_MOVER					:= MOVER_POSITION[OP150C_RH_XTS_POS_NO];	
+	
+IF AUTO_WITH_XTS THEN
+	IF 	OP150C_LH_STN_MOVER>0  THEN
+		OP150C_LH_STN_ENABLE := MOVER_POS_RECHED[OP150C_LH_STN_MOVER] AND (MOVER_CMP_STATUS[OP150C_LH_STN_MOVER][1]>150);
+	END_IF
+	IF 	OP150C_RH_STN_MOVER>0  THEN	 
+		OP150C_RH_STN_ENABLE := MOVER_POS_RECHED[OP150C_RH_STN_MOVER] AND (MOVER_CMP_STATUS[OP150C_RH_STN_MOVER][2]>150);
+	END_IF	
+END_IF
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP150_C">
+      <LineId Id="620" Count="4" />
+      <LineId Id="618" Count="1" />
+      <LineId Id="47" Count="31" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="80" Count="7" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="306" Count="0" />
+      <LineId Id="403" Count="2" />
+      <LineId Id="504" Count="93" />
+      <LineId Id="302" Count="0" />
+      <LineId Id="500" Count="0" />
+      <LineId Id="611" Count="5" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="617" Count="0" />
+      <LineId Id="108" Count="53" />
+      <LineId Id="104" Count="3" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="609" Count="0" />
+      <LineId Id="96" Count="4" />
+      <LineId Id="254" Count="0" />
+      <LineId Id="256" Count="0" />
+      <LineId Id="255" Count="0" />
+      <LineId Id="101" Count="1" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="209" Count="1" />
+      <LineId Id="206" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

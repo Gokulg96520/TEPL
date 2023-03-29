@@ -1,106 +1,81 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP120_Robo_Inputs" Id="{e4d44e83-7a5b-4945-92c9-ccb39f1dd526}" SpecialFunc="None">
+  <POU Name="OP120_Robo_Inputs" Id="{77b19724-6ce1-4629-b652-37b54d0adf57}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP120_Robo_Inputs
 VAR
 	Robo_Enable_err: TON;
+	temp : ARRAY[1..500] OF BOOL;
 	
-	OP120_Robo: ROBO_FB;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-//ROBO Block Calling
-OP120_Robo(
-	Robo_heartBeat:= , 
-	Operation_Enable:= , 
-	ErrorActive:= , 
-	Mode:= , 
-	Robo_Enabled:= , 
-	ResetPB:= , 
-	Home_Cmd:= , 
-	Robo_In_Home:= , 
-	Robo_In_Error:= , 
-	AutoSelected:= , 
-	ManualSelected:= , 
-	Program_Execute:= , 
-	Stop_Ip:= , 
-	Robo_Stopped:= , 
-	Servo_On_Fb:= , 
-	Servo_Off_Fb:= , 
-	Robo_In_Auto:= , 
-	Robo_In_Manual:= , 
-	Robo_In_Teach:= , 
-	Robo_Prog_Loaded:= , 
-	PLC_Prog_IP:= , 
-	Robo_Moving_Home:= , 
-	Auto_Enable=> , 
-	Robo_Comm_Error=> , 
-	Robo_Enable=> , 
-	Error_Reset=> , 
-	Robo_Start=> , 
-	Robo_Stop=> , 
-	Enable_Error=> , 
-	Prog_Reset=> , 
-	Homing=> , 
-	Servo_On=> , 
-	Servo_Off=> , 
-	Mode_OP=> , 
-	Prog_Sel_Done=> , 
-	Robo_Prog_No=> );
+
 
 // Safe to Pick
-IF OP120_GVL.OP120_OperationEnable AND OP120_GVL.CR120_Lifting_Cyl.Position2  THEN
-	OP120_IO_Tag_Link.OP120_SI_Pick_Zone_Safe:=TRUE;
+IF OperationEnable AND OP120_GVL.CR120_Lifting_Cyl.Position2  THEN
+	OP120_SI_Pick_Zone_Safe:=TRUE;
 	ELSE
-		OP120_IO_Tag_Link.OP120_SI_Pick_Zone_Safe:=FALSE;
+		OP120_SI_Pick_Zone_Safe:=FALSE;
 	END_IF
 	
 // Safe To Place
-IF OP120_GVL.OP120_OperationEnable AND OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 THEN
+IF OperationEnable AND OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 THEN
 	OP120_IO_Tag_Link.OP120_SI_Place_Zone_Safe:=TRUE;
 	ELSE
 		OP120_IO_Tag_Link.OP120_SI_Place_Zone_Safe:=FALSE;
 	END_IF
 //Safe to Reject Zone
 	
-	IF OP120_GVL.OP120_OperationEnable AND TRUE THEN
+	IF OperationEnable AND TRUE THEN
 		OP120_IO_Tag_Link.OP120_SI_Reject_Zone_Safe:=TRUE;
 		ELSE
 			OP120_IO_Tag_Link.OP120_SI_Reject_Zone_Safe:=FALSE;
 		END_IF
 // Safe to ATC Zone
-IF OP120_GVL.OP120_OperationEnable THEN
+IF OperationEnable THEN
 	OP120_IO_Tag_Link.OP120_SI_ATC_Tool_Safe:=TRUE;
 	ELSE
 	OP120_IO_Tag_Link.OP120_SI_ATC_Tool_Safe:=FALSE;
 	END_IF
 
 //Ready to Pick
-IF OP120_GVL.OP120_StartEnable AND OP120_GVL.CR120_Lifting_Cyl.Position2 AND OP120_Camera_OK THEN
-OP120_IO_Tag_Link.OP120_EI_Rdy_Pick_Spring :=TRUE;
+IF OP120_GVL.OP120_StartEnable AND OP120_GVL.CR120_Lifting_Cyl.Position2 AND OP120_GotoPick THEN 
+	// AND CheckParkOK AND NOT  CheckParkNOK and (OP120_EI_Gripper1_Open AND  OP120_EI_Gripper2_Open OR temp [1])
+   OP120_EI_Rdy_Pick_Spring :=TRUE;
 ELSE
 	OP120_IO_Tag_Link.OP120_EI_Rdy_Pick_Spring :=FALSE;
 END_IF 
+
 //REady to 	place
-IF OP120_GVL.OP120_StartEnable AND OP120_Comp_Picked AND OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 THEN
+
+IF OP120_GVL.OP120_StartEnable AND OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 AND OP120_MoverPresent  THEN //OP120_STN_ENABLE AND Part_Picked
 	OP120_IO_Tag_Link.OP120_EI_Rdy_Place_Spring:=TRUE;
 	ELSE
-		OP120_IO_Tag_Link.OP120_EI_Rdy_Place_Spring:=FALSE;
-	END_IF
+	OP120_IO_Tag_Link.OP120_EI_Rdy_Place_Spring:=FALSE;
+END_IF
 
 //Insertion Complete
-IF OP120_GVL.OP120_StartEnable AND OP120_Lring_Placed THEN
+
+IF OP120_GVL.OP120_StartEnable AND OP120_PartPushed THEN
 	OP120_IO_Tag_Link.OP120_EI_Insertion_Complete:=TRUE;
-	ELSE
-		OP120_IO_Tag_Link.OP120_EI_Insertion_Complete:=FALSE;
-	END_IF
+ELSE
+	OP120_IO_Tag_Link.OP120_EI_Insertion_Complete:=FALSE;
+END_IF
 
 
 ]]></ST>
     </Implementation>
     <LineIds Name="OP120_Robo_Inputs">
-      <LineId Id="3" Count="87" />
+      <LineId Id="3" Count="30" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="67" Count="1" />
+      <LineId Id="37" Count="4" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="45" Count="5" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="51" Count="6" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

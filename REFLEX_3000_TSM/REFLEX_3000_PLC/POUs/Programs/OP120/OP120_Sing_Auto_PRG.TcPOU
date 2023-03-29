@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP120_Sing_Auto_PRG" Id="{d788ce5d-f89f-4715-b0e2-4d5839b59b4b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP120_Sing_Auto_PRG
+VAR	
+	next_singulation:BOOL;
+	next_singulation_time:ton;
+	singulation_down     :TON;
+	cam_nok_count     :INT;
+	purge_delay       :ton;
+	purge_on          :BOOL;
+	cyl_delay         :BOOL;
+	cyl_down          :ton;
+	time_1            :INT;
+	time_2            :int;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT OP120_StartEnable THEN
+	
+	OP120_Sing_AutoSeq        :=0;
+	OP120_Camera_Auto_Trigger := FALSE;
+	CheckParkNOK              := FALSE;
+	CheckParkOK               := FALSE;
+	OP120_CamOK               := FALSE;
+	OP120_CamNOK              := FALSE;
+	cam_nok_count             :=0;
+	 purge_on                 := false;
+	
+END_IF
+
+CASE   OP120_Sing_AutoSeq OF 
+	
+	10:IF OP120_GVL.OP120_StartEnable AND  Op120_PartSingulated   THEN    
+          CR120_Lifting_Cyl.AutoCmd2:=TRUE;
+		  CR120_Lifting_Cyl.AutoCmd1:=FALSE;
+		  IF CR120_Lifting_Cyl.Position2 THEN
+		     OP120_Sing_AutoSeq:= 160;
+		  ELSIF NOT CR120_Lifting_Cyl.Position2 THEN
+                conveyor_status  := 11; /// waiting for singulation cylinder work feedback	 
+	      END_IF
+		ELSIF NOT  Op120_PartSingulated THEN
+               conveyor_status  := 10;   // waiting for part singulated feedback
+	    END_IF
+		
+	160:IF OP120_GVL.OP120_StartEnable AND NOT  OP120_SO_Rbt_In_Pick_Zone THEN      // enabling camera for part check
+		   OP120_Camera_Auto_Trigger:=TRUE;
+		   OP120_Sing_AutoSeq:= 170;	
+         ELSIF  OP120_SO_Rbt_In_Pick_Zone THEN 
+                conveyor_status  := 12; // waiting for robot not in pick zone feedback
+	    END_IF
+		
+	170: IF OP120_GVL.OP120_StartEnable THEN      // waiting for camera feedback
+           IF OP120_CamOK  THEN  
+		       CheckParkOK:=TRUE;
+		       CheckParkNOK:=FALSE;
+		       OP120_Camera_Auto_Trigger:=FALSE;
+		       OP120_Sing_AutoSeq:= 180;
+		   
+		    END_IF
+			
+		   IF OP120_CamNOK  THEN
+			  OP120_Camera_Auto_Trigger:=FALSE;
+			  cam_nok_count := cam_nok_count+1;
+			  OP120_Sing_AutoSeq:= 190;
+			  CheckParkNOK:=TRUE;
+			  CheckParkOK:=FALSE;
+			 
+			END_IF	 
+		 ELSIF 	OP120_GVL.OP120_StartEnable AND NOT OP120_CamOK AND NOT OP120_CamNOK THEN
+			     conveyor_status  := 13; // waiting for camera result
+		END_IF
+
+	180: IF OP120_StartEnable AND (Ready_for_next_singulation OR singulation_down.q) THEN  //PartPickedTrig.q	     
+		     CheckParkNOK:=FALSE;
+			 CheckParkOK:=FALSE;
+			 next_singulation:=TRUE;
+			 Ready_for_next_singulation:=FALSE;
+			 OP120_Sing_AutoSeq:= 181;
+			 conveyor_status  := 14; 
+		 ELSIF 	 OP120_StartEnable AND NOT Ready_for_next_singulation THEN
+			     conveyor_status  := 14; // camera result ok waiting for robot to pick
+		END_IF	 
+		
+	181 : IF OP120_StartEnable AND 	next_singulation_time.Q AND NOT (OP120_Vaccum1_Bit0 AND OP120_Vaccum2_Bit0) THEN 
+		      next_singulation:=0;
+			  Op120_PartSingulated:=FALSE;
+			  OP120_Sing_AutoSeq:= 200;
+			ELSIF NOT  OP120_Vaccum1_Bit0 AND OP120_Vaccum2_Bit0 THEN
+                  conveyor_status  := 15; ////  waiting for vacum feedback cutoff after robot pick
+		  END_IF	 
+	         
+	190: IF OP120_StartEnable AND CheckParkNOK THEN
+		    OP120_GVL.OP120_Vaccuum_OP_Port5_Byte1 :=1;
+			OP120_GVL.OP120_Vaccuum_OP_Port6_Byte1 :=1;
+			purge_on := TRUE;
+			conveyor_status  := 16; ////  camera nok and purge is turned on
+		IF purge_delay.Q THEN
+               O120_LH_REJ_AIR_PURGE_Q1261_6 :=TRUE;
+		       O120_SPARE_Q1262_3:=TRUE;
+			  
+		IF  NOT OP120_Vaccum1_Bit0 AND NOT OP120_Vaccum2_Bit0 THEN
+		           OP120_GVL.OP120_Vaccuum_OP_Port5_Byte1 :=0;
+			       OP120_GVL.OP120_Vaccuum_OP_Port6_Byte1 :=0;
+                   O120_LH_REJ_AIR_PURGE_Q1261_6 :=FALSE;
+		           O120_SPARE_Q1262_3:=FALSE;
+		           Op120_PartSingulated:=FALSE;
+				   purge_on := FALSE;
+				   cyl_delay :=TRUE;
+		           OP120_Sing_AutoSeq:= 200;
+		ELSIF  OP120_Vaccum1_Bit0 OR OP120_Vaccum2_Bit0  THEN
+					conveyor_status  := 17; ////  waiting for vacum cut off 
+		END_IF  
+	    END_IF
+        END_IF
+		  
+	200: IF OP120_StartEnable AND cyl_down.Q   THEN	
+	        OP120_CamOK:=FALSE;
+	        OP120_CamNOK:=FALSE;   
+		    CheckParkNOK:=FALSE;
+			CheckParkOK := FALSE;
+		    CR120_Lifting_Cyl.AutoCmd1:=TRUE;
+		    CR120_Lifting_Cyl.AutoCmd2:=FALSE;
+			conveyor_status  := 18; /// waitng singulation cylinder home
+		  IF CR120_Lifting_Cyl.Position1 THEN
+		     OP120_Sing_AutoSeq:= 10;
+		 END_IF
+		 END_IF
+		 
+END_CASE
+
+
+
+// ton
+
+next_singulation_time(IN:=  next_singulation, PT:=T#0MS , Q=> , ET=> );
+purge_delay(IN:=purge_on , PT:= INT_TO_TIME(time_1), Q=> , ET=> );
+cyl_down(IN:= cyl_delay, PT:=INT_TO_TIME(time_2) , Q=> , ET=> );
+singulation_down(IN:= OP120_Sing_AutoSeq=180 AND ( NOT OP120_Vaccum1_Bit0 OR NOT OP120_Vaccum2_Bit0) , PT:=T#500MS , Q=> , ET=> );]]></ST>
+    </Implementation>
+    <LineIds Name="OP120_Sing_Auto_PRG">
+      <LineId Id="3" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="4" Count="0" />
+      <LineId Id="107" Count="4" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="5" Count="8" />
+      <LineId Id="196" Count="0" />
+      <LineId Id="217" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="218" Count="1" />
+      <LineId Id="15" Count="4" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="20" Count="2" />
+      <LineId Id="24" Count="4" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="123" Count="1" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="129" Count="0" />
+      <LineId Id="223" Count="1" />
+      <LineId Id="36" Count="7" />
+      <LineId Id="106" Count="0" />
+      <LineId Id="225" Count="1" />
+      <LineId Id="44" Count="5" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="50" Count="1" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="159" Count="0" />
+      <LineId Id="152" Count="5" />
+      <LineId Id="180" Count="1" />
+      <LineId Id="158" Count="0" />
+      <LineId Id="201" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="202" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="62" Count="5" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="68" Count="1" />
+      <LineId Id="203" Count="0" />
+      <LineId Id="70" Count="3" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="74" Count="4" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="162" Count="0" />
+      <LineId Id="176" Count="0" />
+      <LineId Id="195" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

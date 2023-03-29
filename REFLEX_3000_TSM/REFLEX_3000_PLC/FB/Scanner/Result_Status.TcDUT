@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Result_Status" Id="{a7769bb6-274b-46ed-8a76-e23378c6c02d}">
+    <Declaration><![CDATA[TYPE Result_Status :
+STRUCT
+	Decoding			  : BOOL;
+	Decode_Complete 	  : BOOL;
+	Result_Buffer_overrun : BOOL;
+	Result_Available	  : BOOL;
+	Set_When_fault_Occur  : BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

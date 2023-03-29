@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP90_MASTER3_IO" Id="{db6504e7-fced-470e-9065-2471e3759f57}" SpecialFunc="None">
+  <POU Name="OP90_MASTER3_IO" Id="{2c7d9cce-9354-494b-ad67-0aacc0f3c2f1}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP90_MASTER3_IO
 VAR
     OP90_MAS3_PORT1_BYTE1_DI_MODULE_1 AT %I* : BYTE;
@@ -81,7 +81,7 @@ END_VAR
                         <l2 n="OutputItems" cet="Operand">
                           <n />
                           <o>
-                            <v n="Operand">"I120_SPARE_I1221_0"</v>
+                            <v n="Operand">"I120_REJ_BIN_PRSNCE_I1221_0"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -303,7 +303,7 @@ END_VAR
                                 <v n="Id">18L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I120_CAMERA_SLIDECYL_REV_I1220_4"</v>
+                                <v n="Operand">"I120_CAMERA_SLIDE_CYL_REV_I1220_4"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -319,7 +319,7 @@ END_VAR
                                 <v n="Id">19L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I120_CAMERA_SLIDECYL_FWD_I1220_5"</v>
+                                <v n="Operand">"I120_CAMERA_SLIDE_CYL_FWD_I1220_5"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -335,7 +335,7 @@ END_VAR
                                 <v n="Id">20L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I120_SPARE_I1220_6"</v>
+                                <v n="Operand">"I120_SLAVE1_PRSN_PARK_TRAY_I1220_6"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -351,7 +351,7 @@ END_VAR
                                 <v n="Id">21L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I120_SPARE_I1220_7"</v>
+                                <v n="Operand">"I120_SLAVE2_PRSN_PARK_TRAY_I1220_7"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>

@@ -1,0 +1,392 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_Manual" Id="{fee94861-465d-41ad-940b-3095fd171ddd}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_Manual
+VAR
+	
+	Op160_Robot: FB_Robot;
+	OP160_Robo_Automanual_out: BOOL;
+	CR160_MoverREM_CylStatus: INT;
+	CR160_HMI_Gripper_Cyl_1_Home_PB: BOOL;
+	CR160_HMI_Gripper_Cyl_1_Work_PB: BOOL;
+	CR160_HMI_Gripper_Cyl_2_Home_PB :BOOL;
+	CR160_HMI_Gripper_Cyl_2_Work_PB :BOOL;
+	O160_LH_GRPR_OPN_Q1260_5: BOOL;
+	O160_LH_GRPR_CLSE_Q1260_4: BOOL;
+	OP160_Gripper_Cyl_Status: INT;
+	temp5: BOOL;
+	temp6: BOOL;
+	OP160_GRP_TMR: TON;
+	
+END_VAR
+
+VAR PERSISTENT
+	OP160_GRP_DLY				: TIME;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Bottom Cylinder 1
+CR160_MoverREM_CylStatus:=0;
+// Safe Home
+IF (TRUE) THEN 
+	CR160_MoverREM_Cyl.SafeHome:= TRUE;
+	ELSE
+		CR160_MoverREM_Cyl.SafeHome:= FALSE;
+	END_IF
+	//Safe Work
+IF(TRUE) THEN 
+CR160_MoverREM_Cyl.SafeWork:=TRUE;
+ELSE
+	CR160_MoverREM_Cyl.SafeWork:=FALSE;
+	END_IF
+//Manual PB 1
+IF(OP160_HMI_MOVREM_Home_PB) THEN
+	CR160_MoverREM_Cyl.ManualPB1:=TRUE;
+	ELSE
+		CR160_MoverREM_Cyl.ManualPB1:=FALSE;
+	END_IF
+//Manual PB2 
+IF(OP160_HMI_MOVREM_Work_PB) THEN
+	CR160_MoverREM_Cyl.ManualPB2:=TRUE;
+	ELSE
+		CR160_MoverREM_Cyl.ManualPB2:=FALSE;
+	END_IF	
+
+	
+
+CR160_MoverREM_Cyl(
+	Auto:=OP120_AutoSelected , 
+	Manual:=OP120_ManualSelected , 
+	ErrorActive:=OP160_ErrorActive , 
+	ResetPB:=OP160_HMI_Reset , 
+	Sensor1:=I160_MOVR_REM_CYL_REVI1311_6 , 
+	Sensor2:=I160_MOVR_REM_CYL_FWDI1311_7 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:= , 
+	AutoCmd2:= , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:=5 , 
+	TimeOut3:=5 , 
+	Solenoid1=> , 
+	Solenoid2=>, 
+	AlarmSensor1=> , 
+	AlarmSensor2=> , 
+	AlarmSolenoid1=> , 
+	AlarmSolenoid2=> , 
+	AllSignal=> , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=CR160_MoverREM_CylStatus );
+	
+//move ZERO to STATUS
+OP120_Gripper_Cyl_Status:=0;
+
+
+
+//Reset Auto Cmd IN Manual Mode & Homing
+IF (OP160_Auto OR OP160_HomeRunning) THEN
+	CR160_Gripper_Cyl_1.AutoCmd1:=FALSE;
+	CR160_Gripper_Cyl_1.AutoCmd2:=FALSE;
+	CR160_Gripper_Cyl_2.AutoCmd1:=FALSE;
+	CR160_Gripper_Cyl_2.AutoCmd2:=FALSE;			
+END_IF
+
+// Safe Home
+IF (TRUE) AND  (TRUE) THEN 
+	CR160_Gripper_Cyl_1.SafeHome:= TRUE ;
+	CR160_Gripper_Cyl_2.SafeHome:= TRUE ;
+	ELSE 
+		CR160_Gripper_Cyl_1.SafeHome:= FALSE ;
+		CR160_Gripper_Cyl_2.SafeHome:= FALSE ;
+	END_IF
+// Safe Work
+IF (TRUE) OR (TRUE) THEN 
+	CR160_Gripper_Cyl_1.Safework:= TRUE ;
+	CR160_Gripper_Cyl_2.Safework:= TRUE ;
+	ELSE 
+		CR160_Gripper_Cyl_1.Safework:= FALSE ;
+		CR160_Gripper_Cyl_2.Safework:= FALSE ;
+	END_IF
+	
+// grippeer 1 Manual PB  Cyl Mapping
+
+IF (CR160_HMI_Gripper_Cyl_1_Home_PB=TRUE OR (OP160_EO_RO_Gripper1_Open AND OP160_ManualSelected)) THEN
+	CR160_Gripper_Cyl_1.ManualPB1:=TRUE;
+	
+		CR160_Gripper_Cyl_1.ManualPB1:=FALSE;
+		
+	END_IF
+	
+IF (CR160_HMI_Gripper_Cyl_1_Work_PB=TRUE OR (OP160_EO_RO_Gripper1_Close AND OP160_ManualSelected)) THEN
+	
+   CR160_Gripper_Cyl_1.ManualPB2:=TRUE;
+ 
+	ELSE 
+		
+	CR160_Gripper_Cyl_1.ManualPB2:=FALSE;
+		
+	END_IF
+
+ ////  gripper 2 manual pb cyl mapping 
+	
+IF (CR160_HMI_Gripper_Cyl_2_Home_PB=TRUE OR (OP160_EO_RO_Gripper2_Open AND OP160_ManualSelected)) THEN
+	
+	CR160_Gripper_Cyl_2.ManualPB1:=TRUE;
+	
+	ELSE 
+		
+		CR160_Gripper_Cyl_2.ManualPB1:=FALSE;
+		
+	END_IF
+	
+IF (CR160_HMI_Gripper_Cyl_2_Work_PB=TRUE OR (OP160_EO_RO_Gripper2_Close AND OP160_ManualSelected)) THEN
+	
+	CR160_Gripper_Cyl_2.ManualPB2:=TRUE;
+	
+	ELSE 
+		
+		CR160_Gripper_Cyl_2.ManualPB2:=FALSE;
+		
+	END_IF	
+	
+	
+	
+///////// gripper 1 ////////
+	
+CR160_Gripper_Cyl_1(
+	Auto:=OP160_AutoSelected , 
+	Manual:= OP160_ManualSelected, 
+	ErrorActive:= OP160_ErrorActive, 
+	ResetPB:=OP160_HMI_Reset , 
+	Sensor1:=  I160_RH_COMP_PP_GRPR_OPNI712_1  , 
+	Sensor2:= NOT I160_RH_COMP_PP_GRPR_OPNI712_1 , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:=OP160_EO_RO_Gripper1_Open AND OP160_AutoSelected , 
+	AutoCmd2:=OP160_EO_RO_Gripper1_Close AND OP160_AutoSelected , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:=5 , 
+	TimeOut3:=5 , 
+	Solenoid1=> , 
+	Solenoid2=> , 
+	AlarmSensor1=> berror[1506], 
+	AlarmSensor2=> berror[1507], 
+	AlarmSolenoid1=>berror[1508] , 
+	AlarmSolenoid2=>berror[1509] , 
+	AllSignal=>berror[1510] , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP160_Gripper_Cyl_Status );
+	
+///// gripper 2///////	
+
+CR160_Gripper_Cyl_2(
+	Auto:=OP160_AutoSelected , 
+	Manual:= OP160_ManualSelected, 
+	ErrorActive:= OP160_ErrorActive, 
+	ResetPB:=OP160_HMI_Reset , 
+	Sensor1:=  I160_FIXT_LH_COMP_PP_GRPR_OPNI711_7   , 
+	Sensor2:= NOT I160_FIXT_LH_COMP_PP_GRPR_OPNI711_7  , 
+	ManualPB1:= , 
+	ManualPB2:= , 
+	AutoCmd1:=OP160_EO_RO_Gripper2_Open AND OP160_AutoSelected , 
+	AutoCmd2:=OP160_EO_RO_Gripper2_Close AND OP160_AutoSelected , 
+	OperationEnable:=OperationEnable , 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= , 
+	Pulse_1Sec:=Pulse_Block.Q1Hz , 
+	BlinkingBit:= , 
+	TimeOut1:=5 , 
+	TimeOut2:=5 , 
+	TimeOut3:=5 , 
+	Solenoid1=> , 
+	Solenoid2=> , 
+	AlarmSensor1=> berror[1511], 
+	AlarmSensor2=> berror[1512], 
+	AlarmSolenoid1=>berror[1513] , 
+	AlarmSolenoid2=>berror[1514] , 
+	AllSignal=>berror[1515] , 
+	AlarmPresent=> , 
+	Position1=> , 
+	Position2=> , 
+	HomeSensorBlink=> , 
+	WorkSensorBlink=> , 
+	Status:=OP160_Gripper_Cyl_Status );	
+	
+	
+	IF CR160_Gripper_Cyl_1.Solenoid1 THEN
+		O160_LH_COMP_PP_GRPR_CLSE_OPN_Q1350_2:=TRUE;
+		//O160_RH_COMP_PP_GRPR_CLSE_OPN_Q1350_3:=TRUE;
+	END_IF
+	IF CR160_Gripper_Cyl_1.Solenoid2 THEN
+		O160_LH_COMP_PP_GRPR_CLSE_OPN_Q1350_2:=FALSE;
+		//O160_RH_COMP_PP_GRPR_CLSE_OPN_Q1350_3:=FALSE;
+	END_IF	
+
+	IF CR160_Gripper_Cyl_2.Solenoid1 THEN
+		//O160_LH_COMP_PP_GRPR_CLSE_OPN_Q1350_2:=TRUE;
+		O160_RH_COMP_PP_GRPR_CLSE_OPN_Q1350_3:=TRUE;
+	END_IF
+	
+	IF CR160_Gripper_Cyl_2.Solenoid2 THEN
+		//O160_LH_COMP_PP_GRPR_CLSE_OPN_Q1350_2:=FALSE;
+		O160_RH_COMP_PP_GRPR_CLSE_OPN_Q1350_3:=FALSE;
+	END_IF	
+		
+///// gripper 1 close fb to robot	
+	
+IF CR160_Gripper_Cyl_1.Position2 THEN
+	OP160_EI_Gripper1_Close:=TRUE;
+ELSE
+	OP160_EI_Gripper1_Close:=FALSE;
+END_IF
+
+///// gripper 1 open fb to robot
+
+IF CR160_Gripper_Cyl_1.Position1 THEN
+	OP160_EI_Gripper1_Open:=TRUE;
+ELSE
+	OP160_EI_Gripper1_Open:=FALSE;
+END_IF
+
+///// gripper 2 close fb to robot	
+	
+IF CR160_Gripper_Cyl_2.Position2 THEN
+	OP160_EI_Gripper2_Close:=TRUE;
+ELSE
+	OP160_EI_Gripper2_Close:=FALSE;
+END_IF
+
+///// gripper 2 open fb to robot
+
+IF CR160_Gripper_Cyl_2.Position1 THEN
+	OP160_EI_Gripper2_Open:=TRUE;
+ELSE
+	OP160_EI_Gripper2_Open:=FALSE;
+END_IF
+
+OP160_GRP_TMR(IN:=OP160_EO_RO_Gripper1_Close , PT:=OP160_GRP_DLY , Q=> , ET=> );
+                	
+//RoboFB
+				
+	Op160_Robot(
+	i_b_Operation_Enable_Feedback:= OP160_SO_Auto_Operation_Enable, 
+	i_b_Auto_Enable_Feedback:=OP160_SO_Mirror_Auto_enable , 
+	i_b_Servo_On_Feedback:= OP160_SO_Servo_ON_OFF_Status, 
+	i_b_Servo_Off_Feedback:= OP160_SO_Mirror_SRVO_Off, 
+	i_b_Error_Feedback:=OP160_SO_During_error , 
+	i_b_Program_Start_Enable_Feedback:=OP160_SO_Program_Execute , 
+	i_b_Robo_Stopping_Feedback:=OP160_SO_During_Cycle_Stop , 
+	i_b_Emergency_Pressed_Feedback:=OP160_SO_During_EMG_Stop , 
+	i_b_Auto_Mode_Feedback:=OP160_SO_Auto_Ext_Mode , 
+	i_b_Reset:=OP160_HMI_Reset OR HMI_Reset OR Servo_Reset, 
+	i_b_RobotAutoManual:=OP160_Auto , 
+	i_b_ProgramReset:=OP160_Robo_ProgramReset , 
+	o_b_Operation_Enable_Cmd=>OP160_SI_Operation_Enable , 
+	o_b_Auto_Enable_Cmd=>OP160_SI_Auto_Enable , 
+	o_b_Servo_On_Cmd=>OP160_SI_Servo_ON , 
+	o_b_Servo_Off_Cmd=>OP160_SI_Servo_OFF , 
+	o_b_Error_Reset_Cmd=>OP160_SI_Error_Reset , 
+	o_b_Program_Reset_Cmd=>OP160_SI_Program_Reset , 
+	o_b_Program_Start_Cmd=>OP160_SI_Start , 
+	o_b_Program_Stop_Cmd=>OP160_SI_Stop2 , 
+	o_b_RobotAutoManual=>OP160_Robo_Automanual_out , 
+	o_b_Error=>berror[1550] );				
+					
+					
+				]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_Manual">
+      <LineId Id="3" Count="71" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="75" Count="4" />
+      <LineId Id="249" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="248" Count="0" />
+      <LineId Id="82" Count="3" />
+      <LineId Id="250" Count="0" />
+      <LineId Id="86" Count="1" />
+      <LineId Id="251" Count="0" />
+      <LineId Id="88" Count="2" />
+      <LineId Id="347" Count="0" />
+      <LineId Id="91" Count="1" />
+      <LineId Id="252" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="253" Count="0" />
+      <LineId Id="95" Count="3" />
+      <LineId Id="364" Count="0" />
+      <LineId Id="254" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="365" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="255" Count="0" />
+      <LineId Id="101" Count="1" />
+      <LineId Id="342" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="348" Count="2" />
+      <LineId Id="366" Count="0" />
+      <LineId Id="351" Count="2" />
+      <LineId Id="367" Count="0" />
+      <LineId Id="354" Count="4" />
+      <LineId Id="368" Count="0" />
+      <LineId Id="359" Count="2" />
+      <LineId Id="369" Count="0" />
+      <LineId Id="343" Count="3" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="105" Count="32" />
+      <LineId Id="339" Count="0" />
+      <LineId Id="270" Count="0" />
+      <LineId Id="340" Count="0" />
+      <LineId Id="305" Count="31" />
+      <LineId Id="271" Count="2" />
+      <LineId Id="139" Count="7" />
+      <LineId Id="370" Count="4" />
+      <LineId Id="378" Count="0" />
+      <LineId Id="375" Count="2" />
+      <LineId Id="337" Count="0" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="338" Count="0" />
+      <LineId Id="382" Count="0" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="193" Count="3" />
+      <LineId Id="417" Count="0" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="418" Count="0" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="201" Count="2" />
+      <LineId Id="244" Count="0" />
+      <LineId Id="404" Count="6" />
+      <LineId Id="419" Count="0" />
+      <LineId Id="411" Count="0" />
+      <LineId Id="420" Count="0" />
+      <LineId Id="412" Count="4" />
+      <LineId Id="257" Count="1" />
+      <LineId Id="381" Count="0" />
+      <LineId Id="147" Count="0" />
+      <LineId Id="149" Count="25" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

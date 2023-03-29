@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="OP10_ORNG_CYL_OP" Id="{1d31669c-3e3b-485e-90ab-c8634ac4a968}">
+    <Declaration><![CDATA[TYPE OP10_ORNG_CYL_OP :
+STRUCT
+	HORIZ_CYL_AUT_CMD1			: BOOL;
+	HORIZ_CYL_AUT_CMD2			: BOOL;	
+	VERT_CYL_AUT_CMD1			: BOOL;
+	VERT_CYL_AUT_CMD2			: BOOL;	
+	LH_O_GRP_VALVE_ON			: BOOL;
+	RH_O_GRP_VALVE_ON			: BOOL;
+	LH_O_PSH_VALVE_ON			: BOOL;
+	RH_O_PSH_VALVE_ON			: BOOL;
+	DEGREE_AUT_CMD1				: BOOL;
+	DEGREE_AUT_CMD2				: BOOL;	
+	ALL_HOME					: BOOL;	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

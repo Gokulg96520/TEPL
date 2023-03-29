@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="RayPRO_Variables" Id="{ce2ece11-6cb4-4428-857f-4f73a273f55a}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	
+	{attribute 'OPC.UA.DA':='1'}
+	StatusMachineOn			 	: BOOL;
+	{attribute 'OPC.UA.DA':='1'}
+	StatusToolChange         	: BOOL;
+	{attribute 'OPC.UA.DA':='1'}
+	StatusSettings           	: BOOL;
+	{attribute 'OPC.UA.DA':='1'}
+	StatusProducingParts     	: BOOL;
+	{attribute 'OPC.UA.DA':='1'}
+	StatusStop               	: BOOL;
+	{attribute 'OPC.UA.DA':='1'}
+	StatusEmptying           	: BOOL;
+	{attribute 'OPC.UA.DA':='1'}
+	StatusEmpty              	: BOOL;
+	{attribute 'OPC.UA.DA':='1'}
+	PLCAliveCounter  		 	: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PLCTimeSync		 		 	: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PLCStopRequestAck 		 	: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PLCStoppageSync             : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CurrentStopId				: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CurrentStopHourOfStartTime  : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CurrentStopMinuteOfStartTime: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CurrentStopSecondOfStartTime: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CurrentStopStation			: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CurrentStopCause			: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PLCChangeOfbatchStatus		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	BatchMarking				: STRING;
+	{attribute 'OPC.UA.DA':='1'}
+	PLCSyncSetup				: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	BatchGoodPartQuantity		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	BatchScrappedQuantity		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	BatchDefectCounter1			: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	BatchDefectCounter2			: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	FirstSamplingStatus			: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PeriodicSamplingStatus		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	ManualSamplingStatus		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CleanedPartSamplingQuantity	: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CleanedPartSamplingRequest	: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	LastSamplingStatus			: DINT;	
+	
+///MES TAGS
+	
+	{attribute 'OPC.UA.DA':='1'}
+	MESAliveCounter				: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	HourOfTime					: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	MinuteOfTime        		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	SecondOfTime        		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	TimeOffset          		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	MESStopRequestCounter  		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	MESStoppageSync        		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	MESChangeOfBatchRequest 	: BOOl;
+	{attribute 'OPC.UA.DA':='1'}
+	IsProductMarked				: BOOl;
+	{attribute 'OPC.UA.DA':='1'}
+	MarkingCommentLine1			: STRING;
+	{attribute 'OPC.UA.DA':='1'}
+	MarkingCommentLine2			: STRING;
+	{attribute 'OPC.UA.DA':='1'}
+	MESSyncSetup				: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	HandlingUnitSize			: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	FirstSamplingQuantity		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	FirstSamplingRequest		: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	FirstSamplingAck			: DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PeriodicSamplingQuantity    : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PeriodicSamplingAck         : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	ManualSamplingQuantity      : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	ManualSamplingRequest       : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	ManualSamplingAck           : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CleanedPartSamplingStatus   : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	CleanedPartSamplingAck      : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	LastSamplingQuantity        : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	LastSamplingAck             : DINT;
+	{attribute 'OPC.UA.DA':='1'}
+	PeriodicSamplingFrequency   : DINT;
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP10_HMI_GVL" Id="{5cf5331b-ffae-43b8-91af-0067de377157}">
+  <GVL Name="OP10_HMI_GVL" Id="{fb2ace99-c0de-4752-9a28-f74caac8f61e}">
     <Declaration><![CDATA[//{attribute 'qualified_only'}
 VAR_GLOBAL
+
+	
 //LREAL
 	OP10A_SRV_ACT_POS								: LREAL;
 	OP10B_SRV_ACT_POS								: LREAL;
@@ -14,7 +16,9 @@ VAR_GLOBAL
 	OP10_CYL_NO										: INT;
 	OP10B_CYL_NO									: INT;	
 	OP10_SERVO_NO									: INT;
-	OP10B_SERVO_NO									: INT;	
+	OP10B_SERVO_NO									: INT;
+	OP10A_AUTO_STATUS_MES							: INT;	
+	OP10B_AUTO_STATUS_MES							: INT;	
 //BOOL
 	OP10_HOME										: BOOL;
 	OP10_WORK										: BOOL;
@@ -32,11 +36,47 @@ VAR_GLOBAL
 	OP10B_SRV_ENABLE								: BOOL;
 	OP10B_MOVE_TARGET								: BOOL;
 	OP10A_SRV_ENABLE								: BOOL;
+	OP10A_STRT_PB									: BOOL;
+	OP10B_STRT_PB									: BOOL;	
+// ROBO
+									(*OP10A*)
+	OP10A_M_BODY_READY_TO_PICK						: BOOL;
+	OP10A_M_PICK_PART_OK							: BOOL;
+	OP10A_M_PICK_PART_NOK                           : BOOL;
+	OP10A_M_CAMERA_OK                               : BOOL;
+	OP10A_M_CAMERA_NOK                              : BOOL;
+	OP10A_M_GRIPPER_ROTATE_COMPLETE                 : BOOL;
+	OP10A_M_READY_TO_INSERT_ORING                   : BOOL;
+	OP10A_M_ORING_INSERTION_DONE                    : BOOL;
+	OP10A_M_PLACE_IN_CONVEYOR                       : BOOL;
+	OP10A_M_PLACE_IN_REJECTION                      : BOOL;
+	OP10A_M_GRIPPER_OPEN                            : BOOL;
+	OP10A_M_GRIPPER_CLOSE                           : BOOL;
+									(*OP10B*)	
+	OP10B_M_BODY_READY_TO_PICK						: BOOL;
+	OP10B_M_PICK_PART_OK							: BOOL;
+	OP10B_M_PICK_PART_NOK                           : BOOL;
+	OP10B_M_CAMERA_OK                               : BOOL;
+	OP10B_M_CAMERA_NOK                              : BOOL;
+	OP10B_M_GRIPPER_ROTATE_COMPLETE                 : BOOL;
+	OP10B_M_READY_TO_INSERT_ORING                   : BOOL;
+	OP10B_M_ORING_INSERTION_DONE                    : BOOL;
+	OP10B_M_PLACE_IN_CONVEYOR                       : BOOL;
+	OP10B_M_PLACE_IN_REJECTION                      : BOOL;
+	OP10B_M_GRIPPER_OPEN                            : BOOL;
+	OP10B_M_GRIPPER_CLOSE                           : BOOL;	
+	
+
+
+	
 END_VAR
 
 
 
 
-]]></Declaration>
+
+VAR_GLOBAL PERSISTENT
+	OP10_SERVO_POS_VEL_LIMIT: OP10_SERVO_LIMIT;
+END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

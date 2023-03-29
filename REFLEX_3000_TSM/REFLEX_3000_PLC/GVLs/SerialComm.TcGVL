@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="SerialComm" Id="{d299a389-d08e-49b4-857d-eddcc800d488}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+		TxBuffer_1: COMbuffer;
+		RxBuffer_1: COMbuffer;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

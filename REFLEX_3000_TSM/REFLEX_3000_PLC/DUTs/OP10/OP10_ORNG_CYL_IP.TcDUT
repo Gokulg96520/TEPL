@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="OP10_ORNG_CYL_IP" Id="{5c0c04bb-c03a-43f3-b494-aa5248fad140}">
+    <Declaration><![CDATA[TYPE OP10_ORNG_CYL_IP :
+STRUCT
+	HORIZ_CYL_SNR1			: BOOL;
+	HORIZ_CYL_SNR2			: BOOL;	
+	VERT_CYL_SNR1			: BOOL;
+	VERT_CYL_SNR2			: BOOL;
+	LH_O_GRP_SNR1			: BOOL;
+	LH_O_GRP_SNR2			: BOOL;
+	RH_O_GRP_SNR1			: BOOL;
+	RH_O_GRP_SNR2			: BOOL;
+	LH_O_PUSH_SNR1			: BOOL;
+	LH_O_PUSH_SNR2			: BOOL;
+	RH_O_PUSH_SNR1			: BOOL;
+	RH_O_PUSH_SNR2			: BOOL;
+	DEGREE_0				: BOOL;
+	DEGREE_180				: BOOL;
+	LH_REJ_SNR1				: BOOL;
+	LH_REJ_SNR2				: BOOL;	
+	RH_REJ_SNR1				: BOOL;
+	RH_REJ_SNR2				: BOOL;		
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

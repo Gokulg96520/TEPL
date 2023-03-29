@@ -1,48 +1,43 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP120_Error" Id="{70f50bc0-06bc-41b9-899a-123497c14acf}" SpecialFunc="None">
+  <POU Name="OP120_Error" Id="{a0d0c2e6-cd58-4d47-b4eb-724ddbcd9350}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP120_Error
 VAR
 	OP120_StepErr1:ton;
 	OP120_StepErr2:ton;
 	OP120_StepErr3:ton;
+	bdone: BOOL;
+	i: INT;
+	Raise: INT;
+	j: INT;
+	Clear: INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF ((OP120_ErrorWord_0= 1) OR (OP120_ErrorWord_1= 1) OR (OP120_ErrorWord_2= 1)) THEN
-	OP120_ErrorActive:= TRUE;
-	END_IF
-	//Reset ErrorActive
-IF (OP120_HMI_Reset) THEN 
-	OP120_ErrorActive:= FALSE;
-	OP120_ErrorWord_0:= 0;
-	OP120_ErrorWord_1:= 0;
-	OP120_ErrorWord_2:= 0;
-	END_IF
+      <ST><![CDATA[IF NOT bdone THEN
+	bdone:=TRUE;
+FOR i:=1100 TO 1200 BY 1 DO 
 	
-//Step Errors
-
-
-IF OP120_GVL.OP120_AutoSeq=150 AND  NOT  OP120_IO_Tag_Link.OP120_EO_Spring_Pick_Completed AND OP120_StepErr1.q THEN
-OP120_ErrorWord_0.0:=TRUE;
+IF berror[i] THEN
+	OP120_ErrorActive:=TRUE;
 END_IF
-IF  OP120_GVL.OP120_AutoSeq=160 AND  NOT OP120_IO_Tag_Link.OP120_EO_Spring_Place_Pos_Reached AND OP120_StepErr2.q THEN
-OP120_ErrorWord_0.1:=TRUE;
-END_IF
-IF  OP120_GVL.OP120_AutoSeq=210 AND  NOT OP120_IO_Tag_Link.OP120_SO_Rbt_In_Place_Zone AND OP120_StepErr3.q THEN
-OP120_ErrorWord_0.0:=TRUE;
+END_FOR
+bdone:=FALSE;
 END_IF
 
-
-
-// Step Error Delay
-	OP120_StepErr1(IN:=OP120_AutoSequence.OP120_AutoSeq=40 , PT:=T#2S , Q=> , ET=> );
-	OP120_StepErr2(IN:=OP120_AutoSequence.OP120_AutoSeq=150 , PT:=T#2S , Q=> , ET=> );
-
-]]></ST>
+IF OP120_HMI_Reset OR Servo_Reset THEN
+	FOR j:=1100 TO 1200 BY 1 DO 
+		
+	
+	berror[j]:=FALSE;
+	OP120_ErrorActive:=FALSE;
+	
+	END_FOR
+	temp:=false;
+END_IF]]></ST>
     </Implementation>
     <LineIds Name="OP120_Error">
-      <LineId Id="3" Count="29" />
+      <LineId Id="3" Count="19" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

@@ -1,8 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP90_HMI_GVL" Id="{aabe3639-9f81-4c73-ade2-56dd7a19ea25}">
+  <GVL Name="OP90_HMI_GVL" Id="{4aed4a2d-f57f-4512-b2b3-a7116a839520}">
     <Declaration><![CDATA[//{attribute 'qualified_only'}
 VAR_GLOBAL
+	
+//	SERVO
+	OP90_SRV_HORZ_CNTRL						: Servo_Control;
+	OP90_SRV_LH_VERT_CNTRL                  : Servo_Control;
+	OP90_SRV_RH_VERT_CNTRL                  : Servo_Control;
+	OP90_STP_LH_ROTRY_CNTRL					: SERVO_Control;
+	OP90_STP_RH_ROTRY_CNTRL					: SERVO_Control;
+	OP90_SERVO_GUIDE_CNTRL					: Servo_Control;
+	OP90_SRV_LH_CNVY_CNTRL					: Servo_Control;
+	OP90_SRV_RH_CNVY_CNTRL                  : Servo_Control;
 //LREAL	
 	OP90_SERVO_ACTUAL_POS					: LREAL;
 //REAL
@@ -11,6 +21,7 @@ VAR_GLOBAL
 // INT
 	OP90_CYL_NUM							: INT;
 	OP90_SERVO_NUM							: INT;
+	OP90_AUTO_STATUS_MES					: INT;	
 // BOOL
 	OP90_JOG_POS							: BOOL;
 	OP90_JOG_NEG							: BOOL;	
@@ -20,10 +31,26 @@ VAR_GLOBAL
 	OP90_MOVE_TARGT							: BOOL;
 	OP90_SERVO_FAULT						: BOOL;
 	OP90_HOME_REFERENCE						: BOOL;
-	OP90_M_SERVO_ENABLE						: BOOL;	
-	
-// WILL BE DELETED
-	MACHINE_RST: BOOL;
+	OP90_M_SERVO_ENABLE						: BOOL;
+	OP90_HOMING_STRT						: BOOL;
+END_VAR
+VAR_GLOBAL PERSISTENT
+// LREAL
+	OP90_SRV_HORZ_WRK_MM					: LREAL;
+	OP90_SRV_HORZ_HME_MM					: LREAL;
+	OP90_SRV_VERT_LH_HME_MM					: LREAL;
+	OP90_SRV_VERT_LH_PCKWRK_MM				: LREAL;
+    OP90_SRV_VERT_LH_SPLCWRK_MM         	: LREAL;
+    OP90_SRV_VERT_LH_PLCWRK_MM          	: LREAL;
+	OP90_SRV_VERT_RH_HME_MM					: LREAL;
+	OP90_SRV_VERT_RH_PCKWRK_MM		    	: LREAL;
+    OP90_SRV_VERT_RH_SPLCWRK_MM         	: LREAL;
+    OP90_SRV_VERT_RH_PLCWRK_MM          	: LREAL;
+	OP90_STP_ROTRY_LH_HME_MM				: LREAL;
+	OP90_STP_ROTRY_RH_HME_MM				: LREAL;
+	OP90_STP_ROTRY_LH_WRK_MM				: LREAL;
+	OP90_STP_ROTRY_RH_WRK_MM            	: LREAL;
+	OP90_SRV_LIMIT							: OP90_SERVO_LIMIT;
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

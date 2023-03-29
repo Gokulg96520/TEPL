@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="servo" Id="{083be752-38d7-497e-a40b-17d29634cc94}" SpecialFunc="None">
+  <POU Name="servo" Id="{4a372f53-47f9-412b-965e-97efc4b9ff88}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK servo
 
 VAR_INPUT

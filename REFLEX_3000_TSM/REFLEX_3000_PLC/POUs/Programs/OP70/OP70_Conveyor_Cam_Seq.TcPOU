@@ -1,0 +1,290 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP70_Conveyor_Cam_Seq" Id="{913c59e5-1817-47ab-b7f3-74062945a769}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP70_Conveyor_Cam_Seq
+VAR
+	OP70_Conveyor	: Servo_Conveyor_FB;
+	Conv_Cam_Step: INT;
+	OP70_Camera_Trigger: BOOL;
+	OP70_Miss_Trigger: BOOL;
+	OP70_LH_Camera_OK: BOOL;
+	OP70_LH_Camera_NOK: BOOL;
+	OP70_RH_Camera_OK: BOOL;
+	OP70_RH_Camera_NOK: BOOL;
+	OP70_LH_Clr_OK: BOOL;
+	OP70_RH_Clr_OK: BOOL;
+	OP70_LH_Size_NOK: BOOL;
+	OP70_RH_Size_NOK: BOOL;
+	OP70_Size_Rej: BOOL;
+	OP70_LH_Clr_NOK : BOOL;
+	OP70_RH_Clr_NOK	: BOOL;
+	OP70_Size_Rej_Complete: BOOL;
+	Conveyor_Track_Delay: TON;
+	Conveyor_Track_OFF_Delay: TON;
+	Conveyor_Velocity_mode : BOOL;
+	Servo_Conti_Run			: BOOL;
+	Temp_Counter_LH			: UDINT;
+	Temp_Counter_RH			: UDINT;
+	//OP70_Camera_Trigger: BOOL;
+	OP70_LH_Size_OK: BOOL;
+	OP70_RH_Size_OK: BOOL;
+	OP70_Camera_Trigger_Ack : BOOL;
+	Toggle_Pos_LH : R_TRIG;
+	Toggle_Neg_LH : F_TRIG;
+	Toggle_Pos_RH : R_TRIG;
+	Toggle_Neg_RH : F_TRIG;
+	LH_Cam_Completed : BOOL;
+	RH_Cam_Completed : BOOL;
+	Drum_Jam_Timer	 : TON;
+	Conv_Step_no: INT;
+	OP70_Camera_Bypass : BOOL;
+	Control : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+Toggle_Pos_LH(CLK:=OP70_Camera_FB.OP70_LH_Inspection_Status.Inspection_Completed);
+Toggle_Neg_LH(CLK:=OP70_Camera_FB.OP70_LH_Inspection_Status.Inspection_Completed);
+Toggle_Pos_RH(CLK:=OP70_Camera_FB.OP70_RH_Inspection_Status.Inspection_Completed);
+Toggle_Neg_RH(CLK:=OP70_Camera_FB.OP70_RH_Inspection_Status.Inspection_Completed);
+
+IF Toggle_Pos_LH.Q OR Toggle_Neg_LH.Q THEN
+	LH_Cam_Completed:=1;	
+END_IF
+IF Toggle_Pos_RH.Q OR Toggle_Neg_RH.Q THEN
+	RH_Cam_Completed:=1;	
+END_IF
+
+
+IF MANUAL_SELECTED AND OP70_ManualSelected THEN               
+	IF I70_DRUM_CONV_REV_I308_3 THEN
+		SR70_Conv_servo_status.targetVelocity:=OP70_Conv_Rev_Speed_6_3;
+		SR70_Conv_servo_status.moveVelocity:=I70_DRUM_CONV_REV_I308_3;
+ 	ELSIF I70_DRUM_CONV_FWD_I308_4 THEN
+		SR70_Conv_servo_status.targetVelocity:=OP70_Conv_Fwd_Speed_7_89;
+		SR70_Conv_servo_status.moveVelocity:=I70_DRUM_CONV_FWD_I308_4;	
+	ELSE 	
+		SR70_Conv_servo_status.moveVelocity:=0;   	
+	END_IF  	
+END_IF
+
+OP70_Model:=Model;
+
+IF OP70_Model='6.3' THEN
+	OP70_Conv_Fwd_Time:=OP70_Conv_Fwd_Time_6_3;
+	OP70_Conv_Rev_Time:=OP70_Conv_Rev_Time_6_3;
+	OP70_Conveyor_FWD_Speed:= OP70_Conv_Fwd_Speed_6_3;
+	OP70_Conveyor_REV_Speed:= OP70_Conv_Rev_Speed_6_3;
+END_IF
+
+IF OP70_Model='7.89' THEN
+	OP70_Conv_Fwd_Time:=OP70_Conv_Fwd_Time_7_89;
+	OP70_Conv_Rev_Time:=OP70_Conv_Rev_Time_7_89;
+	OP70_Conveyor_FWD_Speed:= OP70_Conv_Fwd_Speed_7_89;
+	OP70_Conveyor_REV_Speed:= OP70_Conv_Rev_Speed_7_89;
+END_IF
+
+Conveyor_Velocity_mode:=1;
+
+OP70_Conveyor(
+	Conveyor_Prgrm_Start:= OP70_Conveyor_ON AND OP70_AutoRunning, 
+	Conveyor_Prgrm_Reset:= , 
+	Conveyor_Continuous_Run:= Servo_Conti_Run, 
+	Conveyor_FWD_Position	:= OP70_Conv_Fwd_Pos,
+    Conveyor_REV_Position	:= OP70_Conv_Rev_Pos,
+    Velocity_mode			:= Conveyor_Velocity_mode,	
+	Track_Overflow := Conveyor_Track_OFF_Delay.Q, 
+    Track_Sensor_FB := Conveyor_Track_Delay.Q,	
+	Camera_Trigger_OK := OP70_Camera_Done OR OP70_Camera_Bypass, 
+	Fwd_Time_IP:= OP70_Conv_Fwd_Time, 
+	Rev_Time_IP:= OP70_Conv_Rev_Time, 
+	Conveyor_FWD_Speed:=OP70_Conveyor_FWD_Speed , 
+	Conveyor_REV_Speed:=OP70_Conveyor_REV_Speed , 
+	LH_Work_Sensor:=CR70_LH_Rej_Cyl.Sensor2 , 
+	LH_Home_Sensor:=CR70_LH_Rej_Cyl.Sensor1 , 
+	RH_Work_Sensor:=CR70_RH_Rej_Cyl.Sensor2 , 
+	RH_Home_Sensor:=CR70_RH_Rej_Cyl.Sensor1 , 
+	LH_Camera_OK:=  OP70_RH_Camera_OK OR OP70_Camera_Bypass, 
+	LH_Camera_NOK:= OP70_RH_Camera_NOK, 
+	RH_Camera_OK:=  OP70_LH_Camera_OK OR OP70_Camera_Bypass, 
+	RH_Camera_NOK:= OP70_LH_Camera_NOK, 
+	Camera_trigger:= OP70_Camera_Trigger,
+	Camera_Trigger_Ack=> OP70_Camera_Trigger_Ack,
+	Step_Num => Conv_Step_no,
+	Drum_ON=> O70_DRUM_MTR_FWD_Q307_1, 
+	LH_Work_Coil=>CR70_LH_Rej_Cyl.AutoCmd2 , 
+	LH_Home_Coil=>CR70_LH_Rej_Cyl.AutoCmd1 , 
+	RH_Work_Coil=>CR70_RH_Rej_Cyl.AutoCmd2,
+	RH_Home_Coil=>CR70_RH_Rej_Cyl.AutoCmd1,
+	Ready_to_Pick=> OP70_pick_ready , 
+	One_Cycle		:= OP70_One_Cycle,	
+	Pick_Done:=     OP70_pick_done , 
+	Conveyor_Servo_Control_Structure:= SR70_CONV_servo_ctrl );
+
+Conveyor_Track_Delay(IN:= NOT I70_DRUM_FEED_CONV1_OVERFLW_I1110_2 OR NOT I70_DRUM_FEED_CONV2_OVERFLW_I1110_3,PT:=INT_TO_TIME(OP70_Drum_ON_Time));	
+Conveyor_Track_OFF_Delay(IN:=I70_DRUM_FEED_CONV1_OVERFLW_I1110_2 AND I70_DRUM_FEED_CONV2_OVERFLW_I1110_3,PT:=INT_TO_TIME(OP70_Drum_OFF_Time)); //  
+	
+IF 	OP70_AutoRunning THEN
+	IF Conveyor_Track_OFF_Delay.Q THEN
+		O70_DRUM_MTR_FWD_Q307_1:=0;
+	END_IF
+	//IF Conveyor_Track_Delay.Q THEN
+	//	O70_DRUM_MTR_FWD_Q307_1:=1;
+	//END_IF
+	O70_AIR_PURGE_ON_Q1153_6:=1;
+	O70_DRUM_RUN_IND_Q307_5 :=O70_DRUM_MTR_FWD_Q307_1;
+ELSE
+	O70_DRUM_MTR_FWD_Q307_1:=I70_DRUM_OFF_ON_I308_2;
+	O70_DRUM_RUN_IND_Q307_5:=I70_DRUM_OFF_ON_I308_2;
+	O70_AIR_PURGE_ON_Q1153_6:=I70_DRUM_OFF_ON_I308_2;
+END_IF	
+
+IF (NOT OP70_AutoRunning OR (NOT OP70_LH_Camera_Online OR NOT OP70_RH_Camera_Online)) AND NOT OP70_Camera_Bypass THEN
+	Conv_Cam_Step:=10;
+END_IF 
+
+CASE Conv_Cam_Step OF
+	10: 	OP70_LH_Camera_OK :=0;
+            OP70_LH_Camera_NOK:=0;
+	        OP70_RH_Camera_OK :=0;
+	        OP70_RH_Camera_NOK:=0;	
+			LH_Cam_Completed  :=0;
+			RH_Cam_Completed  :=0;		
+			OP70_Camera_Done	:=0;
+			OP70_LH_Clr_OK 		:=0;
+		    OP70_RH_Clr_OK 		:=0;		
+			OP70_LH_Size_OK		:=0;
+		    OP70_RH_Size_OK		:=0;	
+			Conv_Cam_Step		:=11;	
+	
+	11: IF ((OP70_Camera_Trigger AND (NOT OP70_Camera_Done)) OR OP70_Miss_Trigger) AND NOT OP70_Camera_Bypass THEN
+			OP70_LH_Camera_Trigger:=1;
+			OP70_RH_Camera_Trigger:=1;
+			Conv_Cam_Step		  :=15;	
+		END_IF
+
+	15:	IF LH_Cam_Completed AND RH_Cam_Completed THEN// (NOT OP70_LH_Camera_Trigger) AND (NOT OP70_RH_Camera_Trigger) THEN //(Temp_Counter_LH<OP70_Camera_FB.OP70_LH_Acquisition_ID AND Temp_Counter_RH<OP70_Camera_FB.OP70_RH_Acquisition_ID )THEN
+			OP70_LH_Camera_Trigger:=0;
+			OP70_RH_Camera_Trigger:=0;
+			OP70_Camera_Trigger :=0;
+			OP70_Miss_Trigger	:=0;
+			Conv_Cam_Step:=25;
+		END_IF  
+	   
+	25: IF OP70_Camera_FB.OP70_LH_Cam_Result[0]=1 AND OP70_Camera_FB.OP70_RH_Cam_Result[0]=1 THEN
+			OP70_LH_Camera_OK:=1;
+			OP70_RH_Camera_OK:=1;
+			Conv_Cam_Step    :=50;
+		ELSIF (OP70_Camera_FB.OP70_LH_Cam_Result[2]<>1 OR OP70_Camera_FB.OP70_RH_Cam_Result[2]<>1) THEN	
+			OP70_One_Cycle  :=1;
+			Conv_Cam_Step   :=50;
+		ELSIF (OP70_Camera_FB.OP70_LH_Cam_Result[1]=1 OR OP70_Camera_FB.OP70_RH_Cam_Result[1]=1) AND (OP70_Camera_FB.OP70_LH_Cam_Result[2]=1 AND OP70_Camera_FB.OP70_RH_Cam_Result[2]=1) THEN			
+			IF OP70_Camera_FB.OP70_LH_Cam_Result[0]=1 THEN
+				OP70_LH_Camera_OK:=1;
+			END_IF
+			IF OP70_Camera_FB.OP70_RH_Cam_Result[0]=1 THEN
+				OP70_RH_Camera_OK:=1;
+			END_IF
+			Conv_Cam_Step:=30;
+		END_IF	
+			
+   30: 	IF OP70_Camera_FB.OP70_LH_Cam_Result[1]=1 THEN
+	   		OP70_LH_Camera_NOK:=1;
+  	    END_IF
+		IF OP70_Camera_FB.OP70_RH_Cam_Result[1]=1 THEN
+	   		OP70_RH_Camera_NOK:=1;
+  	    END_IF
+		Conv_Cam_Step:=50;
+		
+   50:  OP70_Camera_Done:=1;
+   		Temp_Counter_LH:=OP70_Camera_FB.OP70_LH_Acquisition_ID;
+		Temp_Counter_RH:=OP70_Camera_FB.OP70_RH_Acquisition_ID;
+		IF Conv_Step_no>75 THEN
+			Conv_Cam_Step   :=10;
+			OP70_Camera_Done:=0;
+		END_IF
+   	    
+END_CASE
+
+IF OP70_AutoRunning AND Control THEN
+	Drum_Jam_Timer(IN:=(NOT I70_DRUM_FEED_CONV1_OVERFLW_I1110_2)OR(NOT I70_DRUM_FEED_CONV1_OVERFLW_I1110_2)); 
+	Drum_Jam_Timer(PT:=T#40S);
+	IF Drum_Jam_Timer.Q THEN
+		OP70_ErrorActive:=1;
+	END_IF
+END_IF
+
+
+
+(*	30: IF OP70_Camera_FB.OP70_LH_Cam_Result[4]<>1 OR OP70_Camera_FB.OP70_RH_Cam_Result[4]<>1 THEN
+		 	IF OP70_Camera_FB.OP70_LH_Cam_Result[4]<>1 THEN
+				OP70_LH_Size_NOK:=1;
+			END_IF
+		 	IF OP70_Camera_FB.OP70_RH_Cam_Result[4]<>1 THEN
+				OP70_RH_Size_NOK:=1;
+			END_IF
+		    OP70_Size_Rej:=1;
+		    IF OP70_Size_Rej_Complete THEN
+			    OP70_One_Cycle:=1;
+			    Conv_Cam_Step:=10;
+		    END_IF	 
+		ELSIF OP70_Camera_FB.OP70_LH_Cam_Result[4]=1 AND OP70_Camera_FB.OP70_RH_Cam_Result[4]=1 THEN
+			 OP30_LH_Size_OK:= 1;
+		     OP30_RH_Size_OK:= 1;
+			 Conv_Cam_Step:=40;
+		END_IF
+		
+	40: IF OP70_Camera_FB.OP70_LH_Cam_Result[3]<>1 OR OP70_Camera_FB.OP70_RH_Cam_Result[3]<>1 THEN
+		 	IF OP70_Camera_FB.OP70_LH_Cam_Result[3]<>1 THEN
+				OP70_LH_Clr_NOK:=1;
+				OP70_LH_Camera_NOK:=1;
+			END_IF
+		 	IF OP70_Camera_FB.OP70_RH_Cam_Result[3]<>1 THEN
+				OP70_RH_Clr_NOK:=1;
+				OP70_RH_Camera_NOK:=1;
+			END_IF
+			Conv_Cam_Step  :=70;
+		ELSIF OP70_Camera_FB.OP70_LH_Cam_Result[3]=1 AND OP70_Camera_FB.OP70_RH_Cam_Result[3]=1 THEN
+			 OP70_LH_Clr_OK :=1;
+		     OP70_RH_Clr_OK :=1;
+			 Conv_Cam_Step  :=50;
+		END_IF 
+*)
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP70_Conveyor_Cam_Seq">
+      <LineId Id="565" Count="0" />
+      <LineId Id="567" Count="10" />
+      <LineId Id="566" Count="0" />
+      <LineId Id="504" Count="0" />
+      <LineId Id="507" Count="9" />
+      <LineId Id="505" Count="1" />
+      <LineId Id="228" Count="14" />
+      <LineId Id="589" Count="0" />
+      <LineId Id="588" Count="0" />
+      <LineId Id="243" Count="23" />
+      <LineId Id="372" Count="0" />
+      <LineId Id="471" Count="0" />
+      <LineId Id="267" Count="26" />
+      <LineId Id="584" Count="0" />
+      <LineId Id="586" Count="1" />
+      <LineId Id="585" Count="0" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="408" Count="4" />
+      <LineId Id="583" Count="0" />
+      <LineId Id="582" Count="0" />
+      <LineId Id="413" Count="24" />
+      <LineId Id="578" Count="3" />
+      <LineId Id="438" Count="0" />
+      <LineId Id="440" Count="24" />
+      <LineId Id="558" Count="6" />
+      <LineId Id="555" Count="2" />
+      <LineId Id="470" Count="0" />
+      <LineId Id="125" Count="32" />
+      <LineId Id="122" Count="2" />
+      <LineId Id="120" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

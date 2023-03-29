@@ -3,83 +3,95 @@
   <POU Name="Scanner" Id="{255a0fc7-4285-4fcb-91b2-a3278a7e1d8a}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK Scanner
 VAR_INPUT
-	input: INPUT;
-	Trigger_enable: BOOL;
-	Trig: BOOL;
-	reset:BOOL;
-	Scan_Start:BOOL;
+	Acquisition_Status	: Acquisition_Status_Scanner;
+	Result_Status		: Result_Status;
+	Result_Data_Register: Result_Data_Register;
+	Res_Data			: ARRAY[0..MAX_STRING_LENGTH] OF BYTE;
+	reset				: BOOL;
 END_VAR
+
 VAR_OUTPUT
-	output: OUTPUT;
+	Acquisition_Control	: Acquisition_Control_Scanner;
+	Result_Control		: Result_Control_Scanner;
+	Result_ID           : UINT;
+	Read_Done			: BOOL;
+	Busy				: BOOL;
+	Result				: T_MaxString;
+	No_Read				: BOOL;
+	Error				: BOOL;
 END_VAR
+
+VAR_IN_OUT
+	Scan_Start			: BOOL;
+END_VAR
+
 VAR
-	trigger: R_TRIG;
-	rst: R_TRIG;
-	okay: R_TRIG;
-	acq: R_TRIG;
-	i: INT;
-	in: ARRAY[0..MAX_STRING_LENGTH] OF BYTE;
-	ok :BOOL;
-	nok:BOOL;
-	temp:INT;
+	trigger      : R_TRIG;
+	rst		     : R_TRIG;
+	okay	     : R_TRIG;
+	ack			 : R_TRIG;
+	i		     : INT ;
+	in		     : ARRAY[0..MAX_STRING_LENGTH] OF BYTE;
+	ok		     : BOOL;
+	nok		     : BOOL;
+	temp	     : UINT;	
+	Scanner_Read : INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[output.Error:=input.Fault;
+      <ST><![CDATA[
+trigger(CLK:=Scan_Start);
+rst(CLK:=reset);
+okay(CLK:=Result_Status.Result_Available);
+ack(CLK:=Result_Control.Result_acknowledge);
+Busy:=Acquisition_Status.Acquiring;
+Error:=Result_Status.Set_When_fault_Occur;
 
-trigger(CLK:=Trig , Q=> );
-rst(CLK:=reset , Q=> );
-okay(CLK:=scan_start , Q=> );
-acq(CLK:=input.Acquiring);
-
-IF NOT input.Fault THEN
-	IF Trigger_enable=TRUE THEN
-		output.Trigger_Enable:=1;
-	ELSE
-		output.Trigger_Enable:=0;
+IF NOT Result_Status.Set_When_fault_Occur THEN
+	IF NOT Acquisition_Control.Trigger_Enable THEN
+		Acquisition_Control.Trigger_Enable:=1;
 	END_IF
-	IF trigger.Q=TRUE AND Trigger_enable=TRUE THEN
-		output.Trigger:=1;
+	IF trigger.Q=TRUE AND Acquisition_Control.Trigger_Enable THEN
+		Acquisition_Control.Trigger:=1;
 	END_IF
 	IF okay.Q THEN
-		output.Trigger:=0;
+		Acquisition_Control.Trigger:=0;
 	END_IF
-	output.Result_ID:=input.Result_ID;
+	Result_ID:=Result_Data_Register.Result_ID;
 END_IF
 
-IF input.Result_available AND ok AND NOT input.fault  AND NOT input.Acquiring AND (temp<>input.Result_ID) THEN
-	FOR i:=0 TO 245 DO
-	in[i]:=input.Result_data[i];
-    END_FOR
-	output.Result_data:=BYTEARR_TO_MAXSTRING(in:=in);
-	output.no_read:=FALSE;
-	output.Done:=TRUE;
-	temp:=input.Result_ID;
-	//output.Result_ID:=temp;
-	output.Result_acknowledge:=TRUE;
-  	output.Result_len:=input.Result_Length;
-
-ELSE
-	output.Result_acknowledge:=FALSE;   
-END_IF
-
-
-IF rst.Q=TRUE OR input.Acquiring THEN
-	output.no_read:=FALSE;
-    output.Done:=FALSE;
-END_IF
-
-
-IF input.Result_code=0 OR (NOT Scan_Start) THEN
-	output.Result_data:='';
-	output.no_read:=TRUE;
+IF Result_Data_Register.Result_code=0 AND Scan_Start THEN
+	Result:='';
+	No_Read:=TRUE;
+	Scan_Start:=0;
 	nok:=1;ok:=0;
-	output.Done:=TRUE;
-
-ELSIF input.Result_code=1 AND Scan_Start THEN
+	Result_Control.Result_Acknowledge:=TRUE;
+ELSIF Result_Data_Register.Result_Code=1 AND Scan_Start THEN
 	ok:=1;nok:=0;
-	temp:=input.Result_ID;
+	Scan_Start:=0;
+	temp:=Result_Data_Register.Result_ID;
 END_IF
+
+IF Result_Status.Result_available AND ok AND NOT Result_Status.Set_When_fault_Occur  AND NOT Busy AND (temp<>Result_Data_Register.Result_ID) THEN
+	FOR i:=0 TO 245 DO
+		in[i]:=Res_Data[i];
+    END_FOR
+	Result:=BYTEARR_TO_MAXSTRING(in:=in);
+	No_Read:=FALSE;
+	Read_Done:=TRUE;
+	temp:=Result_Data_Register.Result_ID;
+	Result_Control.Result_acknowledge:=TRUE;
+END_IF
+
+IF rst.Q=TRUE OR BUSY THEN
+	No_Read:=FALSE;
+    Read_Done:=FALSE;
+END_IF
+
+IF ack.Q THEN
+   Result_Control.Result_acknowledge:=FALSE;
+END_IF
+
 
 
 
@@ -88,7 +100,7 @@ END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="Scanner">
-      <LineId Id="3" Count="59" />
+      <LineId Id="3" Count="57" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

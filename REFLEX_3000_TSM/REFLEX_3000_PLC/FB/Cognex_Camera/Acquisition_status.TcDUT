@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <DUT Name="Acquisition_status" Id="{7f597e15-3ce4-4cd7-9957-cca4ca7bd61e}">
+  <DUT Name="Acquisition_status" Id="{fb375b61-91af-485d-85d8-3559a919f659}">
     <Declaration><![CDATA[TYPE Acquisition_status :
 STRUCT
 Trigger_Ready		: BIT ;

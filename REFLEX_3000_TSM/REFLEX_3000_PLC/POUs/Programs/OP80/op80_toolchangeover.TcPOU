@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="op80_toolchangeover" Id="{ec82d1f4-3e04-433c-9623-61146b3c2721}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM op80_toolchangeover
+VAR
+	op80_tool_change                    : tool_changeover;
+	OP80_TOOL_CHANGE_MODE_SELECTED      : BOOL;
+	fb_reset_1                          : BOOL;
+	tool_6_fb                           : BOOL;
+	tool_8_fb                           : BOOL;
+	OP80_TOL_UNLOD_STRT					: BOOL;
+	OP80_TOL_LOAD_STRT					: BOOL;
+	OP80_TOL_DISENGAGE					: BOOL;
+	OP80_TOL_ENGAGE						: BOOL;
+	op80_manual_lock                    : BOOL;
+	op80_manual_unlock                  : BOOL;
+	OP80_UNLD_STUS                      : STRING;
+	OP80_LOAD_STUS                      : STRING;
+	op80_t2_manual_lock: BOOL;
+END_VAR
+
+VAR PERSISTENT
+	
+	OP80_TOL_WRK_POS					: LREAL;
+	OP80_TOL_HME_POS					: LREAL;
+	op80_TOL_VELOCITY					: LREAL;
+	OP80_TOL_CHNGE_CMPLE				: BOOL;
+	OP80_TOL_LOAD_COMPLE                : BOOL;
+	OP80_TOL_UNLOAD_COMPLE              : BOOL;
+	
+END_VAR	
+	]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF OP80_TOOL_CHANGE_MODE_SELECTED THEN
+
+op80_tool_change(
+	actual_pos:= SR80_Vert_servo_ctrl.Actual_Position , 
+	actual_vel:= SR80_Vert_servo_ctrl.Actual_Velocity, 
+	target_work_pos:= OP80_TOL_WRK_POS, 
+	target_home_pos:= OP80_TOL_HME_POS, 
+	target_vel_from_hmi:= op80_TOL_VELOCITY, 
+	station_number:= , 
+	mover_number:= , 
+	no_of_mover_present:= , 
+	model_selected:= model_selected, 
+	tool_unloading_start:=OP80_TOL_UNLOD_STRT , 
+	tool_loading_start:=OP80_TOL_LOAD_STRT , 
+	error_active:= , 
+	station_in_auto:= OP80_AutoSelected,                   
+	station_in_home:=  ,                                   
+	absoulte_move_done:= SR80_Vert_servo_ctrl.Axis_In_Pos, 
+	tool_6_3_present:= tool_6_fb, 
+	tool_7_89_present:= tool_8_fb, 
+	fb_reset:=fb_reset_1,
+	SERVO_TOL_CHECK_OFFSET_POS := 18, 
+	tool_changer_over_complete=> OP80_TOL_CHNGE_CMPLE,
+	tool_disengage=> OP80_TOL_DISENGAGE, 
+	tool_engagae=> OP80_TOL_ENGAGE, 
+	tool_loading_complete=> OP80_TOL_LOAD_COMPLE, 
+	tool_unloading_complete=> OP80_TOL_UNLOAD_COMPLE, 
+	servo_move_abs=>SR80_Vert_servo_ctrl.ABSmove_Start, 
+	unloading_status=>OP80_UNLD_STUS , 
+	loading_status=>OP80_LOAD_STUS , 
+	target_pos_to_servo=> SR80_Vert_servo_ctrl.Position, 
+	target_vel_to_servo=> SR80_Vert_servo_ctrl.Velocity,
+    tool_loading_failed := );
+	
+END_IF	
+
+IF op80_manual_lock OR OP80_TOL_ENGAGE THEN
+	O80_TOOL_CHO_UNLOCK_Q1153_0 :=0;
+	O80_TOOL_CHO_LOCK_Q1153_1   :=1;
+ELSIF op80_manual_unlock OR OP80_TOL_DISENGAGE THEN
+	  O80_TOOL_CHO_LOCK_Q1153_1    :=0;
+	  O80_TOOL_CHO_UNLOCK_Q1153_0  :=1;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="op80_toolchangeover">
+      <LineId Id="39" Count="31" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="87" Count="1" />
+      <LineId Id="117" Count="5" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="116" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

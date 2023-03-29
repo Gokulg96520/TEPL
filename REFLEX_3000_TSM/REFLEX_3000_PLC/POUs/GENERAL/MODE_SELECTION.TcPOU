@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="MODE_SELECTION" Id="{d42a47fb-9fcb-4bb4-bd2b-776891b0b43e}" SpecialFunc="None">
+  <POU Name="MODE_SELECTION" Id="{62466ff8-8bc6-4aa9-b792-aaf55af543d7}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MODE_SELECTION
 VAR
 		

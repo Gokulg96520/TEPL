@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Result_Data_Register" Id="{69b8f594-b873-4a76-b7ca-f610b045b532}">
+    <Declaration><![CDATA[TYPE Result_Data_Register :
+STRUCT
+	Result_ID 		: UINT;
+	Result_Code		: UINT;
+	Result_Extended : UINT;
+	Result_Length   : UINT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

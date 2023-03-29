@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Command_Request" Id="{55d6da82-76ec-40ed-be95-26006da28a79}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Command_Request :
+STRUCT
+Command_Request		: BIT;
+Reserve_0			: BIT;
+Reserve_1			: BIT;
+Reserve_2			: BIT;
+Reserve_3			: BIT;
+Reserve_4			: BIT;
+Reserve_5			: BIT;
+Reserve_6			: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

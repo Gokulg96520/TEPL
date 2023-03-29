@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<MultiSetting Crc="880890375" Version="1.2">
+<MultiSetting Crc="1618336" Version="1.2">
   <ProjectData>
     <Id>1</Id>
     <TargetSystem>
@@ -252,31 +252,6 @@
     </Application>
   </ProjectData>
   <ProjectData>
-    <Id>11</Id>
-    <TargetSystem>
-      <SubType>AMI891x</SubType>
-      <ObjectId>50462799</ObjectId>
-      <SafeAddress>28</SafeAddress>
-    </TargetSystem>
-    <SafetyAliasDevice>
-      <SdsId>1</SdsId>
-      <ObjectId>0</ObjectId>
-      <SafeAddress>0</SafeAddress>
-      <Watchdog>100</Watchdog>
-      <CustomFSoEConnectionId>e17cc018-bb1e-447b-b6c3-1e8f0a2742ea</CustomFSoEConnectionId>
-    </SafetyAliasDevice>
-    <Application>
-      <ApplicationId>e529ff5e-9edb-4e98-994e-a6572ec07abc</ApplicationId>
-      <Fb>
-        <FbId>32354c04-0b6f-4b2f-98ea-68a9da4e013e</FbId>
-        <FbParameter>
-          <PortId>848de5fd-227c-4002-9cb7-84ab6e06d509</PortId>
-          <Value><![CDATA[2000]]></Value>
-        </FbParameter>
-      </Fb>
-    </Application>
-  </ProjectData>
-  <ProjectData>
     <Id>12</Id>
     <TargetSystem>
       <SubType>AMI891x</SubType>
@@ -389,31 +364,6 @@
       <SafeAddress>0</SafeAddress>
       <Watchdog>100</Watchdog>
       <CustomFSoEConnectionId>3aba5e10-5460-431c-a227-048d340eac67</CustomFSoEConnectionId>
-    </SafetyAliasDevice>
-    <Application>
-      <ApplicationId>e529ff5e-9edb-4e98-994e-a6572ec07abc</ApplicationId>
-      <Fb>
-        <FbId>32354c04-0b6f-4b2f-98ea-68a9da4e013e</FbId>
-        <FbParameter>
-          <PortId>848de5fd-227c-4002-9cb7-84ab6e06d509</PortId>
-          <Value><![CDATA[2000]]></Value>
-        </FbParameter>
-      </Fb>
-    </Application>
-  </ProjectData>
-  <ProjectData>
-    <Id>17</Id>
-    <TargetSystem>
-      <SubType>AMI891x</SubType>
-      <ObjectId>50462779</ObjectId>
-      <SafeAddress>15</SafeAddress>
-    </TargetSystem>
-    <SafetyAliasDevice>
-      <SdsId>1</SdsId>
-      <ObjectId>0</ObjectId>
-      <SafeAddress>0</SafeAddress>
-      <Watchdog>100</Watchdog>
-      <CustomFSoEConnectionId>1a1f0959-ef39-4005-a4a3-5af902318c71</CustomFSoEConnectionId>
     </SafetyAliasDevice>
     <Application>
       <ApplicationId>e529ff5e-9edb-4e98-994e-a6572ec07abc</ApplicationId>

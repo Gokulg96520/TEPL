@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP10A_OP10B_DRUM_FEEDER" Id="{f23c0cd7-9457-4c1f-be15-c7af39e8a411}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP10A_OP10B_DRUM_FEEDER
+VAR
+	OP10A_DRUM_FB					: Servo_Conveyor_FB;
+	OP10B_DRUM_FB					: Servo_Conveyor_FB;
+		
+	OP10A_CONVEYOR_ON				: BOOL;
+	OP10B_CONVEYOR_ON				: BOOL;
+	OP10A_DRUM_CNVY_CNTINUS_RUN		: BOOL;	
+	OP10A_VELOCITY_MODE				: BOOL;
+	OP10A_CAMERA_TRIG				: BOOL;
+	OP10A_COVY_OVER_FLOW			: BOOL;
+	OP10A_Onecycle					: BOOL;
+	OP10_A_Camera_Done : BOOL;
+	Conveyor_Track_Delay: TON;
+	Conveyor_Track_OFF_Delay: TON;
+
+	OP10B_Conveyor_Track_Delay: TON;
+	OP10B_Conveyor_Track_OFF_Delay: TON;
+	
+	OP10A_Conveyor_Control: BOOL;
+	OP10B_DRUM_CNVY_CNTINUS_RUN: BOOL;
+	OP10_B_Camera_Done: BOOL;
+	OP10B_Onecycle: BOOL;
+	OP10B_Conveyor_Control: BOOL;
+
+	cge: BOOL;
+END_VAR
+
+VAR PERSISTENT
+	OP10A_OVR_FLW_TIMER				: TIME;
+	OP10A_CONVY_FRWD_SPD			: REAL;
+	OP10A_CONVY_REV_SPD				: REAL;
+	OP10A_FWD_POS_DISTANCE			: REAL;
+	OP10A_REV_POS_DISTANCE			: REAL;
+	OP10A_CONV_FRWD_TIME			: INT;	
+	OP10A_CONV_REV_TIME				: INT;	
+
+	OP10B_FWD_POS_DISTANCE          : REAL;
+	OP10B_REV_POS_DISTANCE			: REAL;
+
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+//O10A_DRUM_MTR_FWD_Q708_4				:=I10A_DRUM_OFF_ON_I714_2;
+//O10A_DRUM_FEED_AIRPURGE_ON_Q1052_1		:=O10A_DRUM_MTR_FWD_Q708_4;
+
+IF MANUAL_SELECTED AND OP10A_MANUAL_SELECTED THEN               
+	IF I10A_DRUM_CONV_REV_I714_3 THEN
+		OP10A_SRV_O_CNVY_STUS.targetVelocity:=OP10A_CONVY_REV_SPD;
+		OP10A_SRV_O_CNVY_STUS.moveVelocity:=I10A_DRUM_CONV_REV_I714_3;
+ 	ELSIF I10A_DRUM_CONV_FWD_I714_4 THEN
+		OP10A_SRV_O_CNVY_STUS.targetVelocity:= OP10A_CONVY_FRWD_SPD;
+		OP10A_SRV_O_CNVY_STUS.moveVelocity:=I10A_DRUM_CONV_FWD_I714_4;	
+	ELSE 	
+		OP10A_SRV_O_CNVY_STUS.moveVelocity:=0;   	
+	END_IF  	
+END_IF  
+
+IF MANUAL_SELECTED AND OP10B_MANUAL_SELECTED THEN               
+	IF I10B_DRUM_CONV_REV_I302_3 THEN
+		OP10B_SRV_O_CNVY_STUS.targetVelocity:= OP10A_CONVY_REV_SPD;
+		OP10B_SRV_O_CNVY_STUS.moveVelocity:=I10B_DRUM_CONV_REV_I302_3;
+ 	ELSIF I10B_DRUM_CONV_FWD_I302_4 THEN
+		OP10B_SRV_O_CNVY_STUS.targetVelocity:=OP10A_CONVY_FRWD_SPD;
+		OP10B_SRV_O_CNVY_STUS.moveVelocity:=I10B_DRUM_CONV_FWD_I302_4;	
+	ELSE 	
+		OP10B_SRV_O_CNVY_STUS.moveVelocity:=0;   	
+	END_IF  	
+END_IF  
+
+OP10A_DRUM_FB(
+	Conveyor_Prgrm_Start:= OP10A_AUTO_RUNNING , 
+	Conveyor_Prgrm_Reset:= , 
+	Conveyor_Continuous_Run:= OP10A_DRUM_CNVY_CNTINUS_RUN , 
+	Conveyor_Bypass:= ,
+	Camera_Trigger_OK := OP10A_Camera_Done, 
+	Fwd_Time_IP:= OP10A_CONV_FRWD_TIME, 
+	Rev_Time_IP:= OP10A_CONV_REV_TIME, 
+	Conveyor_FWD_Speed:= OP10A_CONVY_FRWD_SPD, 
+	Conveyor_REV_Speed:= OP10A_CONVY_REV_SPD, 
+	Conveyor_FWD_Position:= OP10A_FWD_POS_DISTANCE, 
+	Conveyor_REV_Position:= OP10A_REV_POS_DISTANCE, 
+	Velocity_mode:= OP10A_VELOCITY_MODE, 
+	LH_Work_Sensor:= OP10A_LH_REJ.Sensor2, 
+	LH_Home_Sensor:= OP10A_LH_REJ.Sensor1, 
+	RH_Work_Sensor:= OP10A_RH_REJ.Sensor2,  
+	RH_Home_Sensor:= OP10A_RH_REJ.Sensor1,
+	LH_Camera_OK:= OP10A_LH_CMR_OK , 
+	LH_Camera_NOK:= OP10A_LH_CMR_NOK, 
+	RH_Camera_OK:= OP10A_RH_CMR_OK , 
+	RH_Camera_NOK:= OP10A_RH_CMR_NOK, 
+	Track_Overflow := Conveyor_Track_OFF_Delay.Q,
+	Track_Sensor_FB := Conveyor_Track_Delay.Q,
+	Camera_Trigger_Ack=> OP10A_Camera_Trigger_Ack,
+	Camera_trigger:= OP10A_Camera_Trigger, 
+	LH_Work_Coil=> OP10A_A_LH_REJ_WRK, 
+	LH_Home_Coil=> OP10A_A_LH_REJ_HOME, 
+	RH_Work_Coil=> OP10A_A_RH_REJ_WRK, 
+	RH_Home_Coil=> OP10A_A_RH_REJ_HOME, 
+	Drum_ON=> O10A_DRUM_MTR_FWD_Q708_4,
+	Step_Num => Conv_Step_no_10A,
+	Ready_to_Pick=> OP10A_ORNG_RDY_PCK, 
+	One_Cycle:= OP10A_Onecycle, 
+	Pick_Done:= OP10A_ORNG_PCK_DN,  
+	Conveyor_Servo_Control_Structure:= OP10A_SRV_O_CNVY_CNT);
+	
+
+
+Conveyor_Track_Delay(IN:= NOT I10A_DRUM_LH_CONV_OVR_FLW_I1010_0 AND NOT I10A_DRUM_RH_CONV_OVR_FLW_I1010_1,PT:=T#4S);	
+Conveyor_Track_OFF_Delay(IN:=I10A_DRUM_LH_CONV_OVR_FLW_I1010_0 AND I10A_DRUM_RH_CONV_OVR_FLW_I1010_1,PT:=T#1S);   
+
+IF OP10A_Conveyor_Control THEN
+	IF Conveyor_Track_OFF_Delay.Q THEN
+		O10A_DRUM_MTR_FWD_Q708_4:=0;
+	END_IF
+	//IF Conveyor_Track_Delay.Q THEN
+	//	O10A_DRUM_MTR_FWD_Q708_4:=1;
+	//END_IF
+	O10A_DRUM_FEED_AIRPURGE_ON_Q1052_1:=1;
+	O10A_DRUM_RUN_IND_Q709_0:=O10A_DRUM_MTR_FWD_Q708_4;
+ELSE
+	O10A_DRUM_MTR_FWD_Q708_4:=I10A_DRUM_OFF_ON_I714_2;
+    O10A_DRUM_RUN_IND_Q709_0:=I10A_DRUM_OFF_ON_I714_2;
+    O10A_DRUM_FEED_AIRPURGE_ON_Q1052_1 :=I10A_DRUM_OFF_ON_I714_2;
+END_IF
+	
+	
+OP10B_DRUM_FB(
+	Conveyor_Prgrm_Start:= OP10B_AUTO_RUNNING , 
+	Conveyor_Prgrm_Reset:= , 
+	Conveyor_Continuous_Run:= OP10B_DRUM_CNVY_CNTINUS_RUN , 
+	Conveyor_Bypass:= ,
+	Camera_Trigger_OK := OP10B_Camera_Done, 
+	Fwd_Time_IP:= OP10A_CONV_FRWD_TIME, 
+	Rev_Time_IP:= OP10A_CONV_REV_TIME, 
+	Conveyor_FWD_Speed:= OP10A_CONVY_FRWD_SPD, 
+	Conveyor_REV_Speed:= OP10A_CONVY_REV_SPD, 
+	Conveyor_FWD_Position:= OP10A_FWD_POS_DISTANCE, 
+	Conveyor_REV_Position:= OP10A_REV_POS_DISTANCE, 
+	Velocity_mode:= OP10A_VELOCITY_MODE, 
+	LH_Work_Sensor:= OP10B_LH_REJ.Sensor2, 
+	LH_Home_Sensor:= OP10B_LH_REJ.Sensor1, 
+	RH_Work_Sensor:= OP10B_RH_REJ.Sensor2,  
+	RH_Home_Sensor:= OP10B_RH_REJ.Sensor1,
+	LH_Camera_OK:= OP10A_LH_CMR_OK , 
+	LH_Camera_NOK:= OP10A_LH_CMR_NOK, 
+	RH_Camera_OK:= OP10A_RH_CMR_OK , 
+	RH_Camera_NOK:= OP10A_RH_CMR_NOK, 
+	Track_Overflow := OP10B_Conveyor_Track_OFF_Delay.Q,
+	Track_Sensor_FB := OP10B_Conveyor_Track_Delay.Q,
+	Camera_Trigger_Ack=> OP10B_Camera_Trigger_Ack,
+	Camera_trigger:= OP10B_Camera_Trigger,
+	Step_Num => Conv_Step_no_10B, 
+	LH_Work_Coil=> OP10B_A_LH_REJ_WRK, 
+	LH_Home_Coil=> OP10B_A_LH_REJ_HOME, 
+	RH_Work_Coil=> OP10B_A_RH_REJ_WRK, 
+	RH_Home_Coil=> OP10B_A_RH_REJ_HOME, 
+	Drum_ON=> O10B_DRUM_MTR_FWD_Q302_0,
+	Ready_to_Pick=> OP10B_ORNG_RDY_PCK,
+	One_Cycle:= OP10B_Onecycle, 
+	Pick_Done:=OP10B_ORNG_PCK_DN,  
+	Conveyor_Servo_Control_Structure:= OP10B_SRV_O_CNVY_CNT);	
+	
+OP10B_Conveyor_Track_Delay(IN:= NOT I10B_DRUM_LH_CONV_OVR_FLW_I1030_0 AND NOT I10B_DRUM_RH_CONV_OVR_FLW_I1030_1,PT:=T#4S);	
+OP10B_Conveyor_Track_OFF_Delay(IN:=I10B_DRUM_LH_CONV_OVR_FLW_I1030_0 AND I10B_DRUM_RH_CONV_OVR_FLW_I1030_1,PT:=T#1S);   
+
+IF OP10B_Conveyor_Control THEN
+	IF OP10B_Conveyor_Track_OFF_Delay.Q THEN
+		O10B_DRUM_MTR_FWD_Q302_0:=0;
+	END_IF
+	//IF Conveyor_Track_Delay.Q THEN
+	//	O10A_DRUM_MTR_FWD_Q708_4:=1;
+	//END_IF
+	O10B_DRUM_FEED_AIRPURGE_ON_Q1062_0:=1;
+	O10B_DRUM_RUN_IND_Q302_4:=O10B_DRUM_MTR_FWD_Q302_0;
+ELSE
+	O10B_DRUM_MTR_FWD_Q302_0:=I10B_DRUM_OFF_ON_I302_2;
+    O10B_DRUM_RUN_IND_Q302_4:=I10B_DRUM_OFF_ON_I302_2;
+    O10B_DRUM_FEED_AIRPURGE_ON_Q1062_0 :=I10B_DRUM_OFF_ON_I302_2;
+END_IF	]]></ST>
+    </Implementation>
+    <LineIds Name="OP10A_OP10B_DRUM_FEEDER">
+      <LineId Id="3" Count="3" />
+      <LineId Id="168" Count="9" />
+      <LineId Id="156" Count="0" />
+      <LineId Id="178" Count="10" />
+      <LineId Id="157" Count="0" />
+      <LineId Id="7" Count="109" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

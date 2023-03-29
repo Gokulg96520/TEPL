@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="IO_OP10A_10B_JB" Id="{efaefa1e-d41a-431f-a118-e246a40978aa}" SpecialFunc="None">
+  <POU Name="IO_OP10A_10B_JB" Id="{d013cc4c-5b49-4ddd-b842-f0cef27dddea}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM IO_OP10A_10B_JB
 VAR
 	//INPUT
@@ -47,7 +47,7 @@ END_VAR
                       <v n="BoxType">"WORD_AS_BIT"</v>
                       <o n="Instance" t="Operand">
                         <v n="Operand">"WORD_AS_BIT_1"</v>
-                        <v n="Type">""</v>
+                        <v n="Type">"WORD_AS_BIT"</v>
                         <v n="Comment">""</v>
                         <v n="SymbolComment">""</v>
                         <v n="Address">""</v>
@@ -66,7 +66,7 @@ END_VAR
                           <n />
                           <o>
                             <v n="Operand">"I10A_LNR_TRK1_CHO_MOD1_I102_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -75,14 +75,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">5L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_LNR_TRK1_CHO_MOD2_I102_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -91,14 +91,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">6L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_LNR_TRK2_CHO_MOD1_I102_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -107,14 +107,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">7L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_LNR_TRK2_CHO_MOD2_I102_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -123,14 +123,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">8L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I10A_LNR_TRK3_CHO_MOD1_I102_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Operand">"I10A_SPARE_I102_4"</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -139,14 +139,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">9L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I10A_LNR_TRK3_CHO_MOD2_I102_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Operand">"I10A_SPARE_I102_5"</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -155,14 +155,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">10L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_LH_BDY_CONT_FB_I102_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -171,14 +171,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">11L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_RH_BDY_CONT_FB_I102_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -187,14 +187,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">12L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -203,14 +203,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">13L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -219,14 +219,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">14L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -235,14 +235,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">15L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -251,14 +251,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">16L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -267,14 +267,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">17L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -283,14 +283,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">18L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -299,14 +299,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">19L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10A_SPARE_I103_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -315,7 +315,7 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">20L</v>
@@ -333,7 +333,7 @@ END_VAR
                           <v n="BoxType">"WORD_AS_BIT"</v>
                           <o n="Instance" t="Operand">
                             <v n="Operand">"WORD_AS_BIT_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"WORD_AS_BIT"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -352,7 +352,7 @@ END_VAR
                               <n />
                               <o>
                                 <v n="Operand">"I10A_HPR_UNIT_ALRM_I100_0"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -361,14 +361,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">23L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_SPARE_I100_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -377,14 +377,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">24L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_HPR_LOW_LVL_SEN_I100_2"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -393,14 +393,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">25L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_HPR_SOL_DOOR_SW_FB_I100_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -409,14 +409,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">26L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_HPR_OFF_ON_I100_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -425,14 +425,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">27L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_BOWL_OFF_ON_I100_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -441,14 +441,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">28L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_LNR1_OFF_ON_I100_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -457,14 +457,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">29L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_LNR2_OFF_ON_I100_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -473,14 +473,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">30L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_HPR_DOOR_SELCTN_I101_0"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -489,14 +489,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">31L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_SPARE_I101_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -505,14 +505,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">32L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_BOWL_LOW_LVL_I101_2"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -521,14 +521,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">33L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_BWL_RUN_I101_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -537,14 +537,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">34L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_LNR1_RUN_I101_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -553,14 +553,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">35L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_LNR2_RUN_I101_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -569,14 +569,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">36L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_LNR_FEED1_OVRFLW_I101_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -585,14 +585,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">37L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10A_BDY_LNR_FEED2_OVRFLW_I101_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -601,7 +601,7 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">38L</v>
@@ -637,7 +637,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"OP10A_BOWL_FEEDER_JB_16DI_MODULE_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"WORD"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -686,22 +686,22 @@ END_VAR
                             </l2>
                             <l2 n="Types" cet="String">
                               <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
                             </l2>
                           </o>
                           <v n="CallType" t="Operator">FunctionBlock</v>
@@ -715,7 +715,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"OP10A_BOWL_FEEDER_JB_16DI_MODULE_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"WORD"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -764,22 +764,22 @@ END_VAR
                         </l2>
                         <l2 n="Types" cet="String">
                           <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
                         </l2>
                       </o>
                       <v n="CallType" t="Operator">FunctionBlock</v>
@@ -808,7 +808,7 @@ END_VAR
                       <v n="BoxType">"BIT_AS_WORD"</v>
                       <o n="Instance" t="Operand">
                         <v n="Operand">"BIT_AS_WORD_1"</v>
-                        <v n="Type">""</v>
+                        <v n="Type">"BIT_AS_WORD"</v>
                         <v n="Comment">""</v>
                         <v n="SymbolComment">""</v>
                         <v n="Address">""</v>
@@ -827,7 +827,7 @@ END_VAR
                           <n />
                           <o>
                             <v n="Operand">"OP10A_BOWL_FEEDER_JB_16DO_MODULE_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"WORD"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -836,7 +836,7 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">48L</v>
@@ -854,7 +854,7 @@ END_VAR
                           <v n="BoxType">"BIT_AS_WORD"</v>
                           <o n="Instance" t="Operand">
                             <v n="Operand">"BIT_AS_WORD_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BIT_AS_WORD"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -873,7 +873,7 @@ END_VAR
                               <n />
                               <o>
                                 <v n="Operand">"OP10A_BOWL_FEEDER_JB_16DO_MODULE_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"WORD"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -882,7 +882,7 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">51L</v>
@@ -918,7 +918,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_HPR_MTR_FWD_Q100_0"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -937,7 +937,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_HPR_RST_Q100_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -956,7 +956,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_EXT_SPEED_Q100_2"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -975,7 +975,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_SPARE_Q100_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -994,7 +994,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_HPR_DOOR_SELCTN_IND_Q100_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1013,7 +1013,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_HPR_TWR_LMP_RED_Q100_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1032,7 +1032,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_HPR_TWR_LMP_GREEN_Q100_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1051,7 +1051,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_SPARE_Q100_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1070,7 +1070,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_BDY_BOWL_ON_Q101_0"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1089,7 +1089,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_BDY_LNR_FEED1_ON_Q101_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1108,7 +1108,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_BDY_LNR_FEED2_ON_Q101_2"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1127,7 +1127,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_BDY_LNR1_AIR_PURGE_Q101_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1146,7 +1146,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_BDY_LNR2_AIR_PURGE_Q101_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1165,7 +1165,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_HPR_DOOR_OPN_Q101_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1184,7 +1184,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_SPARE_Q101_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1203,7 +1203,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10A_SPARE_Q101_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1267,7 +1267,7 @@ END_VAR
                             </l2>
                             <l2 n="Types" cet="String">
                               <v></v>
-                              <v></v>
+                              <v>WORD</v>
                             </l2>
                           </o>
                           <v n="CallType" t="Operator">FunctionBlock</v>
@@ -1281,7 +1281,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1300,7 +1300,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1319,7 +1319,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1338,7 +1338,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1357,7 +1357,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1376,7 +1376,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1395,7 +1395,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1414,7 +1414,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q102_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1433,7 +1433,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1452,7 +1452,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1471,7 +1471,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1490,7 +1490,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1509,7 +1509,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1528,7 +1528,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1547,7 +1547,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1566,7 +1566,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10A_SPARE_Q103_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1630,7 +1630,7 @@ END_VAR
                         </l2>
                         <l2 n="Types" cet="String">
                           <v></v>
-                          <v></v>
+                          <v>WORD</v>
                         </l2>
                       </o>
                       <v n="CallType" t="Operator">FunctionBlock</v>
@@ -1659,7 +1659,7 @@ END_VAR
                       <v n="BoxType">"WORD_AS_BIT"</v>
                       <o n="Instance" t="Operand">
                         <v n="Operand">"WORD_AS_BIT_2"</v>
-                        <v n="Type">""</v>
+                        <v n="Type">"WORD_AS_BIT"</v>
                         <v n="Comment">""</v>
                         <v n="SymbolComment">""</v>
                         <v n="Address">""</v>
@@ -1678,7 +1678,7 @@ END_VAR
                           <n />
                           <o>
                             <v n="Operand">"I10B_LNR_TRK1_CHO_MOD1_I202_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1687,14 +1687,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">121L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_LNR_TRK1_CHO_MOD2_I202_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1703,14 +1703,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">122L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_LNR_TRK2_CHO_MOD1_I202_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1719,14 +1719,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">123L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_LNR_TRK2_CHO_MOD2_I202_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1735,14 +1735,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">124L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I10B_LNR_TRK3_CHO_MOD1_I202_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Operand">"I10B_SPARE_I202_4"</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1751,14 +1751,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">125L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I10B_LNR_TRK3_CHO_MOD2_I202_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Operand">"I10B_SPARE_I202_5"</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1767,14 +1767,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">126L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I202_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1783,14 +1783,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">127L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I202_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1799,14 +1799,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">128L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1815,14 +1815,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">129L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1831,14 +1831,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">130L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1847,14 +1847,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">131L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1863,14 +1863,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">132L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1879,14 +1879,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">133L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1895,14 +1895,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">134L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1911,14 +1911,14 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">135L</v>
                           </o>
                           <o>
                             <v n="Operand">"I10B_SPARE_I203_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1927,7 +1927,7 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">136L</v>
@@ -1945,7 +1945,7 @@ END_VAR
                           <v n="BoxType">"WORD_AS_BIT"</v>
                           <o n="Instance" t="Operand">
                             <v n="Operand">"WORD_AS_BIT_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"WORD_AS_BIT"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -1964,7 +1964,7 @@ END_VAR
                               <n />
                               <o>
                                 <v n="Operand">"I10B_HPR_UNIT_ALRM_I200_0"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1973,14 +1973,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">139L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_SPARE_I200_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -1989,14 +1989,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">140L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_HPR_LOW_LVL_SEN_I200_2"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2005,14 +2005,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">141L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_HPR_SOL_DOOR_SW_FB_I200_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2021,14 +2021,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">142L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_HPR_OFF_ON_I200_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2037,14 +2037,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">143L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_BOWL_OFF_ON_I200_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2053,14 +2053,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">144L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_LNR1_OFF_ON_I200_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2069,14 +2069,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">145L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_LNR2_OFF_ON_I200_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2085,14 +2085,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">146L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_HPR_DOOR_SELCTN_I201_0"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2101,14 +2101,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">147L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_SPARE_I201_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2117,14 +2117,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">148L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_BOWL_LOW_LVL_I201_2"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2133,14 +2133,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">149L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_BWL_RUN_I201_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2149,14 +2149,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">150L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_LNR1_RUN_I201_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2165,14 +2165,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">151L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_LNR2_RUN_I201_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2181,14 +2181,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">152L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_LNR_FEED1_OVRFLW_I201_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2197,14 +2197,14 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">153L</v>
                               </o>
                               <o>
                                 <v n="Operand">"I10B_BDY_LNR_FEED2_OVRFLW_I201_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2213,7 +2213,7 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">154L</v>
@@ -2249,7 +2249,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"OP10B_BOWL_FEEDER_JB_16DI_MODULE_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"WORD"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2298,22 +2298,22 @@ END_VAR
                             </l2>
                             <l2 n="Types" cet="String">
                               <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
-                              <v></v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
+                              <v>BOOL</v>
                             </l2>
                           </o>
                           <v n="CallType" t="Operator">FunctionBlock</v>
@@ -2327,7 +2327,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"OP10B_BOWL_FEEDER_JB_16DI_MODULE_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"WORD"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2376,22 +2376,22 @@ END_VAR
                         </l2>
                         <l2 n="Types" cet="String">
                           <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
-                          <v></v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
+                          <v>BOOL</v>
                         </l2>
                       </o>
                       <v n="CallType" t="Operator">FunctionBlock</v>
@@ -2420,7 +2420,7 @@ END_VAR
                       <v n="BoxType">"BIT_AS_WORD"</v>
                       <o n="Instance" t="Operand">
                         <v n="Operand">"BIT_AS_WORD_3"</v>
-                        <v n="Type">""</v>
+                        <v n="Type">"BIT_AS_WORD"</v>
                         <v n="Comment">""</v>
                         <v n="SymbolComment">""</v>
                         <v n="Address">""</v>
@@ -2439,7 +2439,7 @@ END_VAR
                           <n />
                           <o>
                             <v n="Operand">"OP10B_BOWL_FEEDER_JB_16DO_MODULE_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"WORD"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2448,7 +2448,7 @@ END_VAR
                               <v n="Fixed">true</v>
                               <v n="Extensible">false</v>
                             </o>
-                            <v n="LValue">false</v>
+                            <v n="LValue">true</v>
                             <v n="Boolean">false</v>
                             <v n="IsInstance">false</v>
                             <v n="Id">164L</v>
@@ -2466,7 +2466,7 @@ END_VAR
                           <v n="BoxType">"BIT_AS_WORD"</v>
                           <o n="Instance" t="Operand">
                             <v n="Operand">"BIT_AS_WORD_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BIT_AS_WORD"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2485,7 +2485,7 @@ END_VAR
                               <n />
                               <o>
                                 <v n="Operand">"OP10B_BOWL_FEEDER_JB_16DO_MODULE_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"WORD"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2494,7 +2494,7 @@ END_VAR
                                   <v n="Fixed">true</v>
                                   <v n="Extensible">false</v>
                                 </o>
-                                <v n="LValue">false</v>
+                                <v n="LValue">true</v>
                                 <v n="Boolean">false</v>
                                 <v n="IsInstance">false</v>
                                 <v n="Id">167L</v>
@@ -2529,8 +2529,8 @@ END_VAR
                             </o>
                             <o>
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10B_HPR_RST_Q200_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Operand">"O10B_HPR_MTR_FWD_Q200_0"</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2549,7 +2549,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_HPR_RST_Q200_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2567,8 +2567,8 @@ END_VAR
                             </o>
                             <o>
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10B_SPARE_Q200_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Operand">"O10B_EXT_SPEED_Q200_2"</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2586,8 +2586,8 @@ END_VAR
                             </o>
                             <o>
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10B_HPR_DOOR_SELCTN_IND_Q200_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Operand">"O10B_SPARE_Q200_3"</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2605,8 +2605,8 @@ END_VAR
                             </o>
                             <o>
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10A_HPR_DOOR_SELCTN_IND_Q100_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Operand">"O10B_HPR_DOOR_SELCTN_IND_Q200_4"</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2624,8 +2624,8 @@ END_VAR
                             </o>
                             <o>
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10A_HPR_TWR_LMP_RED_Q100_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Operand">"O10B_HPR_TWR_LMP_RED_Q200_5"</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2643,8 +2643,8 @@ END_VAR
                             </o>
                             <o>
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10A_HPR_TWR_LMP_GREEN_Q100_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Operand">"O10B_HPR_TWR_LMP_GREEN_Q200_6"</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2663,7 +2663,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_SPARE_Q200_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2682,7 +2682,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_BDY_BOWL_ON_Q201_0"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2701,7 +2701,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_BDY_LNR_FEED1_ON_Q201_1"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2720,7 +2720,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_BDY_LNR_FEED2_ON_Q201_2"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2739,7 +2739,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_BDY_LNR1_AIR_PURGE_Q201_3"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2758,7 +2758,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_BDY_LNR2_AIR_PURGE_Q201_4"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2777,7 +2777,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_HPR_DOOR_OPN_Q201_5"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2796,7 +2796,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_SPARE_Q201_6"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2815,7 +2815,7 @@ END_VAR
                             <o>
                               <o n="Operand" t="Operand">
                                 <v n="Operand">"O10B_SPARE_Q201_7"</v>
-                                <v n="Type">""</v>
+                                <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
                                 <v n="Address">""</v>
@@ -2879,7 +2879,7 @@ END_VAR
                             </l2>
                             <l2 n="Types" cet="String">
                               <v></v>
-                              <v></v>
+                              <v>WORD</v>
                             </l2>
                           </o>
                           <v n="CallType" t="Operator">FunctionBlock</v>
@@ -2893,7 +2893,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2912,7 +2912,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2931,7 +2931,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2950,7 +2950,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2969,7 +2969,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -2988,7 +2988,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3007,7 +3007,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3026,7 +3026,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q202_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3045,7 +3045,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_0"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3064,7 +3064,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_1"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3083,7 +3083,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_2"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3102,7 +3102,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_3"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3121,7 +3121,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_4"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3140,7 +3140,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_5"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3159,7 +3159,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_6"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3178,7 +3178,7 @@ END_VAR
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
                             <v n="Operand">"O10B_SPARE_Q203_7"</v>
-                            <v n="Type">""</v>
+                            <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
                             <v n="Address">""</v>
@@ -3242,7 +3242,7 @@ END_VAR
                         </l2>
                         <l2 n="Types" cet="String">
                           <v></v>
-                          <v></v>
+                          <v>WORD</v>
                         </l2>
                       </o>
                       <v n="CallType" t="Operator">FunctionBlock</v>

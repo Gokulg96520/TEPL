@@ -1,0 +1,526 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP150_B" Id="{8db33281-600b-47e0-abaa-d1b44fe04a7e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP150_B
+VAR
+	OP150b_Auto_Seq			: INT;
+	OP150b_Job_Change_Seq	: INT;
+	Job_Change_Seq_Start  	: BOOL;
+	OP150b_Text_Change_Seq  : INT;
+	Text_Change_Seq_Start  	: BOOL;
+	Batch_Change			: BOOL;
+	
+	OP150B_STN_MOVER	: INT;
+	OP150B_LH_STN_MOVER: INT;
+	OP150B_RH_STN_MOVER: INT;
+    OP150B_LH_STN_ENABLE: BOOL;
+    OP150B_RH_STN_ENABLE: BOOL;
+
+	Line_1: STRING ;	
+	Line_2: STRING ;
+	Line_3: STRING ;
+	
+	Rejection_Code : STRING;
+	Temp_String	   : STRING;
+	
+	Laser_Mark_Delay : TON;
+	Fixture_LH  : INT;
+	Fixture_RH  : INT;
+	Dry_run 	: BOOL;
+	OP150B_Job_OK	: BOOL :=0;
+	OP150B_Text_OK  : BOOL ;
+	temp : BOOL;
+	Timer : TON;
+	Txt_Change_Tmr : TON;
+	Laser_Marked : BOOL;
+	Txt_Changed  : BOOL;
+
+	Laser_R			     : R_TRIG;
+	Text_Change_R		 : R_TRIG;
+	Job_Initialize      : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF OP150_B_ErrorActive OR NOT OperationEnable OR NOT OP150B_Job_OK THEN
+	OP150b_Auto_Seq:=10;
+END_IF
+
+Line_2:=Laser_Line2;
+Line_3:=Laser_Line3;
+
+Laser_R(CLK:=OP150_Laser_Completed);
+IF Laser_R. Q THEN
+	Laser_Marked:=1;
+END_IF
+
+Text_Change_R(CLK:=OP150_Lsr_Text_Change_Complete);
+IF Text_Change_R. Q THEN
+	//Laser_Marked:=1;
+END_IF
+
+
+CASE OP150b_Auto_Seq OF 
+	10: IF NOT OP150_B_ErrorActive THEN
+		 	OP150b_Auto_Seq :=20;
+		END_IF
+		
+	20: IF OP150_Lsr_Ready AND OP150B_Job_OK AND OP150B_Text_OK THEN
+			OP150b_Auto_Seq :=30;
+		END_IF
+		
+	30: Laser_Marked:=0;
+		IF OP150B_LH_STN_ENABLE THEN
+			IF Fixture_LH=150 THEN
+				OP150b_Auto_Seq :=40;
+			ELSE
+				OP150b_Auto_Seq :=60;	
+			END_IF
+		ELSIF OP150B_RH_STN_ENABLE THEN
+			IF  Fixture_RH=150 THEN
+				OP150b_Auto_Seq :=100;
+			ELSE
+				OP150b_Auto_Seq :=140;	
+			END_IF
+		END_IF
+		
+	40:	IF OP150B_Text_OK THEN// NOT OP150_Lsr_Text_Change_Start THEN
+			OP150_Laser_Start := TRUE;
+			IF OP150_Laser_Start THEN
+				OP150b_Auto_Seq :=46;
+			END_IF	
+		END_IF	
+		
+	46: IF Laser_Marked THEN
+			OP150_Laser_Start:=0;
+			OP150b_Auto_Seq :=47;
+		END_IF	
+		
+	47:	IF NOT OP150_Laser_Start AND Laser_Marked THEN
+			OP150b_Auto_Seq :=50;
+		ELSIF OP150_Laser_Failed THEN		//Laser_Mark_Delay.Q AND (OP150_Laser_Failed OR NOT OP150_Laser_Completed) THEN
+			OP150_Laser_Start:=0;
+			OP150b_Auto_Seq :=80;
+		END_IF
+		
+	50: MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]:=156;	
+		OP150B_LH_STN_ENABLE:=0;
+		IF MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]=156 THEN
+			STATION_DONE[OP150B_LH_STN_MOVER][OP150B_LH_XTS_POS_NO]			:= TRUE;
+			OP150b_Auto_Seq :=30;
+		END_IF		
+	
+	60: Rejection_Code:=Rejection_Codes_Function(Fixture_LH);
+		OP150B_Text_OK:=0;
+		OP150b_Auto_Seq :=61;
+		
+	61: Line_1						:= Rejection_Code;
+		OP150_Lsr_String  			:= Line_1; 
+		OP150_Lsr_Block_ID			:= 0;
+		OP150_Lsr_Text_Change_Start := 1;
+		OP150b_Auto_Seq :=62;
+		
+	62:IF OP150_Lsr_Text_Change_Complete THEN// NOT OP150_Lsr_Text_Change_Start THEN
+			Txt_Changed:=0;
+			OP150b_Auto_Seq :=66;
+		END_IF	
+		
+	66:	OP150_Laser_Start := TRUE;
+		IF OP150_Laser_Start THEN
+			OP150b_Auto_Seq :=67;
+		END_IF	
+	
+	67: IF Laser_Marked THEN
+			OP150_Laser_Start:=0;
+			OP150b_Auto_Seq :=68;
+		END_IF	
+		
+	68: IF NOT OP150_Laser_Start AND Laser_Marked THEN
+			OP150b_Auto_Seq :=69;
+		ELSIF OP150_Laser_Failed THEN//Laser_Mark_Delay.Q AND (OP150_Laser_Failed OR NOT OP150_Laser_Completed) THEN
+			OP150_Laser_Start:=0;
+			OP150b_Auto_Seq :=80;
+		END_IF	
+		
+	69: Job_Initialize:=1;
+		IF OP150B_Text_OK THEN
+			OP150b_Auto_Seq:=70;
+		END_IF
+		
+	70: OP150B_LH_STN_ENABLE:=0;
+		MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]:=156;	
+		IF MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]=156 THEN
+			STATION_DONE[OP150B_LH_STN_MOVER][OP150B_LH_XTS_POS_NO]			:= TRUE;
+			OP150b_Auto_Seq :=30;
+		END_IF	
+
+    80: MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]:=157;
+		IF MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]=157 THEN
+			OP150B_LH_STN_ENABLE:=0;
+			OP150B_RH_STN_ENABLE:=0;
+			STATION_DONE[OP150B_LH_STN_MOVER][OP150B_LH_XTS_POS_NO]	:= TRUE;
+			OP150b_Auto_Seq :=30;
+		END_IF		
+		
+	100: IF OP150B_Text_OK THEN //NOT OP150_Lsr_Text_Change_Start THEN
+			OP150_Laser_Start := TRUE;
+			IF OP150_Laser_Start THEN
+				OP150b_Auto_Seq :=106;
+			END_IF	
+		 END_IF	
+		
+	106:IF Laser_Marked THEN
+			OP150_Laser_Start:=0;
+			OP150b_Auto_Seq :=107;
+		END_IF	
+		
+	107:IF NOT OP150_Laser_Start AND Laser_Marked THEN
+			OP150b_Auto_Seq :=110;
+		ELSIF OP150_Laser_Failed THEN//Laser_Mark_Delay.Q AND (OP150_Laser_Failed OR NOT OP150_Laser_Completed) THEN
+			OP150_Laser_Start:=0;
+			OP150b_Auto_Seq :=160;
+		END_IF
+		
+	110: OP150B_RH_STN_ENABLE:=0;
+		 MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]:=156;	
+		 IF MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]=156 THEN
+			STATION_DONE[OP150B_RH_STN_MOVER][OP150B_RH_XTS_POS_NO]			:= TRUE;
+			OP150b_Auto_Seq :=30;
+		 END_IF		
+
+	140: Rejection_Code:=Rejection_Codes_Function(Fixture_RH);
+		 OP150b_Auto_Seq :=141;
+		
+	141: Line_1						:= Rejection_Code;
+		 OP150_Lsr_String  			:= Line_1; 
+		 OP150_Lsr_Block_ID			:= 0;
+		 OP150_Lsr_Text_Change_Start := 1;
+		 OP150b_Auto_Seq :=142;
+		 
+	142: IF OP150_Lsr_Text_Change_Complete THEN //NOT OP150_Lsr_Text_Change_Start THEN			
+			OP150b_Auto_Seq :=143;
+		 END_IF	
+
+	143:// Line_2			  			:= 'D7.89';
+		 OP150_Lsr_String  			:= Line_2; 
+		 OP150_Lsr_Block_ID			:= 65536;
+		 OP150_Lsr_Text_Change_Start := 1;
+		 OP150b_Auto_Seq :=144;
+		 
+	144: IF OP150_Lsr_Text_Change_Complete THEN // NOT OP150_Lsr_Text_Change_Start THEN
+			OP150b_Auto_Seq :=145;
+		 END_IF	
+	 
+	145: //Line_3			  			:='>PK25D<';
+		 OP150_Lsr_String  			:= Line_3; 
+		 OP150_Lsr_Block_ID			:= 131072;
+		 OP150_Lsr_Text_Change_Start := 1;
+		 OP150b_Auto_Seq :=146;
+		 
+	146: IF OP150_Lsr_Text_Change_Complete THEN // NOT OP150_Lsr_Text_Change_Start THEN
+			OP150_Laser_Start := TRUE;
+			IF OP150_Laser_Start THEN
+				OP150b_Auto_Seq :=147;
+			END_IF	
+		 END_IF	
+	
+	147: OP150_Laser_Start:=0;
+		IF NOT OP150_Laser_Start THEN
+			OP150b_Auto_Seq :=148;
+		END_IF		 
+		 
+	148: IF NOT OP150_Laser_Start AND Laser_Marked THEN
+			OP150b_Auto_Seq :=150;
+		 ELSIF Laser_Mark_Delay.Q AND OP150_Laser_Failed THEN // OR NOT OP150_Laser_Completed) THEN
+			OP150_Laser_Start:=0;
+			OP150b_Auto_Seq :=160;
+		 END_IF	
+		
+	150: MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]:=156;	
+		 IF MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]=156 THEN
+			STATION_DONE[OP150B_RH_STN_MOVER][OP150B_RH_XTS_POS_NO]			:= TRUE;
+			OP150B_RH_STN_ENABLE:=0;
+			OP150b_Auto_Seq :=30;
+		 END_IF	
+		 
+	160: OP150B_RH_STN_ENABLE:=0;
+		 MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]:=157;	
+		 IF MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]=157 THEN
+			STATION_DONE[OP150B_RH_STN_MOVER][OP150B_RH_XTS_POS_NO]			:= TRUE;
+			OP150b_Auto_Seq :=30;
+		 END_IF		 
+END_CASE
+
+Laser_Mark_Delay(IN:= (OP150_HMI_Reset OR OP150_Laser_Start),PT:=T#1S);
+
+IF Laser_Mark_Delay.Q THEN
+	OP150_HMI_Reset:=0;
+END_IF
+
+//Timer(IN:=OP150b_Auto_Seq=46 OR OP150b_Auto_Seq=106 ,PT:=T#1500MS);
+//Txt_Change_Tmr(IN:=OP150_Lsr_Text_Change_Start ,PT:=T#500MS);
+
+//IF Txt_Change_Tmr.Q THEN
+//	OP150_Lsr_Text_Change_Start:=0;
+//END_IF
+
+IF Dry_run THEN
+	Fixture_LH	:=150;
+	Fixture_RH  :=150;
+ELSE	
+   Fixture_LH:=MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1];
+   Fixture_RH:=MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2];
+END_IF
+
+
+//***************************Job change according to model********************************************\\
+IF OP150_Model='6.3' THEN
+	OP150_Lsr_Job_ID:=131072;
+ELSIF OP150_Model='7.89' THEN
+	OP150_Lsr_Job_ID:=0;
+END_IF
+
+IF OP150_Model='6.3' AND OP150_Laser_FB.Curr_JOB_id=2 THEN
+	OP150B_Job_OK:=1;
+ELSIF OP150_Model='7.89' AND OP150_Laser_FB.Curr_JOB_id=0 THEN
+	OP150B_Job_OK:=1;
+ELSE
+	OP150B_Job_OK:=0;
+END_IF
+
+CASE OP150b_Job_Change_Seq OF
+	10: IF NOT OP150_B_ErrorActive THEN
+		 	OP150b_Job_Change_Seq :=20;
+		END_IF
+		
+	20: IF OP150_Lsr_Ready THEN
+			OP150b_Job_Change_Seq :=30;
+		END_IF
+		
+	25: IF OP150_Model='6.3' AND OP150_Laser_FB.Curr_JOB_id<>2 THEN
+			OP150b_Job_Change_Seq :=30;
+		ELSIF OP150_Model='7.89' AND OP150_Laser_FB.Curr_JOB_id<>0 THEN
+			OP150b_Job_Change_Seq :=30; 	
+		END_IF
+		
+	30: IF OP150_Laser_FB.Curr_JOB_id <> OP150_Lsr_Job_ID THEN
+			OP150b_Job_Change_Seq :=40;
+		END_IF
+		
+	40: OP150_Lsr_Job_Change_Start:=1;
+		OP150b_Job_Change_Seq :=50;
+	 		
+	50: IF OP150_Lsr_Job_Change_Complete AND NOT OP150_Lsr_Job_Change_Start THEN
+			OP150_Lsr_Job_Change_Start := 0;
+			OP150b_Job_Change_Seq :=25;
+		END_IF
+	
+END_CASE
+
+//************************************ Lines change According to Model & Batch ********************\\
+
+Temp_String:=CONCAT(WORD_TO_STRING(fbTime.systemTime.wDay),'-');//WORD_TO_STRING(fbTime.systemTime.wMonth));
+Laser_Line1:=CONCAT(Temp_String,'Jan');
+
+IF Line_1<>Laser_Line1 THEN
+	Job_Initialize:=1;
+END_IF
+
+CASE OP150b_Text_Change_Seq OF 
+	
+	10: IF NOT OP150_B_ErrorActive THEN
+		 	OP150b_Text_Change_Seq :=20;
+		END_IF
+		
+	20: IF OP150_Lsr_Ready THEN
+			OP150b_Text_Change_Seq :=30;
+		END_IF
+
+	30: IF Batch_Change OR Job_Initialize THEN
+			OP150B_Text_OK:=0;
+			OP150b_Text_Change_Seq :=40;
+		END_IF
+	
+ 	40:	 Line_1						 := Laser_Line1;
+		 OP150_Lsr_String  			 := Line_1; 
+		 OP150_Lsr_Block_ID			 := 0;
+		 OP150b_Text_Change_Seq 	 :=41;
+		 
+	41:  OP150_Lsr_Text_Change_Start := 1;
+		  OP150b_Text_Change_Seq 	 :=50;
+		 
+	50: IF OP150_Lsr_Text_Change_Complete THEN //NOT OP150_Lsr_Text_Change_Start THEN
+			Txt_Changed:=0;
+			OP150b_Text_Change_Seq 	 :=60;
+		 END_IF	
+		
+	60:	OP150_Lsr_String  			:= Line_2; 
+		OP150_Lsr_Block_ID			:= 65536;
+		OP150_Lsr_Text_Change_Start := 1;
+		OP150b_Text_Change_Seq 	 :=70;
+		
+	70:IF OP150_Lsr_Text_Change_Complete THEN //NOT OP150_Lsr_Text_Change_Start THEN
+			Txt_Changed:=0;
+			OP150b_Text_Change_Seq 	 :=80;
+		END_IF	
+	 
+	80:	OP150_Lsr_String  			:= Line_3; 
+		OP150_Lsr_Block_ID			:= 131072;
+		OP150_Lsr_Text_Change_Start := 1;
+		OP150b_Text_Change_Seq 	 :=90;
+
+	90: IF OP150_Lsr_Text_Change_Complete THEN //NOT OP150_Lsr_Text_Change_Start THEN
+			Txt_Changed:=0;
+			OP150b_Text_Change_Seq 	 :=100;
+		END_IF		
+		
+  100:	OP150B_Text_OK  :=1;
+  		Batch_Change    :=0;
+		Job_Initialize  :=0;
+		OP150b_Text_Change_Seq 	 :=10;
+END_CASE
+
+
+//############################		OP150B STATION ENABLE CONDITION		##########################\\
+
+	OP150B_LH_STN_MOVER					:= MOVER_POSITION[OP150B_LH_XTS_POS_NO];
+	OP150B_RH_STN_MOVER					:= MOVER_POSITION[OP150B_RH_XTS_POS_NO];
+	
+IF AUTO_WITH_XTS THEN
+
+//###########################		LH			##################################	
+
+	IF 	OP150B_LH_STN_MOVER>0 THEN
+	IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]=5)THEN		
+	OP150B_LH_STN_ENABLE:= MOVER_POS_RECHED[OP150B_LH_STN_MOVER] AND (MOVER_CMP_STATUS[OP150B_LH_STN_MOVER][1]<155);
+	ELSE
+	STATION_DONE[OP150B_LH_STN_MOVER][OP150B_LH_XTS_POS_NO]			:= TRUE;		
+	END_IF
+	ELSE
+		OP150B_LH_STN_ENABLE	:= FALSE;
+	END_IF
+	
+//###########################		RH			##################################	
+	
+	IF 	OP150B_RH_STN_MOVER>0 THEN
+	IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]=5)THEN		
+		OP150B_RH_STN_ENABLE:= MOVER_POS_RECHED[OP150B_RH_STN_MOVER] AND (MOVER_CMP_STATUS[OP150B_RH_STN_MOVER][2]<155);
+	ELSE
+	STATION_DONE[OP150B_RH_STN_MOVER][OP150B_RH_XTS_POS_NO]			:= TRUE;		
+	END_IF
+	ELSE
+		OP150B_RH_STN_ENABLE		:= FALSE;
+	END_IF										
+END_IF
+
+
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP150_B">
+      <LineId Id="3" Count="3" />
+      <LineId Id="371" Count="2" />
+      <LineId Id="356" Count="1" />
+      <LineId Id="408" Count="2" />
+      <LineId Id="551" Count="4" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="549" Count="0" />
+      <LineId Id="8" Count="9" />
+      <LineId Id="411" Count="0" />
+      <LineId Id="18" Count="11" />
+      <LineId Id="56" Count="2" />
+      <LineId Id="536" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="537" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="350" Count="0" />
+      <LineId Id="431" Count="0" />
+      <LineId Id="423" Count="0" />
+      <LineId Id="432" Count="0" />
+      <LineId Id="351" Count="0" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="64" Count="13" />
+      <LineId Id="538" Count="0" />
+      <LineId Id="78" Count="7" />
+      <LineId Id="558" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="559" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="105" Count="1" />
+      <LineId Id="418" Count="1" />
+      <LineId Id="535" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="533" Count="0" />
+      <LineId Id="426" Count="0" />
+      <LineId Id="534" Count="0" />
+      <LineId Id="358" Count="1" />
+      <LineId Id="111" Count="6" />
+      <LineId Id="540" Count="0" />
+      <LineId Id="542" Count="2" />
+      <LineId Id="541" Count="0" />
+      <LineId Id="118" Count="14" />
+      <LineId Id="157" Count="0" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="414" Count="1" />
+      <LineId Id="161" Count="2" />
+      <LineId Id="362" Count="1" />
+      <LineId Id="433" Count="0" />
+      <LineId Id="164" Count="0" />
+      <LineId Id="364" Count="0" />
+      <LineId Id="165" Count="7" />
+      <LineId Id="377" Count="0" />
+      <LineId Id="173" Count="35" />
+      <LineId Id="416" Count="1" />
+      <LineId Id="209" Count="2" />
+      <LineId Id="427" Count="2" />
+      <LineId Id="365" Count="1" />
+      <LineId Id="212" Count="86" />
+      <LineId Id="465" Count="0" />
+      <LineId Id="464" Count="0" />
+      <LineId Id="744" Count="1" />
+      <LineId Id="747" Count="0" />
+      <LineId Id="749" Count="0" />
+      <LineId Id="748" Count="0" />
+      <LineId Id="750" Count="1" />
+      <LineId Id="504" Count="0" />
+      <LineId Id="466" Count="0" />
+      <LineId Id="505" Count="0" />
+      <LineId Id="508" Count="5" />
+      <LineId Id="506" Count="0" />
+      <LineId Id="514" Count="0" />
+      <LineId Id="530" Count="0" />
+      <LineId Id="516" Count="0" />
+      <LineId Id="531" Count="0" />
+      <LineId Id="517" Count="0" />
+      <LineId Id="515" Count="0" />
+      <LineId Id="473" Count="2" />
+      <LineId Id="518" Count="0" />
+      <LineId Id="545" Count="0" />
+      <LineId Id="477" Count="0" />
+      <LineId Id="546" Count="0" />
+      <LineId Id="478" Count="2" />
+      <LineId Id="560" Count="0" />
+      <LineId Id="481" Count="2" />
+      <LineId Id="485" Count="5" />
+      <LineId Id="561" Count="0" />
+      <LineId Id="491" Count="2" />
+      <LineId Id="495" Count="1" />
+      <LineId Id="467" Count="0" />
+      <LineId Id="519" Count="2" />
+      <LineId Id="562" Count="0" />
+      <LineId Id="468" Count="0" />
+      <LineId Id="522" Count="1" />
+      <LineId Id="525" Count="0" />
+      <LineId Id="528" Count="0" />
+      <LineId Id="526" Count="0" />
+      <LineId Id="469" Count="1" />
+      <LineId Id="299" Count="0" />
+      <LineId Id="676" Count="30" />
+      <LineId Id="314" Count="0" />
+      <LineId Id="635" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP70_GVL" Id="{09b80a07-4e53-455f-8c74-745e8ef98964}">
+  <GVL Name="OP70_GVL" Id="{b497c76e-e585-42f4-98b8-ce286222e6d4}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 			
@@ -35,6 +35,9 @@ OP70_LH_AutoSeq: 			INT;
 OP70_RH_AutoSeq: 			INT;
 OP70_Homing_Seq:			INT;
 OP70_Safety_OK:				BOOL;
+OP70_STN_ENABLE				: BOOL;
+OP70_Stop_Request			: BOOL;
+OP70_Conveyor_ON			: BOOL;
 
 OP70_ManualSelected:		BOOL;
 OP70_StepSelected:			BOOL;
@@ -60,7 +63,8 @@ SR70_Conv_servo: FB_Axis;
 SR70_Conv_servo_ctrl:Servo_Control;
 SR70_Conv_servo_status:stManualModeAxis;
 
-OP70_GIUDE_GRP: FB_Axis_FESTO;
+(*OP70_GIUDE_GRP: FB_Axis;*)
+OP70_GUIDE_GRP	: FB_Axis_FESTO;
 OP70_GIUDE_GRP_Manual_Axis: stManualModeAxis; 
 OP70_GIUDE_GRP_ctrl: Servo_Control;
 
@@ -88,7 +92,10 @@ OP70_HMI_RH_Rej_Cyl_Work_PB : BOOL;
 //conveyor
 OP70_pick_ready: BOOL;
 OP70_pick_done : BOOL;
-
+OP70_Conv_Fwd_Time	: INT;
+OP70_Conv_Rev_Time	: INT;
+OP70_Conveyor_FWD_Speed	: REAL;
+OP70_Conveyor_REV_Speed	: REAL;
 //Schunk
 OP70_Gripper_LH : FB_Schunk;
 OP70_Gripper_LH_Manual_Axis: stManualModeAxis; 
@@ -102,9 +109,42 @@ OP70_Gripper_RH : FB_Schunk;
 OP70_Gripper_RH_Manual_Axis: stManualModeAxis;
 OP70_Gripper_RH_Gripper_ctrl: Servo_Control; 
 
+	OP70_Camera_Done: BOOL;
+	OP70_One_Cycle : BOOL;
+
+//Camera GVLS
+	OP70_LH_Camera_Trigger		      : BOOL;
+	OP70_LH_Camera_Job_Change_start   : BOOL;
+	OP70_LH_Camera_Error			  : BOOL;
+	OP70_LH_Camera_Ready			  : BOOL;
+	OP70_LH_Camera_Online			  : BOOL;	
+	OP70_LH_Job_Change_Complete		    : BOOL;
+	OP70_LH_Job_Change_Error   		    : BOOL;
+	OP70_LH_Picture_Taken      		    : BOOL;
+	OP70_LH_Error_status				: STRING;
+	OP70_LH_Target_Job_ID				: UINT;
+	OP70_LH_Loaded_Job_ID		    	: UINT;	
+
+	OP70_RH_Camera_Trigger		      : BOOL;
+	OP70_RH_Camera_Job_Change_start   : BOOL;
+	OP70_RH_Camera_Error			  : BOOL;
+	OP70_RH_Camera_Ready			  : BOOL;
+	OP70_RH_Camera_Online			  : BOOL;	
+	OP70_RH_Job_Change_Complete		    : BOOL;
+	OP70_RH_Job_Change_Error   		    : BOOL;
+	OP70_RH_Picture_Taken      		    : BOOL;
+	OP70_RH_Error_status				: STRING;
+	OP70_RH_Target_Job_ID				: UINT;
+	OP70_RH_Loaded_Job_ID		    	: UINT;	
+	
 END_VAR
 
 VAR_GLOBAL PERSISTENT
+	
+	OP70_Conv_Fwd_Pos				: REAL :=10;
+	OP70_Conv_Rev_Pos				: REAL  :=5;
+
+	OP70_Gripper_Wrk_POS  : LREAL	:=2;
 	OP70_Gripper_LH_Open  : BOOL;
     OP70_Gripper_LH_Close : BOOL;
     OP70_Gripper_LH_State : BOOL;  //1-- Open 0--Close
@@ -112,7 +152,6 @@ VAR_GLOBAL PERSISTENT
     OP70_Gripper_RH_Open  : BOOL;
     OP70_Gripper_RH_Close : BOOL;
     OP70_Gripper_RH_State : BOOL;
-
 
     OP70_VERT_SERVO_POS_DONE	    	: BOOL;
     OP70_VERT_SERVO_ON_SFE_WRK			: BOOL;
@@ -122,21 +161,23 @@ VAR_GLOBAL PERSISTENT
 	  
 	OP70_VERT_SERVO_POSITION		: LREAL ;
 	OP70_VERT_SERVO_HME_POS			: REAL := 0;  				
-	OP70_VERT_SERVO_SFE_WRK_POS		: REAL := 100;		
-	OP70_VERT_SERVO_PICK_POS		: REAL := 400;	
-	OP70_VERT_SERVO_PLACE_POS		: REAL := 200;
+	OP70_VERT_SERVO_SFE_WRK_POS		: REAL :=10;		
+	OP70_VERT_SERVO_PICK_POS		: REAL ;	
+	OP70_VERT_SERVO_PLACE_POS		: REAL ;
 
     OP70_HORI_SERVO_POS_DONE	    	: BOOL;
     OP70_HORI_SERVO_ON_SFE_WRK			: BOOL;
     OP70_HORI_SERVO_ON_WRK_PICK			: BOOL;
+    OP70_HORI_SERVO_ON_SFE_WRK_PICK		: BOOL;	
 	OP70_HORI_SERVO_ON_WRK_PLACE		: BOOL;
     OP70_HORI_SERVO_ON_HOME				: BOOL;
 	  
 	OP70_HORI_SERVO_POSITION		: LREAL ;
-	OP70_HORI_SERVO_HME_POS			: REAL := 0;  				
-	OP70_HORI_SERVO_SFE_WRK_POS		: REAL := 700;		
-	OP70_HORI_SERVO_PICK_POS		: REAL := 400;	
-	OP70_HORI_SERVO_PLACE_POS		: REAL := 200;
+	OP70_HORI_SERVO_HME_POS			: REAL := -40;  				
+	OP70_HORI_SERVO_SFE_WRK_POS		: REAL := -40;
+	OP70_HORI_SERVO_SAFE_PICK_POS	: REAL := 100; 		
+	OP70_HORI_SERVO_PICK_POS		: REAL ;	
+	OP70_HORI_SERVO_PLACE_POS		: REAL ;
 	
     OP70_CONV_SERVO_POS_DONE	    	: BOOL;
     OP70_CONV_SERVO_ON_SFE_WRK			: BOOL;
@@ -146,12 +187,55 @@ VAR_GLOBAL PERSISTENT
 	OP70_CONV_SERVO_POSITION		: LREAL ;
 	OP70_CONV_SERVO_HME_POS			: REAL;// := 0;  				
 	OP70_CONV_SERVO_SFE_WRK_POS		: REAL ;//:= 40;		
-	OP70_CONV_SERVO_WRK_POS			: REAL;// := 200;
+	OP70_CONV_SERVO_WRK_POS			: REAL;// := 200;	
 
 //Error
 OP70_ErrorWord_0: DINT;
 OP70_ErrorWord_1: DINT;
-OP70_ErrorWord_2: DINT;	
+OP70_ErrorWord_2: DINT;
+
+	OP70_Cycle_Time : UDINT;
+
+//Drum_Feeder
+	OP70_Drum_Feed_Motor_Speed		AT %Q*  : INT;	
+	OP70_HMI_Drum_Feed_Mtr_Speed_IP		: INT;
+	OP70_Drum_Feed_Mtr_Speed_Select		: BOOL;
+	OP70_Drum_Feed_Mtr_Run_Fwd 			: BOOL;
+	OP70_Drum_Feed_Mtr_Reset   			: BOOL;	
+
+//Setting Parameters
+
+    OP70_HMI_Servo_Speed_Vertical     : REAL ;
+	OP70_HMI_Servo_Speed_Horizontal	  : REAL ;
+    OP70_HMI_Hori_Low_Limit		 : REAL;
+    OP70_HMI_Hori_High_Limit     : REAL;
+    OP70_HMI_Vert_Low_Limit		 : REAL;
+    OP70_HMI_Vert_High_Limit     : REAL;	
+
+	OP70_Vert_Ser_Safe_Pos			: REAL;
+	OP70_Hori_Ser_Rej_Pos			: REAL;	
+	OP70_Hori_Ser_Jerk_Pos			: REAL :=1;		
+	OP70_Drum_Freq		  			: REAL;
+	
+	OP70_Conv_Fwd_Time_6_3			: INT:=750;
+	OP70_Conv_Fwd_Speed_6_3			: INT:=150;
+	OP70_Conv_Rev_Time_6_3			: INT:=500;
+	OP70_Conv_Rev_Speed_6_3			: INT:=-100;
+
+	OP70_Conv_Fwd_Time_7_89			: INT:=750;
+	OP70_Conv_Fwd_Speed_7_89		: INT:=150;
+	OP70_Conv_Rev_Time_7_89			: INT:=500;
+	OP70_Conv_Rev_Speed_7_89		: INT:=-100;	
+	
+	OP70_Model: STRING[80];
+	OP70_Conveyor_Speed				: REAL;
+	OP70_Grip_LH_Bypass				: BOOL;
+	OP70_Grip_RH_Bypass				: BOOL;
+	OP70_Guide_Pos					: REAL :=70;	
+	
+//Drum Timers
+	OP70_Drum_ON_Time				: INT:=4000;
+	OP70_Drum_OFF_Time				: INT:=1000;		
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

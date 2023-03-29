@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <DUT Name="Inspection_control" Id="{78a659f7-044a-4936-917f-2893818f8704}">
+  <DUT Name="Inspection_control" Id="{ed4c684b-c0bc-414e-b54a-adcd56bdc35c}">
     <Declaration><![CDATA[TYPE Inspection_control :
 STRUCT
 Buffer_Results_Enable	: BIT ;

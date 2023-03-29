@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP150_GVL" Id="{9525a185-fc7d-4b44-a0ff-abadb05add45}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	
+OP150A_LH_Start : BOOL;
+OP150A_RH_Start : BOOL;
+OP150B_LH_Start : BOOL;
+OP150B_RH_Start : BOOL;
+OP150C_LH_Start : BOOL;
+OP150C_RH_Start : BOOL;
+
+OP150_Lsr_Ready				    : BOOL;
+OP150_Laser_Start		        : BOOL;
+OP150_Lsr_Job_Change_Start      : BOOL;
+OP150_Lsr_Job_Change_Complete   : BOOL;
+OP150_Lsr_Text_Change_Start     : BOOL;
+OP150_Lsr_Text_Change_Complete  : BOOL;	
+OP150_Laser_Completed   		: BOOL;
+OP150_Laser_Failed      		: BOOL;	
+OP150_Lsr_Job_ID  				: UDINT;
+OP150_Lsr_Block_ID 				: UDINT;
+OP150_Lsr_String				: STRING[80];
+
+
+OP150_A_ErrorActive			: BOOL;
+OP150_B_ErrorActive			: BOOL;
+OP150_C_ErrorActive			: BOOL;
+
+OP150_ManualSelected	:BOOL;
+OP150_StepSelected      :BOOL;
+OP150_AutoSelected		:BOOL;
+OP150_AutoRunning 		:BOOL;
+OP150_StepRunning		:BOOL;
+OP150_StartEnable		:BOOL;
+OP150_Machine_Stop		:BOOL;
+
+OP150_MoverPresent		: BOOL;
+OP150_Temp_Home_OK		: BOOL;
+OP150_HomeCondition_OK	: BOOL;
+OP150_OperationEnable	: BOOL;
+
+//HMI Tags(From HMI)
+OP150_HMI_AutoMode:						BOOL;
+OP150_HMI_ManualMOde:					BOOL;
+OP150_HMI_StepMode:						BOOL;
+OP150_HMI_CycleStart_PB:				BOOL;
+OP150_HMI_Homing_PB:					BOOL;
+OP150_HMI_Reset	:	 					BOOL;
+//Mover Bit
+
+
+
+
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	OP150A_LH_CMP_OK :BOOL;
+	OP150A_RH_CMP_OK :BOOL;
+	
+	Laser_Line1 : STRING :='E2525';	 
+	Laser_Line2 : STRING :='D7.89';  
+	Laser_Line3 : STRING :='>PK25D<';
+	
+	OP150_Model				: STRING :='7.89';
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP90_JB_IO" Id="{d4edafc1-797d-4162-878c-8314fe11a878}" SpecialFunc="None">
+  <POU Name="OP90_JB_IO" Id="{d5e67623-bca8-448c-b70f-f4018c782a72}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP90_JB_IO
 
 VAR

@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_Initialization_Seq" Id="{dbee5b30-95ec-4991-8753-6971fcbddff0}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_Initialization_Seq
+VAR
+	op160_master_reset :BOOL;
+	op160_robot_homed  :BOOL;
+	op160_ROboProgResetDly   :ton;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF CR160_MoverREM_Cyl.Position1 AND OP160_SO_Rbt_In_Home AND op160_robot_homed THEN
+   OP160_Temp_Home_OK:=TRUE;
+ELSE
+	OP160_Temp_Home_OK:=FALSE;
+END_IF
+
+IF OP160_ErrorActive THEN 
+	op160_robot_homed    :=FALSE;
+END_IF
+
+CASE OP160_Homing_Seq OF
+	
+	0: IF (OP160_Auto AND NOT OP160_HomeRunning AND  NOT OP160_ErrorActive AND  NOT 
+			OP160_AutoRunning AND NOT OP160_StepRunning	 AND NOT OP160_Temp_Home_OK) THEN
+		    OP160_HomeRunning:=TRUE;
+		    OP160_Homing_Seq:=10;	
+	   END_IF
+	   
+	10:IF (OP160_HomeRunning AND OP160_HMI_Homing)THEN
+		OP160_Homing_Seq:=12;		
+		END_IF 
+        
+	
+   12:  OP160_Robo_ProgramReset:=TRUE;
+   
+		IF NOT OP160_SO_Program_Execute	AND op160_ROboProgResetDly.Q THEN
+		OP160_Robo_ProgramReset:=FALSE;			
+		OP160_Homing_Seq:=14;	
+		END_IF
+	
+		
+	
+	14: IF OP160_HomeRunning AND NOT op160_master_reset THEN
+		   OP160_Robo_Out6001   :=1;
+	       OP160_SI_Homing_Start:=TRUE;
+	       OP160_Homing_Seq:=15;
+	    
+		ELSIF  OP160_HomeRunning AND  op160_master_reset THEN
+		       OP160_Robo_Out6001   :=3;
+	           OP160_SI_Homing_Start:=TRUE;
+	           OP160_Homing_Seq     :=15;
+		END_IF
+		
+		
+      (*  OP160_Robo_Out6001:=3;
+        
+		IF OP160_SO_Rbt_In_Home THEN
+		OP160_SI_Homing_Start:=FALSE;
+		
+		OP160_Robo_ProgramReset:=TRUE;	
+		END_IF
+		IF NOT OP160_SO_Program_Execute	AND OP160_Robo_ProgramReset=TRUE THEN
+		OP160_Robo_ProgramReset:=FALSE;
+		OP160_Homing_Seq:=20;		
+		END_IF *)
+			
+	15: IF OP160_HomeRunning AND OP160_SO_Rbt_In_Home THEN
+		   OP160_SI_Homing_Start:=FALSE;
+		   op160_robot_homed    :=TRUE;
+		   OP160_Homing_Seq:=20;
+	    END_IF
+ 
+	
+	20:IF (OP160_HomeRunning AND OP160_HMI_Homing)THEN 
+        IF ( CR160_MoverREM_Cyl.Position1 ) THEN
+			OP160_Homing_Seq:=30;
+		ELSE
+			CR160_MoverREM_Cyl.HomingCmd1:= TRUE;
+				
+		END_IF
+		END_IF
+	
+		
+	30:	OP160_Homing_Seq:=0;
+		OP160_HomeRunning:=FALSE;
+	
+END_CASE
+
+IF NOT OP160_HomeRunning THEN
+	CR160_MoverREM_Cyl.HomingCmd1:= FALSE;
+END_IF
+
+op160_ROboProgResetDly(IN:= OP160_Robo_ProgramReset, PT:= T#200MS, Q=> , ET=> );
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_Initialization_Seq">
+      <LineId Id="3" Count="1" />
+      <LineId Id="7" Count="1" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="115" Count="2" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="14" Count="2" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="54" Count="1" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="57" Count="1" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="107" Count="1" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="104" Count="2" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="72" Count="1" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="28" Count="3" />
+      <LineId Id="33" Count="9" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="43" Count="1" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="120" Count="1" />
+      <LineId Id="119" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

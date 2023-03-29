@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="SAFETY_IOs" Id="{9747f72f-c6e6-4029-b917-6a5e4ef732b6}">
+  <GVL Name="SAFETY_IOs" Id="{63bff32b-d024-47e4-b997-eea0bc83c626}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 IS90_DOORSW_SET1_CH1_IS400_0 :BOOL;

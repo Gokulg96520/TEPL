@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP40_Initialization_Seq" Id="{b6855d55-efdc-4f82-b38f-1db8e6c9adbe}" SpecialFunc="None">
+  <POU Name="OP40_Initialization_Seq" Id="{2510e0f0-1a29-4110-a65c-8e6cf63a8122}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP40_Initialization_Seq
 VAR
 END_VAR
@@ -19,12 +19,14 @@ CASE OP40_Homing_Seq OF
 		OP40_HomeRunning:=TRUE;
 		OP40_Homing_Seq:=10;	
 	   END_IF
-	10:IF (OP40_HomeRunning AND OP40_HMI_Homing)THEN 
+	10:IF (OP40_HomeRunning AND (OP40_HMI_Homing OR HMI_Reset))THEN 
 		IF (SR40_Vert_servo_ctrl.Axis_In_Home) THEN 
 			OP40_Homing_Seq:=20;
 			SR40_Vert_servo_ctrl.Axis_Home_Cmd:=FALSE;
 		ELSE
 			SR40_Vert_servo_ctrl.Position:=0;
+			SR40_Vert_servo_ctrl.Velocity:=100;
+			SR40_Vert_servo_ctrl.ABSmove_Start:=TRUE;
 			SR40_Vert_servo_ctrl.Axis_Home_Cmd:=TRUE;
 	    END_IF
 	   END_IF		
@@ -34,7 +36,7 @@ CASE OP40_Homing_Seq OF
 END_CASE]]></ST>
     </Implementation>
     <LineIds Name="OP40_Initialization_Seq">
-      <LineId Id="3" Count="24" />
+      <LineId Id="3" Count="26" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

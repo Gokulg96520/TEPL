@@ -1,7 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP90_VARIABLE" Id="{1742f8f9-568a-4613-92dd-a065ef348d0a}">
+  <GVL Name="OP90_VARIABLE" Id="{920aa3cb-675b-4bdf-8922-ec14030f2f09}">
     <Declaration><![CDATA[VAR_GLOBAL
+// MODE_BLOCK
+	OP90_MODE_BLOCK							:Mode_Selection_Block1;
+	MACHINE_1S 								: BOOL;
+	MACHINE_BLINK							: BOOL;
+	OP90_MODE_WORD							: INT;
+	OP90_STRT_PB							: BOOL;
+	OP90_RESET_PB							: BOOL;
+	OP90_AUTO_SELECTED						: BOOL;
+	OP90_MANUAL_SELECTED					: BOOL;
+	OP90_STEP_SELECTED						: BOOL;
+	OP90_AUTO_RUNNING						: BOOL;
+	OP90_STEP_RUNNING						: BOOL;
+	OP90_START_ENABLE						: BOOL;
+	OP90_MACHINE_STOP						: BOOL;
+	OP90_ERR								: BOOL;	
+	OP90_OPERATION_ENABLE					: BOOL;
 // FUNTIONAL BLOCK
 							(*CYLINDER*)
 	OP90_LH_GRIPPER							: Cylinder_Block;
@@ -42,19 +58,11 @@
 	OP90_GIUDE_SER_STATUS					: stManualModeAxis;
 	OP90_SRV_LH_CNVY_STATUS					: stManualModeAxis;
 	OP90_SRV_RH_CNVY_STATUS                 : stManualModeAxis;
-	OP90_SRV_HORZ_CNTRL						: Servo_Control;
-	OP90_SRV_LH_VERT_CNTRL                  : Servo_Control;
-	OP90_SRV_RH_VERT_CNTRL                  : Servo_Control;
-	OP90_STP_LH_ROTRY_CNTRL					: SERVO_Control;
-	OP90_STP_RH_ROTRY_CNTRL					: SERVO_Control;
-	OP90_SERVO_GUIDE_CNTRL					: Servo_Control;
-	OP90_SRV_LH_CNVY_CNTRL					: Servo_Control;
-	OP90_SRV_RH_CNVY_CNTRL                  : Servo_Control;
 	
 // HOMING 
 //BOOL
 	OP90_ALL_HOME							: BOOL;
-	START_HOMNG								: BOOL;
+	OP90_START_HOMNG								: BOOL;
 	OP90_LH_GRP_HOMING1						: BOOL;
 	OP90_RH_GRP_HOMING1						: BOOL;
 	OP90_VERT_LHSERV_HOMG1					: BOOL;
@@ -62,7 +70,6 @@
 	OP90_LH_GRP_SNR1						: BOOL;
 	OP90_HORZ_SERV_HOMING1					: BOOL;
 	OP90_VERT_SERVO_HOME					: BOOL;
-	OP90_HORZ_SERVO_HOME					: BOOL;
 	OP90_SUP_VERTP1_CYL_HOME1				: BOOL;
 	OP90_SUP_HORZP1_CYL_HOME1				: BOOL;
 	OP90_SUP_VERTP2_CYL_HOME1				: BOOL;
@@ -73,12 +80,19 @@
 	OP10A_HME_STP_NO						: INT;
 	OP10B_HME_STP_NO						: INT;	
 //MANUAL
+	OP90A_CYLINDER_ERR						: WORD;
 
 								(*SERVO*)
 
 	
 	
 // AUTO	
+	OP90_STN_ENABLE							: BOOL;
+	OP90_LH_GRP_BYPASS						: BOOL;
+	OP90_RH_GRP_BYPASS						: BOOL;
+	OP90_pick_ready							: BOOL;
+	OP90_pick_done_7_89						: BOOL;	
+	OP90_pick_done_6_38						: BOOL;	
 								(*CYLINDER*)
 
 	OP90_A_MVR_SUP_HORZP1_WRK				: BOOL;
@@ -89,13 +103,25 @@
 	OP90_A_MVR_SUP_VERTP1_WRK				: BOOL;
 	OP90_A_MVR_SUP_VERTP2_HME				: BOOL;
 	OP90_A_MVR_SUP_VERTP2_WRK				: BOOL;
-	OP90_POS2								: BOOL;				// BASED ON THE MODEL SELECTION OP90_POS1 R POS 2 IS CHOOSEN FROM RECEIPE
-	OP90_POS1								: BOOL;	
+	OP90_POS2_V7_89							: BOOL;				// BASED ON THE MODEL SELECTION OP90_POS1_V6_3 R POS 2 IS CHOOSEN FROM RECEIPE
+	OP90_POS1_V6_3							: BOOL;	
 	OP90_A_RH_GRP_AUTCMD2					: BOOL;
 	OP90_A_RH_GRP_AUTCMD1					: BOOL;
 	OP90_A_LH_GRP_AUTCMD2					: BOOL;
 	OP90_A_LH_GRP_AUTCMD1					: BOOL;
-	OP90_ERROR_ACTIVE						: BOOL;
+	OP90_A_LH_REJP1_HOME					: BOOL;
+	OP90_A_RH_REJP1_HOME					: BOOL;
+	OP90_A_LH_REJP1_WORK					: BOOL;
+	OP90_A_RH_REJP1_WORK					: BOOL;
+	OP90_A_LH_REJP2_HOME					: BOOL;
+	OP90_A_RH_REJP2_HOME					: BOOL;
+	OP90_A_LH_REJP2_WORK					: BOOL;
+	OP90_A_RH_REJP2_WORK					: BOOL;	
+	
+	
+	
+	
+	
 								(*SERVO*)
 // BOOL
 	OP90_A_SRV_HORZ_WRK						: BOOL;
@@ -127,32 +153,63 @@
 	OP90_STP_LH_ROTY_WRK_FB					: BOOL;
 	OP90_STP_RH_ROTY_HME_FB					: BOOL;
 	OP90_STP_RH_ROTY_WRK_FB					: BOOL;
+	OP90_SRV_HORZ_ZERO_FB					: BOOL;
+	OP90_SRV_LH_VRT_ZERO_FB					: BOOL;
+	OP90_SRV_RH_VRT_ZERO_FB					: BOOL;
+	OP90_VERT_SRV_SAFE_ZONE					: BOOL;
 	
 								(*CAMERA*)
+	OP90_CAMERA_TRIGGER						: BOOL;								
 	OP90_LH_CMR_OK							: BOOL;
+	OP90_LH_CMR_NOK							: BOOL;	
 	OP90_RH_CMR_OK							: BOOL;
-	
+	OP90_RH_CMR_NOK							: BOOL;	
+	//OP90_Camera_Done						: BOOL;
+
 	
 	
 //XTS
-	OP90_MOVER_HOME							: BOOL;					// MOVER REACHED THE POSITION AND READY FOR PROCESS
 	OP90_MVR_LH_CMPNOK						: BOOL;
 	OP90_MVR_RH_CMPNOK						: BOOL;	
-	
-	
-	
-	
-	
-	
-	
-// DELETE AFTER CHANGE
-	MACHINE_AUTO: BOOL;
-	MACHINE_MANUAL: BOOL;
-	MACHINE_ERR: BOOL;
 
-	MACHINE_ENABLE: BOOL;
-	MACHINE_1S : BOOL;
-	MACHINE_BLINK:BOOL;
+// WILL BE DELETED 
+MACHINE_ERR		: BOOL;
+MACHINE_AUTO    : BOOL;
+MACHINE_MANUAL	: BOOL;
+
+//Camera GVLs
+	OP90_LH_Camera_Trigger		      : BOOL;
+	OP90_LH_Camera_Job_Change_start   : BOOL;
+	OP90_LH_Camera_Error			  : BOOL;
+	OP90_LH_Camera_Ready			  : BOOL;
+	OP90_LH_Camera_Online			  : BOOL;	
+	OP90_LH_Job_Change_Complete		    : BOOL;
+	OP90_LH_Job_Change_Error   		    : BOOL;
+	OP90_LH_Picture_Taken      		    : BOOL;
+	OP90_LH_Error_status				: STRING;
+	OP90_LH_Target_Job_ID				: UINT;
+	OP90_LH_Loaded_Job_ID		    	: UINT;
+
+	OP90_RH_Camera_Trigger		      : BOOL;
+	OP90_RH_Camera_Job_Change_start   : BOOL;
+	OP90_RH_Camera_Error			  : BOOL;
+	OP90_RH_Camera_Ready			  : BOOL;
+	OP90_RH_Camera_Online			  : BOOL;	
+	OP90_RH_Job_Change_Complete		    : BOOL;
+	OP90_RH_Job_Change_Error   		    : BOOL;
+	OP90_RH_Picture_Taken      		    : BOOL;
+	OP90_RH_Error_status				: STRING;
+	OP90_RH_Target_Job_ID				: UINT;
+	OP90_RH_Loaded_Job_ID		    	: UINT;
+
+	OP90_Camera_Trigger_Ack: BOOL;
+	OP90_Miss_Trigger: BOOL;
+	OP90_LH_Camera_OK  : BOOL;
+	OP90_LH_Camera_NOK : BOOL;
+	OP90_RH_Camera_OK  : BOOL;
+	OP90_RH_Camera_NOK : BOOL;
+	OP90_Camera_Done	: BOOL;	
+	
 END_VAR
 
 VAR_GLOBAL PERSISTENT

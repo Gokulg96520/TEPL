@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="ATEQ_LEAK" Id="{95e0d26f-2b09-42e2-a6ff-8b64aa329343}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ATEQ_LEAK
+VAR_INPUT
+	AutoSelected: BOOL;
+	ManualSelected:BOOL;
+	Manual_Start:BOOL;
+	Auto_Start:BOOL;
+	Erroractive:BOOL;
+	Start:BOOL;
+	Reset:BOOL;
+	Manual_Prog_No:INT;
+	Auto_Prog_No:INT;
+	Testpass :BOOL;
+	Testfail:BOOL;
+	Reffail:BOOL;
+    Alarm:BOOL;
+	Endofcycle:BOOL;
+	StartRSTDly:TIME;
+	Receive_String : STRING(255);
+END_VAR
+VAR_OUTPUT
+	StartOP:BOOL;
+	ResetOP:BOOL;
+	
+	Error1:BOOL;
+	Error2:BOOL;
+	Error3:BOOL;
+	ProgSel1:BOOL;
+	ProgSel2:BOOL;
+	ProgSel3:BOOL;
+	ProgSel4:BOOL;
+	ProgSel5:BOOL;
+	ProgSel6:BOOL;
+	ProgSel7:BOOL;
+	ProgSel8:BOOL;
+	result_Ateq,Prg_num,status: STRING(255);		
+END_VAR
+VAR
+Tempend:BOOL;	
+TempStart:BOOL;
+	ATEQRunning:BOOL;
+	ATEQRun: R_TRIG;
+	StartResetDly: TON;
+	PassTrig: R_TRIG;
+	failTrig: R_TRIG;
+	Prog_NO:INT;
+	Temp_Prog_NO:INT;
+	comp:INT;	
+	ResetDly: TON;
+	EndofcycleTRIG: R_TRIG;
+END_VAR
+
+VAR_IN_OUT
+	Result_Completed:BOOL;
+	ResultOK        :BOOL;
+	ResultNOK       :BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (AutoSelected AND Auto_Start)OR (ManualSelected AND Manual_Start) AND NOT Erroractive AND NOT ATEQRunning AND NOT TempStart AND NOT Result_Completed THEN
+	ATEQRunning:=TRUE;
+	ELSE
+		ATEQRunning:=FALSE;
+	END_IF
+	ATEQRun(CLK:=ATEQRunning , Q=> );
+	IF ATEQRun.q AND (Testpass OR Testfail OR Reffail OR Alarm) THEN
+		ResetOP:=TRUE;
+		Tempend:=FALSE;
+	END_IF
+	IF ATEQRunning AND (NOT (Testpass OR Testfail OR Reffail OR Alarm) OR ResetDly.Q) THEN
+		ResetOP:=FALSE;
+	END_IF
+	IF ATEQRunning AND NOT ResetOP THEN
+		StartOP:=TRUE;
+		TempStart:=TRUE;
+		ATEQRunning:=FALSE;
+			
+	END_IF
+	
+	//IF StartResetDly.Q  THEN
+		
+	//END_IF
+	ResetDly(IN:=ResetOP , PT:=T#500MS , Q=> , ET=> );
+	
+
+	PassTrig(CLK:=Testpass , Q=> );
+	failTrig(CLK:=Testfail OR  Alarm OR Reffail  , Q=> );
+IF EndofcycleTRIG.q THEN 
+	Tempend:=TRUE;
+END_IF
+	IF ( Tempend AND  Testpass ) THEN
+		StartOP:=FALSE;	
+		ResultOK:=TRUE;
+		ResultNOK:=FALSE;
+		TempStart:=FALSE;
+		Result_Completed:=TRUE;
+		Tempend:=FALSE;
+		END_IF
+IF (Tempend AND (Testfail OR  Reffail OR Alarm)) THEN
+	    StartOP:=FALSE;
+		ResultNOK:=TRUE;
+		ResultOK:=FALSE;
+		TempStart:=FALSE;
+		Result_Completed:=TRUE;
+		Tempend:=FALSE;
+		
+	END_IF
+	
+	
+	StartResetDly(IN:=StartOP , PT:=T#500MS , Q=> , ET=> );
+	
+IF (Reset =TRUE)THEN
+	ResetOP:=TRUE;
+	StartOP:=FALSE;
+	TempStart:=FALSE;
+	ResultOK:=FALSE;
+	ResultNOK:=FALSE;
+	ELSE
+		ResetOP:=FALSE;
+	END_IF
+IF ( ManualSelected)THEN
+	Temp_Prog_NO:=Manual_Prog_No;
+
+ELSIF(AutoSelected) THEN
+	Temp_Prog_NO:=Auto_Prog_No;
+	
+END_IF
+Prog_NO:=Temp_Prog_NO-1;
+ProgSel1:=Prog_NO.0;
+ProgSel2:=Prog_NO.1;
+ProgSel3:=Prog_NO.2;
+ProgSel4:=Prog_NO.3;
+ProgSel5:=Prog_NO.4;
+ProgSel6:=Prog_NO.5;
+ProgSel7:=Prog_NO.6;
+ProgSel8:=Prog_NO.7;
+
+comp:=FIND(STR1:=Receive_String, STR2:='$R');	
+result_Ateq:=MID(STR:=Receive_String, LEN:=(comp-11), POS:=11 );
+status:=MID(STR:=Receive_String , LEN:=2, POS:=7 );	
+Prg_num:=MID(STR:=Receive_String, LEN:=2, POS:=2 );
+EndofcycleTRIG(CLK:=Endofcycle , Q=> );]]></ST>
+    </Implementation>
+    <LineIds Name="ATEQ_LEAK">
+      <LineId Id="9" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="25" Count="2" />
+      <LineId Id="49" Count="1" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="417" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="235" Count="3" />
+      <LineId Id="242" Count="0" />
+      <LineId Id="239" Count="0" />
+      <LineId Id="244" Count="0" />
+      <LineId Id="243" Count="0" />
+      <LineId Id="240" Count="0" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="245" Count="0" />
+      <LineId Id="247" Count="1" />
+      <LineId Id="61" Count="2" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="413" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="73" Count="1" />
+      <LineId Id="301" Count="0" />
+      <LineId Id="415" Count="0" />
+      <LineId Id="411" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="355" Count="0" />
+      <LineId Id="82" Count="2" />
+      <LineId Id="302" Count="0" />
+      <LineId Id="416" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="410" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="86" Count="2" />
+      <LineId Id="30" Count="2" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="93" Count="3" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="113" Count="7" />
+      <LineId Id="179" Count="3" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="112" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

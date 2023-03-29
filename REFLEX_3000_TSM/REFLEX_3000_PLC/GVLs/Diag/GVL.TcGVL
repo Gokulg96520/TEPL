@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="GVL" Id="{ed8b6c97-9bdc-461f-ad30-6660c6e61be7}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL
+	EC_MasterNetID_Arr_X1 	AT %I*:	T_AmsNetIdArr;
+	
+	bExecute			: BOOL;
+	nNoOf_Cfg_Slaves	: UINT;
+	nNoOf_Slaves_Read	: UINT;
+
+END_VAR
+VAR_GLOBAL CONSTANT
+	ECAT_MAX_SLAVES_X1: INT := 20;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

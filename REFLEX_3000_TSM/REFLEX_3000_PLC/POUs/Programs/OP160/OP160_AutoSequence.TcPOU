@@ -1,0 +1,361 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_AutoSequence" Id="{25f46846-6df7-4cd7-bbfa-184644e8c541}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_AutoSequence
+VAR
+	OP160_AutoSeq:INT;
+	OP160_MoverinstationTRIG				: R_TRIG;
+	dllt: ton;
+	COMPLETE_R_TRIG: R_TRIG;
+	fix_lh_1: INT;
+	fix_rh_1: INT;
+	dry_run :bool;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (NOT OP160_Auto OR  OP160_ErrorActive OR OP160_HomeRunning OR OP160_Machine_Stop ) THEN
+	
+	OP160_AutoRunning               := FALSE;
+	OP160_ComponentOk               :=FALSE;
+	OP160_ComponentNok              :=FALSE;
+	OP160_Moverpresent              :=FALSE;
+	op160_place_both_component_ok   :=FALSE;
+	op160_place_1_ok_1_nok          :=FALSE;
+	op160_go_to_place               :=FALSE;
+    op160_place_both_component_rej  := FALSE;
+	OP160_AutoPlaceSeq              :=0;
+	OP160_AutoSeq                   := 10;
+	OP160_Prev_LH_COMP_OK           := FALSE;
+    OP160_Prev_RH_COMP_OK           := FALSE;
+	op160_comp_Lh_ok_to_rbt         := FALSE;
+	op160_comp_Lh_nok_to_rbt        := FALSE;
+	op160_comp_rh_ok_to_rbt         := FALSE;
+	op160_comp_rh_nok_to_rbt        := FALSE;
+	OP160_PartPicked                :=FALSE;
+END_IF
+
+CASE OP160_AutoSeq OF 
+	10:IF (OP160_Auto) THEN		// Check Automode Selected
+		OP160_AutoSeq :=20;
+	    END_IF
+	20:IF ( NOT OP160_ErrorActive) THEN		//Check No error
+		OP160_AutoSeq:=30;
+	   END_IF
+	30:IF (NOT OP160_HomeRunning) THEN		//Check No Homerunning
+		OP160_AutoSeq :=40;
+		END_IF
+    40:IF ( OP160_Temp_Home_OK)THEN	//Check Machine in Home
+		OP160_AutoSeq:= 50;
+		END_IF
+	50:IF ( NOT OP160_OperationCompleted) THEN		// Check Operation Completed Reset
+		OP160_AutoSeq:=60;
+		END_IF
+		
+	60:IF (NOT OP160_ComponentOk) THEN		// Check Component Ok Reset
+		OP160_AutoSeq:=70;
+		END_IF
+		
+	70:IF (NOT OP160_ComponentNok) THEN 	// Check Component NOk Reset
+		OP160_AutoSeq:= 120;
+		OP160_AutoPlaceSeq:=10;
+		END_IF
+		
+		
+    120:IF  ( OP160_HMI_Cycle_Start ) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		    OP160_HomeCondition_OK:=TRUE;
+	 			IF( OP160_HomeCondition_OK AND OP160_AutoSelected) THEN
+					OP160_AutoRunning:=TRUE;
+					OP160_StepRunning:= FALSE;
+				
+				ELSIF ( OP160_HomeCondition_OK AND OP160_StepSelected) THEN
+					OP160_AutoRunning:=FALSE;
+					OP160_StepRunning:= TRUE;
+				END_IF;
+		 END_IF
+		 IF ((OP160_AutoRunning OR OP160_StepRunning) AND OP160_StartEnable) THEN
+			 		O160_VFD_FWD_Q708_0  :=1;
+		            O160_VFD_STOP_Q708_2 :=1;
+					OP160_Prev_Comp_Status:=1;
+					OP160_AutoSeq:= 140;
+		END_IF
+		
+	140: IF  OP160_StartEnable AND OP160_STN_ENABLE  THEN
+                IF fix_lh_1 >0 AND fix_rh_1 >0 THEN
+		           OP160_Prev_LH_COMP_OK           := TRUE;
+	               OP160_Prev_RH_COMP_OK           := TRUE;
+				   
+				   op160_comp_Lh_ok_to_rbt         := TRUE;
+	               op160_comp_Lh_nok_to_rbt        := FALSE;
+	               op160_comp_rh_ok_to_rbt         := TRUE;
+	               op160_comp_rh_nok_to_rbt        := FALSE; 
+				   
+   		           OP160_AutoSeq := 150;
+																																																																																				
+		        ELSIF fix_lh_1 =158 AND fix_rh_1 =159 THEN
+					
+		        	  OP160_Prev_LH_COMP_OK           := TRUE;
+	                  OP160_Prev_RH_COMP_OK           := FALSE;
+					  
+					  op160_comp_Lh_ok_to_rbt         := TRUE;
+					  op160_comp_Lh_nok_to_rbt        := FALSE;
+					  op160_comp_rh_ok_to_rbt         := FALSE;
+					  op160_comp_rh_nok_to_rbt        := TRUE;  
+			
+		        	  OP160_AutoSeq := 150;
+					  
+		        ELSIF fix_lh_1 =159 AND fix_rh_1 =158 THEN
+		        	  OP160_Prev_LH_COMP_OK           := FALSE;
+	                  OP160_Prev_RH_COMP_OK           :=TRUE ;
+					  
+                      op160_comp_Lh_ok_to_rbt         := FALSE;
+                      op160_comp_Lh_nok_to_rbt        := TRUE;
+                      op160_comp_rh_ok_to_rbt         := TRUE;
+                      op160_comp_rh_nok_to_rbt        := FALSE;  
+  
+	                  OP160_AutoSeq := 150;
+					  
+	            ELSIF  fix_lh_1 =159 AND fix_rh_1 =159 THEN
+	                   OP160_Prev_LH_COMP_OK           := FALSE;
+		               OP160_Prev_RH_COMP_OK           :=FALSE ;
+					   
+					   op160_comp_Lh_ok_to_rbt         := FALSE;
+					   op160_comp_Lh_nok_to_rbt        := TRUE;
+					   op160_comp_rh_ok_to_rbt         := FALSE;
+					   op160_comp_rh_nok_to_rbt        := TRUE; 
+					   
+                       OP160_AutoSeq := 150;  
+		        END_IF
+				END_IF
+		
+	150:       IF OP160_StartEnable  THEN
+		          OP160_Moverpresent                   :=TRUE;
+		          OP160_AutoSeq                        := 151;
+	           END_IF
+			   
+	151: COMPLETE_R_TRIG(CLK:=OP160_EO_QC_Pick_Completed , Q=> );
+         IF COMPLETE_R_TRIG.Q THEN
+		    OP160_PartPicked                           :=TRUE;
+          END_IF
+		  IF OP160_PartPicked THEN
+	           IF  OP160_Prev_LH_COMP_OK AND OP160_Prev_RH_COMP_OK THEN
+				   op160_place_both_component_ok       := TRUE;
+					OP160_AutoSeq                      := 152;
+					
+			   ELSIF (NOT OP160_Prev_LH_COMP_OK AND  OP160_Prev_RH_COMP_OK) OR ( OP160_Prev_LH_COMP_OK AND NOT OP160_Prev_RH_COMP_OK) THEN
+                     // op160_place_1_ok_1_nok           := TRUE;
+					  op160_go_to_place                := TRUE;
+					  OP160_AutoSeq                    := 153;
+					  
+			   ELSIF NOT OP160_Prev_LH_COMP_OK AND NOT OP160_Prev_RH_COMP_OK THEN
+	                     op160_place_both_component_rej:= TRUE;
+						 OP160_AutoSeq:= 154;
+			   END_IF
+		     END_IF
+
+    152: IF op160_place_both_component_ok AND OP160_EO_QC_Place_Completed THEN
+		    op160_place_both_component_ok               := FALSE;
+            OP160_AutoSeq                               := 160;
+	     END_IF
+
+
+	153: IF OP160_EO_QC_Place_Completed AND op160_go_to_place THEN
+			op160_place_1_ok_1_nok                      := TRUE ; 
+			op160_go_to_place                           := FALSE;
+			OP160_AutoSeq                               := 155;  
+	    END_IF		
+			
+			
+	     
+		 
+	154: IF op160_place_both_component_rej AND OP160_EO_Rejection_Place_Completed THEN
+			op160_place_both_component_rej              :=FALSE;	
+			OP160_AutoSeq                               := 160;	
+	     END_IF
+	
+    155: IF  op160_place_1_ok_1_nok AND OP160_EO_Rejection_Place_Completed THEN
+			 //  op160_go_to_place                        := FALSE;
+			   op160_place_1_ok_1_nok                   := FALSE ;
+               OP160_AutoSeq                            := 160; 
+		END_IF
+	
+	160:    OP160_Moverpresent                         :=FALSE;
+		    OP160_AutoSeq                              := 170;	   
+		       
+
+	170: OP160_AutoSeq                                 := 180;
+		       
+		
+	180:       IF OP160_StartEnable AND NOT OP160_SO_Rbt_In_Pick_Zone AND NOT I160_FIXT_COMP1_PRSNI1320_4 AND NOT I160_FIXT_COMP1_PRSNI1320_4 THEN 
+		          STATION_DONE[OP160_STN_MOVER][OP160_XTS_POS_NO]			:= TRUE;
+		          MOVER_CMP_STATUS[OP160_STN_MOVER][2]:=0;
+		          MOVER_CMP_STATUS[OP160_STN_MOVER][1]:=0;
+		          OP160_AutoSeq:= 250;
+		       END_IF
+		
+	
+	250:       // Reset All Bits							
+               OP160_LH_Comp_OK:=FALSE;
+               OP160_LH_Comp_NOK:=FALSE;
+               OP160_RH_Comp_OK:=FALSE;
+               OP160_RH_Comp_NOK:=FALSE;
+			   OP160_Prev_LH_COMP_OK := FALSE;
+			   OP160_Prev_RH_COMP_OK := FALSE;
+			   OP160_PartPicked      :=FALSE;
+			   op160_comp_Lh_ok_to_rbt         := FALSE;
+			   op160_comp_Lh_nok_to_rbt        := FALSE;
+			   op160_comp_rh_ok_to_rbt         := FALSE;
+			   op160_comp_rh_nok_to_rbt        := FALSE;
+               OP160_AutoSeq    := 120;
+				
+		
+END_CASE
+
+OP160_EI_Camera_OK :=TRUE;
+OP160_MoverinstationTRIG(CLK:=OP160_MoverinStation , Q=> );
+dry_run:=All_Station_Dry_Run;
+IF Dry_Run THEN
+	fix_lh_1:=158;	
+    fix_rh_1:=158;
+ELSE
+	fix_lh_1:=MOVER_CMP_STATUS[OP160_STN_MOVER][1];	
+    fix_rh_1:=MOVER_CMP_STATUS[OP160_STN_MOVER][2];	
+END_IF
+
+//############################		OP160 STATION ENABLE CONDITION		##########################
+
+	OP160_STN_MOVER					:= MOVER_POSITION[OP160_XTS_POS_NO];
+	IF AUTO_WITH_XTS THEN
+	IF OP160_STN_MOVER>0 THEN
+	IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP160_STN_MOVER][1]=5 AND MOVER_CMP_STATUS[OP160_STN_MOVER][2]=5)THEN
+	OP160_STN_ENABLE					:= MOVER_POS_RECHED[OP160_STN_MOVER] AND ((MOVER_CMP_STATUS[OP160_STN_MOVER][1]>0)OR 
+										(MOVER_CMP_STATUS[OP160_STN_MOVER][2]>0)) AND STATION_ENABLE_CONTROL;	
+	ELSE
+	STATION_DONE[OP160_STN_MOVER][OP160_XTS_POS_NO]			:= TRUE;		
+	END_IF
+	ELSE
+	OP160_STN_ENABLE					:= FALSE;	
+	END_IF	
+	END_IF																			
+
+	
+	
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_AutoSequence">
+      <LineId Id="3" Count="0" />
+      <LineId Id="436" Count="0" />
+      <LineId Id="4" Count="3" />
+      <LineId Id="432" Count="3" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="473" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="476" Count="3" />
+      <LineId Id="566" Count="0" />
+      <LineId Id="10" Count="17" />
+      <LineId Id="373" Count="0" />
+      <LineId Id="28" Count="2" />
+      <LineId Id="372" Count="0" />
+      <LineId Id="31" Count="1" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="370" Count="1" />
+      <LineId Id="34" Count="12" />
+      <LineId Id="250" Count="0" />
+      <LineId Id="47" Count="2" />
+      <LineId Id="375" Count="0" />
+      <LineId Id="520" Count="0" />
+      <LineId Id="567" Count="0" />
+      <LineId Id="354" Count="1" />
+      <LineId Id="502" Count="0" />
+      <LineId Id="489" Count="2" />
+      <LineId Id="484" Count="0" />
+      <LineId Id="503" Count="0" />
+      <LineId Id="356" Count="0" />
+      <LineId Id="492" Count="0" />
+      <LineId Id="357" Count="0" />
+      <LineId Id="518" Count="0" />
+      <LineId Id="358" Count="1" />
+      <LineId Id="501" Count="0" />
+      <LineId Id="496" Count="4" />
+      <LineId Id="360" Count="0" />
+      <LineId Id="493" Count="0" />
+      <LineId Id="361" Count="2" />
+      <LineId Id="509" Count="0" />
+      <LineId Id="505" Count="3" />
+      <LineId Id="504" Count="0" />
+      <LineId Id="364" Count="0" />
+      <LineId Id="494" Count="0" />
+      <LineId Id="368" Count="1" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="510" Count="0" />
+      <LineId Id="515" Count="0" />
+      <LineId Id="513" Count="1" />
+      <LineId Id="511" Count="1" />
+      <LineId Id="495" Count="0" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="568" Count="0" />
+      <LineId Id="352" Count="0" />
+      <LineId Id="78" Count="2" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="391" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="392" Count="1" />
+      <LineId Id="386" Count="0" />
+      <LineId Id="448" Count="3" />
+      <LineId Id="482" Count="0" />
+      <LineId Id="452" Count="0" />
+      <LineId Id="516" Count="0" />
+      <LineId Id="535" Count="0" />
+      <LineId Id="517" Count="0" />
+      <LineId Id="483" Count="0" />
+      <LineId Id="455" Count="3" />
+      <LineId Id="447" Count="0" />
+      <LineId Id="387" Count="1" />
+      <LineId Id="413" Count="0" />
+      <LineId Id="423" Count="0" />
+      <LineId Id="407" Count="0" />
+      <LineId Id="389" Count="1" />
+      <LineId Id="384" Count="0" />
+      <LineId Id="411" Count="1" />
+      <LineId Id="537" Count="0" />
+      <LineId Id="549" Count="0" />
+      <LineId Id="548" Count="0" />
+      <LineId Id="408" Count="1" />
+      <LineId Id="426" Count="0" />
+      <LineId Id="405" Count="0" />
+      <LineId Id="429" Count="0" />
+      <LineId Id="431" Count="0" />
+      <LineId Id="428" Count="0" />
+      <LineId Id="425" Count="0" />
+      <LineId Id="551" Count="3" />
+      <LineId Id="550" Count="0" />
+      <LineId Id="418" Count="0" />
+      <LineId Id="270" Count="0" />
+      <LineId Id="396" Count="0" />
+      <LineId Id="269" Count="0" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="88" Count="1" />
+      <LineId Id="340" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="163" Count="1" />
+      <LineId Id="91" Count="4" />
+      <LineId Id="98" Count="4" />
+      <LineId Id="471" Count="1" />
+      <LineId Id="565" Count="0" />
+      <LineId Id="521" Count="3" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="106" Count="1" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="374" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="377" Count="6" />
+      <LineId Id="122" Count="1" />
+      <LineId Id="313" Count="14" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="299" Count="1" />
+      <LineId Id="223" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

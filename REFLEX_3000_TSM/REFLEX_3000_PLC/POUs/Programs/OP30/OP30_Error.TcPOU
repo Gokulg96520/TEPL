@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP30_Error" Id="{f6587571-ca84-4826-b15e-3c0fac18ed1d}" SpecialFunc="None">
+  <POU Name="OP30_Error" Id="{dad9f30a-94c9-4e61-875d-9b6689c5d378}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP30_Error
 VAR
 	OP30_Step_Err_1: TON;
@@ -19,7 +19,7 @@ IF ((OP30_GVL.OP30_ErrorWord_0<>0) OR (OP30_GVL.OP30_ErrorWord_1<>0) OR (OP30_GV
 END_IF
 
 //Reset ErrorActive
-IF (OP30_GVL.OP30_HMI_Reset) THEN 
+IF (OP30_GVL.OP30_HMI_Reset OR HMI_Reset) THEN 
 	OP30_GVL.OP30_ErrorActive:= FALSE;
 	OP30_GVL.OP30_ErrorWord_0:= 0;
 	OP30_GVL.OP30_ErrorWord_1:= 0;

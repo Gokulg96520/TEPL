@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="POU_1" Id="{c647c264-4cec-4957-bb73-bb44ea2a672a}" SpecialFunc="None">
+  <POU Name="POU_1" Id="{831b7cd7-baa2-4d23-957b-958553d6f5f3}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK POU_1
 VAR_INPUT
 END_VAR

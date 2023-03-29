@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <DUT Name="OP120_Recipe" Id="{3b98861b-5d3d-4db9-a06a-48a02550de65}">
+  <DUT Name="OP120_Recipe" Id="{ff37da49-6863-4f48-aa5b-7534e06fe8e5}">
     <Declaration><![CDATA[TYPE OP120_Recipe :
 STRUCT
 	OP120_Bowl_Feeder_Freq:LREAL;

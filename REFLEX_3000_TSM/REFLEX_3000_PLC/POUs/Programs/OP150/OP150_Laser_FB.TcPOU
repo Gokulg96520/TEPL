@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP150_Laser_FB" Id="{ec5e2d69-f0c7-40d0-8244-21844f8a59f0}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP150_Laser_FB
+VAR
+	Laser_Marker : FB_Keyence_Laser_Steuerung;
+	
+	Genreal_Status AT %I*  : ST_KeyenceLaser_General_Status;
+	IO_Status AT %I*  : ST_KeyenceLaser_IO_Status;
+	Running_Status AT %I*  : ST_KeyenceLaser_Running_Status;	
+	Function_Status_I AT %I*  : ST_KeyenceLaser_Function_Status_I;
+	Control_Status AT %I*  : ST_KeyenceLaser_Control_Status;		
+	Req_Complete_Status AT %I*  : ST_KeyenceLaser_General_Request_Completion_Status;
+	Edit_Req_Comp_Status AT %I*  : ST_KeyenceLaser_Edit_Request_Completion_Status;
+	Operation_Req_Comp_Status AT %I*  : ST_KeyenceLaser_Operation_Request_Completion_Status;
+	Block_Edit_Req_Status AT %I*  : ST_KeyenceLaser_Block_Edit_Request_Completion_Status;
+	Cmnd_Req_Status AT %I*  : ST_KeyenceLaser_Command_Request_Completion_Status;
+	General_Req_Err_Status AT %I*  : ST_KeyenceLaser_General_Request_Error_Status;
+	Edit_Request_Error_Statu AT %I*  : ST_KeyenceLaser_Edit_Request_Error_Status;
+	Operation_Request_Error_Status AT %I*  : ST_KeyenceLaser_Operation_Request_Error_Status;
+	Block_Edit_Request_Error_Status AT %I*  : ST_KeyenceLaser_Block_Edit_Request_Error_Status;
+	Command_Request_Error AT %I*  : ST_KeyenceLaser_Command_Request_Error;
+	
+	General_Request AT %Q* : ST_KeyenceLaser_General_Request_I;	
+	Edit_Request AT %Q* : ST_KeyenceLaser_Edit_Request;	
+	Operating_Request AT %Q* : ST_KeyenceLaser_Operating_Request;	
+	Block_Edit_Request AT %Q* : ST_KeyenceLaser_Block_Edit_Request;	
+	Command_Request AT %Q* : ST_KeyenceLaser_Command_Request;	
+	Function_Request AT %Q* : ST_KeyenceLaser_Function_Request_I;	
+	General_Request_Completion_Clear AT %Q* : ST_KeyenceLaser_General_Request_Completion_Clear;	
+	Edit_Request_Completion_Clear AT %Q* : ST_KeyenceLaser_Edit_Request_Completion_Clear;	
+	Operating_Request_Completion_Clear AT %Q* : ST_KeyenceLaser_Operating_Request_Completion_Clear;	
+	Block_Edit_Request_Completion_Clear AT %Q* : ST_KeyenceLaser_Block_Edit_Request_Completion_Clear;	
+	Command_Request_Completion_Clear AT %Q* : ST_KeyenceLaser_Command_Request_Completion_Clear;	
+	Parameter AT %Q* : UDINT;	
+	User_Data AT %Q* : ARRAY [0..127] OF BYTE;	
+	User_Data_Size AT %Q* : UINT;	
+	Curr_JOB_id AT %I* : UINT;
+
+	OP150B_STN_MOVER	: INT;
+
+	OP150B_LH_STN_MOVER: INT;
+	OP150B_RH_STN_MOVER: INT;
+    OP150B_LH_STN_ENABLE: BOOL;
+    OP150B_RH_STN_ENABLE: BOOL;	
+	
+	Complete_Delay : TON;
+	tmp: BOOL;
+	Error_Delay	: TON;
+
+
+	Dry_run                 : BOOL;	
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Laser_Marker(
+	stGeneralStatus:= Genreal_Status, 
+	stIOStatus:= IO_Status, 
+	stRunningStatus:= Running_Status, 
+	stFunctionStatus:= Function_Status_I, 
+	stControlStatus:= Control_Status, 
+	stGeneralRequestCompletionStatus:= Req_Complete_Status, 
+	stEditRequestCompletionStatus:= Edit_Req_Comp_Status, 
+	stOperationRequestCompletionStatus:= Operation_Req_Comp_Status, 
+	stBlockEditRequestCompletionStatus:= Block_Edit_Req_Status, 
+	stCommandRequestCompletionStatus:= Cmnd_Req_Status, 
+	stGeneralRequestErrorStatus:= General_Req_Err_Status, 
+	stEditRequestErrorStatus:= Edit_Request_Error_Statu, 
+	stOperationRequestErrorStatus:= Operation_Request_Error_Status, 
+	stBlockEditRequestErrorStatus:= Block_Edit_Request_Error_Status, 
+	stCommandRequestError:= Command_Request_Error, 
+	iErrorCode0:= , 
+	iErrorCode1:= , 
+	iCurrentProgramNumber:= Curr_JOB_id, 
+	iCounterNumber:= , 
+	iCounterValue:= , 
+	iRankValue:= , 
+	iISOIECTR29158Grade:= , 
+	iTwoDCCodeResultUpdateCount:= , 
+	iPrintCount:= , 
+	iResultDataSizet:= , 
+	aResultData:= , 
+	bClear_Error:=HMI_Reset OR OP150_HMI_Reset , 
+	bLasermarking_Start:= OP150_Laser_Start , 
+	iProgramNr:= OP150_Lsr_Job_ID, 
+	iBlockNr:= OP150_Lsr_Block_ID, 
+	sText:= OP150_Lsr_String, 
+	bSafetyOK:= OperationEnable, 
+	bProgramChange_Start:= OP150_Lsr_Job_Change_Start, 
+	bBlockChange_Start:= OP150_Lsr_Text_Change_Start, 
+	stGeneralRequest=> General_Request, 
+	stEditRequest=> Edit_Request, 
+	stOperatingRequest=> Operating_Request, 
+	stBlockEditRequest=> Block_Edit_Request, 
+	stCommandRequest=> Command_Request, 
+	stFunctionRequest=> Function_Request, 
+	stGeneralRequestCompletionClear=> General_Request_Completion_Clear, 
+	stEditRequestCompletionClear=>Edit_Request_Completion_Clear, 
+	stOperatingRequestCompletionClear=> Operating_Request_Completion_Clear, 
+	stBlockEditRequestCompletionClear=> Block_Edit_Request_Completion_Clear, 
+	stCommandRequestCompletionClear=> Command_Request_Completion_Clear, 
+	iparameter=> Parameter, 
+	iUserDataSize=> User_Data_Size , 
+	aUserData=> User_Data, 
+	nTemp=> , 
+	nTemp2ByteSwaped=> , 
+	bError=>OP150_B_ErrorActive , 
+	bLaserMarking_finished=>OP150_Laser_Completed , 
+	bLaserMarking_failed=>OP150_Laser_Failed , 
+	bProgChangeComplete=>OP150_Lsr_Job_Change_Complete , 
+	bBlockChangeComplete=>OP150_Lsr_Text_Change_Complete , 
+	bLaserReady=>OP150_Lsr_Ready , 
+	bTXTSM_Laser_not_ready=> , 
+	bTXTSM_Laser_Error=> );
+	
+Error_Delay(IN:= NOT OP150_Lsr_Ready,PT:=T#10S);
+	
+IF Error_Delay.Q THEN
+	OP150_B_ErrorActive:=1;
+END_IF
+
+IF HMI_Reset OR OP150_HMI_Reset THEN
+	OP150_B_ErrorActive:=0;
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP150_Laser_FB">
+      <LineId Id="3" Count="57" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="308" Count="1" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="249" Count="1" />
+      <LineId Id="252" Count="0" />
+      <LineId Id="251" Count="0" />
+      <LineId Id="253" Count="1" />
+      <LineId Id="579" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

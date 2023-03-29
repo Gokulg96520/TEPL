@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP110_GVL" Id="{ac4b2cf1-7076-41cd-9ff8-199cc1bd313f}">
+  <GVL Name="OP110_GVL" Id="{12907062-248d-45f8-bd82-d2e8cab17f89}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 //GENERAL
@@ -34,6 +34,7 @@ OP110_LH_AutoSeq: 			INT;
 OP110_RH_AutoSeq: 			INT;
 OP110_Homing_Seq:			INT;
 OP110_Safety_OK:				BOOL;
+OP110_Stop_Request : BOOl;
 
 Automatic_Run:				BOOL;    //from master mode block
 Manual_mode: 				BOOL;    //from master mode block
@@ -65,24 +66,20 @@ OP110_AutoSelected:		    BOOL;
 OP110_HMI_AutoMode:						BOOL;
 OP110_HMI_ManualMode:					BOOL;
 OP110_HMI_StepMode:						BOOL;
-//OP110_HMI_CycleStart:					BOOL;
-OP110_HMI_Cycle_Start:					BOOL;
+OP110_HMI_CycleStart:					BOOL;
+
 
 OP110_HMI_Homing:						BOOL;
 SR20_Vert_Servo_Max_Lim:				BOOL;
 OP110_HMI_Jog_Pos: BOOL;
 OP110_HMI_Jog_Neg: BOOL;
-//Error
-OP110_ErrorWord_0: DINT;
-OP110_ErrorWord_1: DINT;
-OP110_ErrorWord_2: DINT;
 
 OP110_AUTO_STP_NO: INT;
 
 // MANUAL
 		
 // AUTO	
-	OP110_STN_ENABLE					: BOOL;				// FROM MASTER CONTROL BLOCK
+		// FROM MASTER CONTROL BLOCK
 	OP110_FIXTURE_2					: INT;               //For the comp status in the fixture
 	OP110_FIXTURE_1					: INT; 				 //For the comp status in the fixture
 // SERVO VARIABLE
@@ -103,24 +100,32 @@ END_VAR
 VAR_GLOBAL PERSISTENT
 	
 // MANUAL
-
+	OP110_STN_ENABLE				: BOOL;		
+	OP110_OIL_TIMER 				: INT;
+	OP110_STN_RUNNING 				: BOOL;
 // AUTO
-	OP110_BYPASS						: BOOL;				// OP110 ON-BYPASS / OFF-NOT BYPASSED
+	OP110_BYPASS					: BOOL;				// OP110 ON-BYPASS / OFF-NOT BYPASSED
 	OP110_LH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH OK BIT
-	OP110_LH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH NOK BIT
+	OP110_LH_OIL_NOK				: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH NOK BIT
 	OP110_RH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH OK BIT
-	OP110_RH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH NOK BIT
+	OP110_RH_OIL_NOK				: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH NOK BIT
 	
-	OP110_DLY_AFT_SFE_WRK			: INT:=100;				// AUTO DELAY TIMER AFTER SERVO REACH WORK
-	OP110_DLY_AFT_SPN_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER SPINNER START
-	OP110_DLY_AFT_OILNG_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER OILLING START
-	OP110_DLY_AFT_OILNG_FNISH		: INT:=100;				// AUTO DELAY TIMER AFTER OILLING FINISH
-// SERVO VARIABLE
+//Setting Parameters
+    OP110_HMI_Servo_Speed    	: REAL;
+    OP110_HMI_Low_Limit		 	: REAL;
+    OP110_HMI_High_Limit	 	: REAL;
+	OP110_HMI_Safe_Home		 	: REAL;
+	OP110_HMI_Safe_Work		 	: REAL;
+	OP110_Oil_Position_Offset	: REAL :=10;
+	OP110_Oiling_Velocity		: REAL :=20;
+//Error
+OP110_ErrorWord_0: DINT;
+OP110_ErrorWord_1: DINT;
+OP110_ErrorWord_2: DINT;
 
+	OP110_Cycle_time: UDINT;	
+	
 END_VAR
-
-VAR_GLOBAL 
-	temp:BOOL;
-END_VAR]]></Declaration>
+]]></Declaration>
   </GVL>
 </TcPlcObject>

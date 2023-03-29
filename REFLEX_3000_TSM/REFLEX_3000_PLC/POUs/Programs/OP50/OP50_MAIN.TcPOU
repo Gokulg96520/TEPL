@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP50_MAIN" Id="{c61d3117-5541-47a3-adbe-b3a8386e84cf}" SpecialFunc="None">
+  <POU Name="OP50_MAIN" Id="{6e3d9efb-9882-4842-a9dd-01dbca8bc24e}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP50_MAIN
 VAR
 	OP50_Modeselection_FB: Mode_Selection_Block1;
@@ -8,14 +8,18 @@ VAR
 	Pulse_1s: BOOL;
 	Times: LREAL;
 	Pge_NUM : INT;
+
+	Gen_Timer: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[OP50_Manual();
 OP50_AUTOSEQUENCE();
-OP50_CONVEYOR();
+//OP50_CONVEYOR();
+OP50_Camera_FB();
 OP50_Error();
 OP50_Initialize_Seq();
+OP50_Conveyor_Cam_Seq();
 
 //MOdeselection From HMI
 
@@ -40,10 +44,12 @@ ELSE
   SR50_VERT_servo.bEnable:=FALSE;	
 END_IF
 *)
-IF SR50_CONV_servo.bAxisError THEN//OR SR50_HORI_servo.bAxisError OR SR50_VERT_servo.bAxisError THEN
+IF SR50_CONV_servo.bAxisError OR SR50_HORI_servo.bAxisError OR SR50_VERT_servo.bAxisError THEN
 	OP50_ErrorActive:=TRUE;
 END_IF
 	
+OP50_Safety_OK:=OperationEnable;
+
 OP50_Modeselection_FB(
 	ModeWord:= , 
 	HomeConditionOK:=OP50_HomeConditionOK , 
@@ -64,10 +70,27 @@ OP50_Modeselection_FB(
 	StartEnable:=OP50_StartEnable  , 
 	MachineStop:=OP50_Machine_Stop );
 	
-TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#1S , Q=>Pulse_1s, ET=> );	]]></ST>
+IF OP50_Stop_Request AND NOT OP50_STN_ENABLE THEN
+	OP50_Machine_Stop:=1;
+END_IF
+Gen_Timer(IN:=OP50_Machine_Stop,PT:=T#5S);
+IF Gen_Timer.Q THEN
+	OP50_Machine_Stop:=0;
+END_IF
+]]></ST>
     </Implementation>
     <LineIds Name="OP50_MAIN">
-      <LineId Id="3" Count="52" />
+      <LineId Id="3" Count="2" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="6" Count="1" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="8" Count="27" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="36" Count="18" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="75" Count="5" />
+      <LineId Id="74" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

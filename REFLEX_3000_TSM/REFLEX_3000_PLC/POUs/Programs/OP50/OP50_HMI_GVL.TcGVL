@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP50_HMI_GVL" Id="{2162dd47-314e-4726-a612-d8d9687a98c7}">
+  <GVL Name="OP50_HMI_GVL" Id="{7885dfad-b5b8-4ee0-8f08-a7f75f83029e}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 	

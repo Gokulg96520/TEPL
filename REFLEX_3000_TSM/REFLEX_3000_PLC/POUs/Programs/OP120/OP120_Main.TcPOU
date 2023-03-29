@@ -1,21 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP120_Main" Id="{a4338066-70d1-4bbe-9ff5-dfeb4735eaa2}" SpecialFunc="None">
+  <POU Name="OP120_Main" Id="{39e33e53-40d7-48b9-bca0-6c27b252bb43}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP120_Main
 VAR
 	OP120_Modeselection_FB: Mode_Selection_Block1;
-	OP120_AutoSelected:		    BOOL;
+	
 
+	OP120_Vaccum1_Bit2: BOOL;
+	OP120_Vaccum1_Bit6: BOOL;
+	OP120_Vaccum1_Bit3: BOOL;
+	OP120_Vaccum1_Bit4: BOOL;
+	OP120_Vaccum1_Bit5: BOOL;
+	OP120_Vaccum1_Bit7: BOOL;
+	OP120_Vaccum_Byte2_bit0: BOOL;
+	OP120_Vaccum_Byte2_bit1: BOOL;
+	OP120_Vaccum_Byte2_bit2: BOOL;
+	OP120_Vaccum_Byte2_bit3: BOOL;
+	OP120_Vaccum_Byte2_bit4: BOOL;
+	OP120_Vaccum_Byte2_bit5: BOOL;
+	OP120_Vaccum_Byte2_bit6: BOOL;
+	OP120_Vaccum_Byte2_bit7: BOOL;
+	OP120_Vaccum2_Bit3: BOOL;
+	OP120_Vaccum2_Bit4: BOOL;
+	OP120_Vaccum2_Bit2: BOOL;
+	OP120_Vaccum2_Bit5: BOOL;
+	OP120_Vaccum2_Bit6: BOOL;
+	OP120_Vaccum2_Bit7: BOOL;
+	OP120_Vaccum2_Byte2_bit0: BOOL;
+	OP120_Vaccum2_Byte2_bit1: BOOL;
+	OP120_Vaccum2_Byte2_bit2: BOOL;
+	OP120_Vaccum2_Byte2_bit3: BOOL;
+	OP120_Vaccum2_Byte2_bit4: BOOL;
+	OP120_Vaccum2_Byte2_bit5: BOOL;
+	OP120_Vaccum2_Byte2_bit6: BOOL;
+	OP120_Vaccum2_Byte2_bit7: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
+      <ST><![CDATA[op120_camera_FB();
 OP120_Manual();
 Op120_Error();
-OP120_Robo_Inputs();
+
 OP120_Initialization_Seq();
 OP120_AutoSequence();
 OP120_feed_Conveyor();
+OP120_LockInsert_AutoSequence();
+
+OP120_Sing_Auto_PRG();
 
 
 IF (OP120_HMI_AutoMode AND NOT OP120_HMI_ManualMOde AND NOT OP120_HMI_StepMode) THEN
@@ -36,9 +67,9 @@ END_IF
 OP120_Modeselection_FB(
 	ModeWord:= , 
 	HomeConditionOK:=OP120_HomeCondition_OK , 
-	OperationEnable:=OP120_OperationEnable , 
+	OperationEnable:=OperationEnable , 
 	StartPB:= , 
-	SafetyAndNOError:= , 
+	SafetyAndNOError:=OperationEnable , 
 	ModeAck:=TRUE , 
 	HomingINProgress:= , 
 	TempHomeOK:=OP120_Temp_Home_OK , 
@@ -55,16 +86,58 @@ OP120_Modeselection_FB(
 	
 	IF (OP120_AutoSelected OR  OP120_StepSelected ) THEN
 		OP120_GVL.OP120_Auto:=TRUE;
+		O120_ROB_MAN_AUTO_MODE_Q709_4:=TRUE;
+		//OP120_SI_Dry_Run:=TRUE;
+		OP120_Robo_Out6002:=1;
+		
 		ELSE
 			OP120_GVL.OP120_Auto:=FALSE;
+			O120_ROB_MAN_AUTO_MODE_Q709_4:=FALSE;
+			OP120_Robo_Out6002:=0;
 		END_IF
-
+IF OP120_Auto AND NOT OP120_ManualSelected AND NOT OP120_HomeRunning THEN
+	OP120_Robo_Out6001:=1;
+END_IF
 	
+	(*OP120_Vaccum1_Bit0:=OP120_Vaccuum_IP_Port5_Byte1.7;
+	OP120_Vaccum1_Bit1:=OP120_Vaccuum_IP_Port5_Byte1.6;
+	OP120_Vaccum1_Bit2:=OP120_Vaccuum_IP_Port5_Byte1.5;
+	OP120_Vaccum1_Bit3:=OP120_Vaccuum_IP_Port5_Byte1.4;
+	OP120_Vaccum1_Bit4:=OP120_Vaccuum_IP_Port5_Byte1.3;
+	OP120_Vaccum1_Bit5:=OP120_Vaccuum_IP_Port5_Byte1.2;
+	OP120_Vaccum1_Bit6:=OP120_Vaccuum_IP_Port5_Byte1.1;
+	OP120_Vaccum1_Bit7:=OP120_Vaccuum_IP_Port5_Byte1.0;
 	
+	OP120_Vaccum_Byte2_bit0:=OP120_Vaccuum_IP_Port5_Byte2.7;
+	OP120_Vaccum_Byte2_bit1:=OP120_Vaccuum_IP_Port5_Byte2.6;
+	OP120_Vaccum_Byte2_bit2:=OP120_Vaccuum_IP_Port5_Byte2.5;
+	OP120_Vaccum_Byte2_bit3:=OP120_Vaccuum_IP_Port5_Byte2.4;
+	OP120_Vaccum_Byte2_bit4:=OP120_Vaccuum_IP_Port5_Byte2.3;
+	OP120_Vaccum_Byte2_bit5:=OP120_Vaccuum_IP_Port5_Byte2.2;
+	OP120_Vaccum_Byte2_bit6:=OP120_Vaccuum_IP_Port5_Byte2.1;*)
+	OP120_Vaccum1_Bit0:=OP120_Vaccuum_IP_Port5_Byte2.0;
+	
+(*OP120_Vaccum2_Bit0:=OP120_Vaccuum_IP_Port6_Byte1.7;
+	OP120_Vaccum2_Bit1:=OP120_Vaccuum_IP_Port6_Byte1.6;
+	OP120_Vaccum2_Bit2:=OP120_Vaccuum_IP_Port6_Byte1.5;
+	OP120_Vaccum2_Bit3:=OP120_Vaccuum_IP_Port6_Byte1.4;
+	OP120_Vaccum2_Bit4:=OP120_Vaccuum_IP_Port6_Byte1.3;
+	OP120_Vaccum2_Bit5:=OP120_Vaccuum_IP_Port6_Byte1.2;
+	OP120_Vaccum2_Bit6:=OP120_Vaccuum_IP_Port6_Byte1.1;
+	OP120_Vaccum2_Bit7:=OP120_Vaccuum_IP_Port6_Byte1.0;
+	
+	OP120_Vaccum2_Byte2_bit0:=OP120_Vaccuum_IP_Port6_Byte2.7;
+	OP120_Vaccum2_Byte2_bit1:=OP120_Vaccuum_IP_Port6_Byte2.6;
+	OP120_Vaccum2_Byte2_bit2:=OP120_Vaccuum_IP_Port6_Byte2.5;
+	OP120_Vaccum2_Byte2_bit3:=OP120_Vaccuum_IP_Port6_Byte2.4;
+	OP120_Vaccum2_Byte2_bit4:=OP120_Vaccuum_IP_Port6_Byte2.3;
+	OP120_Vaccum2_Byte2_bit5:=OP120_Vaccuum_IP_Port6_Byte2.2;
+	OP120_Vaccum2_Byte2_bit6:=OP120_Vaccuum_IP_Port6_Byte2.1;*)
+	OP120_Vaccum2_Bit0:=OP120_Vaccuum_IP_Port6_Byte2.0;
 	]]></ST>
     </Implementation>
     <LineIds Name="OP120_Main">
-      <LineId Id="3" Count="51" />
+      <LineId Id="134" Count="96" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

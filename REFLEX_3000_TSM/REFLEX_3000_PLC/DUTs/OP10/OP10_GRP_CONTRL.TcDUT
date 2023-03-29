@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="OP10_GRP_CONTRL" Id="{4e7fb451-7192-4a1f-a14d-6f8e445acd15}">
+    <Declaration><![CDATA[TYPE OP10_GRP_CONTRL :
+STRUCT
+	LH_BODY_GRIP_WRK				: BOOL;
+	LH_BODY_GRIP_HOM				: BOOL;	
+	RH_BODY_GRIP_WRK				: BOOL;
+	RH_BODY_GRIP_HME				: BOOL;
+	LH_BODY_ROTRY_WRK				: BOOL;
+	LH_BODY_RTRY_FITEE				: BOOL;	
+	LH_BODY_ROTRY_CMR				: BOOL;	
+	LH_BODY_ROTRY_HOM				: BOOL;	
+	RH_BODY_ROTRY_WRK				: BOOL;
+	RH_BODY_RTRY_FITEE				: BOOL;	
+	RH_BODY_ROTRY_CMR				: BOOL;
+	RH_BODY_ROTRY_HME				: BOOL;
+	LH_BODY_GRIP_HOMING_1			: BOOL;
+	RH_BODY_GRIP_HOMING_1			: BOOL;
+	LH_BODY_ROTRY_HOMING_1			: BOOL;		
+	RH_BODY_ROTRY_HOMING_1			: BOOL;	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

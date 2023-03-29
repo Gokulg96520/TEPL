@@ -18,9 +18,11 @@ VAR_INPUT
 	fDec				 : LREAL; //:= 100.0;
 	Servo_High_Limit	 : LREAL;
 	Servo_Low_Limit	 	 : LREAL;
-	WARNING_LIMIT		 : LREAL;	
+	WARNING_LIMIT		 : LREAL;
+	LIMIT_BYPASS		 : BOOL;	
 	Safe_move_Conditions : BOOL;
 	HME_WRITE_ADD		 : UDINT;
+	Torque_limit_perent	 : REAL;
 END_VAR
 VAR_IN_OUT
 	Axis 				: AXIS_REF;
@@ -53,6 +55,10 @@ VAR_OUTPUT
 	Actual_velocity		: LREAL;
 	Actual_Torque		: LREAL;
     SERVO_LIMIT_WARNING	: BOOL;
+	TORQUE_LIMIT		: UINT; 
+	POS_TORQUE_LIMIT 	: UINT;
+	NEG_TORQUE_LIMIT	: UINT;	
+	
 	
 END_VAR
 VAR
@@ -139,6 +145,7 @@ VAR
 	POS_LIMIT: BOOL;
 	AUTO_TARGET_POSITION: LREAL;
 	MANUAL_TARGET_POSITION: LREAL;
+	START_TIMER: TON;
 END_VAR
 VAR_TEMP
  	//tmpVelocityDirection		: MC_Direction;
@@ -154,8 +161,7 @@ VAR PERSISTENT
 	HOMING_VALUE		: LREAL;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-//Init
+      <ST><![CDATA[//Init
 bHaltDone := FALSE;
 bSTOPDone := FALSE;
 
@@ -237,7 +243,7 @@ END_IF
 									iSchritt := ENUM_Axis.Init;
 								ELSIF bAxisInError THEN
 									iSchritt := ENUM_Axis.Error;
-								ELSIF bEnable AND TRIAL THEN
+								ELSIF bEnable  THEN
 									iSchritt := ENUM_Axis.PowerON;
 								END_IF
 								
@@ -553,7 +559,7 @@ fbAxisReset(
 	
 fbAxisPower(
 	Axis:= Axis, 
-	Enable:= bAxisPowerExecute AND NOT home_pressed, 
+	Enable:= bAxisPowerExecute AND NOT home_pressed AND TRIAL, 
 	Enable_Positive:= bAxisPowerExecute, 
 	Enable_Negative:= bAxisPowerExecute, 
 	Override:= fOverride, 
@@ -603,7 +609,7 @@ END_IF;
 
 
 IF bManualMode THEN
-	fHMTargetPosition:= stManualModeAxis.targetPositon;//MANUAL_TARGET_POSITION;
+	fHMTargetPosition:= MANUAL_TARGET_POSITION;//MANUAL_TARGET_POSITION;
 	fHMTargetVelocity:= stManualModeAxis.targetVelocity;
 ELSE
 	fHMTargetPosition:=AUTO_TARGET_POSITION;
@@ -639,8 +645,8 @@ fbAxisSetPosition(
 
 fbAxisJog(
 	Axis:= Axis, 
-	JogForward:=bAxisJogExecutePos ,// AND (POS_LIMIT OR 1)
-	JogBackwards:= bAxisJogExecuteNeg  , //AND (LEG_LIMIT OR 1)
+	JogForward:=bAxisJogExecutePos AND (POS_LIMIT OR LIMIT_BYPASS),
+	JogBackwards:= bAxisJogExecuteNeg AND (LEG_LIMIT OR LIMIT_BYPASS),
 	//Mode:= MC_JOGMODE_STANDARD_SLOW, //MC_JOGMODE_STANDARD_SLOW, //MC_JOGMODE_STANDARD_FAST, //MC_JOGMODE_CONTINOUS, //MC_JOGMODE_INCHING, //MC_JOGMODE_INCHING_MODULO
 	//Position:= 0, 
 	Velocity:= stManualModeAxis.targetVelocity, 
@@ -801,7 +807,8 @@ Actual_Torque:=fActualTorque;
 	bAxisError := bAxisInError OR iSchritt = ENUM_Axis.Error;
 	bAxis_ready := (iSchritt = ENUM_Axis.Ready);
 	bAxisEnabled:= (iSchritt <> ENUM_Axis.PowerOFF) AND (iSchritt <> ENUM_Axis.Error);
-IF In_range(stManualModeAxis.actualPosition,0,1) THEN
+	
+IF In_range(stManualModeAxis.actualPosition,0,2) THEN
 	baxis_in_home_pos:=TRUE;
 ELSE
 	baxis_in_home_pos:=FALSE;		
@@ -814,11 +821,13 @@ ELSE
 	bsafe_to_move:=FALSE;
 	fOverride := 0;
 END_IF	
-
 IF bmove_home THEN
 	CASE moving_home OF
-		0:IF bmove_home AND NOT bMoveAbsolute AND NOT baxis_in_home_pos THEN
+		0:IF bmove_home AND bAxisEnabled AND NOT baxis_in_home_pos THEN
             fTargetPosition:=0;
+			IF fTargetVelocity=0 THEN
+				fTargetVelocity:=50;
+			END_IF
 		    moving_home:=1;	
 		  ELSIF baxis_in_home_pos THEN
 			bmove_home:=FALSE;
@@ -826,10 +835,12 @@ IF bmove_home THEN
 		  END_IF
 	   
 		1: bMoveAbsolute:=TRUE; 
-		   moving_home:=2;  
-		
-		2:  IF In_range(stManualModeAxis.actualPosition,0,1) OR bDone THEN
-			 bMoveAbsolute:=FALSE;
+		  IF bMoveAbsolute THEN
+			   moving_home:=2; 
+		  END_IF
+		   	
+		2:  IF In_range(stManualModeAxis.actualPosition,0,1) OR fbAxisMoveAbsolute.Done THEN
+			 //fbAxisMoveAbsolute.Execute:=FALSE;
 			// moving_home:=0;
 			 bmove_home:=FALSE;
 		    END_IF		
@@ -846,6 +857,9 @@ bAxisEnabled:= NOT bAxisError AND fbAxisPower.Status;
 
 
 ///////////////////////////////////// AUTO HOMING	////////////////////////////////
+START_TIMER(IN:=bAxisPowerExecute , PT:=T#3S, Q=> , ET=> );
+IF START_TIMER.Q THEN
+	
 
 bSet_Encoder_Zero:=NOT TRIAL OR home_pressed;
 
@@ -930,81 +944,93 @@ IF step=99 THEN
 	//bAxisHomeExecute:= FALSE;
 	//iSchritt := ENUM_Axis.Ready;	
 END_IF
-	
+END_IF	
 	
 	
 //############################		SERVO LIMIT 	##############################	
 
-(*Servo_Low_Limit	  :=-1000;
-Servo_High_Limit  :=1000;
+IF NOT LIMIT_BYPASS THEN
+
 IF (stManualModeAxis.actualPosition>=Servo_Low_Limit) THEN
-LEG_LIMIT			:= TRUE;
+	LEG_LIMIT			:= TRUE;
 ELSE	
-LEG_LIMIT			:= FALSE;
+	LEG_LIMIT			:= FALSE;
 END_IF;
 
 IF stManualModeAxis.actualPosition<=Servo_High_Limit THEN
-POS_LIMIT			:= TRUE;	
+	POS_LIMIT			:= TRUE;	
 ELSE
-POS_LIMIT			:= FALSE;
+	POS_LIMIT			:= FALSE;
 END_IF
-
-IF (fTargetPosition<=Servo_Low_Limit) THEN
+ 
+IF (fTargetPosition<=Servo_High_Limit) AND (fTargetPosition>=Servo_Low_Limit) THEN
 	AUTO_TARGET_POSITION:=fTargetPosition;
-ELSE
-	AUTO_TARGET_POSITION:=Servo_Low_Limit;
-END_IF
-
-IF fTargetPosition>=Servo_High_Limit THEN
+ELSIF (fTargetPosition>=Servo_High_Limit)THEN
 	AUTO_TARGET_POSITION:=Servo_High_Limit;
-ELSE
-	AUTO_TARGET_POSITION:=fTargetPosition;
+ELSIF (fTargetPosition<=Servo_Low_Limit) AND (fTargetPosition<=Servo_High_Limit) THEN
+	AUTO_TARGET_POSITION:=Servo_Low_Limit;	
 END_IF
 
-IF (stManualModeAxis.targetPositon<=Servo_Low_Limit) THEN
-MANUAL_TARGET_POSITION:=Servo_Low_Limit;
-ELSE 
-MANUAL_TARGET_POSITION:=stManualModeAxis.targetPositon;	
-END_IF
-
-IF stManualModeAxis.targetPositon>=Servo_High_Limit THEN
-MANUAL_TARGET_POSITION:=Servo_High_Limit;
-ELSE
-MANUAL_TARGET_POSITION:=stManualModeAxis.targetPositon;
+IF (stManualModeAxis.targetPositon<=Servo_High_Limit) AND (stManualModeAxis.targetPositon>=Servo_Low_Limit) THEN
+	MANUAL_TARGET_POSITION:=stManualModeAxis.targetPositon;
+ELSIF (stManualModeAxis.targetPositon>=Servo_High_Limit)THEN
+	MANUAL_TARGET_POSITION:=Servo_High_Limit;
+ELSIF (stManualModeAxis.targetPositon<=Servo_Low_Limit) AND (stManualModeAxis.targetPositon<=Servo_High_Limit) THEN
+	MANUAL_TARGET_POSITION:=Servo_Low_Limit;	
 END_IF
 
 IF (stManualModeAxis.actualPosition-WARNING_LIMIT)<=Servo_Low_Limit AND (stManualModeAxis.actualPosition+WARNING_LIMIT)<=Servo_High_Limit THEN
-SERVO_LIMIT_WARNING	:= TRUE;
+	SERVO_LIMIT_WARNING	:= TRUE;
 ELSE
-SERVO_LIMIT_WARNING	:= FALSE;	
+	SERVO_LIMIT_WARNING	:= FALSE;	
 END_IF
-*)
-]]></ST>
+
+ELSE	
+	AUTO_TARGET_POSITION			:=fTargetPosition;
+	MANUAL_TARGET_POSITION			:=stManualModeAxis.targetPositon;
+END_IF
+
+//################################			TORQUE LIMIT	############################
+
+(*IF ((Torque_limit_perent=>0) AND (Torque_limit_perent<=100)) THEN
+TORQUE_LIMIT	:= REAL_TO_UINT(327.68*Torque_limit_perent);	
+END_IF*)
+				
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					]]></ST>
     </Implementation>
     <LineIds Name="FB_Axis">
-      <LineId Id="3" Count="779" />
-      <LineId Id="994" Count="0" />
-      <LineId Id="993" Count="0" />
-      <LineId Id="783" Count="0" />
-      <LineId Id="945" Count="5" />
-      <LineId Id="789" Count="0" />
-      <LineId Id="951" Count="0" />
-      <LineId Id="953" Count="0" />
-      <LineId Id="956" Count="0" />
-      <LineId Id="952" Count="0" />
-      <LineId Id="958" Count="2" />
-      <LineId Id="962" Count="1" />
-      <LineId Id="961" Count="0" />
-      <LineId Id="957" Count="0" />
-      <LineId Id="970" Count="3" />
-      <LineId Id="965" Count="0" />
-      <LineId Id="974" Count="0" />
-      <LineId Id="984" Count="3" />
-      <LineId Id="975" Count="1" />
-      <LineId Id="989" Count="3" />
-      <LineId Id="977" Count="0" />
-      <LineId Id="790" Count="6" />
+      <LineId Id="3" Count="645" />
+      <LineId Id="972" Count="0" />
+      <LineId Id="649" Count="12" />
+      <LineId Id="663" Count="3" />
+      <LineId Id="976" Count="2" />
+      <LineId Id="667" Count="6" />
+      <LineId Id="973" Count="2" />
+      <LineId Id="674" Count="0" />
+      <LineId Id="676" Count="108" />
+      <LineId Id="1133" Count="0" />
+      <LineId Id="785" Count="0" />
+      <LineId Id="1135" Count="0" />
+      <LineId Id="786" Count="32" />
+      <LineId Id="1140" Count="0" />
+      <LineId Id="1137" Count="1" />
+      <LineId Id="1141" Count="0" />
+      <LineId Id="1136" Count="0" />
+      <LineId Id="819" Count="0" />
       <LineId Id="2" Count="0" />
+      <LineId Id="1300" Count="0" />
+      <LineId Id="1472" Count="2" />
+      <LineId Id="1471" Count="0" />
+      <LineId Id="1303" Count="9" />
     </LineIds>
   </POU>
 </TcPlcObject>

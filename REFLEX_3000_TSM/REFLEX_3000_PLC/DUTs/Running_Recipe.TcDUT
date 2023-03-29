@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Running_Recipe" Id="{8e63951b-5dbf-439a-9be4-2eec539f72c5}">
+    <Declaration><![CDATA[TYPE Running_Recipe :
+STRUCT
+//General
+	Model_Dia					: STRING[80];
+	Part_Number					: STRING[80];
+	Body_Conductivity			: BOOL;
+	Comp_Per_Bag 				: INT;
+		
+//OP10	
+	OP10_Cam_Prog_Num			: INT;
+	OP10_Robot_Prog_Num			: INT;
+	OP10_Gripper_Pos			: REAL;
+
+//OP20
+	OP20_Vert_Ser_Pos			: REAL;
+	OP20_Oiling_Time			: INT;
+	
+OP20_Oiling_Range				: REAL;
+
+//OP30
+	OP30_Cam_Prog_Num			: INT;
+	OP30_Grip_Wrk_Pos			: REAL;
+	OP30_Vert_Ser_Pick_Pos		: REAL;
+	OP30_Vert_Ser_Place_Pos		: REAL;	
+	OP30_Hori_Ser_Pick_Pos		: REAL;
+	OP30_Hori_Ser_Place_Pos		: REAL;		
+
+//OP40
+	OP40_Vert_Ser_Pos			: REAL;
+	OP40_LVDT_Chck_Value		: REAL;
+
+//OP40_LVDT_Tolerance				: REAL;
+
+//OP50
+	OP50_Cam_Prog_Num			: INT;
+	OP50_Vert_Ser_Pick_Pos		: REAL;
+	OP50_Vert_Ser_Place_Pos		: REAL;	
+	OP50_Hori_Ser_Pick_Pos		: REAL;
+	OP50_Hori_Ser_Place_Pos		: REAL;		
+
+//OP60
+	OP60_Vert_Ser_Pos			: REAL;
+	OP60_LVDT_Chck_Value		: REAL;
+
+//OP60_LVDT_Tolerance				: REAL;
+
+//OP70
+	OP70_Cam_Prog_Num			: INT;
+	OP70_Grip_Wrk_Pos			: REAL;
+	OP70_Vert_Ser_Pick_Pos		: REAL;
+	OP70_Vert_Ser_Place_Pos		: REAL;	
+	OP70_Hori_Ser_Pick_Pos		: REAL;
+	OP70_Hori_Ser_Place_Pos		: REAL;		
+
+
+//OP80
+	OP80_Vert_Ser_Pos			: REAL;
+	OP80_LVDT_Chck_Value		: REAL;
+
+//OP80_LVDT_Tolerance				: REAL;
+
+//OP90
+	OP90_Cam_Prog_Num			: INT;
+	OP90_Vert_Ser_Pick_Pos		: REAL;
+	OP90_Vert_Ser_Place_Pos		: REAL;	
+	OP90_Hori_Ser_Pick_Pos		: REAL;
+	OP90_Hori_Ser_Place_Pos		: REAL;	
+
+//OP110
+	OP110_Vert_Ser_Pos			: REAL;
+	OP110_Oiling_Time			: INT;
+	
+OP110_Oiling_Range				: REAL;
+
+//OP120
+	OP120_Cam_Prog_Num			: INT;
+                            	
+//OP130                     	
+	OP130_Trq_value				: REAL;
+	OP130_Vert_Ser_Pos			: REAL;
+	                        	
+//OP140                     	
+	OP140_Vert_Ser_Pos			: REAL;
+	                        	
+OP140_Wiping_Cycle				: INT;
+OP140_NOK_Retry_Cycle			: INT;
+                            	
+//OP150-A                   	
+	OP150A_Cam_Prog_Num			: INT;
+	                        	
+//OP150-B                   	
+	OP150B_Lsr_Mrk_Job_num		: INT;
+	
+//OP160
+	OP160_Robo_Prog_Num			: INT;	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

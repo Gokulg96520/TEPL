@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="Recipe_Values" Id="{c851b6be-89c4-4c34-bbd3-3da30b6fff6a}">
+    <Declaration><![CDATA[
+VAR_GLOBAL PERSISTENT
+	
+//General
+	Model_Dia					: STRING[80];
+	Part_Number					: STRING[80];
+	Body_Conductivity			: BOOL;
+	Comp_Per_Bag 				: INT;
+		
+//OP10	
+	OP10_Cam_Prog_Num			: INT;
+	OP10_Robot_Prog_Num			: INT;
+	OP10_Gripper_Pos			: REAL;
+	
+OP10_Bowl_freq_6_3				: REAL;
+OP10_Conv_Fwd_Time_6_3			: INT;
+OP10_Conv_Fwd_Speed_6_3			: INT;
+OP10_Conv_Rev_Time_6_3			: INT;
+OP10_Conv_Rev_Speed_6_3			: INT;
+OP10_Hopper_ON_time_6_3			: INT;
+OP10_Hopper_freq_6_3			: REAL;
+OP10_Lnr_Trck_Dly_6_3			: REAL;
+
+OP10_Bowl_freq_7_89				: REAL;	
+OP10_Conv_Fwd_Time_7_89			: INT;
+OP10_Conv_Fwd_Speed_7_89		: INT;
+OP10_Conv_Rev_Time_7_89			: INT;
+OP10_Conv_Rev_Speed_7_89		: INT;
+OP10_Hopper_ON_time_7_89		: INT;
+OP10_Hopper_freq_7_89			: REAL;
+OP10_Lnr_Trck_Dly_7_89			: REAL;
+
+//OP20
+	OP20_Vert_Ser_Pos			: REAL;
+	OP20_Oiling_Time			: INT;
+	
+OP20_Oiling_Range				: REAL;
+
+//OP30
+	OP30_Cam_Prog_Num			: INT;
+	OP30_Grip_Wrk_Pos			: REAL;
+	OP30_Vert_Ser_Pick_Pos		: REAL;
+	OP30_Vert_Ser_Place_Pos		: REAL;	
+	OP30_Hori_Ser_Pick_Pos		: REAL;
+	OP30_Hori_Ser_Place_Pos		: REAL;		
+
+//OP40
+	OP40_Vert_Ser_Pos			: REAL;
+	OP40_LVDT_Chck_Value		: REAL;
+
+//OP40_LVDT_Tolerance				: REAL;
+
+//OP50
+	OP50_Cam_Prog_Num			: INT;
+	OP50_Vert_Ser_Pick_Pos		: REAL;
+	OP50_Vert_Ser_Place_Pos		: REAL;	
+	OP50_Hori_Ser_Pick_Pos		: REAL;
+	OP50_Hori_Ser_Place_Pos		: REAL;		
+
+//OP60
+	OP60_Vert_Ser_Pos			: REAL;
+	OP60_LVDT_Chck_Value		: REAL;
+
+//OP60_LVDT_Tolerance				: REAL;
+
+//OP70
+	OP70_Cam_Prog_Num			: INT;
+	OP70_Grip_Wrk_Pos			: REAL;
+	OP70_Vert_Ser_Pick_Pos		: REAL;
+	OP70_Vert_Ser_Place_Pos		: REAL;	
+	OP70_Hori_Ser_Pick_Pos		: REAL;
+	OP70_Hori_Ser_Place_Pos		: REAL;		
+
+
+//OP80
+	OP80_Vert_Ser_Pos			: REAL;
+	OP80_LVDT_Chck_Value		: REAL;
+
+//OP80_LVDT_Tolerance				: REAL;
+
+//OP90
+	OP90_Cam_Prog_Num			: INT;
+	OP90_Vert_Ser_Pick_Pos		: REAL;
+	OP90_Vert_Ser_Place_Pos		: REAL;	
+	OP90_Hori_Ser_Pick_Pos		: REAL;
+	OP90_Hori_Ser_Place_Pos		: REAL;	
+
+OP90_Bowl_freq_7_89				: REAL;	
+OP90_Conv_Fwd_Time_7_89			: INT;
+OP90_Conv_Fwd_Speed_7_89		: INT;
+OP90_Conv_Rev_Time_7_89			: INT;
+OP90_Conv_Rev_Speed_7_89		: INT;
+OP90_Lnr_Trck_Dly_7_89			: REAL;
+
+OP90_Bowl_freq_6_3				: REAL;	
+OP90_Conv_Fwd_Time_6_3			: INT;
+OP90_Conv_Fwd_Speed_6_3			: INT;
+OP90_Conv_Rev_Time_6_3			: INT;
+OP90_Conv_Rev_Speed_6_3			: INT;
+OP90_Lnr_Trck_Dly_6_3			: REAL;
+
+//OP110
+	OP110_Vert_Ser_Pos			: REAL;
+	OP110_Oiling_Time			: INT;
+	
+OP110_Oiling_Range				: REAL;
+
+//OP120
+	OP120_Cam_Prog_Num			: INT;
+
+OP120_Bowl_freq 				: REAL;	
+OP120_Conv_Fwd_Time 			: INT;
+OP120_Conv_Fwd_Speed 			: INT;
+OP120_Conv_Rev_Time 			: INT;
+OP120_Conv_Rev_Speed 			: INT;
+OP120_Lnr_Trck_Dly 				: REAL;
+                            	
+//OP130                     	
+	OP130_Trq_value				: REAL;
+	OP130_Vert_Ser_Pos			: REAL;
+	                        	
+//OP140                     	
+	OP140_Vert_Ser_Pos			: REAL;
+	                        	
+OP140_Wiping_Cycle				: INT;
+OP140_NOK_Retry_Cycle			: INT;
+                            	
+//OP150-A                   	
+	OP150A_Cam_Prog_Num			: INT;
+	                        	
+//OP150-B                   	
+	OP150B_Lsr_Mrk_Job_num		: INT;
+	
+//OP160
+	OP160_Robo_Prog_Num			: INT;
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

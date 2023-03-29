@@ -1,99 +1,95 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP70_Error" Id="{067a6e7c-5323-4138-ba12-53b12a23d83c}" SpecialFunc="None">
+  <POU Name="OP70_Error" Id="{7b6500f2-b30a-4d36-bc14-e3c6bcc397bd}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP70_Error
 VAR
-	OP30_Step_Err_1: TON;
-	OP30_Step_Err_2: TON;
-	OP30_Step_Err_3: TON;
-	OP30_Step_Err_4: TON;
-	OP30_Step_Err_5: TON;
-	OP30_Step_Err_6: TON;
+	OP70_Step_Err_1: TON;
+	OP70_Step_Err_2: TON;
+	OP70_Step_Err_3: TON;
+	OP70_Step_Err_4: TON;
+	OP70_Step_Err_5: TON;
+	OP70_Step_Err_6: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-// Set ERROR ACTIVE
-IF ((OP30_GVL.OP30_ErrorWord_0<>0) OR (OP30_GVL.OP30_ErrorWord_1<>0) OR (OP30_GVL.OP30_ErrorWord_2<>0)) THEN
-	OP30_GVL.OP30_ErrorActive:= TRUE;
+      <ST><![CDATA[// Set ERROR ACTIVE
+IF ((OP70_GVL.OP70_ErrorWord_0<>0) OR (OP70_GVL.OP70_ErrorWord_1<>0) OR (OP70_GVL.OP70_ErrorWord_2<>0)) THEN
+	OP70_GVL.OP70_ErrorActive:= TRUE;
 END_IF
 
 //Reset ErrorActive
-IF (OP30_GVL.OP30_HMI_Reset) THEN 
-	OP30_GVL.OP30_ErrorActive:= FALSE;
-	OP30_GVL.OP30_ErrorWord_0:= 0;
-	OP30_GVL.OP30_ErrorWord_1:= 0;
-	OP30_GVL.OP30_ErrorWord_2:= 0;	
+IF (OP70_GVL.OP70_HMI_Reset) OR HMI_Reset THEN 
+	OP70_GVL.OP70_ErrorActive:= FALSE;
+	OP70_GVL.OP70_ErrorWord_0:= 0;
+	OP70_GVL.OP70_ErrorWord_1:= 0;
+	OP70_GVL.OP70_ErrorWord_2:= 0;	
 END_IF
 
 // Auto Seq Step Error
 
 //Horizontal Servo is not in home or safe-work position 
-OP30_Step_Err_1(IN:=(OP30_GVL.OP30_AutoSeq=70) , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=70 AND OP30_Step_Err_1.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.0:=TRUE;
+OP70_Step_Err_1(IN:=(OP70_GVL.OP70_AutoSeq=70) , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=70 AND OP70_Step_Err_1.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.0:=TRUE;
 END_IF
 
 
 //Horizontal Servo not reaching pick position 
-OP30_Step_Err_1(IN:=(OP30_GVL.OP30_AutoSeq=80) , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=80 AND NOT OP30_HORI_SERVO_ON_WRK_PICK AND OP30_Step_Err_1.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.1:=TRUE;
+OP70_Step_Err_1(IN:=(OP70_GVL.OP70_AutoSeq=80) , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=80 AND NOT OP70_HORI_SERVO_ON_WRK_PICK AND OP70_Step_Err_1.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.1:=TRUE;
 END_IF
 
 // Gripper is not closing
-OP30_Step_Err_2(IN:=OP30_GVL.OP30_AutoSeq=82 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=82 AND OP30_Step_Err_2.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.2:=TRUE;
+OP70_Step_Err_2(IN:=OP70_GVL.OP70_AutoSeq=82 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=82 AND OP70_Step_Err_2.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.2:=TRUE;
 END_IF
 
 // Vertical Servo not reaching work position 
-OP30_Step_Err_3(IN:=OP30_GVL.OP30_AutoSeq=100 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=100 AND OP30_Step_Err_3.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.3:=TRUE;
+OP70_Step_Err_3(IN:=OP70_GVL.OP70_AutoSeq=100 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=100 AND OP70_Step_Err_3.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.3:=TRUE;
 END_IF
 
 // Vertical Servo not reaching safe-work position 
-OP30_Step_Err_3(IN:=OP30_GVL.OP30_AutoSeq=130 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=130 AND OP30_Step_Err_3.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.4:=TRUE;
+OP70_Step_Err_3(IN:=OP70_GVL.OP70_AutoSeq=170 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=170 AND OP70_Step_Err_3.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.4:=TRUE;
 END_IF
 
 // Checking the gripper condition is opened or not
-OP30_Step_Err_3(IN:=OP30_GVL.OP30_AutoSeq=140 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=140 AND OP30_Step_Err_3.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.5:=TRUE;
+OP70_Step_Err_3(IN:=OP70_GVL.OP70_AutoSeq=140 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=140 AND OP70_Step_Err_3.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.5:=TRUE;
 END_IF
 
 //  Horizontal sevo not moving to place position
-OP30_Step_Err_3(IN:=OP30_GVL.OP30_AutoSeq=160 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=160 AND OP30_Step_Err_3.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.6:=TRUE;
+OP70_Step_Err_3(IN:=OP70_GVL.OP70_AutoSeq=160 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=160 AND OP70_Step_Err_3.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.6:=TRUE;
 END_IF
 
 //  Vertical sevo not moving to place position
-OP30_Step_Err_3(IN:=OP30_GVL.OP30_AutoSeq=180 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=180 AND OP30_Step_Err_3.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.7:=TRUE;
+OP70_Step_Err_3(IN:=OP70_GVL.OP70_AutoSeq=180 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=180 AND OP70_Step_Err_3.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.7:=TRUE;
 END_IF
 
 // Vertical Servo not reaching safe-work position 
-OP30_Step_Err_3(IN:=OP30_GVL.OP30_AutoSeq=210 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=210 AND OP30_Step_Err_3.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.8:=TRUE;
+OP70_Step_Err_3(IN:=OP70_GVL.OP70_AutoSeq=210 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=210 AND OP70_Step_Err_3.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.8:=TRUE;
 END_IF
 
 //  Horizontal sevo not moving to safe work position
-OP30_Step_Err_3(IN:=OP30_GVL.OP30_AutoSeq=240 , PT:=T#5S , Q=> , ET=> );
-IF (OP30_GVL.OP30_AutoSeq=240 AND OP30_Step_Err_3.Q) THEN
-	OP30_GVL.OP30_ErrorWord_0.9:=TRUE;
-END_IF
-
-
-]]></ST>
+OP70_Step_Err_3(IN:=OP70_GVL.OP70_AutoSeq=240 , PT:=T#5S , Q=> , ET=> );
+IF (OP70_GVL.OP70_AutoSeq=240 AND OP70_Step_Err_3.Q) THEN
+	OP70_GVL.OP70_ErrorWord_0.9:=TRUE;
+END_IF]]></ST>
     </Implementation>
     <LineIds Name="OP70_Error">
-      <LineId Id="3" Count="77" />
+      <LineId Id="3" Count="73" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

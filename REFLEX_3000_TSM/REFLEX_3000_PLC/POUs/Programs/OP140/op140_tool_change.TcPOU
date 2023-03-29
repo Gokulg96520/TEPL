@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="op140_tool_change" Id="{e3d21ed2-4f9e-4a7b-a6e8-58bed56c1713}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM op140_tool_change
+VAR
+	op140_1_tool_change : tool_changeover;
+	op140_2_tool_change : tool_changeover; 
+	op140_3_tool_change : tool_changeover;
+	fb_reset_1       :BOOL;
+	fb_reset_2       :BOOL;
+	fb_reset_3       :BOOL;
+	
+	
+	tool_6_fb: BOOL;
+	tool_8_fb: BOOL;
+	
+	// VERTICAL 1
+	OP140_V1_TOL_UNLOD_STRT					: BOOL;
+	OP140_V1_TOL_LOAD_STRT					: BOOL;
+	OP140_V1_TOL_DISENGAGE					: BOOL;
+	OP140_V1_TOL_ENGAGE						: BOOL;
+	op140_t1_manual_lock                    : BOOL;
+	op140_t1_manual_unlock                  : BOOL;
+	OP140_V1_UNLD_STUS                      : STRING;
+	OP140_V1_LOAD_STUS                      : STRING;
+	
+	// VERTICAL 2
+	
+	OP140_V2_TOL_UNLOD_STRT					: BOOL;
+	OP140_V2_TOL_LOAD_STRT					: BOOL;
+	OP140_V2_TOL_DISENGAGE					: BOOL;
+	OP140_V2_TOL_ENGAGE						: BOOL;
+	op140_t2_manual_lock                    : BOOL;
+	op140_t2_manual_unlock                  : BOOL;
+	OP140_V2_UNLD_STUS                      : STRING;
+	OP140_V2_LOAD_STUS                      : STRING;
+	
+	// VERTICAL 3
+	
+	OP140_V3_TOL_UNLOD_STRT					: BOOL;
+	OP140_V3_TOL_LOAD_STRT					: BOOL;
+	OP140_V3_TOL_DISENGAGE					: BOOL;
+	OP140_V3_TOL_ENGAGE						: BOOL;
+	op140_t3_manual_lock                    : BOOL;
+	op140_t3_manual_unlock                  : BOOL;
+	OP140_V3_UNLD_STUS                      : STRING;
+	OP140_V3_LOAD_STUS                      : STRING;
+	
+	
+END_VAR
+
+VAR PERSISTENT
+	
+	OP140_V1_TOL_WRK_POS					: LREAL;
+	OP140_V1_TOL_HME_POS					: LREAL;
+	op140_v1_TOL_VELOCITY					: LREAL;
+	OP140_V1_TOL_CHNGE_CMPLE				: BOOL;
+	OP140_V1_TOL_LOAD_COMPLE                : BOOL;
+	OP140_V1_TOL_UNLOAD_COMPLE              : BOOL;
+	
+	OP140_V2_TOL_WRK_POS					: LREAL;
+	OP140_V2_TOL_HME_POS					: LREAL;
+	op140_V2_T0L_VELOCITY					: LREAL;
+	OP140_V2_TOL_CHNGE_CMPLE				: BOOL;
+	OP140_V2_TOL_LOAD_COMPLE                : BOOL;
+	OP140_V2_TOL_UNLOAD_COMPLE              : BOOL;
+	
+	
+	OP140_V3_TOL_WRK_POS					: LREAL;
+	OP140_V3_TOL_HME_POS					: LREAL;
+	op140_v3_TOL_VELOCITY					: LREAL;
+	OP140_V3_TOL_CHNGE_CMPLE				: BOOL;
+	OP140_V3_TOL_LOAD_COMPLE                : BOOL;
+	OP140_V3_TOL_UNLOAD_COMPLE              : BOOL;
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF OP140_TOOL_CHANGE_MODE_SELECTED THEN
+
+op140_1_tool_change(
+	actual_pos:= SR140_Vert_Servo_Ctrl_1.Actual_position , 
+	actual_vel:=SR140_Vert_Servo_Ctrl_1.Actual_velocity , 
+	target_work_pos:= OP140_V1_TOL_WRK_POS, 
+	target_home_pos:= OP140_V1_TOL_HME_POS, 
+	target_vel_from_hmi:= op140_v1_TOL_VELOCITY, 
+	station_number:= , 
+	mover_number:= , 
+	no_of_mover_present:= , 
+	model_selected:= model_selected, 
+	tool_unloading_start:=OP140_V1_TOL_UNLOD_STRT , 
+	tool_loading_start:=OP140_V1_TOL_LOAD_STRT , 
+	error_active:=OP140_ErrorActive , 
+	station_in_auto:= OP140_Auto, 
+	station_in_home:=  OP140_Temp_Home_Ok, 
+	absoulte_move_done:= SR140_Vert_Servo_Ctrl_1.Axis_In_Pos, 
+	tool_6_3_present:= tool_6_fb, 
+	tool_7_89_present:= tool_8_fb, 
+	fb_reset:=fb_reset_1,
+	SERVO_TOL_CHECK_OFFSET_POS := 18, 
+	tool_changer_over_complete=> OP140_V1_TOL_CHNGE_CMPLE,
+	tool_disengage=> OP140_V1_TOL_DISENGAGE, 
+	tool_engagae=> OP140_V1_TOL_ENGAGE, 
+	tool_loading_complete=> OP140_V1_TOL_LOAD_COMPLE, 
+	tool_unloading_complete=> OP140_V1_TOL_UNLOAD_COMPLE, 
+	servo_move_abs=>SR140_Vert_Servo_Ctrl_1.ABSmove_Start, 
+	unloading_status=>OP140_V1_UNLD_STUS , 
+	loading_status=>OP140_V1_LOAD_STUS , 
+	target_pos_to_servo=>SR140_Vert_Servo_Ctrl_1.Position , 
+	target_vel_to_servo=> SR140_Vert_Servo_Ctrl_1.Velocity,
+tool_loading_failed := );
+	
+	op140_2_tool_change(
+	actual_pos:= SR140_Vert_Servo_Ctrl_2.Actual_position , 
+	actual_vel:=SR140_Vert_Servo_Ctrl_2.Actual_velocity , 
+	target_work_pos:= OP140_V2_TOL_WRK_POS, 
+	target_home_pos:= OP140_V2_TOL_HME_POS, 
+	target_vel_from_hmi:= op140_V2_T0L_VELOCITY, 
+	station_number:= , 
+	mover_number:= , 
+	no_of_mover_present:= , 
+	model_selected:= model_selected, 
+	tool_unloading_start:=OP140_V2_TOL_UNLOD_STRT , 
+	tool_loading_start:=OP140_V2_TOL_LOAD_STRT , 
+	error_active:=OP140_ErrorActive , 
+	station_in_auto:= OP140_Auto, 
+	station_in_home:=  OP140_Temp_Home_Ok, 
+	absoulte_move_done:= SR140_Vert_Servo_Ctrl_2.Axis_In_Pos, 
+	tool_6_3_present:= tool_6_fb, 
+	tool_7_89_present:= tool_8_fb, 
+	fb_reset:=fb_reset_1,
+	SERVO_TOL_CHECK_OFFSET_POS := 18, 
+	tool_changer_over_complete=> OP140_V2_TOL_CHNGE_CMPLE,
+	tool_disengage=> OP140_V2_TOL_DISENGAGE, 
+	tool_engagae=> OP140_V2_TOL_ENGAGE, 
+	tool_loading_complete=> OP140_V2_TOL_LOAD_COMPLE, 
+	tool_unloading_complete=> OP140_V2_TOL_UNLOAD_COMPLE, 
+	servo_move_abs=>SR140_Vert_Servo_Ctrl_2.ABSmove_Start, 
+	unloading_status=>OP140_V2_UNLD_STUS , 
+	loading_status=>OP140_V2_LOAD_STUS , 
+	target_pos_to_servo=>SR140_Vert_Servo_Ctrl_2.Position , 
+	target_vel_to_servo=> SR140_Vert_Servo_Ctrl_2.Velocity,
+tool_loading_failed := );
+	
+	op140_3_tool_change(
+	actual_pos:= SR140_Vert_Servo_Ctrl_3.Actual_position , 
+	actual_vel:=SR140_Vert_Servo_Ctrl_3.Actual_velocity , 
+	target_work_pos:= OP140_V3_TOL_WRK_POS, 
+	target_home_pos:= OP140_V3_TOL_HME_POS, 
+	target_vel_from_hmi:= op140_v3_TOL_VELOCITY, 
+	station_number:= , 
+	mover_number:= , 
+	no_of_mover_present:= , 
+	model_selected:= model_selected, 
+	tool_unloading_start:=OP140_V3_TOL_UNLOD_STRT , 
+	tool_loading_start:=OP140_V3_TOL_LOAD_STRT , 
+	error_active:=OP140_ErrorActive , 
+	station_in_auto:= OP140_Auto, 
+	station_in_home:=  OP140_Temp_Home_Ok, 
+	absoulte_move_done:= SR140_Vert_Servo_Ctrl_3.Axis_In_Pos, 
+	tool_6_3_present:= tool_6_fb, 
+	tool_7_89_present:= tool_8_fb, 
+	fb_reset:=fb_reset_1,
+	SERVO_TOL_CHECK_OFFSET_POS := 18, 
+	tool_changer_over_complete=> OP140_V3_TOL_CHNGE_CMPLE,
+	tool_disengage=> OP140_V3_TOL_DISENGAGE, 
+	tool_engagae=> OP140_V3_TOL_ENGAGE, 
+	tool_loading_complete=> OP140_V3_TOL_LOAD_COMPLE, 
+	tool_unloading_complete=> OP140_V3_TOL_UNLOAD_COMPLE, 
+	servo_move_abs=>SR140_Vert_Servo_Ctrl_3.ABSmove_Start, 
+	unloading_status=>OP140_V3_UNLD_STUS , 
+	loading_status=>OP140_V3_LOAD_STUS , 
+	target_pos_to_servo=>SR140_Vert_Servo_Ctrl_3.Position , 
+	target_vel_to_servo=> SR140_Vert_Servo_Ctrl_3.Velocity,
+tool_loading_failed := );
+	
+	END_IF 
+
+//// op 140 tool 1 outputs/////
+
+	
+IF op140_t1_manual_lock OR OP140_V1_TOL_ENGAGE THEN
+	O140_TOOL1_CHO_LOCK_Q1341_5:=TRUE;
+	O140_TOOL1_CHO_UNLOCK_Q1341_4 :=FALSE;
+ELSIF op140_t1_manual_unlock OR OP140_V1_TOL_DISENGAGE THEN
+	O140_TOOL1_CHO_UNLOCK_Q1341_4 :=TRUE;
+	O140_TOOL1_CHO_LOCK_Q1341_5:=FALSE;
+END_IF
+   
+
+//// op 140 tool 2 outputs///// 	
+
+IF op140_t2_manual_lock OR OP140_V2_TOL_ENGAGE THEN
+	O140_TOOL2_CHO_LOCK_Q1342_5:=TRUE;
+	O140_TOOL2_CHO_UNLOCK_Q1342_4 :=FALSE;
+ELSIF op140_t2_manual_unlock OR OP140_V2_TOL_DISENGAGE THEN
+	O140_TOOL2_CHO_UNLOCK_Q1342_4 :=TRUE;
+	O140_TOOL2_CHO_LOCK_Q1342_5   :=FALSE;
+END_IF
+
+//// op 140 tool 3 outputs/////
+
+IF op140_t3_manual_lock OR OP140_V3_TOL_ENGAGE THEN
+	O140_TOOL3_CHO_LOCK_Q1343_5   :=TRUE;
+	O140_TOOL3_CHO_UNLOCK_Q1343_4 :=FALSE;
+ELSIF op140_t3_manual_unlock OR OP140_V3_TOL_DISENGAGE THEN
+	O140_TOOL3_CHO_UNLOCK_Q1343_4 :=TRUE;
+	O140_TOOL3_CHO_LOCK_Q1343_5   :=FALSE;
+END_IF
+    		
+	]]></ST>
+    </Implementation>
+    <LineIds Name="op140_tool_change">
+      <LineId Id="349" Count="1" />
+      <LineId Id="7" Count="18" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="26" Count="8" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="431" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="255" Count="28" />
+      <LineId Id="150" Count="0" />
+      <LineId Id="430" Count="0" />
+      <LineId Id="284" Count="0" />
+      <LineId Id="286" Count="28" />
+      <LineId Id="285" Count="0" />
+      <LineId Id="429" Count="0" />
+      <LineId Id="336" Count="0" />
+      <LineId Id="315" Count="0" />
+      <LineId Id="333" Count="2" />
+      <LineId Id="65" Count="1" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="423" Count="0" />
+      <LineId Id="73" Count="1" />
+      <LineId Id="424" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="338" Count="0" />
+      <LineId Id="337" Count="0" />
+      <LineId Id="339" Count="0" />
+      <LineId Id="316" Count="1" />
+      <LineId Id="425" Count="0" />
+      <LineId Id="318" Count="1" />
+      <LineId Id="426" Count="0" />
+      <LineId Id="323" Count="0" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="340" Count="0" />
+      <LineId Id="325" Count="2" />
+      <LineId Id="427" Count="0" />
+      <LineId Id="328" Count="1" />
+      <LineId Id="428" Count="0" />
+      <LineId Id="324" Count="0" />
+      <LineId Id="67" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

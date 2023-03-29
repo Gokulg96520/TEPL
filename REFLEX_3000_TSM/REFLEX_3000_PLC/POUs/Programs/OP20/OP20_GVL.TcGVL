@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP20_GVL" Id="{81292742-e03a-478f-8852-26e78172858e}">
+  <GVL Name="OP20_GVL" Id="{008b013c-f79c-4e45-ac1a-435d7a601a9d}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 //GENERAL
@@ -34,6 +34,7 @@ OP20_LH_AutoSeq: 			INT;
 OP20_RH_AutoSeq: 			INT;
 OP20_Homing_Seq:			INT;
 OP20_Safety_OK:				BOOL;
+OP20_Stop_Request: BOOL;
 
 Automatic_Run:				BOOL;    //from master mode block
 Manual_mode: 				BOOL;    //from master mode block
@@ -47,7 +48,7 @@ OP20_Prev_RH_COMP_NOK:BOOL;
 OP20_LH_Operation_Completed:BOOL;
 OP20_RH_Operation_Completed:BOOL;
 
-
+temp_oil : BOOL;
 //Servo controls
 	OP20_Servo_Enable	: BOOL;
 	OP20_Servo_Reset	: BOOL;
@@ -66,24 +67,19 @@ OP20_HMI_AutoMode:						BOOL;
 OP20_HMI_ManualMode:					BOOL;
 OP20_HMI_StepMode:						BOOL;
 OP20_HMI_CycleStart:					BOOL;
-OP20_HMI_Cycle_Start:					BOOL;
 OP20_HMI_Reset:						    BOOL;
 OP20_HMI_Homing:						BOOL;
-SR20_Vert_Servo_Max_Lim:				BOOL;
 
 OP20_HMI_Jog_Pos: BOOL;
 OP20_HMI_Jog_Neg: BOOL;
-//Error
-OP20_ErrorWord_0: DINT;
-OP20_ErrorWord_1: DINT;
-OP20_ErrorWord_2: DINT;
+
 
 OP20_AUTO_STP_NO: INT;
 
 // MANUAL
 		
 // AUTO	
-	OP20_STN_ENABLE					: BOOL;				// FROM MASTER CONTROL BLOCK
+
 	OP20_FIXTURE_2					: INT;               //For the comp status in the fixture
 	OP20_FIXTURE_1					: INT; 				 //For the comp status in the fixture
 // SERVO VARIABLE
@@ -104,25 +100,29 @@ END_VAR
 VAR_GLOBAL PERSISTENT
 	
 // MANUAL
-
+	OP20_STN_ENABLE			: BOOL;				// FROM MASTER CONTROL BLOCK
+	OP20_STN_RUNNING		: BOOL;
 // AUTO
-	OP20_BYPASS						: BOOL;				// OP20 ON-BYPASS / OFF-NOT BYPASSED
-	OP20_LH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH OK BIT
-	OP20_LH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH NOK BIT
-	OP20_RH_OIL_OK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH OK BIT
-	OP20_RH_OIL_NOK					: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH NOK BIT
+	OP20_BYPASS				: BOOL;				// OP20 ON-BYPASS / OFF-NOT BYPASSED
+	OP20_LH_OIL_OK			: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH OK BIT
+	OP20_LH_OIL_NOK			: BOOL;				// TO MASTER CONTROL BLOCK OILLING LH NOK BIT
+	OP20_RH_OIL_OK			: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH OK BIT
+	OP20_RH_OIL_NOK			: BOOL;				// TO MASTER CONTROL BLOCK OILLING RH NOK BIT
 	
-	OP20_DLY_AFT_SFE_WRK			: INT:=100;				// AUTO DELAY TIMER AFTER SERVO REACH WORK
-	OP20_DLY_AFT_SPN_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER SPINNER START
-	OP20_DLY_AFT_OILNG_STRT			: INT:=100;				// AUTO DELAY TIMER AFTER OILLING START
-	OP20_DLY_AFT_OILNG_FNISH		: INT:=100;				// AUTO DELAY TIMER AFTER OILLING FINISH
+	OP20_OIL_TIMER			: INT:=100;			    	// AUTO DELAY TIMER AFTER SERVO REACH WORK
+	OP20_Cycle_time			: UDINT;
 //Setting Parameters
-    HMI_Servo_UP_Speed : LREAL;
-    HMI_Servo_Down_Speed : LREAL;
-    HMI_Torque_limit : REAL;
-	HMI_Stroke_Limit : REAL;
-
-
+    OP20_HMI_Servo_Speed      : REAL;
+    OP20_HMI_Low_Limit		 : REAL;
+    OP20_HMI_High_Limit		 : REAL;
+	OP20_HMI_Safe_Home		 : REAL;
+	OP20_HMI_Safe_Work		 : REAL;
+//Error
+	OP20_ErrorWord_0: DINT;
+	OP20_ErrorWord_1: DINT;
+	OP20_ErrorWord_2: DINT;
+	
+		Oil_Region : REAL:=6;
 END_VAR
 
 VAR_GLOBAL 

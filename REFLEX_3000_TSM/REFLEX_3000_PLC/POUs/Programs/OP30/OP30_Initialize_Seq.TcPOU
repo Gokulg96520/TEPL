@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP30_Initialize_Seq" Id="{9f59eba7-2797-4257-98f3-94581ad5709b}" SpecialFunc="None">
+  <POU Name="OP30_Initialize_Seq" Id="{b380e939-8072-4c73-ab5c-c17bec0ff2c2}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP30_Initialize_Seq
 VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF (SR30_Vert_servo_ctrl.Axis_In_Home) AND SR30_Hori_servo_ctrl.Axis_In_Home AND NOT OP30_Gripper_LH_State AND NOT OP30_Gripper_RH_State THEN
-OP30_Temp_hmeOK:=TRUE;
-OP30_HomeRunning:=FALSE;
-OP30_Homing_Seq:=0;
+      <ST><![CDATA[IF OP30_GIUDE_GRP_ctrl.Axis_In_Home AND OP30_GIUDE_GRP_ctrl.Axis_Home_Done AND (SR30_Vert_servo_ctrl.Axis_In_Home) AND OP30_HORI_SERVO_ON_HOME AND NOT OP30_Gripper_LH_State AND NOT OP30_Gripper_RH_State  AND OP30_Gripper_LH_Gripper_ctrl.Axis_reference AND OP30_Gripper_RH_Gripper_ctrl.Axis_reference THEN
+	OP30_Temp_hmeOK:=TRUE;
+	OP30_HomeRunning:=FALSE;
+	OP30_Homing_Seq:=0;
 ELSE
 	OP30_Temp_hmeOK:=FALSE;	
 END_IF
@@ -17,61 +17,86 @@ END_IF
 CASE OP30_Homing_Seq OF
 	0: IF (OP30_AutoSelected AND NOT OP30_HomeRunning AND NOT OP30_ErrorActive AND NOT OP30_AutoRunning AND NOT OP30_StepRunning AND NOT OP30_Temp_hmeOK) THEN
 		OP30_HomeRunning:=TRUE;
-		OP30_Homing_Seq:=10;	
+		OP30_Homing_Seq:=10;
+	   ELSE
+		OP30_HomeRunning:=FALSE;	
 	   END_IF
 	   
-	10:IF (OP30_HomeRunning AND OP30_HMI_Homing)THEN 
+	10:IF (OP30_HomeRunning AND (OP30_HMI_Homing OR HMI_Reset))THEN 
 		IF (SR30_Vert_servo_ctrl.Axis_In_Home) THEN 
 			SR30_Vert_servo_ctrl.Axis_Home_Cmd:=FALSE;
+			OP30_Homing_Seq:=20;
 		ELSE
-			SR30_Vert_servo_ctrl.Axis_Home_Cmd:=TRUE;
-	    END_IF
-		OP30_Homing_Seq:=20;
+			SR30_Vert_servo_ctrl.Position:=0;
+			SR30_Vert_servo_ctrl.ABSmove_Start:=TRUE;
+	    END_IF	
 	   END_IF	
 	   
-   20: IF (SR30_Hori_servo_ctrl.Axis_In_Home) THEN 
+   20: IF (OP30_HORI_SERVO_ON_HOME) THEN 
 			SR30_Hori_servo_ctrl.Axis_Home_Cmd:=FALSE;
+			OP30_Homing_Seq:=40;
 		ELSE
-			SR30_Hori_servo_ctrl.Axis_Home_Cmd:=TRUE;
-	    END_IF
-		OP30_Homing_Seq:=40;
+			SR30_HORI_servo_ctrl.Position:=OP30_HORI_SERVO_HME_POS;
+			SR30_HORI_servo_ctrl.Velocity:=100;
+			SR30_Hori_servo_ctrl.ABSmove_Start:=1;
+	    END_IF		
 		
-   40:  IF OP30_Gripper_LH_State THEN 
-			OP30_Gripper_LH_Close := TRUE;
-		ELSE
-			OP30_Gripper_LH_Close := FALSE;
-	    END_IF
-		OP30_Homing_Seq:=50;
-		
-   50: 	IF OP30_Gripper_RH_State THEN 
-			OP30_Gripper_RH_Close := TRUE;
-		ELSE
-			OP30_Gripper_RH_Close := FALSE;
-	    END_IF
-		OP30_Homing_Seq:=60;
-   60: IF CR30_LH_Rej_Cyl.Position2 THEN
-			CR30_LH_Rej_Cyl.HomingCmd1:=TRUE;	
+   40:  IF  OP30_Gripper_LH_Gripper_ctrl.Axis_reference THEN
+		  OP30_Gripper_LH_Close:=1;
+		  OP30_Gripper_LH_State:=0;
+		  OP30_Homing_Seq:=50;
+		ELSE 
+			OP30_Gripper_LH_Gripper_ctrl.Reference_Start := TRUE;  
 		END_IF
+		
+   50:	IF  OP30_Gripper_RH_Gripper_ctrl.Axis_reference THEN
+			OP30_Gripper_RH_Close:=1;	
+   			OP30_Gripper_RH_State:=0;
+			OP30_Homing_Seq:=60;
+		ELSE
+			OP30_Gripper_RH_Gripper_ctrl.Reference_Start := TRUE;	
+		END_IF
+		
+   60: 	CR30_LH_Rej_Cyl.HomingCmd1:=TRUE;	
 		IF CR30_LH_Rej_Cyl.Position1 THEN
 			CR30_LH_Rej_Cyl.HomingCmd1:=FALSE;
 			OP30_Homing_Seq:=70;
 		END_IF
 		
-   70:	IF CR30_RH_Rej_Cyl.Position2 THEN
-			CR30_RH_Rej_Cyl.HomingCmd1:=TRUE;	
-		END_IF
+   70:	CR30_RH_Rej_Cyl.HomingCmd1:=TRUE;	
 		IF CR30_RH_Rej_Cyl.Position1 THEN
 			CR30_RH_Rej_Cyl.HomingCmd1:=FALSE;
-			OP30_Homing_Seq:=80;
+			OP30_Homing_Seq:=75;
 		END_IF
 		
+  75:	IF OP30_GIUDE_GRP_ctrl.Axis_In_Home AND OP30_GIUDE_GRP_ctrl.Axis_Home_Done THEN
+	  		OP30_GIUDE_GRP_ctrl.Bsethome:=0;
+			OP30_Homing_Seq:=80;
+		ELSE
+			OP30_GIUDE_GRP_ctrl.Bsethome:=1;
+  		END_IF
+		
    80:	OP30_Homing_Seq:=0;
+   		CR30_LH_Rej_Cyl.HomingCmd1:=FALSE;
+   		CR30_RH_Rej_Cyl.HomingCmd1:=FALSE;
 		OP30_HomeRunning:=FALSE;
 		OP30_HMI_Homing:=FALSE;
 END_CASE]]></ST>
     </Implementation>
     <LineIds Name="OP30_Initialize_Seq">
-      <LineId Id="3" Count="61" />
+      <LineId Id="3" Count="11" />
+      <LineId Id="78" Count="1" />
+      <LineId Id="15" Count="37" />
+      <LineId Id="55" Count="5" />
+      <LineId Id="63" Count="3" />
+      <LineId Id="88" Count="2" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="92" Count="1" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="67" Count="1" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="69" Count="1" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Operate_Parameter" Id="{ca4b289a-9a0a-4551-bdcf-09add047013a}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Operate_Parameter :
+STRUCT
+PROGRAM_No_Status		: WORD ;
+Counter_No_Status		: WORD ;
+Counter_Value_Status	: DWORD ;
+Rank_Value_Status		: WORD ;
+ReserveWord_5			: WORD ;
+ReserveDWord_1			: DWORD ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,706 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="op120_camera_FB" Id="{93c9971e-8511-480d-bf39-d7cb0c4c562a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM op120_camera_FB
+/// op 120 color cam 1
+VAR
+	op120_color_cam_1 			              : FB_Cognex_ProfiNET_1;
+	op120color1_Camera_Trigger		          : BOOL;
+	op120color1_Camera_Job_Change_start       : BOOL;
+	op120color1_Camera_Error			      : BOOL;
+	op120color1_Camera_Ready			      : BOOL;
+	op120color1_Camera_Online		          : BOOL;	
+	
+	op120color1_Acquisition_Status AT %I*      :Acquisition_Status;
+	op120color1_Inspection_Status  AT %I*      :Inspection_Status;	
+	op120color1_Acquisition_ID     AT %I*      :UINT;
+	op120color1_Inspection_ID   	 AT %I*       :UINT;
+	op120color1_Error_code      	 AT %I*       :UINT;
+	op120color1_Current_Job_ID  	 AT %I*       :UINT;
+	op120color1_Result_code     	 AT %I*       :UINT;
+	op120color1_Cam_Result      	 AT %I*       :ARRAY[0..63] OF BYTE;
+
+	op120color1_Acquisition_Control AT %Q*     : Acquisition_Control;
+	op120color1_Inspection_Control  AT %Q*     : Inspection_Control;
+	op120color1_Command_word		  AT %Q*      : UINT;
+	Error_status				              : STRING;
+	op120color1_Target_Job_ID				  : UINT;
+	op120color1_Loaded_Job_ID		    	  : UINT;
+	op120color1_Union                          : UNION_64Byte;
+	op120color1_Job_Change_Complete		      : BOOL;
+	op120color1_Job_Change_Error   		      : BOOL;
+	op120color1_Picture_Taken      		      : BOOL;
+	
+	
+	
+	
+	
+	
+END_VAR
+ /// op 120 color cam 2//
+VAR
+ op120_color_cam_2                         : FB_Cognex_ProfiNET_1;
+ op120color2_Camera_Trigger                 : BOOL;
+ op120color2_Camera_Job_Change_start        : BOOL;
+ op120color2_Camera_Error                   : BOOL;
+ op120color2_Camera_Ready                   : BOOL;
+ op120color2_Camera_Online                  : BOOL; 
+ 
+ op120color2_Acquisition_Status AT %I*      :Acquisition_Status;
+ op120color2_Inspection_Status  AT %I*      :Inspection_Status; 
+ op120color2_Acquisition_ID     AT %I*      :UINT;
+ op120color2_Inspection_ID     AT %I*       :UINT;
+ op120color2_Error_code        AT %I*       :UINT;
+ op120color2_Current_Job_ID    AT %I*       :UINT;
+ op120color2_Result_code       AT %I*       :UINT;
+ op120color2_Cam_Result        AT %I*       :ARRAY[0..63] OF BYTE;
+
+ op120color2_Acquisition_Control AT %Q*     : Acquisition_Control;
+ op120color2_Inspection_Control  AT %Q*     : Inspection_Control;
+ op120color2_Command_word    AT %Q*         : UINT;
+ Error_status_1                               : STRING;
+ op120color2_Target_Job_ID                  : UINT;
+ op120color2_Loaded_Job_ID                  : UINT;
+ op120color2_Union                          : UNION_64Byte;
+ op120color2_Job_Change_Complete            : BOOL;
+ op120color2_Job_Change_Error               : BOOL;
+ op120color2_Picture_Taken                  : BOOL;
+
+
+END_VAR
+
+VAR
+ op120_orient_cam_1                         : FB_Cognex_ProfiNET_1;
+ op120orient1_Camera_Trigger                : BOOL;
+ op120orient1_Camera_Job_Change_start       : BOOL;
+ op120orient1_Camera_Error                  : BOOL;
+ op120orient1_Camera_Ready                  : BOOL;
+ op120orient1_Camera_Online                 : BOOL; 
+ 
+ op120orient1_Acquisition_Status AT %I*          :Acquisition_Status;
+ op120orient1_Inspection_Status  AT %I*          :Inspection_Status; 
+ op120orient1_Acquisition_ID     AT %I*          :UINT;
+ op120orient1_Inspection_ID     AT %I*           :UINT;
+ op120orient1_Error_code        AT %I*           :UINT;
+ op120orient1_Current_Job_ID    AT %I*           :UINT;
+ op120orient1_Result_code       AT %I*           :UINT;
+ op120orient1_Cam_Result        AT %I*           :ARRAY[0..63] OF BYTE;
+ 
+ op120orient1_User_Data        AT %Q*           :ARRAY[0..63] OF BYTE;
+ op120orient1_Acquisition_Control AT %Q*         :Acquisition_Control;
+ op120orient1_Inspection_Control  AT %Q*         : Inspection_Control;
+ op120orient1_Command_word    AT %Q*          : UINT;
+ Error_status_3                  : STRING;
+ op120orient1_Target_Job_ID             : UINT;
+ op120orient1_Loaded_Job_ID                : UINT;
+ op120orient1_Union                              : UNION_64Byte;
+ op120orient1_Job_Change_Complete            : BOOL;
+ op120orient1_Job_Change_Error               : BOOL;
+ op120orient1_Picture_Taken                  : BOOL;
+END_VAR
+
+
+VAR
+op120_orient_cam_2                        : FB_Cognex_ProfiNET_1;
+ op120orient2_Camera_Trigger                : BOOL;
+ op120orient2_Camera_Job_Change_start       : BOOL;
+ op120orient2_Camera_Error                  : BOOL;
+ op120orient2_Camera_Ready                  : BOOL;
+ op120orient2_Camera_Online                 : BOOL; 
+ 
+ op120orient2_Acquisition_Status AT %I*          :Acquisition_Status;
+ op120orient2_Inspection_Status  AT %I*          :Inspection_Status; 
+ op120orient2_Acquisition_ID     AT %I*          :UINT;
+ op120orient2_Inspection_ID     AT %I*           :UINT;
+ op120orient2_Error_code        AT %I*           :UINT;
+ op120orient2_Current_Job_ID    AT %I*           :UINT;
+ op120orient2_Result_code       AT %I*           :UINT;
+ op120orient2_Cam_Result        AT %I*           :ARRAY[0..63] OF BYTE;
+ 
+ op120orient2_User_Data        AT %Q*           :ARRAY[0..63] OF BYTE;
+ op120orient2_Acquisition_Control AT %Q*         :Acquisition_Control;
+ op120orient2_Inspection_Control  AT %Q*         : Inspection_Control;
+ op120orient2_Command_word    AT %Q*          : UINT;
+ Error_status_2                  : STRING;
+ op120orient2_Target_Job_ID             : UINT;
+ op120orient2_Loaded_Job_ID                : UINT;
+ op120orient2_Union                              : UNION_64Byte;
+ op120orient2_Job_Change_Complete            : BOOL;
+ op120orient2_Job_Change_Error               : BOOL;
+ op120orient2_Picture_Taken                  : BOOL;
+ 
+END_VAR
+
+VAR
+	
+	color_1_counter                             :UINT;
+	color_2_counter                             :UINT;
+	orient_1_counter                            :UINT;
+	orient_2_counter                            :UINT;
+	
+	color_cam_1_ok                              :BOOL;
+	color_cam_1_nok                             :BOOL;
+	color_cam_2_ok                              :BOOL;
+	color_cam_2_nok                             :BOOL;
+	orient_cam_1_ok                             :BOOL;
+	orient_cam_1_nok                            :BOOL;
+	orient_cam_2_ok                             :BOOL;
+	orient_cam_2_nok                            :BOOL;
+	temp_camera_ok                              :BOOL;
+END_VAR
+
+VAR
+	color1_Toggle_Pos : R_trig;
+	color1_Toggle_Neg : F_trig;
+	color2_Toggle_Pos : R_trig;
+	color2_Toggle_Neg : F_trig;
+	orient1_Toggle_Pos : R_trig;
+	orient1_Toggle_Neg : F_trig;
+	orient2_Toggle_Pos : R_trig;
+	orient2_Toggle_Neg : F_trig;
+	OP120_color1_seq   : INT;
+	OP120_color2_seq   : INT;
+	OP120_orient1_seq  : INT;
+	OP120_orient2_seq  : INT;
+	color1_result_avaliable :BOOL;
+	color2_result_avaliable :BOOL;
+	orient1_result_avaliable:BOOL;
+	orient2_result_avaliable:BOOL;
+END_VAR
+
+VAR
+////// bypass  button
+	
+	Lh_color_cam_bypass  :BOOL;
+	Lh_orient_cam_bypass :BOOL;
+	rh_color_cam_bypass  :BOOL;
+    rh_orient_cam_bypass :BOOL;
+	
+    Lh_color_cam_cmp_bypass: BOOL;
+	Lh_orient_cam_cmp_bypass: BOOL;
+	rh_color_cam_cmp_bypass: BOOL;
+	rh_orient_cam_cmp_bypass: BOOL;
+	
+	
+////// count for color cam
+	
+	Lh_color_cam_ok_count:LINT;
+	Lh_color_cam_nok_count:LINT;
+	rh_color_cam_ok_count:LINT;
+	rh_color_cam_nok_count:LINT;
+
+////// count for orient cam	
+
+	Lh_orient_cam_ok_count:LINT;
+	Lh_orient_cam_nok_count:LINT;
+	rh_orient_cam_ok_count:LINT;
+	rh_orient_cam_nok_count:LINT;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[///////////////////////////////       op120 part color camera function block///////////////////////////////////
+
+op120_color_cam_1(
+	tTimeout                                                 := , 
+	sJob_Name                                                := , 
+	camera_ready                                             => op120color1_Camera_Ready,
+	Camera_online                                            => op120color1_Camera_Online,
+	stCognex_record_status                                   :=op120color1_Acquisition_Status, 
+	Acquisition_ID                                           :=op120color1_Acquisition_ID , 
+	stCognex_Inspection_status                               :=op120color1_Inspection_Status, 
+	Error_Code                                               :=op120color1_Error_code , 
+	wcommand_control_in                                      := op120color1_Current_Job_ID, 
+	aResults_64_Bytes                                        := op120color1_Cam_Result, 
+	number_of_inspections                                    :=op120color1_Inspection_ID , 
+	iresult_code                                             := op120color1_Result_code, 
+	bTarget_job_ID                                           :=op120color1_Target_Job_ID , 
+	Error_Status_message                                     => Error_status, 
+	bError                                                   => op120color1_Camera_Error, 
+	stCognex_record_control                                  => op120color1_Acquisition_Control , 
+	stCognex_inspection_control                              => op120color1_Inspection_Control , 
+	wCommandControl_out                                      =>op120color1_Command_word , 
+	aUser_data_64_Byte                                       => op120color1_Union.aArrayOfByte, 
+	bJob_loading_completed                                   =>op120color1_Job_Change_Complete , 
+	bJob_load_failed                                         =>op120color1_Job_Change_Error , 
+	bInspection_Result_IO=>  , 
+	bInspection_Result_NIO=> , 
+	bTXTSM_Error_Job_Change                                  => op120color1_Job_Change_Error, 
+	bPictureTakenComplete                                    => op120color1_Picture_Taken, 
+	Loaded_Job_ID                                            =>op120color1_Loaded_Job_ID	 , 
+	bClear_Error                                             := HMI_Reset, 
+	bJob_change_start                                        := op120color1_Camera_Job_Change_start, 
+	TXTSM_camera_not_online                                  =>op120color1_Camera_Error	 , 
+	bTrigger_start                                           := op120color1_Camera_Trigger );
+	
+///////////////////////////// op120 color camera 2 function block ////////////////////////////////////////////
+
+op120_color_cam_2(
+ tTimeout:= , 
+ sJob_Name:= , 
+ camera_ready=> op120color2_Camera_Ready,
+ Camera_online=> op120color2_Camera_Online,
+ stCognex_record_status:=op120color2_Acquisition_Status, 
+ Acquisition_ID:=op120color2_Acquisition_ID , 
+ stCognex_Inspection_status:=op120color2_Inspection_Status, 
+ Error_Code:=op120color2_Error_code , 
+ wcommand_control_in:= op120color2_Current_Job_ID, 
+ aResults_64_Bytes:= op120color2_Cam_Result, 
+ number_of_inspections:=op120color2_Inspection_ID , 
+ iresult_code:= op120color2_Result_code, 
+ bTarget_job_ID:=op120color2_Target_Job_ID , 
+ Error_Status_message=> Error_status, 
+ bError=> op120color2_Camera_Error, 
+ stCognex_record_control=>op120color2_Acquisition_Control , 
+ stCognex_inspection_control=>op120color2_Inspection_Control , 
+ wCommandControl_out=>op120color2_Command_word , 
+ aUser_data_64_Byte=> op120color2_Union.aArrayOfByte, 
+ bJob_loading_completed=>op120color2_Job_Change_Complete , 
+ bJob_load_failed=>op120color2_Job_Change_Error , 
+ bInspection_Result_IO=>  , 
+ bInspection_Result_NIO=> , 
+ bTXTSM_Error_Job_Change=> op120color2_Job_Change_Error, 
+ bPictureTakenComplete=> op120color2_Picture_Taken, 
+ Loaded_Job_ID=>op120color2_Loaded_Job_ID  , 
+ bClear_Error:= HMI_Reset, 
+ bJob_change_start:= op120color2_Camera_Job_Change_start, 
+ TXTSM_camera_not_online=>op120color2_Camera_Error  , 
+ bTrigger_start:= op120color2_Camera_Trigger );
+ 
+/////////////////////////       op120 part orientation camera function block///////////////////////////////////	
+
+op120_orient_cam_1(
+	tTimeout:= , 
+	sJob_Name:= , 
+	camera_ready=> op120orient1_Camera_Ready,
+	Camera_online=> op120orient1_Camera_Online,
+	stCognex_record_status:=op120orient1_Acquisition_Status, 
+	Acquisition_ID:=op120orient1_Acquisition_ID , 
+	stCognex_Inspection_status:=op120orient1_Inspection_Status, 
+	Error_Code:=op120orient1_Error_code , 
+	wcommand_control_in:= op120orient1_Current_Job_ID, 
+	aResults_64_Bytes:= op120orient1_Cam_Result, 
+	number_of_inspections:=op120orient1_Inspection_ID , 
+	iresult_code:= op120orient1_Result_code, 
+	bTarget_job_ID:=op120orient1_Target_Job_ID , 
+	Error_Status_message=> Error_status, 
+	bError=> op120orient1_Camera_Error, 
+	stCognex_record_control=>op120orient1_Acquisition_Control , 
+	stCognex_inspection_control=>op120orient1_Inspection_Control , 
+	wCommandControl_out=>op120orient1_Command_word , 
+	aUser_data_64_Byte=> op120orient1_Union.aArrayOfByte, 
+	bJob_loading_completed=>op120orient1_Job_Change_Complete , 
+	bJob_load_failed=>op120orient1_Job_Change_Error , 
+	bInspection_Result_IO=>  , 
+	bInspection_Result_NIO=> , 
+	bTXTSM_Error_Job_Change=> op120orient1_Job_Change_Error, 
+	bPictureTakenComplete=> op120orient1_Picture_Taken, 
+	Loaded_Job_ID=>op120orient1_Loaded_Job_ID	 , 
+	bClear_Error:= HMI_Reset, 
+	bJob_change_start:= op120orient1_Camera_Job_Change_start, 
+	TXTSM_camera_not_online=>op120orient1_Camera_Error	 , 
+	bTrigger_start:= op120orient1_Camera_Trigger );
+	
+	/////////////////////////////////// op120 orientation camera 2 function block //////////////////////////////
+	
+ op120_orient_cam_2(
+ tTimeout:= , 
+ sJob_Name:= , 
+ camera_ready=> op120orient2_Camera_Ready,
+ Camera_online=> op120orient2_Camera_Online,
+ stCognex_record_status:=op120orient2_Acquisition_Status, 
+ Acquisition_ID:=op120orient2_Acquisition_ID , 
+ stCognex_Inspection_status:=op120orient2_Inspection_Status, 
+ Error_Code:=op120orient2_Error_code , 
+ wcommand_control_in:= op120orient2_Current_Job_ID, 
+ aResults_64_Bytes:= op120orient2_Cam_Result, 
+ number_of_inspections:=op120orient2_Inspection_ID , 
+ iresult_code:= op120orient2_Result_code, 
+ bTarget_job_ID:=op120orient2_Target_Job_ID , 
+ Error_Status_message=> Error_status, 
+ bError=> op120orient2_Camera_Error, 
+ stCognex_record_control=>op120orient2_Acquisition_Control , 
+ stCognex_inspection_control=>op120orient2_Inspection_Control , 
+ wCommandControl_out=>op120orient2_Command_word , 
+ aUser_data_64_Byte=> op120orient2_Union.aArrayOfByte, 
+ bJob_loading_completed=>op120orient2_Job_Change_Complete , 
+ bJob_load_failed=>op120orient2_Job_Change_Error , 
+ bInspection_Result_IO=>  , 
+ bInspection_Result_NIO=> , 
+ bTXTSM_Error_Job_Change=> op120orient2_Job_Change_Error, 
+ bPictureTakenComplete=> op120orient2_Picture_Taken, 
+ Loaded_Job_ID=>op120orient2_Loaded_Job_ID  , 
+ bClear_Error:= HMI_Reset, 
+ bJob_change_start:= op120orient2_Camera_Job_Change_start, 
+ TXTSM_camera_not_online=>op120orient2_Camera_Error  , 
+ bTrigger_start:= op120orient2_Camera_Trigger );
+	
+/////////////////////////////// op120 set user data /////////////////////////////////////////////////////////////////////////
+
+IF op120_modelselected = 1 THEN
+   op120orient2_Union.aArrayOfByte[0] :=1;
+   op120orient1_Union.aArrayOfByte[0] :=1;	
+END_IF
+
+op120orient1_Inspection_Control.Set_User_Data := op120_setuserdata;
+op120orient2_Inspection_Control.Set_User_Data := op120_setuserdata;
+
+IF op120orient1_Inspection_Status.Set_User_Data_Ack AND op120orient2_Inspection_Status.Set_User_Data_Ack THEN
+	op120_setuserdata :=FALSE;
+END_IF
+
+////////////////////////////// all camera status //////////////////////////////////
+IF (((op120color1_Camera_Ready AND op120color1_Camera_Online) OR Lh_color_cam_bypass OR Lh_color_cam_cmp_bypass )AND
+   ((op120color2_Camera_Ready AND op120color2_Camera_Online) OR rh_color_cam_bypass OR rh_color_cam_cmp_bypass) AND
+   (( op120orient1_Camera_Ready AND op120orient1_Camera_Online ) OR Lh_orient_cam_bypass OR Lh_orient_cam_cmp_bypass )AND
+   (( op120orient2_Camera_Ready AND op120orient2_Camera_Online ) OR rh_orient_cam_bypass OR rh_orient_cam_cmp_bypass )) THEN                                                                                                    
+	op120_all_camera_ok := TRUE;	
+ELSE op120_all_camera_ok := FALSE;																								 
+END_IF		  
+
+
+
+	
+///////////////////	////////// op 120 camera sequence //////////////////////////////////////////////////////////////////////
+ 
+op120color1_Camera_Trigger:=NOT Lh_color_cam_cmp_bypass AND  OP120_Camera_Auto_Trigger ;
+op120orient1_Camera_Trigger:= NOT Lh_orient_cam_cmp_bypass AND OP120_Camera_Auto_Trigger ;
+op120color2_Camera_Trigger:= NOT rh_color_cam_cmp_bypass AND OP120_Camera_Auto_Trigger ;
+op120orient2_Camera_Trigger:= NOT rh_orient_cam_cmp_bypass AND OP120_Camera_Auto_Trigger ;
+
+
+//////////////////////////////// toggle bits ////////////////////////////////////////////////////
+
+
+color1_Toggle_Pos(CLK:=op120color1_Inspection_Status.Inspection_Completed);
+color1_Toggle_Neg(CLK:=op120color1_Inspection_Status.Inspection_Completed);
+color2_Toggle_Pos(CLK:=op120color2_Inspection_Status.Inspection_Completed);
+color2_Toggle_Neg(CLK:=op120color2_Inspection_Status.Inspection_Completed);
+orient1_Toggle_Pos(CLK:=op120orient1_Inspection_Status.Inspection_Completed);
+orient1_Toggle_Pos(CLK:=op120orient1_Inspection_Status.Inspection_Completed);
+orient2_Toggle_Pos(CLK:=op120orient2_Inspection_Status.Inspection_Completed);
+orient2_Toggle_Pos(CLK:=op120orient2_Inspection_Status.Inspection_Completed);
+
+
+////////////////////////////////////////////// camera sequence///////////////////////////////////////////////
+
+CASE  OP120_color1_seq OF
+	0: IF op120_auto AND  OP120_Camera_Auto_Trigger THEN
+		   OP120_color1_seq               := 10;
+	END_IF
+	
+	10: IF color1_Toggle_Pos.q OR  color1_Toggle_Neg.q THEN
+		   IF (op120color1_Cam_Result[0]=1 AND op120color1_Cam_Result[0]<>0) OR temp_camera_ok  
+               OR Lh_color_cam_bypass OR Lh_color_cam_cmp_bypass  THEN
+	          color_cam_1_ok              := TRUE;
+	          color_cam_1_nok             := FALSE;
+			     IF NOT  lh_color_cam_bypass THEN
+			     Lh_color_cam_ok_count       := Lh_color_cam_ok_count+1;
+			     END_IF
+			  color1_result_avaliable     := TRUE;
+	          OP120_color1_seq            := 0;
+            ELSIF NOT Lh_color_cam_bypass AND op120color1_Cam_Result[0]=0 AND op120color1_Cam_Result[0]<>1 THEN
+	              color_cam_1_ok          := FALSE;
+	              color_cam_1_nok         := TRUE;
+				  IF NOT  lh_color_cam_bypass THEN
+				  Lh_color_cam_nok_count       := Lh_color_cam_nok_count+1;
+				  END_IF
+				  color1_result_avaliable := TRUE;
+				  OP120_color1_seq        := 0;
+             END_IF
+	END_IF
+END_CASE
+
+
+CASE  OP120_color2_seq OF
+	0: IF op120_auto AND  OP120_Camera_Auto_Trigger THEN
+		   OP120_color2_seq                :=10;
+	END_IF
+	
+	10: IF color2_Toggle_Pos.q OR  color2_Toggle_Neg.q THEN
+		   IF (op120color2_Cam_Result[0]=1 AND op120color2_Cam_Result[0]<>0) OR temp_camera_ok 
+               OR rh_color_cam_bypass OR rh_color_cam_cmp_bypass THEN
+	          color_cam_2_ok               := TRUE;
+	          color_cam_2_nok              := FALSE;
+			    IF NOT rh_color_cam_bypass THEN
+			    rh_color_cam_ok_count        :=rh_color_cam_ok_count+1;
+			    END_IF
+			  color2_result_avaliable      :=TRUE;
+	          OP120_color2_seq             := 0;
+            ELSIF NOT rh_color_cam_bypass AND op120color2_Cam_Result[0]=0 AND op120color2_Cam_Result[0]<>1 THEN
+	              color_cam_2_ok           := FALSE;
+	              color_cam_2_nok          := TRUE;
+				  IF NOT rh_color_cam_bypass THEN
+				  rh_color_cam_nok_count   :=rh_color_cam_nok_count+1;
+				  END_IF
+				  color2_result_avaliable:=TRUE;
+				  OP120_color2_seq         := 0;
+             END_IF
+	END_IF
+END_CASE
+
+CASE  OP120_orient1_seq OF
+	0: IF op120_auto AND  OP120_Camera_Auto_Trigger THEN
+		   OP120_orient1_seq               := 10;
+	END_IF
+	
+	10: IF color2_Toggle_Pos.q OR  color2_Toggle_Neg.q THEN
+		   IF (op120orient1_Cam_Result[1]=1 AND op120orient1_Cam_Result[2]=0) OR temp_camera_ok 
+              OR Lh_orient_cam_bypass OR Lh_orient_cam_cmp_bypass THEN
+	          orient_cam_1_ok              := TRUE;
+	          orient_cam_1_nok             :=FALSE;
+			  IF NOT Lh_orient_cam_bypass THEN
+			  Lh_orient_cam_ok_count:=Lh_orient_cam_ok_count+1;	  
+			  END_IF
+			  orient1_result_avaliable     :=TRUE;
+	          OP120_orient1_seq            := 0;
+            ELSIF NOT Lh_orient_cam_bypass AND  op120orient1_Cam_Result[1]=0 AND op120orient1_Cam_Result[2]=1 THEN
+	              orient_cam_1_ok          := FALSE;
+	              orient_cam_1_nok         :=TRUE;
+				  IF NOT Lh_orient_cam_bypass THEN
+				  Lh_orient_cam_nok_count:=Lh_orient_cam_nok_count+1;	  
+				  END_IF
+				  orient1_result_avaliable :=TRUE;
+				  OP120_orient1_seq        := 0;
+             END_IF
+	END_IF
+END_CASE
+
+CASE  OP120_orient2_seq OF
+	0: IF op120_auto AND  OP120_Camera_Auto_Trigger THEN
+		   OP120_orient2_seq               := 10;
+	END_IF
+	
+	10: IF color2_Toggle_Pos.q OR  color2_Toggle_Neg.q THEN
+		   IF (op120orient2_Cam_Result[1]=1 AND op120orient2_Cam_Result[2]=0) OR temp_camera_ok 
+               OR rh_orient_cam_bypass OR rh_orient_cam_cmp_bypass THEN
+	           orient_cam_2_ok             := TRUE;
+	           orient_cam_2_nok            :=FALSE;
+			   IF NOT rh_orient_cam_bypass THEN
+			   rh_orient_cam_ok_count:=rh_orient_cam_ok_count+1;	   
+			   END_IF
+			   orient2_result_avaliable    :=TRUE;
+	           OP120_orient2_seq := 0;
+            ELSIF NOT rh_orient_cam_bypass AND  op120orient2_Cam_Result[1]=0 AND op120orient2_Cam_Result[2]=1 THEN
+	              orient_cam_2_ok          := FALSE;
+	              orient_cam_2_nok         :=TRUE;
+				  IF  NOT rh_orient_cam_bypass THEN
+				  rh_orient_cam_nok_count:=rh_orient_cam_nok_count+1;	  
+				  END_IF
+				  orient2_result_avaliable :=TRUE;
+				  OP120_orient2_seq        := 0;
+             END_IF
+	END_IF
+END_CASE
+
+
+/////////////////////////////////////// op120 camera results ///////////////////////////////////////////////////////////////////
+
+IF orient2_result_avaliable AND orient1_result_avaliable AND color2_result_avaliable AND color1_result_avaliable THEN
+IF (color_cam_1_ok AND color_cam_2_ok AND orient_cam_1_ok AND orient_cam_2_ok ) THEN
+   OP120_CamOK                              :=TRUE;
+   OP120_CamNOK                             :=FALSE;
+   color_cam_1_ok                           :=FALSE;
+   color_cam_2_ok                           :=false;
+   orient_cam_1_ok                          :=false;
+   orient_cam_2_ok                          :=false;
+   color_cam_1_nok                          :=false;
+   color_cam_2_nok                          :=false;
+   orient_cam_1_nok                         :=false;
+   orient_cam_2_nok                         :=FALSE;
+   orient2_result_avaliable                 :=FALSE;
+   orient1_result_avaliable                 :=FALSE;
+   color2_result_avaliable                  :=FALSE;
+   color1_result_avaliable                  :=FALSE;
+   
+ELSIF  ( color_cam_1_nok OR color_cam_2_nok OR orient_cam_1_nok OR orient_cam_2_nok ) THEN
+        OP120_CamOK                         :=FALSE;
+        OP120_CamNOK                        :=TRUE;
+		color_cam_1_ok                      :=FALSE;
+		color_cam_2_ok                      :=FALSE;
+		orient_cam_1_ok                     :=FALSE;
+		orient_cam_2_ok                     :=FALSE;
+		color_cam_1_nok                     :=FALSE;
+		color_cam_2_nok                     :=FALSE;
+		orient_cam_1_nok                    :=FALSE;
+		orient_cam_2_nok                    :=FALSE;
+        orient2_result_avaliable            :=FALSE;
+        orient1_result_avaliable            :=FALSE;
+        color2_result_avaliable             :=FALSE;
+	    color1_result_avaliable             :=FALSE;
+		
+END_IF
+END_IF
+
+
+
+
+
+// color camera 1 result
+(*IF (op120color1_Cam_Result[0]=1 AND op120color1_Cam_Result[0]<>0 AND color_1_counter <> op120color1_Inspection_ID)OR temp_camera_ok  THEN
+	          color_cam_1_ok := TRUE;
+	          color_cam_1_nok:= FALSE;
+	          color_1_counter:=op120color1_Inspection_ID;
+            ELSIF op120color1_Cam_Result[0]=0 AND op120color1_Cam_Result[0]<>1 AND color_1_counter <> op120color1_Inspection_ID THEN
+	              color_cam_1_ok := FALSE;
+	              color_cam_1_nok:= TRUE;
+             END_IF
+
+
+// color camera 2 result
+
+IF (op120color2_Cam_Result[0]=1 AND   op120color2_Cam_Result[0]<>0 AND color_2_counter <> op120color2_Inspection_ID) OR temp_camera_ok THEN
+	color_cam_2_ok := TRUE;
+	color_cam_2_nok:= FALSE;
+	color_2_counter:=op120color2_Inspection_ID;
+
+ELSIF op120color2_Cam_Result[0]=0 AND op120color2_Cam_Result[0] <> 1 AND color_2_counter <> op120color2_Inspection_ID THEN
+	  color_cam_2_ok := FALSE;
+	  color_cam_2_nok:= TRUE;
+END_IF
+
+// orient camera 1 result
+
+IF (op120orient1_Cam_Result[1]=1 AND op120orient1_Cam_Result[2]=0 AND orient_1_counter <> op120orient1_Inspection_ID) OR temp_camera_ok THEN
+	orient_cam_1_ok := TRUE;
+	orient_cam_1_nok:=FALSE;
+	orient_1_counter := op120orient1_Inspection_ID;
+	
+ELSIF op120orient1_Cam_Result[1]=0 AND op120orient1_Cam_Result[2]=1 AND orient_1_counter <> op120orient1_Inspection_ID THEN
+	  	orient_cam_1_ok := FALSE;
+	    orient_cam_1_nok:=TRUE;
+END_IF
+
+// orient camera 2 result
+
+IF (op120orient2_Cam_Result[1]=1 AND op120orient2_Cam_Result[2]=0 AND orient_2_counter <> op120orient2_Inspection_ID) OR temp_camera_ok THEN
+	orient_cam_2_ok := TRUE;
+	orient_cam_2_nok:=FALSE;
+	orient_2_counter := op120orient2_Inspection_ID;
+ELSIF op120orient2_Cam_Result[1]=0 AND op120orient2_Cam_Result[2]=1 AND orient_2_counter <> op120orient2_Inspection_ID THEN
+	  	orient_cam_2_ok := FALSE;
+	    orient_cam_2_nok:=TRUE;
+END_IF *)
+]]></ST>
+    </Implementation>
+    <LineIds Name="op120_camera_FB">
+      <LineId Id="3" Count="34" />
+      <LineId Id="512" Count="0" />
+      <LineId Id="38" Count="30" />
+      <LineId Id="510" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="511" Count="0" />
+      <LineId Id="70" Count="31" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="505" Count="0" />
+      <LineId Id="105" Count="32" />
+      <LineId Id="1634" Count="0" />
+      <LineId Id="1629" Count="0" />
+      <LineId Id="1631" Count="0" />
+      <LineId Id="1633" Count="0" />
+      <LineId Id="1632" Count="0" />
+      <LineId Id="1638" Count="0" />
+      <LineId Id="1636" Count="0" />
+      <LineId Id="1635" Count="0" />
+      <LineId Id="1637" Count="0" />
+      <LineId Id="1653" Count="0" />
+      <LineId Id="1863" Count="1" />
+      <LineId Id="1654" Count="0" />
+      <LineId Id="1630" Count="0" />
+      <LineId Id="1660" Count="0" />
+      <LineId Id="1656" Count="0" />
+      <LineId Id="1662" Count="1" />
+      <LineId Id="1665" Count="1" />
+      <LineId Id="1661" Count="0" />
+      <LineId Id="1657" Count="2" />
+      <LineId Id="1655" Count="0" />
+      <LineId Id="138" Count="5" />
+      <LineId Id="1230" Count="0" />
+      <LineId Id="509" Count="0" />
+      <LineId Id="668" Count="0" />
+      <LineId Id="971" Count="0" />
+      <LineId Id="970" Count="0" />
+      <LineId Id="828" Count="0" />
+      <LineId Id="827" Count="0" />
+      <LineId Id="840" Count="0" />
+      <LineId Id="839" Count="0" />
+      <LineId Id="842" Count="0" />
+      <LineId Id="841" Count="0" />
+      <LineId Id="844" Count="0" />
+      <LineId Id="843" Count="0" />
+      <LineId Id="847" Count="0" />
+      <LineId Id="849" Count="0" />
+      <LineId Id="846" Count="0" />
+      <LineId Id="851" Count="0" />
+      <LineId Id="850" Count="0" />
+      <LineId Id="852" Count="0" />
+      <LineId Id="855" Count="2" />
+      <LineId Id="854" Count="0" />
+      <LineId Id="861" Count="0" />
+      <LineId Id="1650" Count="0" />
+      <LineId Id="862" Count="1" />
+      <LineId Id="1423" Count="0" />
+      <LineId Id="1178" Count="0" />
+      <LineId Id="1424" Count="0" />
+      <LineId Id="975" Count="0" />
+      <LineId Id="864" Count="0" />
+      <LineId Id="866" Count="2" />
+      <LineId Id="1427" Count="0" />
+      <LineId Id="1420" Count="0" />
+      <LineId Id="1428" Count="0" />
+      <LineId Id="976" Count="0" />
+      <LineId Id="876" Count="0" />
+      <LineId Id="859" Count="1" />
+      <LineId Id="853" Count="0" />
+      <LineId Id="884" Count="8" />
+      <LineId Id="1649" Count="0" />
+      <LineId Id="893" Count="1" />
+      <LineId Id="1425" Count="0" />
+      <LineId Id="1421" Count="0" />
+      <LineId Id="1426" Count="0" />
+      <LineId Id="977" Count="0" />
+      <LineId Id="895" Count="3" />
+      <LineId Id="1429" Count="0" />
+      <LineId Id="1422" Count="0" />
+      <LineId Id="1430" Count="0" />
+      <LineId Id="978" Count="0" />
+      <LineId Id="899" Count="2" />
+      <LineId Id="883" Count="0" />
+      <LineId Id="903" Count="0" />
+      <LineId Id="905" Count="6" />
+      <LineId Id="1648" Count="0" />
+      <LineId Id="912" Count="1" />
+      <LineId Id="1431" Count="2" />
+      <LineId Id="979" Count="0" />
+      <LineId Id="914" Count="3" />
+      <LineId Id="1434" Count="2" />
+      <LineId Id="980" Count="0" />
+      <LineId Id="918" Count="2" />
+      <LineId Id="904" Count="0" />
+      <LineId Id="921" Count="7" />
+      <LineId Id="1651" Count="0" />
+      <LineId Id="929" Count="1" />
+      <LineId Id="1437" Count="2" />
+      <LineId Id="981" Count="0" />
+      <LineId Id="931" Count="3" />
+      <LineId Id="1440" Count="2" />
+      <LineId Id="982" Count="0" />
+      <LineId Id="935" Count="2" />
+      <LineId Id="902" Count="0" />
+      <LineId Id="939" Count="2" />
+      <LineId Id="1231" Count="0" />
+      <LineId Id="942" Count="1" />
+      <LineId Id="945" Count="9" />
+      <LineId Id="984" Count="3" />
+      <LineId Id="1232" Count="0" />
+      <LineId Id="956" Count="10" />
+      <LineId Id="989" Count="2" />
+      <LineId Id="988" Count="0" />
+      <LineId Id="1233" Count="0" />
+      <LineId Id="938" Count="0" />
+      <LineId Id="983" Count="0" />
+      <LineId Id="1180" Count="49" />
+      <LineId Id="1179" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

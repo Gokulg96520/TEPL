@@ -1,15 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP30_AUTOSEQUENCE" Id="{1ec3b55c-8769-4ee0-8812-2eb37c9825e9}" SpecialFunc="None">
+  <POU Name="OP30_AUTOSEQUENCE" Id="{36552371-df3f-4612-b47a-5a0742dcebe4}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP30_AUTOSEQUENCE
 VAR
 	OP30_Oring_OK 	: BOOL;
-	MOVER_OK		: BOOL;
 	FIXTURE_LH		: INT;
 	FIXTURE_RH 		: INT;
 	del : ton;
 	tmp :BOOL;
+	Jerk_Check	: TON;
+	Gripper_Delay: TON;
+	Gripper_Aft_Place_Delay	: TON;
+	OP30_STN_MOVER: INT;
+	Dry_run : BOOL;
+	OP30_Cycle_Time_FB : FB_Cycletime;
+	Guide_Control_Temp : BOOL;
 	
+	PAP_CYC_VAR : BOOL;
+	OP30_PAP_Cycle_time : UDINT;
+	OP30_Overall_Cyc_Time	: UDINT;
+	OP30_PAP_Cycle_Time_FB : FB_Cycletime;
+	OP30_Continous_Run : BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -18,6 +29,25 @@ IF (NOT OP30_AutoSelected OR  OP30_ErrorActive OR OP30_HomeRunning ) THEN
 	OP30_AutoRunning:= FALSE;
 	OP30_AutoSeq:= 10;
 END_IF	
+
+IF (NOT OP30_AutoSelected OR  OP30_ErrorActive ) THEN
+	OP30_Conveyor_ON:=FALSE;
+END_IF	
+
+IF OP30_AutoSelected THEN
+	OP30_GIUDE_GRP_ctrl.Position:=OP30_Guide_Pos;
+	OP30_GIUDE_GRP_ctrl.Velocity:=50;
+	SR30_Vert_servo_ctrl.Velocity:=OP30_HMI_Servo_Speed_Vertical;
+	SR30_HORI_servo_ctrl.Velocity:=OP30_HMI_Servo_Speed_Horizontal;	
+END_IF
+
+IF NOT OP30_AutoRunning THEN
+    OP30_GIUDE_GRP_ctrl.Position:=0;
+	OP30_GIUDE_GRP_ctrl.Velocity:=50;
+	IF NOT In_Range(OP30_GIUDE_GRP_ctrl.Actual_Position,0,1) THEN
+		OP30_GIUDE_GRP_ctrl.ABSmove_Start:=TRUE;
+	END_IF	
+END_IF
 
 CASE OP30_AutoSeq OF
 	    10: IF (OP30_AutoSelected) THEN		// Check Automode Selected
@@ -37,38 +67,54 @@ CASE OP30_AutoSeq OF
       	   END_IF
 		   
       	50:IF ( NOT OP30_OperationCompleted) THEN		// Check Operation Completed Reset
-      		   OP30_AutoSeq:=60;
+			   OP30_AutoSeq:=60;
       	   END_IF
 		   
-		60:IF  ( AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP30_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		60:IF  ( OP30_AutoRunning OR (NOT OP30_AutoRunning AND OP30_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
 		    OP30_GVL.OP30_HomeConditionOK:=TRUE;
 	 			IF( OP30_Main.OP30_Modeselection_FB.HomeConditionOK AND OP30_AutoSelected) THEN
 					OP30_GVL.OP30_AutoRunning:=TRUE;
-					OP30_GVL.OP30_StepRunning:= FALSE;
-				
+					OP30_GVL.OP30_StepRunning:= FALSE;				
 				ELSIF (OP30_Main.OP30_Modeselection_FB.HomeConditionOK AND OP30_StepSelected) THEN
 					OP30_GVL.OP30_AutoRunning:=FALSE;
 					OP30_GVL.OP30_StepRunning:= TRUE;
 				END_IF;
 		  END_IF
 		   IF ((OP30_AutoRunning OR OP30_StepRunning) AND OP30_StartEnable) THEN
-				OP30_AutoSeq:= 70;
+			   	OP30_GIUDE_GRP_ctrl.ABSmove_Start:=TRUE;
+				OP30_Conveyor_ON:=TRUE;
+				OP30_AutoSeq:= 65;
 		   END_IF	
 		   
-		 70 : //MOVING HORIZONTAL SERVO TO PICK POSITION
-			  IF (OP30_HORI_SERVO_ON_SFE_WRK OR OP30_HORI_SERVO_ON_HOME OR OP30_HORI_SERVO_ON_WRK_PLACE )AND OP30_HORI_SERVO_POS_DONE AND NOT SR30_HORI_servo_ctrl.ABSmove_Start THEN 
-	           MOVER_OK := FALSE;
+		65 :  OP30_Gripper_LH_Close:=TRUE;  //CHECKING GRIPPER STATE BEFORE GRIPPING
+			  OP30_Gripper_RH_Close:=TRUE;
+			  IF NOT OP30_Gripper_LH_State AND NOT OP30_Gripper_RH_State THEN
+				   OP30_AutoSeq:=66;
+			  ELSE 	   
+				   OP30_AutoSeq:=220;
+			  END_IF 
+		   
+	    66: PAP_CYC_VAR:=1;
+			IF OP30_pick_ready THEN
+				OP30_AutoSeq:=70;
+			ELSE 
+				OP30_AutoSeq:=86;	
+			END_IF 
+			  
+		70 : //MOVING HORIZONTAL SERVO TO PICK POSITION
+			  IF (OP30_HORI_SERVO_ON_SFE_WRK OR OP30_HORI_SERVO_ON_HOME OR OP30_HORI_SERVO_ON_WRK_PLACE OR OP30_HORI_SERVO_ON_WRK_PICK )AND OP30_HORI_SERVO_POS_DONE AND NOT SR30_HORI_servo_ctrl.ABSmove_Start THEN 
 			   SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_PICK_POS;
-			   tmp:=TRUE;
-			   IF del.Q THEN
-              	 OP30_AutoSeq:=80;
-			   END_IF 			  
-	          END_IF
+               OP30_AutoSeq:=80;
+			  END_IF
 			 
-		 80 :  SR30_HORI_servo_ctrl.ABSmove_Start := TRUE;     //HORIZONTAL SERVO MOVING
+		80 :  SR30_HORI_servo_ctrl.ABSmove_Start := TRUE;     //HORIZONTAL SERVO MOVING
 		       IF OP30_HORI_SERVO_ON_WRK_PICK THEN
 				   SR30_HORI_servo_ctrl.ABSmove_Start := FALSE;
-				   OP30_AutoSeq:=82;
+				   IF OP30_Gripper_LH_State AND OP30_Gripper_RH_State THEN
+				        OP30_AutoSeq:=85;
+				   ELSE 
+						OP30_AutoSeq:=82;
+				   END_IF
 			   END_IF
 		
 	  	82 :  OP30_Gripper_LH_Close:=TRUE;  //CHECKING GRIPPER STATE BEFORE GRIPPING
@@ -78,57 +124,74 @@ CASE OP30_AutoSeq OF
 			  END_IF
 			   
 		85:	   // MOVING VERTICAL SERVO TO PICK POSITION
-               IF  OP30_HORI_SERVO_ON_WRK_PICK AND (OP30_VERT_SERVO_ON_SFE_WRK OR OP30_VERT_SERVO_ON_HOME) AND OP30_VERT_SERVO_POS_DONE AND NOT SR30_VERT_servo_ctrl.ABSmove_Start THEN
+               IF  OP30_HORI_SERVO_ON_WRK_PICK AND (OP30_VERT_SERVO_ON_SFE_WRK OR OP30_VERT_SERVO_ON_HOME) AND OP30_VERT_SERVO_POS_DONE AND NOT SR30_VERT_servo_ctrl.ABSmove_Start   THEN
 				   SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_PICK_POS;
-			   tmp:=TRUE;
-			   IF del.Q THEN
-              	 OP30_AutoSeq:=90;
-			   END_IF 				   
+				   SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;
+              	   OP30_AutoSeq:=100;			   
 			   END_IF
 			   
-			   
-		90 :  IF OP30_pick_ready THEN  // WAITING FOR O-RING TO BE OK AND THEN MOVING THE VERTICAL SERVO
-			 	SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;
-				OP30_AutoSeq:=100;
+	    86:   IF (OP30_HORI_SERVO_ON_SFE_WRK OR OP30_HORI_SERVO_ON_HOME OR OP30_HORI_SERVO_ON_WRK_PLACE OR OP30_HORI_SERVO_ON_WRK_PICK )AND OP30_HORI_SERVO_POS_DONE AND NOT SR30_HORI_servo_ctrl.ABSmove_Start THEN 
+			    SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_SAFE_PICK_POS;
+			    SR30_HORI_servo_ctrl.ABSmove_Start := TRUE;
+                OP30_AutoSeq:=90;
+			  END_IF
+  
+		90 :   IF OP30_pick_ready THEN  // WAITING FOR O-RING TO BE OK AND THEN MOVING THE VERTICAL SERVO
+			 		SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_PICK_POS;
+					OP30_AutoSeq:=92;
 		       END_IF
 			   
-			   
+		92:  SR30_Hori_servo_ctrl.ABSmove_Start := TRUE;
+			 IF OP30_HORI_SERVO_ON_WRK_PICK THEN
+				 SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_PICK_POS;
+				 SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;
+				 OP30_AutoSeq:=100;
+			 END_IF
+						  						   			   
 	   100 : IF OP30_VERT_SERVO_ON_WRK_PICK AND NOT SR30_VERT_servo_ctrl.ABSmove_Start THEN
-				   SR30_VERT_servo_ctrl.ABSmove_Start := FALSE;
-				   SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_SFE_WRK_POS; // FEEDING SAFE-WORK POSITION TO VERTICAL SERVO
-			   tmp:=TRUE;
-			   IF del.Q THEN
-              	 OP30_AutoSeq:=110;
-			   END_IF 				   
+				 SR30_VERT_servo_ctrl.ABSmove_Start := FALSE;
+				 SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_SFE_WRK_POS; // FEEDING SAFE-WORK POSITION TO VERTICAL SERVO
+              	 OP30_AutoSeq:=110;			    				   
 			 END_IF	   
-			 
-      110:    //PICKING O-RING
-    		   	OP30_Gripper_LH_Open:=TRUE;
-    		   	OP30_Gripper_RH_Open:=TRUE;					
-    		    OP30_AutoSeq:=120;
+			   
+       110:	IF NOT OP30_Grip_LH_Bypass THEN
+				OP30_Gripper_LH_Open:=TRUE; 
+			END_IF	
+			IF NOT OP30_Grip_RH_Bypass THEN
+    			OP30_Gripper_RH_Open:=TRUE;
+			END_IF	
+			IF Gripper_Delay.Q THEN
+				 OP30_AutoSeq:=120;
+		    END_IF 
     		
-      120: OP30_AutoSeq:=130;
+       120: SR30_Hori_servo_ctrl.Position:=(OP30_HORI_SERVO_PICK_POS+OP30_Hori_Ser_Jerk_Pos);
+	   		SR30_HORI_servo_ctrl.ABSmove_Start := 1;
+			IF Jerk_Check.Q THEN
+				OP30_AutoSeq:=130;
+			END_IF    
     		   
-      130: SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;	   //MOVING VERTICL SERVO TO SAFE-WORK
+       130: SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;	   //MOVING VERTICL SERVO TO SAFE-WORK
             IF OP30_VERT_SERVO_ON_SFE_WRK  THEN
     	      SR30_VERT_servo_ctrl.ABSmove_Start := FALSE;
 			  OP30_pick_done:=TRUE;
               OP30_AutoSeq:=140;   
     		END_IF
     		   
-      140:  IF OP30_Gripper_LH_State AND OP30_Gripper_RH_State THEN   // CHECKING GRIPPER STATE BEFORE PLACING 
-    		      OP30_AutoSeq:=150;
-    		ELSE    
-    			  OP30_AutoSeq:=220;
-    	    END_IF
-    	   
-    		  
+       140: IF (NOT OP30_Gripper_LH_State AND OP30_Grip_LH_Bypass ) AND OP30_Gripper_RH_State THEN  
+    			OP30_AutoSeq:=150;
+			ELSIF (NOT OP30_Gripper_RH_State AND OP30_Grip_RH_Bypass) AND OP30_Gripper_LH_State THEN
+				OP30_AutoSeq:=150;
+			ELSIF OP30_Gripper_LH_State AND OP30_Gripper_RH_State THEN  
+    			OP30_AutoSeq:=150;
+			ELSIF (NOT OP30_Gripper_LH_State AND NOT OP30_Grip_LH_Bypass) OR (NOT OP30_Gripper_RH_State AND NOT OP30_Grip_RH_Bypass) THEN	
+				OP30_AutoSeq:=220;
+			ELSIF OP30_Grip_LH_Bypass AND OP30_Grip_RH_Bypass THEN
+				OP30_AutoSeq:=250;
+			END_IF
+    	    		  
        150:  IF OP30_VERT_SERVO_ON_SFE_WRK  THEN // FEEDING PLACE POSITION TO HORIZONTAL SERVO
     		   SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_PLACE_POS;
-			   tmp:=TRUE;
-			   IF del.Q THEN
-              	 OP30_AutoSeq:=160;
-			   END_IF 				 
+              OP30_AutoSeq:=160;			 
     		 END_IF
     		   
        160:  SR30_HORI_servo_ctrl.ABSmove_Start := TRUE;    // MOVING HORIZONTAL SERVO TO PLACE POSITION
@@ -137,77 +200,283 @@ CASE OP30_AutoSeq OF
     			 OP30_AutoSeq:=170;
     		   END_IF
        
-       170: //WAITING FOR MOVER TO BE OK 
-    		IF OP30_HORI_SERVO_ON_WRK_PLACE AND NOT SR30_VERT_servo_ctrl.ABSmove_Start AND OP30_VERT_SERVO_ON_SFE_WRK AND MOVER_OK THEN
+       170: PAP_CYC_VAR:=0;
+			IF OP30_HORI_SERVO_ON_WRK_PLACE AND NOT SR30_VERT_servo_ctrl.ABSmove_Start AND OP30_VERT_SERVO_ON_SFE_WRK AND OP30_STN_ENABLE THEN
     	   		SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_PLACE_POS;
-			   tmp:=TRUE;
-			   IF del.Q THEN
-              	 OP30_AutoSeq:=180;
-			   END_IF 			
+              	OP30_AutoSeq:=175;		
       		END_IF
+			
+	   175: IF FIXTURE_LH<>20 AND FIXTURE_RH<>20 THEN
+		   		OP30_AutoSeq:=250;	
+			ELSIF FIXTURE_LH<>20 OR FIXTURE_RH<>20 THEN
+				OP30_AutoSeq:=260;	
+			ELSE
+				OP30_AutoSeq:=180;		
+	  	    END_IF
     		
-       180: SR30_VERT_servo_ctrl.ABSmove_Start := TRUE; //MOVING VERTICAL SERVO TO PLACE POSITION
+       180: SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_PLACE_POS;
+			SR30_VERT_servo_ctrl.ABSmove_Start := TRUE; //MOVING VERTICAL SERVO TO PLACE POSITION
     		IF OP30_VERT_SERVO_ON_WRK_PLACE THEN
     			SR30_VERT_servo_ctrl.ABSmove_Start := FALSE;
-    			OP30_AutoSeq:=190;	
+    		    OP30_AutoSeq:=190;					
     		END_IF	
-    
-       190:	IF FIXTURE_LH =99 THEN //PLACING THE O-RING  && RESULT UPDATION
-    			 OP30_Gripper_LH_Close:=TRUE; 
-    		END_IF	 
-    		IF FIXTURE_RH =99 THEN
-    			 OP30_Gripper_RH_Close:=TRUE;
-    		END_IF
-    		  OP30_AutoSeq:=200;
-    	
+			
+       190: IF FIXTURE_LH=20 AND NOT OP30_Grip_LH_Bypass THEN 
+				OP30_Gripper_LH_Close:=TRUE;	
+			END_IF	
+			IF FIXTURE_RH=20 AND NOT OP30_Grip_RH_Bypass THEN 
+				OP30_Gripper_RH_Close:=TRUE;
+			END_IF			
+			OP30_AutoSeq	:=200;
+			OP30_CURR_MOVER	:= OP30_STN_MOVER;
+				
+	
        200:  //MOVING BACK TO VERTICAL SERVO SAFE POSITION
     		 IF OP30_VERT_SERVO_ON_WRK_PLACE AND NOT SR30_VERT_servo_ctrl.ABSmove_Start THEN
     		   SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_SFE_WRK_POS;
-			   tmp:=TRUE;
-			   IF del.Q THEN
-              	 OP30_AutoSeq:=210;
-			   END_IF 			   
+			   IF Gripper_Aft_Place_Delay.Q THEN
+                OP30_AutoSeq:=201;
+			   END_IF			   
     		 END_IF 
     		 
-       210:	 SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;  //PROCEEDING FOR NEXT CYCLE          
-              IF OP30_VERT_SERVO_ON_SFE_WRK  THEN
-    			  SR30_VERT_servo_ctrl.ABSmove_Start := FALSE;			  
-    			  IF OP30_Gripper_LH_State OR OP30_Gripper_RH_State THEN
-    		  		OP30_AutoSeq:=220;
-    			  ELSE  				
-                  	OP30_AutoSeq:=70; 
-    			  END_IF  			  
-    		  END_IF
+	   201: IF Dry_Run THEN
+				OP30_AutoSeq:=210; 
+			END_IF
+			IF  FIXTURE_LH=20 AND FIXTURE_RH=20 THEN
+				MOVER_CMP_STATUS[OP30_CURR_MOVER][1]:=30 ;
+				MOVER_CMP_STATUS[OP30_CURR_MOVER][2]:=30 ;
+				OP30_AutoSeq:=210;
+			ELSIF FIXTURE_LH=20 THEN
+				MOVER_CMP_STATUS[OP30_CURR_MOVER][1]:=30 ;
+				OP30_AutoSeq:=210;
+			ELSIF FIXTURE_RH=20 THEN
+				MOVER_CMP_STATUS[OP30_CURR_MOVER][2]:=30 ;
+				OP30_AutoSeq:=210;
+			END_IF		 
+			 
+       210:	   //PROCEEDING FOR NEXT CYCLE 
+			  SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;         
+              IF OP30_VERT_SERVO_ON_SFE_WRK OR OP30_VERT_SERVO_ON_HOME  THEN
+    			SR30_VERT_servo_ctrl.ABSmove_Start := FALSE;			  
+				OP30_STN_ENABLE:=0;
+				IF OP30_Gripper_LH_State OR OP30_Gripper_RH_State THEN
+					OP30_AutoSeq:=220;
+				ELSIF (MOVER_CMP_STATUS[OP30_STN_MOVER][1]=30 OR MOVER_CMP_STATUS[OP30_STN_MOVER][2]=30) OR Dry_Run THEN
+					STATION_DONE[OP30_CURR_MOVER][OP30_XTS_POS_NO]	:= TRUE;
+					IF MOVER_STP_NO[OP30_CURR_MOVER]<>((OP30_XTS_POS_NO*10)+1)THEN
+						OP30_AutoSeq:=66;  
+					END_IF	
+    		  	END_IF  			  
+			  END_IF
     		  
-       220:  IF OP30_VERT_SERVO_ON_SFE_WRK AND NOT SR30_HORI_servo_ctrl.ABSmove_Start AND (OP30_HORI_SERVO_ON_WRK_PLACE OR OP30_HORI_SERVO_ON_WRK_Pick)  THEN
-    		  SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_SFE_WRK_POS;
-			   tmp:=TRUE;
-			   IF del.Q THEN
-              	 OP30_AutoSeq:=240;
-			   END_IF 			  
+       220:  IF (OP30_VERT_SERVO_ON_SFE_WRK OR OP30_VERT_SERVO_ON_HOME OR OP30_VERT_SERVO_ON_WRK_PLACE OR OP30_VERT_SERVO_ON_WRK_PICK) AND NOT SR30_HORI_servo_ctrl.ABSmove_Start AND (OP30_HORI_SERVO_ON_WRK_PLACE OR OP30_HORI_SERVO_ON_WRK_Pick)  THEN
+    		   SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_SFE_WRK_POS;
+			   SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_SFE_WRK_POS;
+               OP30_AutoSeq:=240;			  
     		 END_IF  
     	
-       240: SR30_HORI_servo_ctrl.ABSmove_Start := TRUE;
-            IF OP30_HORI_SERVO_ON_SFE_WRK THEN
-    	  	   SR30_HORI_servo_ctrl.ABSmove_Start := FALSE;
-      		   OP30_Gripper_RH_Close:=TRUE;	
-    		   OP30_Gripper_LH_Close:=TRUE; 			   
-      		 END_IF
-    		 IF NOT OP30_Gripper_LH_State AND NOT OP30_Gripper_RH_State THEN
-    		   OP30_AutoSeq:=70;
-    		 END_IF
+       240: SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;	
+			IF OP30_VERT_SERVO_ON_SFE_WRK THEN
+			 	SR30_HORI_servo_ctrl.ABSmove_Start := TRUE;
+             	IF OP30_HORI_SERVO_ON_SFE_WRK THEN
+    	  	 	  SR30_HORI_servo_ctrl.ABSmove_Start := FALSE;
+      		 	  OP30_Gripper_RH_Close:=TRUE;	
+    		 	  OP30_Gripper_LH_Close:=TRUE; 			   
+      		 	END_IF
+			END_IF	
+    		IF NOT OP30_Gripper_LH_State AND NOT OP30_Gripper_RH_State THEN
+    		   OP30_AutoSeq:=66;
+    		END_IF
+			 		
+		250://MOVER_CMP_STATUS[OP30_CURR_MOVER][1]:=31;
+			//MOVER_CMP_STATUS[OP30_CURR_MOVER][2]:=31;
+			OP30_STN_ENABLE:=0;
+			IF 	(MOVER_CMP_STATUS[OP30_STN_MOVER][1]=31 AND MOVER_CMP_STATUS[OP30_STN_MOVER][2]=31) THEN
+				MOVER_STP_NO[OP30_CURR_MOVER]	:= (OP160_XTS_POS_NO*10);
+			ELSE		
+				STATION_DONE[OP30_CURR_MOVER][OP30_XTS_POS_NO]	:= TRUE;
+			END_IF	
+			IF MOVER_STP_NO[OP30_CURR_MOVER]<>((OP30_XTS_POS_NO*10)+1)THEN 
+				OP30_CURR_MOVER	:= 0;
+				OP30_AutoSeq	:=170;  
+			END_IF
 
+	   260: SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_SFE_WRK_POS;
+			SR30_Hori_servo_ctrl.ABSmove_Start:=TRUE;
+			IF OP30_HORI_SERVO_ON_SFE_WRK THEN
+				OP30_AutoSeq:=270; 
+			END_IF
+			
+	   270: IF FIXTURE_LH<>20 AND NOT OP30_Grip_LH_Bypass THEN
+				OP30_Gripper_LH_Close:=TRUE;
+				IF NOT OP30_Gripper_LH_State THEN
+					OP30_AutoSeq:=280; 
+				END_IF
+			ELSE
+				OP30_AutoSeq:=280;	
+			END_IF	
+			
+	   280: IF FIXTURE_RH<>20 AND NOT OP30_Grip_RH_Bypass THEN
+				OP30_Gripper_RH_Close:=TRUE;
+				IF NOT OP30_Gripper_RH_State THEN
+					OP30_AutoSeq:=290; 
+				END_IF
+			ELSE
+				OP30_AutoSeq:=290;	
+			END_IF	
+
+	   290: SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_PLACE_POS;
+			SR30_Hori_servo_ctrl.ABSmove_Start:=TRUE;
+			IF OP30_HORI_SERVO_ON_WRK_PLACE THEN
+				OP30_AutoSeq:=180;	
+			END_IF
+					
+      300: IF (OP30_HORI_SERVO_ON_SFE_WRK OR OP30_HORI_SERVO_ON_HOME OR OP30_HORI_SERVO_ON_SFE_WRK_PICK ) AND NOT SR30_HORI_servo_ctrl.ABSmove_Start AND OP30_Size_Rej THEN
+		  		SR30_Hori_servo_ctrl.Position:=OP30_HORI_SERVO_PICK_POS;	
+				OP30_Size_Rej:=0;		
+				OP30_AutoSeq:=310;
+	       END_IF
+		   
+	  310: SR30_Hori_servo_ctrl.ABSmove_Start  := TRUE;
+		   IF OP30_HORI_SERVO_ON_WRK_PICK THEN
+		  		SR30_Vert_servo_ctrl.Position:=OP30_VERT_SERVO_PICK_POS;
+				OP30_AutoSeq:=320;
+	  	   END_IF
+		   
+	 320: SR30_VERT_servo_ctrl.ABSmove_Start := TRUE;
+		  IF OP30_VERT_SERVO_ON_WRK_PICK THEN
+		 	  OP30_Gripper_LH_Open:=OP30_LH_Size_NOK;
+			  OP30_Gripper_RH_Open:=OP30_LH_Size_NOK;
+			  OP30_Size_Rej_Complete:=1;
+			  OP30_AutoSeq:=220;
+	 	  END_IF
+  
+	   
 END_CASE
 
+IF OP30_Size_Rej THEN
+	OP30_AutoSeq:=300;
+END_IF
+
+Dry_Run:=All_Station_Dry_Run;
+IF Dry_run THEN
+	FIXTURE_LH :=20;	
+    FIXTURE_RH :=20;
+ELSE 
+	FIXTURE_LH:=MOVER_CMP_STATUS[OP30_STN_MOVER][1];
+	FIXTURE_RH:=MOVER_CMP_STATUS[OP30_STN_MOVER][2];	
+END_IF
+
+OP30_Cycle_Time_FB(i_b_startTime:=OP30_STN_ENABLE , i_b_stopTime:= NOT OP30_STN_ENABLE , o_t_StationTime=>OP30_Cycle_time );					
+OP30_PAP_Cycle_Time_FB(i_b_startTime:=PAP_CYC_VAR , i_b_stopTime:= NOT PAP_CYC_VAR , o_t_StationTime=>OP30_PAP_Cycle_time );					
+OP30_Overall_Cyc_Time:=OP30_Cycle_time+OP30_PAP_Cycle_time;
+
+Gripper_Delay(IN:=(OP30_AutoSeq=110),PT:=T#700MS);
+Gripper_Aft_Place_Delay(IN:=(OP30_AutoSeq=200),PT:=T#700MS);
+Jerk_Check(IN:= OP30_AutoSeq=120 , PT:=T#100MS);
 
 
-del(IN:=tmp,PT:=T#1S);
+del(IN:=tmp,PT:=T#700MS);
 IF del.Q THEN
 	tmp:=FALSE;
-END_IF]]></ST>
+END_IF
+
+OP30_STN_ENABLE:=OP30_Continous_Run;
+//######################## 				ENABLE CONDTION   				#################
+
+
+	OP30_STN_MOVER	:= MOVER_POSITION[OP30_XTS_POS_NO];
+	
+IF AUTO_WITH_XTS THEN
+IF OP30_STN_MOVER>0 THEN
+IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP30_STN_MOVER][1]=5 AND MOVER_CMP_STATUS[OP30_STN_MOVER][2]=5)THEN	
+OP30_STN_ENABLE	:= MOVER_POS_RECHED[OP30_STN_MOVER] AND ((MOVER_CMP_STATUS[OP30_STN_MOVER][1]=20)OR 
+					(MOVER_CMP_STATUS[OP30_STN_MOVER][2]=20)) AND STATION_ENABLE_CONTROL;
+ELSE
+	STATION_DONE[OP30_STN_MOVER][OP30_XTS_POS_NO]			:= TRUE;	
+END_IF
+ELSE
+OP30_STN_ENABLE				:= FALSE;	
+END_IF	
+END_IF										
+
+					
+
+]]></ST>
     </Implementation>
     <LineIds Name="OP30_AUTOSEQUENCE">
-      <LineId Id="3" Count="190" />
+      <LineId Id="3" Count="4" />
+      <LineId Id="430" Count="0" />
+      <LineId Id="432" Count="0" />
+      <LineId Id="434" Count="0" />
+      <LineId Id="431" Count="0" />
+      <LineId Id="8" Count="10" />
+      <LineId Id="562" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="563" Count="0" />
+      <LineId Id="20" Count="19" />
+      <LineId Id="414" Count="0" />
+      <LineId Id="41" Count="13" />
+      <LineId Id="561" Count="0" />
+      <LineId Id="55" Count="11" />
+      <LineId Id="587" Count="0" />
+      <LineId Id="67" Count="41" />
+      <LineId Id="110" Count="3" />
+      <LineId Id="379" Count="0" />
+      <LineId Id="114" Count="21" />
+      <LineId Id="373" Count="0" />
+      <LineId Id="376" Count="2" />
+      <LineId Id="138" Count="1" />
+      <LineId Id="141" Count="29" />
+      <LineId Id="588" Count="0" />
+      <LineId Id="171" Count="20" />
+      <LineId Id="195" Count="2" />
+      <LineId Id="201" Count="1" />
+      <LineId Id="610" Count="0" />
+      <LineId Id="203" Count="9" />
+      <LineId Id="538" Count="0" />
+      <LineId Id="545" Count="1" />
+      <LineId Id="544" Count="0" />
+      <LineId Id="536" Count="0" />
+      <LineId Id="540" Count="1" />
+      <LineId Id="539" Count="0" />
+      <LineId Id="532" Count="0" />
+      <LineId Id="542" Count="0" />
+      <LineId Id="534" Count="1" />
+      <LineId Id="543" Count="0" />
+      <LineId Id="529" Count="1" />
+      <LineId Id="213" Count="4" />
+      <LineId Id="220" Count="3" />
+      <LineId Id="633" Count="0" />
+      <LineId Id="224" Count="7" />
+      <LineId Id="233" Count="3" />
+      <LineId Id="382" Count="0" />
+      <LineId Id="380" Count="0" />
+      <LineId Id="237" Count="4" />
+      <LineId Id="381" Count="0" />
+      <LineId Id="242" Count="8" />
+      <LineId Id="494" Count="1" />
+      <LineId Id="493" Count="0" />
+      <LineId Id="632" Count="0" />
+      <LineId Id="634" Count="0" />
+      <LineId Id="492" Count="0" />
+      <LineId Id="252" Count="33" />
+      <LineId Id="383" Count="0" />
+      <LineId Id="287" Count="3" />
+      <LineId Id="357" Count="0" />
+      <LineId Id="291" Count="0" />
+      <LineId Id="293" Count="3" />
+      <LineId Id="358" Count="0" />
+      <LineId Id="297" Count="1" />
+      <LineId Id="300" Count="18" />
+      <LineId Id="398" Count="1" />
+      <LineId Id="586" Count="0" />
+      <LineId Id="319" Count="3" />
+      <LineId Id="374" Count="1" />
+      <LineId Id="323" Count="4" />
+      <LineId Id="490" Count="1" />
+      <LineId Id="473" Count="16" />
+      <LineId Id="341" Count="2" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP150_Main" Id="{01cc1ee2-1e47-483c-ad2d-6962790ad86f}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP150_Main
+VAR
+	OP150_Modeselection_FB: Mode_Selection_Block1;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP150_A();
+OP150_B();
+OP150_Laser_FB();
+OP150_C();
+
+IF (OP150_HMI_AutoMode AND NOT OP150_HMI_ManualMOde AND NOT OP150_HMI_StepMode) THEN
+	OP150_Modeselection_FB.ModeWord:=1;
+	ELSIF (NOT OP150_HMI_AutoMode AND OP150_HMI_ManualMOde AND NOT OP150_HMI_StepMode) THEN
+		OP150_Modeselection_FB.ModeWord:=2;
+	ELSIF  (NOT OP150_HMI_AutoMode AND NOT OP150_HMI_ManualMOde AND  OP150_HMI_StepMode) THEN
+		OP150_Modeselection_FB.ModeWord:=3;
+    ELSE   
+		OP150_Modeselection_FB.ModeWord:=0;
+END_IF
+	
+
+OP150_Modeselection_FB(
+	ModeWord:= , 
+	HomeConditionOK:=OP150_HomeCondition_OK , 
+	OperationEnable:=OperationEnable , 
+	StartPB:= , 
+	SafetyAndNOError:=OperationEnable , 
+	ModeAck:=TRUE , 
+	HomingINProgress:= , 
+	TempHomeOK:=OP150_Temp_Home_OK , 
+	ResetPB:= , 
+	AutoSelected=>OP150_AutoSelected , 
+	ManualSelected=>OP150_ManualSelected , 
+	StepSelected=>OP150_StepSelected , 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP150_AutoRunning , 
+	StepRunning:=OP150_StepRunning , 
+	StartEnable:=OP150_StartEnable , 
+	MachineStop:=OP150_Machine_Stop );]]></ST>
+    </Implementation>
+    <LineIds Name="OP150_Main">
+      <LineId Id="44" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="6" Count="10" />
+      <LineId Id="21" Count="18" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

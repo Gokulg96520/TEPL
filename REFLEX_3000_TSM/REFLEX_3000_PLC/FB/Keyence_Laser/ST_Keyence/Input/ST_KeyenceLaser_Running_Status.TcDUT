@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="ST_KeyenceLaser_Running_Status" Id="{7a0b846a-6d96-45a0-82bb-e9070c62a9d7}">
+    <Declaration><![CDATA[TYPE ST_KeyenceLaser_Running_Status :
+STRUCT
+Busy_Status							: BIT;
+Print_Busy_Status					: BIT;
+Guide_Print_Busy_Status				: BIT;
+Program_Change_Busy_Status			: BIT;
+Lock_Busy_Status					: BIT;
+Edit_Busy_Status					: BIT;
+TwoDC_Read_Busy_Status				: BIT;
+Reserve								: BIT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

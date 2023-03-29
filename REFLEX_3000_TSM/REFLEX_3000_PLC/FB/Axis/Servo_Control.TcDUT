@@ -10,12 +10,13 @@ STRUCT
 	RELmove_Start:BOOL;
 	VELmove_Start:BOOL;
 	Torque_mode_Start:BOOL;
-	Velocity:LREAL;		//Target velocity
+	Velocity: LREAL;	
 	Position : LREAL; //target position
 	BsetPos:BOOL;
 	Bsethome : BOOL;
 	Axis_Home_Cmd:BOOL;	
 	Safety_cond : BOOL; //interlocks
+	Axis_Home_Done : BOOL;
 	//Output
 	Axis_State:STRING;
 	Axis_ready:BOOL;
@@ -32,6 +33,7 @@ STRUCT
 	Actual_Position : LREAL;
 	Actual_Velocity : LREAL;
 	Actual_Torque : LREAL;
+	
 END_STRUCT
 END_TYPE
 ]]></Declaration>

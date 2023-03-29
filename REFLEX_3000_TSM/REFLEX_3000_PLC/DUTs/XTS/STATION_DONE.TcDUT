@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="STATION_DONE" Id="{edbac3c1-fe99-4562-97aa-344905bb2b74}">
+    <Declaration><![CDATA[TYPE STATION_DONE :
+STRUCT
+		POSITION_DONE				: ARRAY[0..35] OF BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

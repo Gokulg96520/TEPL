@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP10B_Camera_FB" Id="{e2fb1d6a-8463-4a3d-8576-3c140d090d97}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP10B_Camera_FB
+VAR
+	OP10B_LH_Camera 			        : FB_Cognex_ProfiNET_1;
+
+	
+	OP10B_LH_Acquisition_Status AT %I*    :Acquisition_Status;
+	OP10B_LH_Inspection_Status  AT %I*    :Inspection_Status;	
+	OP10B_LH_Acquisition_ID     AT %I*    :UINT;
+	OP10B_LH_Inspection_ID   	 AT %I*  :UINT;
+	OP10B_LH_Error_code      	 AT %I*  :UINT;
+	OP10B_LH_Current_Job_ID  	 AT %I*  :UINT;
+	OP10B_LH_Result_code     	 AT %I*  :UINT;
+	OP10B_LH_Cam_Result      	 AT %I*  :ARRAY[0..63] OF BYTE;	
+	OP10B_LH_Acquisition_Control AT %Q*  : Acquisition_Control;
+	OP10B_LH_Inspection_Control  AT %Q*  : Inspection_Control;
+	OP10B_LH_Command_word		AT %Q*  : UINT;
+	OP10B_LH_Union                       : UNION_64Byte;
+
+	OP10B_RH_Camera 			          : FB_Cognex_ProfiNET_1;
+
+	
+	OP10B_RH_Acquisition_Status AT %I*    :Acquisition_Status;
+	OP10B_RH_Inspection_Status  AT %I*    :Inspection_Status;	
+	OP10B_RH_Acquisition_ID     AT %I*    :UINT;
+	OP10B_RH_Inspection_ID   	 AT %I*  :UINT;
+	OP10B_RH_Error_code      	 AT %I*  :UINT;
+	OP10B_RH_Current_Job_ID  	 AT %I*  :UINT;
+	OP10B_RH_Result_code     	 AT %I*  :UINT;
+	OP10B_RH_Cam_Result      	 AT %I*  :ARRAY[0..63] OF BYTE;	
+	OP10B_RH_Acquisition_Control AT %Q*  : Acquisition_Control;
+	OP10B_RH_Inspection_Control  AT %Q*  : Inspection_Control;
+	OP10B_RH_Command_word		AT %Q*  : UINT;
+	OP10B_RH_Union                       : UNION_64Byte;
+	
+	OP10_B_Empty_Camera_2	      : FB_Cognex_ProfiNET_1;
+
+	
+	OP10B_Empty_Cam_2_Acquisition_Status   AT %I*  :Acquisition_Status;
+	OP10B_Empty_Cam_2_Inspection_Status    AT %I*  :Inspection_Status;	
+	OP10B_Empty_Cam_2_Acquisition_ID       AT %I*  :UINT;
+	OP10B_Empty_Cam_2_Inspection_ID   	 AT %I*  :UINT;
+	OP10B_Empty_Cam_2_Error_code      	 AT %I*  :UINT;
+	OP10B_Empty_Cam_2_Current_Job_ID  	 AT %I*  :UINT;
+	OP10B_Empty_Cam_2_Result_code     	 AT %I*  :UINT;
+	OP10B_Empty_Cam_2_Result      	 AT %I*  :ARRAY[0..63] OF BYTE;
+	
+	OP10B_Empty_Cam_2_Acquisition_Control AT %Q*  : Acquisition_Control;
+	OP10B_Empty_Cam_2_Inspection_Control  AT %Q*  : Inspection_Control;
+	OP10B_Empty_Cam_2_Command_word		AT %Q*  : UINT;
+	Error_status_Cam_2						      : STRING;
+	OP10B_Empty_Cam_2_Target_Job_ID				  : UINT;
+	OP10B_Empty_Cam_2_Loaded_Job_ID		    	  : UINT;
+	OP10B_Empty_Cam_2_Union                       : UNION_64Byte;
+	OP10B_Empty_Cam_2_Job_Change_Complete		  : BOOL;
+	OP10B_Empty_Cam_2_Job_Change_Error   		  : BOOL;
+	OP10B_Empty_Cam_2_Picture_Taken      		  : BOOL;	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP10B_LH_Camera (
+	tTimeout:= , 
+	sJob_Name:= , 
+	camera_ready=> OP10B_LH_Camera_Ready,
+	Camera_online=> OP10B_LH_Camera_Online,
+	stCognex_record_status:=OP10B_LH_Acquisition_Status, 
+	Acquisition_ID:=OP10B_LH_Acquisition_ID , 
+	stCognex_Inspection_status:=OP10B_LH_Inspection_Status, 
+	Error_Code:=OP10B_LH_Error_code , 
+	wcommand_control_in:= OP10B_LH_Current_Job_ID, 
+	aResults_64_Bytes:= OP10B_LH_Cam_Result, 
+	number_of_inspections:=OP10B_LH_Inspection_ID , 
+	iresult_code:= OP10B_LH_Result_code, 
+	bTarget_job_ID:=OP10B_LH_Target_Job_ID , 
+	Error_Status_message=> OP10B_LH_Error_status, 
+	bError=> OP10B_LH_Camera_Error, 
+	stCognex_record_control=>OP10B_LH_Acquisition_Control , 
+	stCognex_inspection_control=>OP10B_LH_Inspection_Control , 
+	wCommandControl_out=>OP10B_LH_Command_word , 
+	aUser_data_64_Byte=> OP10B_LH_Union.aArrayOfByte, 
+	bJob_loading_completed=>OP10B_LH_Job_Change_Complete , 
+	bJob_load_failed=>OP10B_LH_Job_Change_Error , 
+	bInspection_Result_IO=>  , 
+	bInspection_Result_NIO=> , 
+	bTXTSM_Error_Job_Change=> OP10B_LH_Job_Change_Error, 
+	bPictureTakenComplete=> OP10B_LH_Picture_Taken, 
+	Loaded_Job_ID=>OP10B_LH_Loaded_Job_ID	 , 
+	bClear_Error:= HMI_Reset, 
+	bJob_change_start:= OP10B_LH_Camera_Job_Change_start, 
+	TXTSM_camera_not_online=>OP10B_LH_Camera_Error	 , 
+	bTrigger_start:= OP10B_LH_Camera_Trigger );
+	
+OP10B_RH_Camera (
+	tTimeout:= , 
+	sJob_Name:= , 
+	camera_ready=> OP10B_RH_Camera_Ready,
+	Camera_online=> OP10B_RH_Camera_Online,
+	stCognex_record_status:=OP10B_RH_Acquisition_Status, 
+	Acquisition_ID:=OP10B_RH_Acquisition_ID , 
+	stCognex_Inspection_status:=OP10B_RH_Inspection_Status, 
+	Error_Code:=OP10B_RH_Error_code , 
+	wcommand_control_in:= OP10B_RH_Current_Job_ID, 
+	aResults_64_Bytes:= OP10B_RH_Cam_Result, 
+	number_of_inspections:=OP10B_RH_Inspection_ID , 
+	iresult_code:= OP10B_RH_Result_code, 
+	bTarget_job_ID:=OP10B_RH_Target_Job_ID , 
+	Error_Status_message=> OP10B_RH_Error_status, 
+	bError=> OP10B_RH_Camera_Error, 
+	stCognex_record_control=>OP10B_RH_Acquisition_Control , 
+	stCognex_inspection_control=>OP10B_RH_Inspection_Control , 
+	wCommandControl_out=>OP10B_RH_Command_word , 
+	aUser_data_64_Byte=> OP10B_RH_Union.aArrayOfByte, 
+	bJob_loading_completed=>OP10B_RH_Job_Change_Complete , 
+	bJob_load_failed=>OP10B_RH_Job_Change_Error , 
+	bInspection_Result_IO=>  , 
+	bInspection_Result_NIO=> , 
+	bTXTSM_Error_Job_Change=> OP10B_RH_Job_Change_Error, 
+	bPictureTakenComplete=> OP10B_RH_Picture_Taken, 
+	Loaded_Job_ID=>OP10B_RH_Loaded_Job_ID	 , 
+	bClear_Error:= HMI_Reset, 
+	bJob_change_start:= OP10B_RH_Camera_Job_Change_start, 
+	TXTSM_camera_not_online=>OP10B_RH_Camera_Error	 , 
+	bTrigger_start:= OP10B_RH_Camera_Trigger );	
+
+OP10_B_Empty_Camera_2(
+	tTimeout:= , 
+	sJob_Name:= , 
+	camera_ready=> OP10B_Empty_Cam_2_Camera_Ready,
+	Camera_online=> OP10B_Empty_Cam_2_Camera_Online,
+	stCognex_record_status:=OP10B_Empty_Cam_2_Acquisition_Status, 
+	Acquisition_ID:=OP10B_Empty_Cam_2_Acquisition_ID , 
+	stCognex_Inspection_status:=OP10B_Empty_Cam_2_Inspection_Status, 
+	Error_Code:=OP10B_Empty_Cam_2_Error_code , 
+	wcommand_control_in:= OP10B_Empty_Cam_2_Current_Job_ID, 
+	aResults_64_Bytes:= OP10B_Empty_Cam_2_Result, 
+	number_of_inspections:=OP10B_Empty_Cam_2_Inspection_ID , 
+	iresult_code:= OP10B_Empty_Cam_2_Result_code, 
+	bTarget_job_ID:=OP10B_Empty_Cam_2_Target_Job_ID , 
+	Error_Status_message=> Error_status_Cam_2, 
+	bError=> OP10B_Empty_Cam_2_Camera_Error, 
+	stCognex_record_control=>OP10B_Empty_Cam_2_Acquisition_Control , 
+	stCognex_inspection_control=>OP10B_Empty_Cam_2_Inspection_Control , 
+	wCommandControl_out=>OP10B_Empty_Cam_2_Command_word , 
+	aUser_data_64_Byte=> OP10B_Empty_Cam_2_Union.aArrayOfByte, 
+	bJob_loading_completed=>OP10B_Empty_Cam_2_Job_Change_Complete, 
+	bJob_load_failed=>OP10B_Empty_Cam_2_Job_Change_Error , 
+	bInspection_Result_IO=>  , 
+	bInspection_Result_NIO=> , 
+	bTXTSM_Error_Job_Change=> OP10B_Empty_Cam_2_Job_Change_Error, 
+	bPictureTakenComplete=> OP10B_Empty_Cam_2_Picture_Taken, 
+	Loaded_Job_ID=>OP10B_Empty_Cam_2_Loaded_Job_ID	 , 
+	bClear_Error:= HMI_Reset, 
+	bJob_change_start:= OP10B_Empty_Cam_2_Camera_Job_Change_start, 
+	TXTSM_camera_not_online=>OP10B_Empty_Cam_2_Camera_Error	 , 
+	bTrigger_start:= OP10B_Empty_Cam_2_Camera_Trigger );		
+	]]></ST>
+    </Implementation>
+    <LineIds Name="OP10B_Camera_FB">
+      <LineId Id="3" Count="61" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="128" Count="30" />
+      <LineId Id="126" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="Error_GVL" Id="{75932d8c-5558-4a0a-813a-6328f97bd68c}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	berror: ARRAY [0..2001] OF BOOL;
+	bclear: ARRAY [0..2001] OF BOOL;
+	reset: BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

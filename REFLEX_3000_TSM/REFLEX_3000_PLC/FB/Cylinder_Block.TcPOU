@@ -137,8 +137,10 @@ IF NOT Solenoid1 THEN Timer1 :=0; END_IF
 //Timer1 is for Monitoring Cylinder Home Position Time
 HomePositionErr_1SecPls(CLK := Pulse_1Sec);
 
-IF Solenoid1 AND HomePositionErr_1SecPls.Q THEN 
+IF Solenoid1 AND NOT Sensor1 AND HomePositionErr_1SecPls.Q THEN 
 Timer1 := Timer1 + 1;
+ELSE
+Timer1:= 0;	
 END_IF
 
 
@@ -156,8 +158,10 @@ IF NOT Solenoid2 THEN Timer2 :=0; END_IF
 //Timer2 is for Monitoring Cylinder Work Position Time
 WorkPositionErr_1SecPls(CLK := Pulse_1Sec);
 
-IF Solenoid2 AND WorkPositionErr_1SecPls.Q THEN 
+IF Solenoid2 AND NOT Sensor2 AND WorkPositionErr_1SecPls.Q THEN 
 	Timer2 := Timer2 + 1;
+ELSE
+	Timer2	:=0;
 END_IF
 
 
@@ -177,6 +181,8 @@ BothSensorErr_1SecPls (CLK := Pulse_1Sec);
 
  IF Sensor1 AND Sensor2 AND BothSensorErr_1SecPls.Q THEN
 	 Timer3 := Timer3 + 1;
+ ELSE
+	 Timer3:=0;
  END_IF
  
  
@@ -208,10 +214,25 @@ AlarmSolenoid1          					:= FALSE;
 AlarmSolenoid2          					:= FALSE;
 AllSignal               					:= FALSE;
 
+END_IF
+
+
+IF AlarmSensor1 OR AlarmSensor2 OR AlarmSolenoid1 OR AlarmSolenoid2 OR AllSignal THEN
+		AlarmPresent						:= TRUE;
+ELSE
+		AlarmPresent						:= FALSE;
 END_IF]]></ST>
     </Implementation>
     <LineIds Name="Cylinder_Block">
-      <LineId Id="3" Count="145" />
+      <LineId Id="3" Count="87" />
+      <LineId Id="318" Count="0" />
+      <LineId Id="320" Count="0" />
+      <LineId Id="319" Count="0" />
+      <LineId Id="92" Count="17" />
+      <LineId Id="316" Count="1" />
+      <LineId Id="110" Count="18" />
+      <LineId Id="369" Count="1" />
+      <LineId Id="129" Count="19" />
       <LineId Id="197" Count="0" />
       <LineId Id="2" Count="0" />
       <LineId Id="199" Count="0" />
@@ -220,6 +241,12 @@ END_IF]]></ST>
       <LineId Id="208" Count="4" />
       <LineId Id="202" Count="0" />
       <LineId Id="204" Count="0" />
+      <LineId Id="262" Count="1" />
+      <LineId Id="261" Count="0" />
+      <LineId Id="266" Count="0" />
+      <LineId Id="264" Count="0" />
+      <LineId Id="267" Count="0" />
+      <LineId Id="265" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

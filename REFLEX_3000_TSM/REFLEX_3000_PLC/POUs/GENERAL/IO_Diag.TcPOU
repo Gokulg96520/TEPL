@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="IO_Diag" Id="{af703e2c-653b-4aef-baee-c61c6d138beb}" SpecialFunc="None">
+  <POU Name="IO_Diag" Id="{28349577-b84d-4fad-b7af-58cbec3e93cd}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM IO_Diag
 VAR
 	Panel_num : INT := 1;
@@ -13,12 +13,12 @@ VAR
 	OP_Arr_OP10A : ARRAY[0..100] OF UINT := [100,101,102,103];
 	IP_Arr_OP10B : ARRAY[0..100] OF UINT := [200,201,202,203];
 	OP_Arr_OP10B_JB : ARRAY[0..100] OF UINT := [200,201,202,203];
-	IP_Arr_OP10P : ARRAY[0..100] OF UINT := [300,301,302,303,304,305,306,307,308,309,310,311,1000,1001,1010,1011,1020,1021,1030,1031,1040,1041,1100,1101,1110,1111]; 
+	IP_Arr_OP10P : ARRAY[0..100] OF UINT := [302,303,304,305,306,307,308,309,310,311,1000,1001,1010,1011,1020,1021,1030,1031,1040,1041,1100,1101,1110,1111]; 
 	OP_Arr_OP10P : ARRAY[0..100] OF UINT := [300,301,302,303,304,305,306,307,308,309,1050,1051,1052,1053,1060,1061,1062,1063,1150,1151,1152,1153];
 	IP_Arr_OP90P : ARRAY[0..100] OF UINT := [400,401,402,403,404,405,1200,1201,1210,1211,1220,1221];
-	OP_Arr_OP90P : ARRAY[0..100] OF UINT := [400,401,402,403,1240,1241,1242,1250,1251,1260];
-	IP_Arr_OP160P : ARRAY[0..100] OF UINT := [700,701,702,703,704,705,706,707,708,709];
-	OP_Arr_OP160P : ARRAY[0..100] OF UINT := [700,701,702,703,704,705,706,707,708,709];
+	OP_Arr_OP90P : ARRAY[0..100] OF UINT := [400,401,402,403,1240,1241,1242,1250,1251,1260,1261,1262];
+	IP_Arr_OP160P : ARRAY[0..100] OF UINT := [700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,1300,1301,1310,1311,1320,1321,1330,1331];
+	OP_Arr_OP160P : ARRAY[0..100] OF UINT := [700,701,702,703,704,705,706,707,708,709,1340,1341,1342,1343,1350,1351,1352,1353];
 	IP_Arr_OP90JB : ARRAY[0..100] OF UINT := [500,501,502,503,504,505];
 	OP_Arr_OP90 : ARRAY[0..100] OF UINT := [500,501,502,503];	
 	IP_Arr_OP120_JB : ARRAY[0..100] OF UINT := [600,601,602,603];
@@ -88,10 +88,10 @@ END_VAR
     <Implementation>
       <ST><![CDATA[CASE panel_num OF 
  1: CASE IP_Arr_OP10P[Input_Page_num] OF
-     300: Line1:= "I10A_SPARE_I300.0(I300.0) "                   ;
-     301: Line1:= "I10A_SPARE_I301.0(I301.0) "                   ;
+   //300: Line1:= "I10A_SPARE_I300_0(I300.0) "                   ;
+   //301: Line1:= "I10A_SPARE_I301_0(I301.0) "                   ;
      302: Line1:= "I10B_DRUM_FEED_ALRM(I302.0)"                  ;
-     303: Line1:= "I10B_SPARE_I303.0(I303.0)  "                  ;
+     303: Line1:= "I10B_SPARE_I303_0(I303.0)  "                  ;
      304: Line1:= "I30_DRUM_FEED_ALRM(I304.0) "                  ;
      305: Line1:= "I40_ATC_DECLAMP_FB(I305.0) "                  ;
      306: Line1:= "I50_DRUM_FEED_ALRM(I306.0) "                  ;
@@ -101,19 +101,19 @@ END_VAR
      310: Line1:= "I80_SPARE_I310.0(I310.0) "                    ;
      311: Line1:= "I80_SPARE_I311.0(I311.0) "                    ;
      1000: Line1:= "I10A_MAIN_AIR_PRES_FB(I1000.0) "             ;
-     1001: Line1:= "I10A_SPARE_I1001.0(I1001.0) "                ;
+     1001: Line1:= "I10A_SPARE_I1001_0(I1001.0) "              ;
      1010: Line1:= "I10A_DRUM_LH_CONV_OVR_FLW(I1010.0) "         ;
-     1011: Line1:= "I10A_ORING_RH_PUSHR_CYL_REV(I1011.0) "       ;
-     1020: Line1:= "I10A_LH_FIRTRE_ORING_REJ_CYL_REV(I1020.0) "  ;
-     1021: Line1:= "I10A_SPARE_I1021.0(I1021.0) "                ;
+     1011: Line1:= "I10A_ORING_ROTRY_CYL_O_DEG(I1011.0) "        ;
+     1020: Line1:= "I10A_RH_FIRTRE_ORING_REJ_CYL_REV(I1020.0) "  ;
+     1021: Line1:= "I10A_BOWL_TRK_INDXR_POS2(I1021.0) "          ;
      1030: Line1:= "I10B_DRUM_LH_CONV_OVR_FLW(I1030.0) "         ;
-     1031: Line1:= "I10B_ORING_RH_PUSHR_CYL_REV_FWD(I1031.0) "   ;
-     1040: Line1:= "I10B_LH_FIRTRE_ORING_REJ_CYL_REV(I1040.0) "  ;
-     1041: Line1:= "I10B_SPARE_I1041.0(I1041.0) "                ;
-     1100: Line1:= "I30_DRUM_FEED_CONV1_OVERFLW(I1100.0) "       ;
+     1031: Line1:= "I10B_ORING_ROTRY_CYL_O_DEG(I1031.0) "        ;
+     1040: Line1:= "I10B_RH_FIRTRE_ORING_REJ_CYL_REV(I1040.0) "  ;
+     1041: Line1:= "I10B_BOWL_TRK_INDXR_POS2(I1041.0) "          ;
+     1100: Line1:= "I30_DRUM_FEED_CONV1_OVERFL(I1100.0) "        ;
      1101: Line1:= "I50_DRUM_FEED_CONV1_OVERFLW(I1101.0) "       ;
-     1110: Line1:= "I50_RH_GRIP_OPN(I1110.0) "                   ;
-     1111: Line1:= "I70_SPARE_I1111.0(I1111.0) "                ;
+     1110: Line1:= "I50_SPARE_I1110_0(I1110.0) "                 ;
+     1111: Line1:= "I50_TOP_REJ_BIN_PRSNCE(I1111.0) "            ;
      
      ELSE
        Line1:= " ";	
@@ -121,79 +121,79 @@ END_VAR
 	 Visibility_1:=TRUE;
    
      CASE IP_Arr_OP10P[Input_Page_num] OF
-		300: Lamp1:=I10A_SPARE_I300_0 ;
-		301: Lamp1:=I10A_SPARE_I301_0 ;
-		302: Lamp1:=I10B_DRUM_FEED_ALRM_I302_0 ;
-		303: Lamp1:=I10B_SPARE_I303_0 ;
-		304: Lamp1:=I30_DRUM_FEED_ALRM_I304_0  ;
-		305: Lamp1:=I40_ATC_DECLAMP_FB_I305_0 ;
-		306: Lamp1:=I50_DRUM_FEED_ALRM_I306_0 ;
-		307: Lamp1:=I60_ATC_DECLAMP_FB_I307_0 ;
-		308: Lamp1:=I70_DRUM_FEED_ALRM_I308_0 ;
-		309: Lamp1:=I80_ATC_DECLAMP_FB_I309_0 ;
-		310: Lamp1:=I80_SPARE_I310_0 ;
-		311: Lamp1:=I80_SPARE_I311_0 ;
-		1000: Lamp1:=I10A_MAIN_AIR_PRES_FB_I1000_0 ;
+	      //300: Lamp1:=I10A_SPARE_I300_0                    ;
+              //301: Lamp1:=I10A_SPARE_I301_0                    ;
+		302: Lamp1:=I10B_DRUM_FEED_ALRM_I302_0           ;
+		303: Lamp1:=I10B_SPARE_I303_0 			 ;
+		304: Lamp1:=I30_DRUM_FEED_ALRM_I304_0  		 ;
+		305: Lamp1:=I40_ATC_DECLAMP_FB_I305_0 		 ;
+		306: Lamp1:=I50_DRUM_FEED_ALRM_I306_0            ;
+		307: Lamp1:=I60_ATC_DECLAMP_FB_I307_0            ;
+		308: Lamp1:=I70_DRUM_FEED_ALRM_I308_0            ;
+		309: Lamp1:=I80_ATC_DECLAMP_FB_I309_0            ;
+		310: Lamp1:=I80_SPARE_I310_0                     ;
+		311: Lamp1:=I80_SPARE_I311_0                     ;
+		1000: Lamp1:=I10A_MAIN_AIR_PRES_FB_I1000_0       ;
 		1001: Lamp1:=I10_LH_LNR_TRCK_FIX_CHO_2_I1001_0 ;
-		1010: Lamp1:=I10A_DRUM_LH_CONV_OVR_FLW_I1010_0 ;
-		1011: Lamp1:=I10A_ORING_ROTRY_CYL_O_DEG_I1011_0 ;
+		1010: Lamp1:=I10A_DRUM_LH_CONV_OVR_FLW_I1010_0   ;
+		1011: Lamp1:=I10A_ORING_ROTRY_CYL_O_DEG_I1011_0  ;
 		1020: Lamp1:=I10A_RH_FIRTRE_ORING_REJ_CYL_REV_I1020_0 ;
-		1021: Lamp1:=I10A_SPARE_I1021_0 ;
-		1030: Lamp1:=I10B_DRUM_LH_CONV_OVR_FLW_I1030_0 ;
-		1031: Lamp1:=I10B_ORING_ROTRY_CYL_O_DEG_I1031_0 ;
+		1021: Lamp1:=I10A_BOWL_TRK_INDXR_POS2_I1021_0    ;
+		1030: Lamp1:=I10B_DRUM_LH_CONV_OVR_FLW_I1030_0   ;
+		1031: Lamp1:=I10B_ORING_ROTRY_CYL_O_DEG_I1031_0  ;
 		1040: Lamp1:=I10B_RH_FIRTRE_ORING_REJ_CYL_REV_I1040_0 ;
-		1041: Lamp1:=I10B_SPARE_I1041_0 ;
+		1041: Lamp1:=I10B_BOWL_TRK_INDXR_POS2_I1041_0    ;
 		1100: Lamp1:=I30_DRUM_FEED_CONV1_OVERFLW_I1100_0 ;
 		1101: Lamp1:=I50_DRUM_FEED_CONV1_OVERFLW_I1101_0 ;
-		1110: Lamp1:=I50_SPARE_I1110_0 ;
-		1111: Lamp1:=I70_SPARE_I1111_0 ;
+		1110: Lamp1:=I50_SPARE_I1110_0;
+		1111: Lamp1:=I50_TOP_REJ_BIN_PRSNCE_I1111_0 ;
      ELSE
        Visibility_1:=FALSE;	
      END_CASE
 	 
      CASE IP_Arr_OP10P[Input_Page_num] OF
-     300: Line2:=  "I10A_SPARE_I300.1(I300.1)"                ;
-     301: Line2:=  "I10A_SPARE_I301.1(I301.1)"                ;
-     302: Line2:=  "I10A_SPARE_I302.1(I302.1)"                ;
-     303: Line2:=  "I10B_SPARE_I303.1(I303.1)"                ;
-     304: Line2:=  "I30_SPARE_I304.1(I304.1) "                ;
+     //300: Line2:=  "I10A_SPARE_I300_1(I300.1)"              ;
+     //301: Line2:=  "I10A_SPARE_I301_1(I301.1)"              ;
+     302: Line2:=  "I10A_SPARE_I302_1(I302.1)"                ;
+     303: Line2:=  "I10B_SPARE_I303_1(I303.1)"                ;
+     304: Line2:=  "I30_SPARE_I304_1(I304.1) "                ;
      305: Line2:=  "I40_ATC_CLAMP_FB(I305.1) "                ;
-     306: Line2:=  "I50_SPARE_I306.1(I306.1) "                ;
+     306: Line2:=  "I50_SPARE_I306_1(I306.1) "                ;
      307: Line2:=  "I60_ATC_CLAMP_FB(I307.1) "                ;
-     308: Line2:=  "I70_SPARE_I308.1(I308.1) "                ;
+     308: Line2:=  "I70_SPARE_I308_1(I308.1) "                ;
      309: Line2:=  "I80_ATC_CLAMP_FB(I309.1) "                ;
-     310: Line2:=  "I80_SPARE_I310.1(I310.1) "                ;
-     311: Line2:=  "I80_SPARE_I311.1(I311.1) "                ;
-     1000: Line2:= "I10A_SPARE_I1000.1(I1000.1) "             ;
-     1001: Line2:= "I10A_SPARE_I1001,1(I1001,1) "             ;
+     310: Line2:=  "I80_SPARE_I310_1(I310.1) "                ;
+     311: Line2:=  "I80_SPARE_I311_1(I311.1) "                ;
+     1000: Line2:= "I10A_SPARE_I1000_1(I1000.1) "             ;
+     1001: Line2:= "I10A_SPARE_I1001,1(I1001,1) "           ;
      1010: Line2:= "I10A_DRUM_RH_CONV_OVR_FLW(I1010.1)"       ;
-     1011: Line2:= "I10A_ORING_RH_PUSHR_CYL_FWD(I1011.1)  "   ;
-     1020: Line2:= "I10A_LH_FIRTRE_ORING_REJ_CYL_FWD(I1020.1)";
-     1021: Line2:= "I10A_SPARE_I1021.1(I1021.1) "             ;
+     1011: Line2:= "I10A_ORING_ROTRY_CYL_180_DEG(I1011.1)  "  ;
+     1020: Line2:= "I10A_RH_FIRTRE_ORING_REJ_CYL_FWD(I1020.1)";
+     1021: Line2:= "I10A_BOWL_TRK_INDXR_POS3(I1021.1) "       ;
      1030: Line2:= "I10B_DRUM_RH_CONV_OVR_FLW(I1030.1)"       ;
-     1031: Line2:= "I10B_ORING_RH_PUSHR_CYL_FWD(I1031.1)  "   ;
-     1040: Line2:= "I10B_LH_FIRTRE_ORING_REJ_CYL_FWD(I1040.1)";
-     1041: Line2:= "I10B_SPARE_I1041.1(I1041.1)  "            ;
+     1031: Line2:= "I10B_ORING_ROTRY_CYL_180_DEG(I1031.1)  "  ;
+     1040: Line2:= "I10B_RH_FIRTRE_ORING_REJ_CYL_FWD(I1040.1)";
+     1041: Line2:= "I10B_BOWL_TRK_INDXR_POS3(I1041.1)  "      ;
      1100: Line2:= "I30_DRUM_FEED_CONV2_OVERFLW(I1100.1) "    ;
      1101: Line2:= "I50_DRUM_FEED_CONV2_OVERFLW(I1101.1) "    ;
      1110: Line2:= "I50_RH_GRIP_CLSE(I1110.1) "               ;
-     1111: Line2:= "I70_SPARE_I1111.1(I1111.1) "			 ;
+     1111: Line2:= "I50_BOT_REJ_BIN_PRSNCE_I1111_1(I1111.1) " ;
      ELSE
      	Line2 := " ";
      END_CASE
 	 
 	 Visibility_2:=TRUE;
      CASE IP_Arr_OP10P[Input_Page_num] OF
-	300: Lamp2:=I10A_SPARE_I300_1 ;
-	301: Lamp2:=I10A_SPARE_I301_1 ;
+	//300: Lamp2:=I10A_SPARE_I300_1 ;
+	//301: Lamp2:=I10A_SPARE_I301_1 ;
 	302: Lamp2:=I10A_SPARE_I302_1 ;
 	303: Lamp2:=I10B_SPARE_I303_1 ;
 	304: Lamp2:=I30_SPARE_I304_1 ;
-	305: Lamp2:=I40_ATC_CLAMP_FB_I305_1  ;
+	305: Lamp2:=I40_ATC_CLAMP_FB_I305_1 ;
 	306: Lamp2:=I50_SPARE_I306_1 ;
 	307: Lamp2:=I60_ATC_CLAMP_FB_I307_1 ;
 	308: Lamp2:=I70_SPARE_I308_1 ;
-	309: Lamp2:=I80_ATC_CLAMP_FB_I309_1;
+	309: Lamp2:=I80_ATC_CLAMP_FB_I309_1 ;
 	310: Lamp2:=I80_SPARE_I310_1 ;
 	311: Lamp2:=I80_SPARE_I311_1 ;
 	1000: Lamp2:=I10A_SPARE_I1000_1 ;
@@ -201,54 +201,54 @@ END_VAR
 	1010: Lamp2:=I10A_DRUM_RH_CONV_OVR_FLW_I1010_1 ;
 	1011: Lamp2:=I10A_ORING_ROTRY_CYL_180_DEG_I1011_1 ;
 	1020: Lamp2:=I10A_RH_FIRTRE_ORING_REJ_CYL_FWD_I1020_1 ;
-	1021: Lamp2:=I10A_SPARE_I1021_1;
+	1021: Lamp2:=I10A_BOWL_TRK_INDXR_POS3_I1021_1;
 	1030: Lamp2:=I10B_DRUM_RH_CONV_OVR_FLW_I1030_1  ;
 	1031: Lamp2:=I10B_ORING_ROTRY_CYL_180_DEG_I1031_1  ;
 	1040: Lamp2:=I10B_RH_FIRTRE_ORING_REJ_CYL_FWD_I1040_1  ;
-	1041: Lamp2:=I10B_SPARE_I1041_1  ;
+	1041: Lamp2:=I10B_BOWL_TRK_INDXR_POS3_I1041_1  ;
 	1100: Lamp2:=I30_DRUM_FEED_CONV2_OVERFLW_I1100_1  ;
 	1101: Lamp2:=I50_DRUM_FEED_CONV2_OVERFLW_I1101_1  ;
 	1110: Lamp2:=I50_RH_GRIP_CLSE_I1110_1 ;
-	1111: Lamp2:=I70_SPARE_I1111_1 ;
+	1111: Lamp2:=I50_BOT_REJ_BIN_PRSNCE_I1111_1 ;
    ELSE
        Visibility_2:=FALSE;	
    END_CASE 
    
      CASE IP_Arr_OP10P[Input_Page_num] OF
-     300:  Line3:= "I10A_SPARE_I300.2(I300.2)                 "  ;
-     301:  Line3:= "I10A_SPARE_I301.2(I301.2)                 "  ;
+     //300:  Line3:= "I10A_SPARE_I300_2(I300.2)               "  ;
+     //301:  Line3:= "I10A_SPARE_I301_2(I301.2)               "  ;
      302:  Line3:= "I10B_DRUM_OFF_ON(I302.2)                  "  ;
-     303:  Line3:= "I10B_SPARE_I303.2(I303.2)                 "  ;
+     303:  Line3:= "I10B_SPARE_I303_2(I303.2)                 "  ;
      304:  Line3:= "I30_DRUM_OFF_ON(I304.2)                   "  ;
      305:  Line3:= "I40_ATC_STN_POKE_YOKE_1(I305.2)           "  ;
      306:  Line3:= "I50_DRUM_OFF_ON(I306.2)                   "  ;
      307:  Line3:= "I60_ATC_STN_POKE_YOKE_1(I307.2)           "  ;
      308:  Line3:= "I70_DRUM_OFF_ON(I308.2)                   "  ;
      309:  Line3:= "I80_ATC_STN_POKE_YOKE_1(I309.2)           "  ;
-     310:  Line3:= "I80_SPARE_I310.2(I310.2)                  "  ;
-     311:  Line3:= "I80_SPARE_I311.2(I311.2)                  "  ;
+     310:  Line3:= "I80_SPARE_I310_2(I310.2)                  "  ;
+     311:  Line3:= "I80_SPARE_I311_2(I311.2)                  "  ;
      1000: Line3:= "I10A_BDY_REJ_BIN_OVERFLW(I1000.2)         "  ;
-     1001: Line3:= "I10A_SPARE_I1001,2(I1001,2)               "  ;
+     1001: Line3:= "I10A_SPARE_I1001,2(I1001,2)             "  ;
      1010: Line3:= "I10A_ORING_LH_GRPR_CLSE(I1010.2)          "  ;
-     1011: Line3:= "I10A_ORING_ROTRY_CYL_O_DEG(I1011.2)       "  ;
-     1020: Line3:= "I10A_RH_FIRTRE_ORING_REJ_CYL_REV(I1020.2) "  ;
-     1021: Line3:= "I10A_SPARE_I1021.2(I1021.2)               "  ;
+     1011: Line3:= "I10A_ORING_HORZ_CYL_REV(I1011.2)          "  ;
+     1020: Line3:= "I10A_BDY_SING_CYL_CLSE(I1020.2)           "  ;
+     1021: Line3:= "I10A_SPARE_I1021_2(I1021.2)               "  ;
      1030: Line3:= "I10B_ORING_LH_GRPR_CLSE(I1030.2)          "  ;
-     1031: Line3:= "I10B_ORING_ROTRY_CYL_O_DEG(I1031.2)       "  ;
-     1040: Line3:= "I10B_RH_FIRTRE_ORING_REJ_CYL_REV(I1040.2) "  ;
-     1041: Line3:= "I10B_SPARE_I1041.2(I1041.2)               "  ;
+     1031: Line3:= "I10B_ORING_HORZ_CYL_REV(I1031.2)          "  ;
+     1040: Line3:= "I10B_BDY_SING_CYL_CLSE(I1040.2)           "  ;
+     1041: Line3:= "I10B_SPARE_I1041_2(I1041.2)               "  ;
      1100: Line3:= "I30_LH_REJ_CYL_FWD(I1100.2)               "  ;
      1101: Line3:= "I50_LH_REJ_CYL_FWD(I1101.2)               "  ;
      1110: Line3:= "I70_DRUM_FEED_CONV1_OVERFLW(I1110.2)      "  ;
-     1111: Line3:= "I70_SPARE_I1111.2(I1111.2)				"  ;
+     1111: Line3:= "I70_TOP_REJ_BIN_PRSNCE_I1111_2(I1111.2)   "  ;  
      ELSE
      	Line3 := " ";
      END_CASE
 	 
 	Visibility_3:=TRUE;
     CASE IP_Arr_OP10P[Input_Page_num] OF
-	300: Lamp3:=I10A_SPARE_I300_2 ;
-	301: Lamp3:=I10A_SPARE_I301_2 ;
+	//300: Lamp3:=I10A_SPARE_I300_2 ;
+	//301: Lamp3:=I10A_SPARE_I301_2 ;
 	302: Lamp3:=I10B_DRUM_OFF_ON_I302_2 ;
 	303: Lamp3:=I10B_SPARE_I303_2 ;
 	304: Lamp3:=I30_DRUM_OFF_ON_I304_2 ;
@@ -272,46 +272,46 @@ END_VAR
 	1100: Lamp3:=I30_LH_REJ_CYL_FWD_I1100_2  ;
 	1101: Lamp3:=I50_LH_REJ_CYL_FWD_I1101_2  ;
 	1110: Lamp3:=I70_DRUM_FEED_CONV1_OVERFLW_I1110_2  ;
-	1111: Lamp3:=I70_SPARE_I1111_2 ;
+	1111: Lamp3:=I70_TOP_REJ_BIN_PRSNCE_I1111_2 ;
    ELSE
        Visibility_3:=FALSE;	
    END_CASE  
    
      CASE IP_Arr_OP10P[Input_Page_num] OF
-     300:  Line4:= "I10A_SPARE_I300.3(I300.3)                "  ;
-     301:  Line4:= "I10A_SPARE_I301.3(I301.3)                "  ;
+     //300:  Line4:= "I10A_SPARE_I300_3(I300.3)              "  ;
+     //301:  Line4:= "I10A_SPARE_I301_3(I301.3)              "  ;
      302:  Line4:= "I10B_DRUM_CONV_REV(I302.3)               "  ;
-     303:  Line4:= "I10B_SPARE_I303.3(I303.3)                "  ;
+     303:  Line4:= "I10B_SPARE_I303_3(I303.3)                "  ;
      304:  Line4:= "I30_DRUM_CONV_REV(I304.3)                "  ;
      305:  Line4:= "I40_ATC_STN_POKE_YOKE_2(I305.3)          "  ;
      306:  Line4:= "I50_DRUM_CONV_REV(I306.3)                "  ;
      307:  Line4:= "I60_ATC_STN_POKE_YOKE_2(I307.3)          "  ;
      308:  Line4:= "I70_DRUM_CONV_REV(I308.3)                "  ;
      309:  Line4:= "I80_ATC_STN_POKE_YOKE_2(I309.3)          "  ;
-     310:  Line4:= "I80_SPARE_I310.3(I310.3)                 "  ;
-     311:  Line4:= "I80_SPARE_I311.3(I311.3)                 "  ;
-     1000: Line4:= "I10A_SPARE_I1000.3(I1000.3)              "  ;
+     310:  Line4:= "I80_SPARE_I310_3(I310.3)                 "  ;
+     311:  Line4:= "I80_SPARE_I311_3(I311.3)                 "  ;
+     1000: Line4:= "I10A_SPARE_I1000_3(I1000.3)              "  ;
      1001: Line4:= "I10A_BDY1_PRSN_MOVER(I1001,3)            "  ;
      1010: Line4:= "I10A_ORING_LH_GRPR_OPN(I1010.3)          "  ;
-     1011: Line4:= "I10A_ORING_ROTRY_CYL_180_DEG(I1011.3)    "  ;
-     1020: Line4:= "I10A_RH_FIRTRE_ORING_REJ_CYL_FWD(I1020.3)"  ;
-     1021: Line4:= "I10A_SPARE_I1021.3(I1021.3)              "  ;
+     1011: Line4:= "I10A_ORING_HORZ_CYL_FWD(I1011.3)         "  ;
+     1020: Line4:= "I10A_BDY_SING_CYL_OPN(I1020.3)           "  ;
+     1021: Line4:= "I10A_SPARE_I1021_3(I1021.3)              "  ;
      1030: Line4:= "I10B_ORING_LH_GRPR_OPN(I1030.3)          "  ;
-     1031: Line4:= "I10B_ORING_ROTRY_CYL_180_DEG(I1031.3)    "  ;
-     1040: Line4:= "I10B_RH_FIRTRE_ORING_REJ_CYL_FWD(I1040.3)"  ;
-     1041: Line4:= "I10B_SPARE_I1041.3(I1041.3)              "  ;
+     1031: Line4:= "I10B_ORING_HORZ_CYL_FWD(I1031.3)         "  ;
+     1040: Line4:= "I10B_BDY_SING_CYL_OPN(I1040.3)           "  ;
+     1041: Line4:= "I10B_SPARE_I1041_3(I1041.3)              "  ;
      1100: Line4:= "I30_LH_REJ_CYL_REV(I1100.3)              "  ;
      1101: Line4:= "I50_LH_REJ_CYL_REV(I1101.3)              "  ;
-     1110: Line4:= "I70_DRUM_FEED_CONV2_OVERFLW(I1110.3)				  "  ;
-     1111: Line4:= "I70_SPARE_I1111.3(I1111.3)				  "  ;
+     1110: Line4:= "I70_DRUM_FEED_CONV2_OVERFLW(I1110.3)     "  ;
+     1111: Line4:= "I70_BOT_REJ_BIN_PRSNCE_I1111_3(I1111.3)  "  ;
      ELSE
      	Line4 := " ";
      END_CASE
 	 
 	 Visibility_4:=TRUE;
     CASE IP_Arr_OP10P[Input_Page_num] OF
-	300: Lamp4:=I10A_SPARE_I300_3;
-	301: Lamp4:=I10A_SPARE_I301_3;
+	//300: Lamp4:=I10A_SPARE_I300_3;
+	//301: Lamp4:=I10A_SPARE_I301_3;
 	302: Lamp4:=I10B_DRUM_CONV_REV_I302_3 ;
 	303: Lamp4:=I10B_SPARE_I303_3 ;
 	304: Lamp4:=I30_DRUM_CONV_REV_I304_3;
@@ -335,46 +335,46 @@ END_VAR
 	1100: Lamp4:=I30_LH_REJ_CYL_REV_I1100_3 ;
 	1101: Lamp4:=I50_LH_REJ_CYL_REV_I1101_3  ;
 	1110: Lamp4:=I70_DRUM_FEED_CONV2_OVERFLW_I1110_3 ;
-	1111: Lamp4:=I70_SPARE_I1111_3 ;
+	1111: Lamp4:=I70_BOT_REJ_BIN_PRSNCE_I1111_3 ;
    ELSE
        Visibility_4:=FALSE;	
    END_CASE 
    
      CASE IP_Arr_OP10P[Input_Page_num] OF
-     300:  Line5:= "I10A_SPARE_I300.4(I300.4)               "  ;
-     301:  Line5:= "I10A_SPARE_I301.4(I301.4)               "  ;
+     //300:  Line5:= "I10A_SPARE_I300_4(I300.4)             "  ;
+     //301:  Line5:= "I10A_SPARE_I301_4(I301.4)             "  ;
      302:  Line5:= "I10B_DRUM_CONV_FWD(I302.4)              "  ;
-     303:  Line5:= "I10B_SPARE_I303.4(I303.4)               "  ;
+     303:  Line5:= "I10B_SPARE_I303_4(I303.4)               "  ;
      304:  Line5:= "I30_DRUM_CONV_FWD(I304.4)               "  ;
      305:  Line5:= "I40_ATC_STN_POKE_YOKE_3(I305.4)         "  ;
      306:  Line5:= "I50_DRUM_CONV_FWD(I306.4)               "  ;
      307:  Line5:= "I60_ATC_STN_POKE_YOKE_3(I307.4)         "  ;
      308:  Line5:= "I70_DRUM_CONV_FWD(I308.4)               "  ;
      309:  Line5:= "I80_ATC_STN_POKE_YOKE_3(I309.4)         "  ;
-     310:  Line5:= "I80_SPARE_I310.4(I310.4)                "  ;
-     311:  Line5:= "I80_SPARE_I311.4(I311.4)                "  ;
-     1000: Line5:= "I10A_SPARE_I1000.4(I1000.4)             "  ;
+     310:  Line5:= "I80_SPARE_I310_4(I310.4)                "  ;
+     311:  Line5:= "I80_SPARE_I311_4(I311.4)                "  ;
+     1000: Line5:= "I10A_SPARE_I1000_4(I1000.4)             "  ;
      1001: Line5:= "I10A_BDY2_PRSN_MOVER(I1001,4)           "  ;
-     1010: Line5:= "I10A_ORING_LH_PUSHR_CYL_REV_FWD(I1010.4)"  ;
-     1011: Line5:= "I10A_ORING_HORZ_CYL_REV(I1011.4)        "  ;
-     1020: Line5:= "I10A_BDY_SING_CYL_CLSE(I1020.4)         "  ;
-     1021: Line5:= "I10A_SPARE_I1021.4(I1021.4)             "  ;
-     1030: Line5:= "I10B_ORING_LH_PUSHR_CYL_REV_FWD(I1030.4)"  ;
-     1031: Line5:= "I10B_ORING_HORZ_CYL_REV(I1031.4)        "  ;
-     1040: Line5:= "I10B_BDY_SING_CYL_CLSE(I1040.4)         "  ;
-     1041: Line5:= "I10B_SPARE_I1041.4(I1041.4)             "  ;
+     1010: Line5:= "I10A_ORING_LH_PUSHR_CYL_REV(I1010.4)    "  ;
+     1011: Line5:= "I10A_ORING_VERT_CYL_UP(I1011.4)         "  ;
+     1020: Line5:= "I10A_ORING_RH_GRPR_OPN(I1020.4)         "  ;
+     1021: Line5:= "I10A_SPARE_I1021_4(I1021.4)             "  ;
+     1030: Line5:= "I10B_ORING_LH_PUSHR_CYL_REV(I1030.4)    "  ;
+     1031: Line5:= "I10B_ORING_VERT_CYL_UP(I1031.4)         "  ;
+     1040: Line5:= "I10B_ORING_RH_GRPR_OPN(I1040.4)         "  ;
+     1041: Line5:= "I10B_SPARE_I1041_4(I1041.4)             "  ;
      1100: Line5:= "I30_RH_REJ_CYL_FWD(I1100.4)             "  ;
      1101: Line5:= "I50_RH_REJ_CYL_FWD(I1101.4)             "  ;
-     1110: Line5:= "I70_LH_REJ_CYL_FWD(I1110.4)    "  ;
-     1111: Line5:= "I70_SPARE_I1111.4(I1111.4)			   "  ;
+     1110: Line5:= "I70_LH_REJ_CYL_FWD(I1110.4)             "  ;
+     1111: Line5:= "I70_SPARE_I1111_4(I1111.4)		    "  ;
      ELSE
      	Line5 := " ";
      END_CASE
      
 	 Visibility_5:=TRUE;	
 	 CASE IP_Arr_OP10P[Input_Page_num] OF
-	300: Lamp5:=I10A_SPARE_I300_4;
-	301: Lamp5:=I10A_SPARE_I301_4;
+	//300: Lamp5:=I10A_SPARE_I300_4;
+	//301: Lamp5:=I10A_SPARE_I301_4;
 	302: Lamp5:=I10B_DRUM_CONV_FWD_I302_4 ;
 	303: Lamp5:=I10B_SPARE_I303_4 ;
 	304: Lamp5:=I30_DRUM_CONV_FWD_I304_4 ;
@@ -385,15 +385,15 @@ END_VAR
 	309: Lamp5:=I80_ATC_STN_POKE_YOKE_3_I309_4 ;
 	310: Lamp5:=I80_SPARE_I310_4 ;
 	311: Lamp5:=I80_SPARE_I311_4 ;
-	1000:Lamp5:=I10A_SPARE_I1000_4                               ;
+	1000:Lamp5:=I10A_SPARE_I1000_4 ;
 	1001:Lamp5:=I10A_BDY2_PRSN_MOVER_I1001_4;
-	1010:Lamp5:=I10A_ORING_LH_PUSHR_CYL_REV_FWD_I1010_4  ;
+	1010:Lamp5:=I10A_ORING_LH_PUSHR_CYL_REV_I1010_4 ;
 	1011:Lamp5:=I10A_ORING_VERT_CYL_UP_I1011_4   ;
-	1020:Lamp5:=I10A_SPARE_I1020_4;
+	1020:Lamp5:=I10A_ORING_RH_GRPR_OPN_I1020_4;
 	1021:Lamp5:=I10A_SPARE_I1021_4 ;
-	1030:Lamp5:=I10B_ORING_LH_PUSHR_CYL_REV_FWD_I1030_4 ;
+	1030:Lamp5:=I10B_ORING_LH_PUSHR_CYL_REV_I1030_4 ;
 	1031:Lamp5:=I10B_ORING_VERT_CYL_UP_I1031_4  ;
-	1040:Lamp5:=I10B_SPARE_I1040_4 ;
+	1040:Lamp5:=I10B_ORING_RH_GRPR_OPN_I1040_4 ;
 	1041:Lamp5:=I10B_SPARE_I1041_4;
 	1100:Lamp5:=I30_RH_REJ_CYL_FWD_I1100_4  ;
 	1101:Lamp5:=I50_RH_REJ_CYL_FWD_I1101_4 ;
@@ -404,39 +404,39 @@ END_VAR
    END_CASE
 	 
      CASE IP_Arr_OP10P[Input_Page_num] OF
-     300:  Line6:= "I10A_SPARE_I300.5(I300.5)            "  ;
-     301:  Line6:= "I10A_SPARE_I301.5(I301.5)            "  ;
+     //300:  Line6:= "I10A_SPARE_I300_5(I300.5)          "  ;
+     //301:  Line6:= "I10A_SPARE_I301_5(I301.5)          "  ;
      302:  Line6:= "I10B_ROB_MAN_AUTO_MODE(I302.5)       "  ;
-     303:  Line6:= "I10B_SPARE_I303.5(I303.5)            "  ;
-     304:  Line6:= "I30_SPARE_I304.5(I304.5)             "  ;
+     303:  Line6:= "I10B_SPARE_I303_5(I303.5)            "  ;
+     304:  Line6:= "I30_SPARE_I304_5(I304.5)             "  ;
      305:  Line6:= "I40_ATC_STN_POKE_YOKE_4(I305.5)      "  ;
-     306:  Line6:= "I50_SPARE_I306.5(I306.5)             "  ;
+     306:  Line6:= "I50_SPARE_I306_5(I306.5)             "  ;
      307:  Line6:= "I60_ATC_STN_POKE_YOKE_4(I307.5)      "  ;
-     308:  Line6:= "I70_SPARE_I308.5(I308.5)             "  ;
+     308:  Line6:= "I70_SPARE_I308_5(I308.5)             "  ;
      309:  Line6:= "I80_ATC_STN_POKE_YOKE_4(I309.5)      "  ;
-     310:  Line6:= "I80_SPARE_I310.5(I310.5)             "  ;
-     311:  Line6:= "I80_SPARE_I311.5(I311.5)             "  ;
+     310:  Line6:= "I80_SPARE_I310_5(I310.5)             "  ;
+     311:  Line6:= "I80_SPARE_I311_5(I311.5)             "  ;
      1000: Line6:= "I10_LH_LNR_TRK_BDY_PRSN(I1000.5)     "  ;
      1001: Line6:= "I10B_BDY1_PRSN_MOVER(I1001,5)        "  ;
-     1010: Line6:= "I10A_ORING_LH_PUSHR_CYL_FWD(I1010.5) "  ;
-     1011: Line6:= "I10A_ORING_HORZ_CYL_FWD(I1011.5)     "  ;
-     1020: Line6:= "I10A_BDY_SING_CYL_OPN(I1020.5)       "  ;
-     1021: Line6:= "I10A_SPARE_I1021.5(I1021.5)          "  ;
-     1030: Line6:= "I10B_ORING_LH_PUSHR_CYL_FWD(I1030.5) "  ;
-     1031: Line6:= "I10B_ORING_HORZ_CYL_FWD(I1031.5)     "  ;
-     1040: Line6:= "I10B_BDY_SING_CYL_OPN(I1040.5)       "  ;
-     1041: Line6:= "I10B_SPARE_I1041.5(I1041.5)          "  ;
+     1010: Line6:= "I10A_ORING_RH_GRPR_OPN_I1010_5(I1010.5) "  ;
+     1011: Line6:= "I10A_ORING_VERT_CYL_DWN(I1011.5)     "  ;
+     1020: Line6:= "I10A_ORING_RH_PUSHR_CYL_FWD(I1020.5) "  ;
+     1021: Line6:= "I10A_SPARE_I1021_5(I1021.5)          "  ;
+     1030: Line6:= "I10B_ORING_RH_GRPR_OPN_I1030_5(I1030.5) "  ;
+     1031: Line6:= "I10B_ORING_VERT_CYL_DWN(I1031.5)     "  ;
+     1040: Line6:= "I10B_ORING_RH_PUSHR_CYL_FWD(I1040.5  "  ;
+     1041: Line6:= "I10B_SPARE_I1041_5(I1041.5)          "  ;
      1100: Line6:= "I30_RH_REJ_CYL_REV(I1100.5)          "  ;
      1101: Line6:= "I50_RH_REJ_CYL_REV(I1101.5)          "  ;
-     1110: Line6:= "I70_LH_REJ_CYL_REV(I1110.5) "  ;
+     1110: Line6:= "I70_LH_REJ_CYL_REV(I1110.5)          "  ;
      1111: Line6:= "I70_SPARE_I1111.5(I1111.5)           "  ;
      ELSE
      	Line6 := " ";
      END_CASE
      Visibility_6:=TRUE;
 	CASE IP_Arr_OP10P[Input_Page_num] OF
-	300: Lamp6:=I10A_SPARE_I300_5 ;
-	301: Lamp6:=I10A_SPARE_I301_5;
+	//300: Lamp6:=I10A_SPARE_I300_5 ;
+	//301: Lamp6:=I10A_SPARE_I301_5;
 	302: Lamp6:=I10B_ROB_MAN_AUTO_MODE_I302_5 ;
 	303: Lamp6:=I10B_SPARE_I303_5 ;
 	304: Lamp6:=I30_SPARE_I304_5;
@@ -451,11 +451,11 @@ END_VAR
 	1001: Lamp6:=I10B_BDY1_PRSN_MOVER_I1001_5;
 	1010: Lamp6:=I10A_ORING_RH_GRPR_OPN_I1010_5 ;
 	1011: Lamp6:=I10A_ORING_VERT_CYL_DWN_I1011_5  ;
-	1020: Lamp6:=I10A_SPARE_I1020_5 ;
+	1020: Lamp6:=I10A_ORING_RH_PUSHR_CYL_FWD_I1020_5 ;
 	1021: Lamp6:=I10A_SPARE_I1021_5 ;
-	1030: Lamp6:=I10B_ORING_RH_GRPR_CLSE_I1030_5 ;
+	1030: Lamp6:=I10B_ORING_RH_GRPR_OPN_I1030_5 ;
 	1031: Lamp6:=I10B_ORING_VERT_CYL_DWN_I1031_5   ;
-	1040: Lamp6:=I10B_SPARE_I1040_5  ;
+	1040: Lamp6:=I10B_ORING_RH_PUSHR_CYL_FWD_I1040_5  ;
 	1041: Lamp6:=I10B_SPARE_I1041_5 ;
 	1100: Lamp6:=I30_RH_REJ_CYL_REV_I1100_5 ;
 	1101: Lamp6:=I50_RH_REJ_CYL_REV_I1101_5  ;
@@ -466,39 +466,39 @@ END_VAR
    END_CASE
 	 
      CASE IP_Arr_OP10P[Input_Page_num] OF
-     300:  Line7:= "I10A_SPARE_I300.6(I300.6)       "  ;
-     301:  Line7:= "I10A_SPARE_I301.6(I301.6)       "  ;
-     302:  Line7:= "I10B_SPARE_I302.6(I302.6)       "  ;
-     303:  Line7:= "I10B_SPARE_I303.6(I303.6)       "  ;
-     304:  Line7:= "I30_SPARE_I304.6(I304.6)        "  ;
+     //300:  Line7:= "I10A_SPARE_I300_6(I300.6)     "  ;
+     //301:  Line7:= "I10A_SPARE_I301_6(I301.6)     "  ;
+     302:  Line7:= "I10B_SPARE_I302_6(I302.6)       "  ;
+     303:  Line7:= "I10B_SPARE_I303_6(I303.6)       "  ;
+     304:  Line7:= "I30_SPARE_I304_6(I304.6)        "  ;
      305:  Line7:= "I40_ATC_SLAVE_MODL1(I305.6)     "  ;
-     306:  Line7:= "I50_SPARE_I306.6(I306.6)        "  ;
+     306:  Line7:= "I50_SPARE_I306_6(I306.6)        "  ;
      307:  Line7:= "I60_ATC_SLAVE_MODL1(I307.6)     "  ;
-     308:  Line7:= "I70_SPARE_I308.6(I308.6)        "  ;
+     308:  Line7:= "I70_SPARE_I308_6(I308.6)        "  ;
      309:  Line7:= "I80_ATC_SLAVE_MODL1(I309.6)     "  ;
-     310:  Line7:= "I80_SPARE_I310.6(I310.6)        "  ;
-     311:  Line7:= "I80_SPARE_I311.6(I311.6)        "  ;
+     310:  Line7:= "I80_SPARE_I310_6(I310.6)        "  ;
+     311:  Line7:= "I80_SPARE_I311_6(I311.6)        "  ;
      1000: Line7:= "I10_RH_LNR_TRK_BDY_PRSN(I1000.6)"  ;
      1001: Line7:= "I10B_BDY2_PRSN_MOVER(I1001,6)   "  ;
      1010: Line7:= "I10A_ORING_RH_GRPR_CLSE(I1010.6)"  ;
-     1011: Line7:= "I10A_ORING_VERT_CYL_UP(I1011.6) "  ;
-     1020: Line7:= "I10A_SPARE_I1020.6(I1020.6)     "  ;
-     1021: Line7:= "I10A_SPARE_I1021.6(I1021.6)     "  ;
+     1011: Line7:= "I10A_LH_FIRTRE_ORING_REJ_CYL_REV(I1011.6) "  ;
+     1020: Line7:= "I10A_ORING_REJ_BIN_PRSNCE(I1020.6)     "  ;
+     1021: Line7:= "I10A_SPARE_I1021_6(I1021.6)     "  ;
      1030: Line7:= "I10B_ORING_RH_GRPR_CLSE(I1030.6)"  ;
-     1031: Line7:= "I10B_ORING_VERT_CYL_UP(I1031.6) "  ;
-     1040: Line7:= "I10B_SPARE_I1040.6(I1040.6)     "  ;
-     1041: Line7:= "I10B_SPARE_I1041.6(I1041.6)     "  ;
-     1100: Line7:= "I30_SPARE_I1100.6(I1100.6)      "  ;
-     1101: Line7:= "O50_LH_GRIP_OPN(I1101.6)        "  ;
+     1031: Line7:= "I10B_LH_FIRTRE_ORING_REJ_CYL_REV(I1031.6) "  ;
+     1040: Line7:= "I10B_ORING_REJ_BIN_PRSNCE_I1040_6(I1040.6)"  ;
+     1041: Line7:= "I10B_SPARE_I1041_6(I1041.6)     "  ;
+     1100: Line7:= "I30_TOP_REJ_BIN_PRSNCE_I1100_6(I1100.6)"  ;
+     1101: Line7:= "I50_SPARE_I1101_6(I1101.6)        "  ;
      1110: Line7:= "I70_RH_REJ_CYL_FWD(I1110.6)     "  ;
-     1111: Line7:= "I70_SPARE_I1111.6(I1111.6)	   "  ;
+     1111: Line7:= "I70_SPARE_I1111_6(I1111.6)	   "  ;
      ELSE
      	Line7 := " ";
      END_CASE
      Visibility_7:=TRUE;
 	 CASE IP_Arr_OP10P[Input_Page_num] OF
-	300: Lamp7:=I10A_SPARE_I300_6 ;
-	301: Lamp7:=I10A_SPARE_I301_6;
+	//300: Lamp7:=I10A_SPARE_I300_6 ;
+	//301: Lamp7:=I10A_SPARE_I301_6;
 	302: Lamp7:=I10B_SPARE_I302_6 ;
 	303: Lamp7:=I10B_SPARE_I303_6 ;
 	304: Lamp7:=I30_SPARE_I304_6 ;
@@ -513,13 +513,13 @@ END_VAR
 	1001:Lamp7:=I10B_BDY2_PRSN_MOVER_I1001_6;
 	1010:Lamp7:=I10A_ORING_RH_GRPR_CLSE_I1010_6 ;
 	1011:Lamp7:=I10A_LH_FIRTRE_ORING_REJ_CYL_REV_I1011_6   ;
-	1020:Lamp7:=I10A_SPARE_I1020_6;
+	1020:Lamp7:=I10A_ORING_REJ_BIN_PRSNCE_I1020_6;
 	1021:Lamp7:=I10A_SPARE_I1021_6 ;
-	1030:Lamp7:=I10B_ORING_RH_GRPR_OPN_I1030_6 ;
+	1030:Lamp7:=I10B_ORING_RH_GRPR_CLSE_I1030_6 ;
 	1031:Lamp7:=I10B_LH_FIRTRE_ORING_REJ_CYL_REV_I1031_6 ;
-	1040:Lamp7:=I10B_SPARE_I1040_6 ;
+	1040:Lamp7:=I10B_ORING_REJ_BIN_PRSNCE_I1040_6 ;
 	1041:Lamp7:=I10B_SPARE_I1041_6;
-	1100:Lamp7:=I30_SPARE_I1100_6 ;
+	1100:Lamp7:=I30_TOP_REJ_BIN_PRSNCE_I1100_6 ;
 	1101:Lamp7:=I50_SPARE_I1101_6 ;
 	1110:Lamp7:=I70_RH_REJ_CYL_FWD_I1110_6   ;
 	1111:Lamp7:=I70_SPARE_I1111_6   ;
@@ -528,40 +528,40 @@ END_VAR
    END_CASE 
 	 
      CASE IP_Arr_OP10P[Input_Page_num] OF
-     300:  Line8:= "I10A_SPARE_I300.7(I300.7)       "  ;
-     301:  Line8:= "I10A_SPARE_I301.7(I301.7)       "  ;
-     302:  Line8:= "I10B_SPARE_I302.7(I302.7)       "  ;
-     303:  Line8:= "I10B_SPARE_I303.7(I303.7)       "  ;
-     304:  Line8:= "I30_SPARE_I304.7(I304.7)        "  ;
+     //300:  Line8:= "I10A_SPARE_I300_7(I300.7)       "  ;
+     //301:  Line8:= "I10A_SPARE_I301_7(I301.7)       "  ;
+     302:  Line8:= "I10B_SPARE_I302_7(I302.7)       "  ;
+     303:  Line8:= "I10B_SPARE_I303_7(I303.7)       "  ;
+     304:  Line8:= "I30_SPARE_I304_7(I304.7)        "  ;
      305:  Line8:= "I40_ATC_SLAVE_MODL2(I305.7)     "  ;
-     306:  Line8:= "I50_SPARE_I306.7(I306.7)        "  ;
+     306:  Line8:= "I50_SPARE_I306_7(I306.7)        "  ;
      307:  Line8:= "I60_ATC_SLAVE_MODL2(I307.7)     "  ;
-     308:  Line8:= "I70_SPARE_I308.7(I308.7)        "  ;
+     308:  Line8:= "I70_SPARE_I308_7(I308.7)        "  ;
      309:  Line8:= "I80_ATC_SLAVE_MODL2(I309.7)     "  ;
-     310:  Line8:= "I80_SPARE_I310.7(I310.7)        "  ;
-     311:  Line8:= "I80_SPARE_I311.7(I311.7)        "  ;
-     1000: Line8:= "I10A_SPARE_I1000.7(I1000.7)     "  ;
-     1001: Line8:= "I10B_SPARE_I1001,7(I1001,7)     "  ;
-     1010: Line8:= "I10A_ORING_RH_GRPR_OPN(I1010.7) "  ;
-     1011: Line8:= "I10A_ORING_VERT_CYL_DWN(I1011.7)"  ;
-     1020: Line8:= "I10A_SPARE_I1020.7(I1020.7)     "  ;
-     1021: Line8:= "I10A_SPARE_I1021.7(I1021.7)     "  ;
-     1030: Line8:= "I10B_ORING_RH_GRPR__OPN(I1030.7)"  ;
-     1031: Line8:= "I10B_ORING_VERT_CYL_DWN(I1031.7)"  ;
-     1040: Line8:= "I10B_SPARE_I1040.7(I1040.7)     "  ;
-     1041: Line8:= "I10B_SPARE_I1041.7(I1041.7)     "  ;
-     1100: Line8:= "I30_SPARE_I1100.7(I1100.7)      "  ;
+     310:  Line8:= "I80_SPARE_I310_7(I310.7)        "  ;
+     311:  Line8:= "I80_SPARE_I311_7(I311.7)        "  ;
+     1000: Line8:= "I10_LH_LNR_TRCK_FIX_CHO_1_I1000_7(I1000.7)     "  ;
+     1001: Line8:= "I10B_SPARE_I1001_7(I1001,7)     "  ;
+     1010: Line8:= "I10A_ORING_RH_PUSHR_CYL_REV(I1010.7) "  ;
+     1011: Line8:= "I10A_LH_FIRTRE_ORING_REJ_CYL_FWD(I1011.7)"  ;
+     1020: Line8:= "I10A_BOWL_TRK_INDXR_POS1(I1020.7)     "  ;
+     1021: Line8:= "I10A_SPARE_I1021_7(I1021.7)     "  ;
+     1030: Line8:= "I10B_ORING_RH_PUSHR_CYL_REV(I1030.7)"  ;
+     1031: Line8:= "I10B_LH_FIRTRE_ORING_REJ_CYL_FWD(I1031.7)"  ;
+     1040: Line8:= "I10B_BOWL_TRK_INDXR_POS1(I1040.7)     "  ;
+     1041: Line8:= "I10B_SPARE_I1041_7(I1041.7)     "  ;
+     1100: Line8:= "I30_BOT_REJ_BIN_PRSNCE(I1100.7)      "  ;
      1101: Line8:= "O50_LH_GRIP_CLSE(I1101.7)       "  ;
      1110: Line8:= "I70_RH_REJ_CYL_REV(I1110.7)     "  ;
-     1111: Line8:= "I70_SPARE_I1111.7(I1111.7)      "  ;
+     1111: Line8:= "I70_SPARE_I1111_7(I1111.7)      "  ;
      ELSE
      	Line8 := " ";
      END_CASE
      
 	Visibility_8:=TRUE;	 
     CASE IP_Arr_OP10P[Input_Page_num] OF
-	300: Lamp8:=I10A_SPARE_I300_7 ;
-	301: Lamp8:=I10A_SPARE_I301_7;
+	//300: Lamp8:=I10A_SPARE_I300_7 ;
+	//301: Lamp8:=I10A_SPARE_I301_7;
 	302: Lamp8:=I10B_SPARE_I302_7 ;
 	303: Lamp8:=I10B_SPARE_I303_7;
 	304: Lamp8:=I30_SPARE_I304_7 ;
@@ -574,15 +574,15 @@ END_VAR
 	311: Lamp8:=I80_SPARE_I311_7 ;
 	1000:Lamp8:=I10_LH_LNR_TRCK_FIX_CHO_1_I1000_7   ;
 	1001:Lamp8:=I10A_SPARE_I1001_7 ;
-	1010:Lamp8:=I10A_ORING_RH_PUSHR_CYL_REV_FWD_I1010_7   ;
+	1010:Lamp8:=I10A_ORING_RH_PUSHR_CYL_REV_I1010_7   ;
 	1011:Lamp8:=I10A_LH_FIRTRE_ORING_REJ_CYL_FWD_I1011_7    ;
-	1020:Lamp8:=I10A_SPARE_I1020_7 ;
+	1020:Lamp8:=I10A_BOWL_TRK_INDXR_POS1_I1020_7 ;
 	1021:Lamp8:=I10A_SPARE_I1021_7  ;
-	1030:Lamp8:=I10B_ORING_RH_PUSHR_CYL_REV_FWD_I1030_7;
+	1030:Lamp8:=I10B_ORING_RH_PUSHR_CYL_REV_I1030_7;
 	1031:Lamp8:=I10B_LH_FIRTRE_ORING_REJ_CYL_FWD_I1031_7;
-	1040:Lamp8:=I10B_SPARE_I1040_7 ;
+	1040:Lamp8:=I10B_BOWL_TRK_INDXR_POS1_I1040_7 ;
 	1041:Lamp8:=I10B_SPARE_I1041_7 ;
-	1100:Lamp8:=I30_SPARE_I1100_7;
+	1100:Lamp8:=I30_BOT_REJ_BIN_PRSNCE_I1100_7;
 	1101:Lamp8:=I50_LH_GRIP_CLSE_I1101_7 ;
 	1110:Lamp8:=I70_RH_REJ_CYL_REV_I1110_7  ;
 	1111:Lamp8:=I70_SPARE_I1111_7 ;
@@ -591,35 +591,35 @@ END_VAR
    END_CASE 
      
      CASE OP_Arr_OP10P[Output_Page_num] OF
-     300: OLine1:= "O10A_SPARE_Q300.0	Q300.0              ";
-     301: OLine1:= "O10A_BDY_EMPT_CAM_LGHT1_ON	Q301.0  ";
-     302: OLine1:= "O10B_DRUM_MTR_FWD	Q302.0              ";
-     303: OLine1:= "O10_TWR_LMP_BUZZ	Q303.0              ";
-     304: OLine1:= "O20_SPARE_Q304.0	Q304.0              ";
-     305: OLine1:= "O30_DRUM_RUN_IND	Q305.0              ";
-     306: OLine1:= "O50_DRUM_EXT_SPEED	Q306.0          ";
-     307: OLine1:= "O50_BARLIGHT_OP2	Q307.0              ";
-     308: OLine1:= "O70_BARLIGHT_OP1	Q308.0              ";
-     309: OLine1:= "O70_SPARE_Q309.0	Q309.0              ";
-     1050: OLine1:= "O10A_ORING_LH_GRPR_CLSE_OPN	Q1050.0 ";
-     1051: OLine1:= "O10A_ORING_VERT_CYL_UP	Q1051.0     ";
-     1052: OLine1:= "O10A_SPARE_Q1052.0	Q1052.0         ";
-     1053: OLine1:= "O10A_SPARE_Q1053.0	Q1053.0         ";
-     1060: OLine1:= "O10B_ORING_LH_GRPR_CLSE_OPN	Q1060.0 ";
-     1061: OLine1:= "O10B_ORING_VERT_CYL_UP	Q1061.0     ";
-     1062: OLine1:= "O10B_DRUM_FEED_AIRPURGE_ON	Q1062.0 ";
-     1063: OLine1:= "O10B_SPARE_Q1063.0	Q1063.0         ";
-     1150: OLine1:= "O20_LH_OIL_DISPN_ON	Q1150.0         ";
-     1151: OLine1:= "O40_TOOL_CHO_UNLOCK	Q1151.0         ";
-     1152: OLine1:= "O50_RH_REJ_CYL_FWD_REV	Q1152.0     ";
-     1153: OLine1:= "O80_TOOL_CHO_UNLOCK	Q1153.0			";	
+     300: OLine1:= "O10_XTS_GREASE_VALVE_ON(Q300.0)  ";
+     301: OLine1:= "O10A_BDY_EMPT_CAM_LGHT1_ON(Q301.0)     ";
+     302: OLine1:= "O10B_DRUM_MTR_FWD(Q302.0)              ";
+     303: OLine1:= "O10_TWR_LMP_BUZZ(Q303.0)             ";
+     304: OLine1:= "O20_SPARE_Q304_0(Q304.0)             ";
+     305: OLine1:= "O30_DRUM_RUN_IND(Q305.0)             ";
+     306: OLine1:= "O50_DRUM_EXT_SPEED(Q306.0)              ";
+     307: OLine1:= "O50_BARLIGHT_OP2(Q307.0)             ";
+     308: OLine1:= "O70_BARLIGHT_OP1(Q308.0)              ";
+     309: OLine1:= "O70_SPARE_Q309_0(Q309.0)              ";
+     1050: OLine1:= "O10A_ORING_LH_GRPR_CLSE_OPN(Q1050.0) ";
+     1051: OLine1:= "O10A_ORING_VERT_CYL_UP(Q1051.0)     ";
+     1052: OLine1:= "O10A_SPARE_Q1052_0(Q1052.0)         ";
+     1053: OLine1:= "O10A_SPARE_Q1053_0(Q1053.0)         ";
+     1060: OLine1:= "O10B_ORING_LH_GRPR_CLSE_OPN(Q1060.0) ";
+     1061: OLine1:= "O10B_ORING_VERT_CYL_UP(Q1061.0)     ";
+     1062: OLine1:= "O10B_DRUM_FEED_AIRPURGE_ON(Q1062.0) ";
+     1063: OLine1:= "O10B_SPARE_Q1063_0(Q1063.0)        ";
+     1150: OLine1:= "O20_LH_OIL_DISPN_ON(Q1150.0)         ";
+     1151: OLine1:= "O40_TOOL_CHO_UNLOCK(Q1151.0)         ";
+     1152: OLine1:= "O50_RH_REJ_CYL_FWD_REV(Q1152.0)     ";
+     1153: OLine1:= "O80_TOOL_CHO_UNLOCK(Q1153.0)			";	
      ELSE
      	OLine1 := " ";
      END_CASE
       Out_Visibility_1:=TRUE;
    
    CASE OP_Arr_OP10P[Output_Page_num] OF
-	300:  Out_Lamp1:=O10A_SPARE_Q300_0;
+	300:  Out_Lamp1:=O10_XTS_GREASE_VALVE_ON_Q300_0;
 	301:  Out_Lamp1:=O10A_BDY_EMPT_CAM_LGHT1_ON_Q301_0;
 	302:  Out_Lamp1:=O10B_DRUM_MTR_FWD_Q302_0;
 	303:  Out_Lamp1:=O10_TWR_LMP_BUZZ_Q303_0;
@@ -629,9 +629,9 @@ END_VAR
 	307:  Out_Lamp1:=O50_BARLIGHT_OP2_Q307_0;
 	308:  Out_Lamp1:=O70_BARLIGHT_OP1_Q308_0;
 	309:  Out_Lamp1:=O70_SPARE_Q309_0;
-	1050: Out_Lamp1:=O10A_ORING_VERT_CYL_UP_Q1051_0;
+	1050: Out_Lamp1:=O10A_ORING_LH_GRPR_CLSE_OPN_Q1050_0;
 	1051: Out_Lamp1:=O10A_ORING_VERT_CYL_UP_Q1051_0;
-	1052: Out_Lamp1:=O10A_DRUM_FEED_AIRPURGE_ON_Q1052_0;
+	1052: Out_Lamp1:=O10A_SPARE_Q1052_0;
 	1053: Out_Lamp1:=O10A_SPARE_Q1053_0;
 	1060: Out_Lamp1:=O10B_ORING_LH_GRPR_CLSE_OPN_Q1060_0;
 	1061: Out_Lamp1:=O10B_ORING_VERT_CYL_UP_Q1061_0;
@@ -646,29 +646,29 @@ END_VAR
    END_CASE
    
      CASE OP_Arr_OP10P[Output_Page_num] OF	
-     300: OLine2:= "O10A_SPARE_Q300.1	Q300.1					";
-     301: OLine2:= "O10A_BDY_EMPT_CAM_LGHT2_ON	Q301.1      ";
-     302: OLine2:= "O10B_DRUM_RST	Q302.1                      ";
-     303: OLine2:= "O10B_SPARE_Q303.1	Q303.1                  ";
-     304: OLine2:= "O20_SPARE_Q304.1	Q304.1                  ";
-     305: OLine2:= "O30_CAM_LGHT1_ON	Q305.1                  ";
-     306: OLine2:= "O50_SPARE_Q306.1	Q306.1                  ";
-     307: OLine2:= "O70_DRUM_MTR_FWD	Q307.1                  ";
-     308: OLine2:= "O70_BARLIGHT_OP2	Q308.1                  ";
-     309: OLine2:= "O70_SPARE_Q309.1	Q309.1                  ";
-     1050:OLine2:= "O10A_ORING_LH_PUSHR_CYL_REV_FWD	Q1050.1 ";
-     1051:OLine2:= "O10A_ORING_VERT_CYL_DWN	Q1051.1         ";
-     1052:OLine2:= "O10A_DRUM_FEED_AIRPURGE_ON	Q1052.1     ";
-     1053:OLine2:= "O10A_SPARE_Q1053.1	Q1053.1             ";
-     1060:OLine2:= "O10B_ORING_LH_PUSHR_CYL_REV_FWD	Q1060.1 ";
-     1061:OLine2:= "O10B_ORING_VERT_CYL_DWN	Q1061.1         ";
-     1062:OLine2:= "O10B_SPARE_Q1062.1	Q1062.1             ";
-     1063:OLine2:= "O10B_SPARE_Q1063.1	Q1063.1             ";
-     1150:OLine2:= "O20_LH_OIL_SPIN_ON	Q1150.1             ";
-     1151:OLine2:= "O40_TOOL_CHO_LOCK	Q1151.1                 ";
-     1152:OLine2:= "O50_SPARE_Q1152.1	Q1152.1                 ";
-     1153:OLine2:= "O80_TOOL_CHO_LOCK	Q1153.1                 ";
-     ELSE
+     300: OLine2:= "O10A_SPARE_Q300_1(Q300.1)                   ";
+     301: OLine2:= "O10A_BDY_EMPT_CAM_LGHT2_ON(Q301.1)          ";
+     302: OLine2:= "O10B_DRUM_RST(Q302.1)                       ";
+     303: OLine2:= "O10B_SPARE_Q303_1(Q303.1)                   ";
+     304: OLine2:= "O20_SPARE_Q304_1(Q304.1)                    ";
+     305: OLine2:= "O30_CAM_LGHT1_ON(Q305.1)                    ";
+     306: OLine2:= "O50_SPARE_Q306_1(Q306.1)                    ";
+     307: OLine2:= "O70_DRUM_MTR_FWD(Q307.1)                    ";
+     308: OLine2:= "O70_BARLIGHT_OP2(Q308.1)                    ";
+     309: OLine2:= "O70_SPARE_Q309_1(Q309.1)                    ";
+     1050:OLine2:= "O10A_ORING_LH_PUSHR_CYL_REV_FWD(Q1050.1)    ";
+     1051:OLine2:= "O10A_ORING_VERT_CYL_DWN(Q1051.1)            ";
+     1052:OLine2:= "O10A_DRUM_FEED_AIRPURGE_ON(Q1052.1)         ";
+     1053:OLine2:= "O10A_SPARE_Q1053_1(Q1053.1)                 ";
+     1060:OLine2:= "O10B_ORING_LH_PUSHR_CYL_REV_FWD(Q1060.1)    ";
+     1061:OLine2:= "O10B_ORING_VERT_CYL_DWN(Q1061.1)            ";
+     1062:OLine2:= "O10B_SPARE_Q1062_1(Q1062.1)                 ";
+     1063:OLine2:= "O10B_SPARE_Q1063_1(Q1063.1)                 ";
+     1150:OLine2:= "O20_LH_OIL_SPIN_ON(Q1150.1)                 ";
+     1151:OLine2:= "O40_TOOL_CHO_LOCK(Q1151.1)                  ";
+     1152:OLine2:= "O50_SPARE_Q1152_1(Q1152.1)                  ";
+     1153:OLine2:= "O80_TOOL_CHO_LOCK(Q1153.1)                     ";
+     ELSE 
      OLine2 := " ";
      END_CASE
 	 Out_Visibility_2:=TRUE;	
@@ -676,16 +676,16 @@ END_VAR
 	300:  Out_Lamp2:=O10A_SPARE_Q300_1;
 	301:  Out_Lamp2:=O10A_BDY_EMPT_CAM_LGHT2_ON_Q301_1;
 	302:  Out_Lamp2:=O10B_DRUM_RST_Q302_1;
-	303:  Out_Lamp2:=O10B_DRUM_RST_Q303_1;
+	303:  Out_Lamp2:=O10B_SPARE_Q303_1;
 	304:  Out_Lamp2:=O20_SPARE_Q304_1;
 	305:  Out_Lamp2:=O30_CAM_LGHT1_ON_Q305_1;
 	306:  Out_Lamp2:=O50_SPARE_Q306_1;
 	307:  Out_Lamp2:=O70_DRUM_MTR_FWD_Q307_1;
 	308:  Out_Lamp2:=O70_BARLIGHT_OP2_Q308_1;
 	309:  Out_Lamp2:=O70_SPARE_Q309_1;
-    1050: Out_Lamp2:=O10A_ORING_LH_PUSHR_CYL_REV_FWD_Q1050_1;
+        1050: Out_Lamp2:=O10A_ORING_LH_PUSHR_CYL_REV_FWD_Q1050_1;
 	1051: Out_Lamp2:=O10A_ORING_VERT_CYL_DWN_Q1051_1;
-	1052: Out_Lamp2:=O10A_SPARE_Q1052_1;
+	1052: Out_Lamp2:=O50_RH_REJ_CYL_FWD_Q1152_1;
 	1053: Out_Lamp2:=O10A_SPARE_Q1053_1;
 	1060: Out_Lamp2:=O10B_ORING_LH_PUSHR_CYL_REV_FWD_Q1060_1;
 	1061: Out_Lamp2:=O10B_ORING_VERT_CYL_DWN_Q1061_1;
@@ -700,28 +700,28 @@ END_VAR
    END_CASE 
    
      CASE OP_Arr_OP10P[Output_Page_num] OF	
-     300: OLine3:= "O10A_SPARE_Q300.2	Q300.2					";
-     301: OLine3:= "O10A_FIRTREE_ORING_CAM_LGHT1_ON	Q301.2  ";
-     302: OLine3:= "O10B_DRUM_EXT_SPEED	Q302.2              ";
-     303: OLine3:= "O10B_FIRTREE_ORING_CAM_LGHT1_ON	Q303.2  ";
-     304: OLine3:= "O20_SPARE_Q304.2	Q304.2                  ";
-     305: OLine3:= "O30_CAM_LGHT2_ON	Q305.2                  ";
-     306: OLine3:= "O50_DRUM_RUN_IND	Q306.2                  ";
-     307: OLine3:= "O70_DRUM_RST	Q307.2                      ";
-     308: OLine3:= "O70_SPARE_Q308.2	Q308.2                  ";
-     309: OLine3:= "O70_SPARE_Q309.2	Q309.2                  ";
-     1050:OLine3:= "O10A_ORING_RH_GRPR_CLSE_OPN	Q1050.2     ";
-     1051:OLine3:= "O10A_LH_FIRTRE_ORING_REJ_CYL_REV	Q1051.2 ";
-     1052:OLine3:= "O10A_SPARE_Q1052.2	Q1052.2             ";
-     1053:OLine3:= "O10A_SPARE_Q1053.2	Q1053.2             ";
-     1060:OLine3:= "O10B_ORING_RH_GRPR_CLSE_OPN	Q1060.2     ";
-     1061:OLine3:= "O10B_LH_FIRTRE_ORING_REJ_CYL_REV	Q1061.2 ";
-     1062:OLine3:= "O10B_SPARE_Q1062.2	Q1062.2             ";
-     1063:OLine3:= "O10B_SPARE_Q1063.2	Q1063.2             ";
-     1150:OLine3:= "O20_RH_OIL_DISPN_ON Q1150_2           ";
-     1151:OLine3:= "O50_LH_GRIP_OPN_CLSE	Q1151.2             ";
-     1152:OLine3:= "O60_TOOL_CHO_UNLOCK	Q1152.2             ";
-     1153:OLine3:= "O30_AIR_PURGE_ON	Q1153.2                 ";
+     300: OLine3:= "O10A_SPARE_Q300_2(Q300.2)		     ";
+     301: OLine3:= "O10A_FIRTREE_ORING_CAM_LGHT1_ON(Q301.2)  ";
+     302: OLine3:= "O10B_DRUM_EXT_SPEED(Q302.2)              ";
+     303: OLine3:= "O10B_FIRTREE_ORING_CAM_LGHT1_ON(Q303.2)  ";
+     304: OLine3:= "O20_SPARE_Q304_2(Q304.2)                 ";
+     305: OLine3:= "O30_CAM_LGHT2_ON(Q305.2)                 ";
+     306: OLine3:= "O50_DRUM_RUN_IND(Q306.2)                 ";
+     307: OLine3:= "O70_DRUM_RST(Q307.2)                     ";
+     308: OLine3:= "O70_SPARE_Q308_2(Q308.2)                 ";
+     309: OLine3:= "O70_SPARE_Q309_2(Q309.2)                 ";
+     1050:OLine3:= "O10A_ORING_RH_GRPR_CLSE_OPN(Q1050.2)     ";
+     1051:OLine3:= "O10A_LH_FIRTRE_ORING_REJ_CYL_REV(Q1051.2)";
+     1052:OLine3:= "O10A_SPARE_Q1052_2(Q1052.2)              ";
+     1053:OLine3:= "O10A_SPARE_Q1053_2(Q1053.2)              ";
+     1060:OLine3:= "O10B_ORING_RH_GRPR_CLSE_OPN(Q1060.2)     ";
+     1061:OLine3:= "O10B_LH_FIRTRE_ORING_REJ_CYL_REV(Q1061.2)";
+     1062:OLine3:= "O10B_SPARE_Q1062_2(Q1062.2)              ";
+     1063:OLine3:= "O10B_SPARE_Q1063_2(Q1063.2)              ";
+     1150:OLine3:= "O20_RH_OIL_DISPN_ON(Q1150_2)             ";
+     1151:OLine3:= "O50_LH_GRIP_OPN_CLSE(Q1151.2)            ";
+     1152:OLine3:= "O60_TOOL_CHO_UNLOCK(Q1152.2)             ";
+     1153:OLine3:= "O30_AIR_PURGE_ON(Q1153.2)                ";
      ELSE
      	OLine3 := " ";
      END_CASE
@@ -737,7 +737,7 @@ END_VAR
 	307:  Out_Lamp3:=O70_DRUM_RST_Q307_2;
 	308:  Out_Lamp3:=O70_SPARE_Q308_2;
 	309:  Out_Lamp3:=O70_SPARE_Q309_2;
-        1050: Out_Lamp3:= O10A_ORING_RH_GRPR_CLSE_OPN_Q1050_2;
+    1050: Out_Lamp3:= O10A_ORING_RH_GRPR_CLSE_OPN_Q1050_2;
 	1051: Out_Lamp3:=O10A_LH_FIRTRE_ORING_REJ_CYL_REV_Q1051_2;
 	1052: Out_Lamp3:=O10A_SPARE_Q1052_2;
 	1053: Out_Lamp3:=O10A_SPARE_Q1053_2;
@@ -748,142 +748,142 @@ END_VAR
 	1150: Out_Lamp3:=O20_RH_OIL_DISPN_ON_Q1150_2;
 	1151: Out_Lamp3:=O50_LH_GRIP_OPN_Q1151_2;
 	1152: Out_Lamp3:=O60_TOOL_CHO_UNLOCK_Q1152_2;
-	1153: Out_Lamp3:=O30_SPARE_Q1153_2;
+	1153: Out_Lamp3:=O30_AIR_PURGE_ON_Q1153_2;
    ELSE
        Out_Visibility_3:=FALSE;	
    END_CASE 
    
      CASE OP_Arr_OP10P[Output_Page_num] OF	
-     300: OLine4:= "O10A_SPARE_Q300.3	Q300.3				   "; 
-     301: OLine4:= "O10A_FIRTREE_ORING_CAM_LGHT2_ON	Q301.3 ";
-     302: OLine4:= "O10A_SPARE_Q302.3	Q302.3                 ";
-     303: OLine4:= "O10B_FIRTREE_ORING_CAM_LGHT2_ON	Q303.3 ";
-     304: OLine4:= "O20_SPARE_Q304.3	Q304.3                 ";
-     305: OLine4:= "O30_SPARE_Q305.3	Q305.3                 ";
-     306: OLine4:= "O50_CAM_LGHT1_ON	Q306.3                 ";
-     307: OLine4:= "O70_DRUM_EXT_SPEED	Q307.3             ";
-     308: OLine4:= "O70_SPARE_Q308.3	Q308.3                 ";
-     309: OLine4:= "O70_SPARE_Q309.3	Q309.3                 ";
-     1050:OLine4:= "O10A_ORING_RH_PUSHR_CYL_REV_FWD	Q1050.3";
-     1051:OLine4:= "O10A_LH_FIRTRE_ORING_REJ_CYL_FWD	Q1051.3";
-     1052:OLine4:= "O10A_SPARE_Q1052.3	Q1052.3            ";
-     1053:OLine4:= "O10A_SPARE_Q1053.3	Q1053.3            ";
-     1060:OLine4:= "O10B_ORING_RH_PUSHR_CYL_REV_FWD	Q1060.3";
-     1061:OLine4:= "O10B_LH_FIRTRE_ORING_REJ_CYL_FWD	Q1061.3";
-     1062:OLine4:= "O10B_SPARE_Q1062.3	Q1062.3            ";
-     1063:OLine4:= "O10B_SPARE_Q1063.3	Q1063.3            ";
-     1150:OLine4:= "O20_RH_OIL_SPIN_ON	Q1150.3            ";
-     1151:OLine4:= "O50_SPARE_Q1151.3	Q1151.3                ";
-     1152:OLine4:= "O60_TOOL_CHO_LOCK	Q1152.3                ";
-     1153:OLine4:= "O70_SPARE_Q1153.3	Q1153.3                ";
+     300: OLine4:= "O10A_SPARE_Q300_3(Q300.3)	           "; 
+     301: OLine4:= "O10A_FIRTREE_ORING_CAM_LGHT2_ON(Q301.3)";
+     302: OLine4:= "O10A_SPARE_Q302_3(Q302.3)              ";
+     303: OLine4:= "O10B_FIRTREE_ORING_CAM_LGHT2_ON(Q303.3)";
+     304: OLine4:= "O20_SPARE_Q304_3(Q304.3)               ";
+     305: OLine4:= "O30_SPARE_Q305_3(Q305.3)               ";
+     306: OLine4:= "O50_CAM_LGHT1_ON(Q306.3)               ";
+     307: OLine4:= "O70_DRUM_EXT_SPEED(Q307.3)             ";
+     308: OLine4:= "O70_SPARE_Q308_3(Q308.3)               ";
+     309: OLine4:= "O70_SPARE_Q309_3(Q309.3)               ";
+     1050:OLine4:= "O10A_ORING_RH_PUSHR_CYL_REV_FWD(Q1050.3)";
+     1051:OLine4:= "O10A_LH_FIRTRE_ORING_REJ_CYL_FWD(Q1051.3)";
+     1052:OLine4:= "O10A_SPARE_Q1052_3(Q1052.3)            ";
+     1053:OLine4:= "O10A_SPARE_Q1053_3(Q1053.3)            ";
+     1060:OLine4:= "O10B_ORING_RH_PUSHR_CYL_REV_FWD(Q1060.3)";
+     1061:OLine4:= "O10B_LH_FIRTRE_ORING_REJ_CYL_FWD(Q1061.3)";
+     1062:OLine4:= "O10B_SPARE_Q1062_3(Q1062.3)            ";
+     1063:OLine4:= "O10B_SPARE_Q1063_3(Q1063.3)            ";
+     1150:OLine4:= "O20_RH_OIL_SPIN_ON(Q1150.3)            ";
+     1151:OLine4:= "O50_SPARE_Q1151_3(Q1151.3)             ";
+     1152:OLine4:= "O60_TOOL_CHO_LOCK(Q1152.3)             ";
+     1153:OLine4:= "O70_SPARE_Q1153_3(Q1153.3)             ";
      ELSE
      	OLine4 := " ";
      END_CASE
        Out_Visibility_4:=TRUE;	
-		 CASE OP_Arr_OP10P[Output_Page_num] OF
-		300:  Out_Lamp4:=O10A_SPARE_Q300_3;
-		301:  Out_Lamp4:=O10A_FIRTREE_ORING_CAM_LGHT2_ON_Q301_3;
-		302:  Out_Lamp4:=O10A_SPARE_Q302_3_Q302_3;
-		303:  Out_Lamp4:=O10B_FIRTREE_ORING_CAM_LGHT2_ON_Q303_3;
-		304:  Out_Lamp4:=O20_SPARE_Q304_3;
-		305:  Out_Lamp4:=O30_SPARE_Q305_3;
-		306:  Out_Lamp4:=O50_CAM_LGHT1_ON_Q306_3;
-		307:  Out_Lamp4:=O70_DRUM_EXT_SPEED_Q307_3;
-		308:  Out_Lamp4:=O70_SPARE_Q308_3;
-		309:  Out_Lamp4:=O70_SPARE_Q309_3;
-		1050: Out_Lamp4:=O10A_ORING_RH_PUSHR_CYL_REV_FWD_Q1050_3;
-		1051: Out_Lamp4:=O10A_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1051_3;
-		1052: Out_Lamp4:=O10A_SPARE_Q1052_3;
-		1053: Out_Lamp4:=O10A_SPARE_Q1053_3;
-		1060: Out_Lamp4:=O10B_ORING_RH_PUSHR_CYL_REV_FWD_Q1060_3;
-		1061: Out_Lamp4:=O10B_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1061_3;
-		1062: Out_Lamp4:=O10B_SPARE_Q1062_3;
-		1063: Out_Lamp4:=O10B_SPARE_Q1063_3;
-		1150: Out_Lamp4:=O20_RH_OIL_SPIN_ON_Q1150_3;
-		1151: Out_Lamp4:=O50_LH_GRIP_CLSE_Q1151_3;
-		1152: Out_Lamp4:=O60_TOOL_CHO_LOCK_Q1152_3;
-		1153: Out_Lamp4:=O30_AIR_PURGE_ON_Q1153_3;
-	   ELSE
-	       Out_Visibility_4:=FALSE;	
-	   END_CASE 
+     CASE OP_Arr_OP10P[Output_Page_num] OF
+     300:  Out_Lamp4:=O10A_SPARE_Q300_3;
+     301:  Out_Lamp4:=O10A_FIRTREE_ORING_CAM_LGHT2_ON_Q301_3;
+     302:  Out_Lamp4:=O10A_SPARE_Q302_3_Q302_3;
+     303:  Out_Lamp4:=O10B_FIRTREE_ORING_CAM_LGHT2_ON_Q303_3;
+     304:  Out_Lamp4:=O20_SPARE_Q304_3;
+     305:  Out_Lamp4:=O30_SPARE_Q305_3;
+     306:  Out_Lamp4:=O50_CAM_LGHT1_ON_Q306_3;
+     307:  Out_Lamp4:=O70_DRUM_EXT_SPEED_Q307_3;
+     308:  Out_Lamp4:=O70_SPARE_Q308_3;
+     309:  Out_Lamp4:=O70_SPARE_Q309_3;
+     1050: Out_Lamp4:=O10A_ORING_RH_PUSHR_CYL_REV_FWD_Q1050_3;
+     1051: Out_Lamp4:=O10A_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1051_3;
+     1052: Out_Lamp4:=O10A_SPARE_Q1052_3;
+     1053: Out_Lamp4:=O10A_SPARE_Q1053_3;
+     1060: Out_Lamp4:=O10B_ORING_RH_PUSHR_CYL_REV_FWD_Q1060_3;
+     1061: Out_Lamp4:=O10B_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1061_3;
+     1062: Out_Lamp4:=O10B_SPARE_Q1062_3;
+     1063: Out_Lamp4:=O10B_SPARE_Q1063_3;
+     1150: Out_Lamp4:=O20_RH_OIL_SPIN_ON_Q1150_3;
+     1151: Out_Lamp4:=O50_LH_GRIP_CLSE_Q1151_3;
+     1152: Out_Lamp4:=O60_TOOL_CHO_LOCK_Q1152_3;
+     1153: Out_Lamp4:=O30_SPARE_Q1153_3;
+     ELSE	
+       Out_Visibility_4:=FALSE;	
+     END_CASE 
 	 
      CASE OP_Arr_OP10P[Output_Page_num] OF	
-     300: OLine5:= "O10A_SPARE_Q300.4	Q300.4					";
-     301: OLine5:= "O10A_ORING_CAM_LGHT1_ON	Q301.4          ";
-     302: OLine5:= "O10B_DRUM_RUN_IND	Q302.4                  ";
-     303: OLine5:= "O10B_ORING_CAM_LGHT1_ON	Q303.4          ";
-     304: OLine5:= "O30_DRUM_MTR_FWD	Q304.4                  ";
-     305: OLine5:= "O30_SPARE_Q305.4	Q305.4                  ";
-     306: OLine5:= "O50_CAM_LGHT2_ON	Q306.4                  ";
-     307: OLine5:= "O70_SPARE_Q307.4	Q307.4                  ";
-     308: OLine5:= "O70_SPARE_Q308.4	Q308.4                  ";
-     309: OLine5:= "O70_SPARE_Q309.4	Q309.4                  ";
-     1050:OLine5:= "O10A_ORING_ROTRY_CYL_O_DEG	Q1050.4     ";
-     1051:OLine5:= "O10A_RH_FIRTRE_ORING_REJ_CYL_REV	Q1051.4 ";
-     1052:OLine5:= "O10A_SPARE_Q1052.4	Q1052.4             ";
-     1053:OLine5:= "O10A_SPARE_Q1053.4	Q1053.4             ";
-     1060:OLine5:= "O10B_ORING_ROTRY_CYL_O_DEG	Q1060.4     ";
-     1061:OLine5:= "O10B_RH_FIRTRE_ORING_REJ_CYL_REV	Q1061.4 ";
-     1062:OLine5:= "O10B_SPARE_Q1062.4	Q1062.4             ";
-     1063:OLine5:= "O10B_SPARE_Q1063.4	Q1063.4             ";
-     1150:OLine5:= "O30_LH_REJ_CYL_REV	Q1150.4             ";
-     1151:OLine5:= "O50_RH_GRIP_OPN_CLSE	Q1151.4             ";
-     1152:OLine5:= "O70_LH_REJ_CYL_FWD_REV	Q1152.4         ";
-     1153:OLine5:= "O50_AIR_PURGE_ON	Q1153.4                 ";
+     300: OLine5:= "O10A_SPARE_Q300_4(Q300.4)	       	     ";
+     301: OLine5:= "O10A_ORING_CAM_LGHT1_ON(Q301.4)          ";
+     302: OLine5:= "O10B_DRUM_RUN_IND(Q302.4)                ";
+     303: OLine5:= "O10B_ORING_CAM_LGHT1_ON(Q303.4)          ";
+     304: OLine5:= "O30_DRUM_MTR_FWD(Q304.4)                 ";
+     305: OLine5:= "O30_SPARE_Q305_4(Q305.4)                 ";
+     306: OLine5:= "O50_CAM_LGHT2_ON(Q306.4)                 ";
+     307: OLine5:= "O70_SPARE_Q307_4(Q307.4)                 ";
+     308: OLine5:= "O70_SPARE_Q308_4(Q308.4)                 ";
+     309: OLine5:= "O70_SPARE_Q309_4(Q309.4)                 ";
+     1050:OLine5:= "O10A_ORING_ROTRY_CYL_O_DEG(Q1050.4)      ";
+     1051:OLine5:= "O10A_RH_FIRTRE_ORING_REJ_CYL_REV(Q1051.4)";
+     1052:OLine5:= "O10A_SPARE_Q1052_4(Q1052.4)              ";
+     1053:OLine5:= "O10A_SPARE_Q1053_4(Q1053.4)              ";
+     1060:OLine5:= "O10B_ORING_ROTRY_CYL_O_DEG(Q1060.4)      ";
+     1061:OLine5:= "O10B_RH_FIRTRE_ORING_REJ_CYL_REV(Q1061.4)";
+     1062:OLine5:= "O10B_SPARE_Q1062_4(Q1062.4)              ";
+     1063:OLine5:= "O10B_SPARE_Q1063_4(Q1063.4)              ";
+     1150:OLine5:= "O30_LH_REJ_CYL_REV(Q1150.4)              ";
+     1151:OLine5:= "O50_RH_GRIP_OPN_CLSE(Q1151.4)            ";
+     1152:OLine5:= "O70_LH_REJ_CYL_FWD_REV(Q1152.4)          ";
+     1153:OLine5:= "O50_AIR_PURGE_ON(Q1153.4)                ";
      ELSE
      	OLine5 := " ";
      END_CASE
-       Out_Visibility_5:=TRUE;	
-		 CASE OP_Arr_OP10P[Output_Page_num] OF
-		300:  Out_Lamp5:=O10A_SPARE_Q300_4;
-		301:  Out_Lamp5:=O10A_ORING_CAM_LGHT1_ON_Q301_4;
-		302:  Out_Lamp5:=O10B_DRUM_RUN_IND_Q302_4;
-		303:  Out_Lamp5:=O10B_ORING_CAM_LGHT1_ON_Q303_4;
-		304:  Out_Lamp5:=O30_DRUM_MTR_FWD_Q304_4;
-		305:  Out_Lamp5:=O30_SPARE_Q305_4;
-		306:  Out_Lamp5:=O50_CAM_LGHT2_ON_Q306_4;
-		307:  Out_Lamp5:=O70_SPARE_Q307_4;
-		308:  Out_Lamp5:=O70_SPARE_Q308_4;
-		309:  Out_Lamp5:=O70_SPARE_Q309_4;
-		1050: Out_Lamp5:=O10A_ORING_ROTRY_CYL_O_DEG_Q1050_4;
-		1051: Out_Lamp5:=O10A_RH_FIRTRE_ORING_REJ_CYL_REV_Q1051_4;
-		1052: Out_Lamp5:=O10A_SPARE_Q1052_4;
-		1053: Out_Lamp5:=O10A_SPARE_Q1053_4;
-		1060: Out_Lamp5:=O10B_ORING_ROTRY_CYL_O_DEG_Q1060_4;
-		1061: Out_Lamp5:=O10B_RH_FIRTRE_ORING_REJ_CYL_REV_Q1061_4;
-		1062: Out_Lamp5:=O10B_SPARE_Q1062_4;
-		1063: Out_Lamp5:=O10B_SPARE_Q1063_4;
-		1150: Out_Lamp5:=O30_LH_REJ_CYL_REV_Q1150_4;
-		1151: Out_Lamp5:=O50_RH_GRIP_OPN_Q1151_4;
-		1152: Out_Lamp5:=O70_LH_REJ_CYL_REV_Q1152_4;
-		1153: Out_Lamp5:=O50_AIR_PURGE_ON_Q1153_4;
- 		 ELSE
-    	   Out_Visibility_5:=FALSE;	
-  		 END_CASE
+         Out_Visibility_5:=TRUE;	
+	 CASE OP_Arr_OP10P[Output_Page_num] OF
+	      300:  Out_Lamp5:=O10A_SPARE_Q300_4;
+	      301:  Out_Lamp5:=O10A_ORING_CAM_LGHT1_ON_Q301_4;
+	      302:  Out_Lamp5:=O10B_DRUM_RUN_IND_Q302_4;
+	      303:  Out_Lamp5:=O10B_ORING_CAM_LGHT1_ON_Q303_4;
+	      304:  Out_Lamp5:=O30_DRUM_MTR_FWD_Q304_4;
+	      305:  Out_Lamp5:=O30_SPARE_Q305_4;
+	      306:  Out_Lamp5:=O50_CAM_LGHT2_ON_Q306_4;
+	      307:  Out_Lamp5:=O70_SPARE_Q307_4;
+           308:  Out_Lamp5:=O70_SPARE_Q308_4;
+           309:  Out_Lamp5:=O70_SPARE_Q309_4;
+	      1050: Out_Lamp5:=O10A_ORING_ROTRY_CYL_O_DEG_Q1050_4;
+	      1051: Out_Lamp5:=O10A_RH_FIRTRE_ORING_REJ_CYL_REV_Q1051_4;
+	      1052: Out_Lamp5:=O10A_SPARE_Q1052_4;
+	      1053: Out_Lamp5:=O10A_SPARE_Q1053_4;
+	      1060: Out_Lamp5:=O10B_ORING_ROTRY_CYL_O_DEG_Q1060_4;
+	      1061: Out_Lamp5:=O10B_RH_FIRTRE_ORING_REJ_CYL_REV_Q1061_4;
+	      1062: Out_Lamp5:=O10B_SPARE_Q1062_4;
+	      1063: Out_Lamp5:=O10B_SPARE_Q1063_4;
+	      1150: Out_Lamp5:=O30_LH_REJ_CYL_REV_Q1150_4;
+	      1151: Out_Lamp5:=O50_RH_GRIP_OPN_Q1151_4;
+	      1152: Out_Lamp5:=O70_LH_REJ_CYL_REV_Q1152_4;
+	      1153: Out_Lamp5:=O50_AIR_PURGE_ON_Q1153_4;
+ 	      ELSE
+    	        Out_Visibility_5:=FALSE;	
+  	      END_CASE
 	 
      CASE OP_Arr_OP10P[Output_Page_num] OF	
-     300: OLine6:= "O10A_SPARE_Q300.5	Q300.5					";
-     301: OLine6:= "O10A_ORING_CAM_LGHT2_ON	Q301.5          ";
-     302: OLine6:= "O10_TWR_LMP_RD	Q302.5                  ";
-     303: OLine6:= "O10B_ORING_CAM_LGHT2_ON	Q303.5          ";
-     304: OLine6:= "O30_DRUM_RST	Q304.5                      ";
-     305: OLine6:= "O50_DRUM_MTR_FWD	Q305.5                  ";
-     306: OLine6:= "O50_SPARE_Q306.5	Q306.5                  ";
-     307: OLine6:= "O70_DRUM_RUN_IND	Q307.5                  ";
-     308: OLine6:= "O70_SPARE_Q308.5	Q308.5                  ";
-     309: OLine6:= "O70_SPARE_Q309.5	Q309.5                  ";
-     1050:OLine6:= "O10A_ORING_ROTRY_CYL_180_DEG	Q1050.5     ";
-     1051:OLine6:= "O10A_RH_FIRTRE_ORING_REJ_CYL_FWD	Q1051.5 ";
-     1052:OLine6:= "O10A_SPARE_Q1052.5	Q1052.5             ";
-     1053:OLine6:= "O10A_SPARE_Q1053.5	Q1053.5             ";
-     1060:OLine6:= "O10B_ORING_ROTRY_CYL_180_DEG	Q1060.5     ";
-     1061:OLine6:= "O10B_RH_FIRTRE_ORING_REJ_CYL_FWD	Q1061.5 ";
-     1062:OLine6:= "O10B_SPARE_Q1062.5	Q1062.5             ";
-     1063:OLine6:= "O10B_SPARE_Q1063.5	Q1063.5             ";
-     1150:OLine6:= "O30_LH_REJ_CYL_FWD	Q1150.5             ";
-     1151:OLine6:= "O50_SPARE_Q1151.5	Q1151.5                 ";
-     1152:OLine6:= "O70_SPARE_Q1152.5	Q1152.5                 ";
-     1153:OLine6:= "O70_AIR_PURGE_ON	Q1153.5                 ";
+     300: OLine6:= "O10A_SPARE_Q300_5(Q300.5)					";
+     301: OLine6:= "O10A_ORING_CAM_LGHT2_ON(Q301.5)          ";
+     302: OLine6:= "O10_TWR_LMP_RD(Q302.5)                  ";
+     303: OLine6:= "O10B_ORING_CAM_LGHT2_ON(Q303.5)          ";
+     304: OLine6:= "O30_DRUM_RST(Q304.5)                      ";
+     305: OLine6:= "O50_DRUM_MTR_FWD(Q305.5)                  ";
+     306: OLine6:= "O50_SPARE_Q306_5(Q306.5)                  ";
+     307: OLine6:= "O70_DRUM_RUN_IND(Q307.5)                  ";
+     308: OLine6:= "O70_SPARE_Q308_5(Q308.5)                  ";
+     309: OLine6:= "O70_SPARE_Q309_5(Q309.5)                  ";
+     1050:OLine6:= "O10A_ORING_ROTRY_CYL_180_DEG(Q1050.5)     ";
+     1051:OLine6:= "O10A_RH_FIRTRE_ORING_REJ_CYL_FWD(Q1051.5) ";
+     1052:OLine6:= "O10A_SPARE_Q1052_5(Q1052.5)               ";
+     1053:OLine6:= "O10A_SPARE_Q1053_5(Q1053.5)               ";
+     1060:OLine6:= "O10B_ORING_ROTRY_CYL_180_DEG(Q1060.5)     ";
+     1061:OLine6:= "O10B_RH_FIRTRE_ORING_REJ_CYL_FWD(Q1061.5) ";
+     1062:OLine6:= "O10B_SPARE_Q1062_5	(Q1062.5)             ";
+     1063:OLine6:= "O10B_SPARE_Q1063_5	(Q1063.5)             ";
+     1150:OLine6:= "O30_LH_REJ_CYL_FWD	(Q1150.5)             ";
+     1151:OLine6:= "O50_SPARE_Q1151_5	(Q1151.5)             ";
+     1152:OLine6:= "O70_SPARE_Q1152_5	(Q1152.5)             ";
+     1153:OLine6:= "O70_AIR_PURGE_ON	Q1153.5               ";
      ELSE
      	OLine6 := " ";
      END_CASE
@@ -911,34 +911,34 @@ END_VAR
 	1150: Out_Lamp6:=O30_LH_REJ_CYL_FWD_Q1150_5;
 	1151: Out_Lamp6:=O50_RH_GRIP_CLSE_Q1151_5;
 	1152: Out_Lamp6:=O70_LH_REJ_CYL_FWD_Q1152_5;
-	1153: Out_Lamp6:=O70_AIR_PURGE_ON_Q1153_5;
+	1153: Out_Lamp6:=O30_SPARE_Q1153_5;
    ELSE           
        Out_Visibility_6:=FALSE;	
    END_CASE
 	 
      CASE OP_Arr_OP10P[Output_Page_num] OF	
-     300: OLine7:= "O10_BARLIGHT_OP1	Q300.6                    ";
-     301: OLine7:= "O10A_FIRTREE_ORING_CAMBAR_LGHT1_ON	Q301.6";
-     302: OLine7:= "O10_TWR_LMP_GN	Q302.6                    ";
-     303: OLine7:= "O10B_FIRTREE_ORING_CAMBAR_LGHT1_ON	Q303.6";
-     304: OLine7:= "O30_DRUM_EXT_SPEED	Q304.6                ";
-     305: OLine7:= "O50_DRUM_RST	Q305.6                        ";
-     306: OLine7:= "O50_SPARE_Q306.6	Q306.6                    ";
-     307: OLine7:= "O70_CAM_LGHT1_ON	Q307.6                    ";
-     308: OLine7:= "O70_SPARE_Q308.6	Q308.6                    ";
-     309: OLine7:= "O70_SPARE_Q309.6	Q309.6                    ";
-     1050:OLine7:= "O10A_ORING_HORZ_CYL_REV	Q1050.6           ";
-     1051:OLine7:= "O10A_BDY_SING_CYL_CLSE	Q1051.6           ";
-     1052:OLine7:= "O10A_SPARE_Q1052.6	Q1052.6               ";
-     1053:OLine7:= "O10A_SPARE_Q1053.6	Q1053.6               ";
-     1060:OLine7:= "O10B_ORING_HORZ_CYL_REV	Q1060.6           ";
-     1061:OLine7:= "O10B_BDY_SING_CYL_CLSE	Q1061.6           ";
-     1062:OLine7:= "O10B_SPARE_Q1062.6	Q1062.6               ";
-     1063:OLine7:= "O10B_SPARE_Q1063.6	Q1063.6               ";
-     1150:OLine7:= "O30_RH_REJ_CYL_REV	Q1150.6               ";
-     1151:OLine7:= "O50_LH_REJ_CYL_FWD_REV	Q1151.6           ";
-     1152:OLine7:= "O70_RH_REJ_CYL_FWD_REV	Q1152.6           ";
-     1153:OLine7:= "O80_SPARE_Q1153.6	Q1153.6                   ";
+     300: OLine7:= "O10_BARLIGHT_OP1(Q300.6)                      ";
+     301: OLine7:= "O10A_FIRTREE_ORING_CAMBAR_LGHT1_ON(Q301.6)    ";
+     302: OLine7:= "O10_TWR_LMP_GN(Q302.6)                        ";
+     303: OLine7:= "O10B_FIRTREE_ORING_CAMBAR_LGHT1_ON(Q303.6)    ";
+     304: OLine7:= "O30_DRUM_EXT_SPEED(Q304.6)                    ";
+     305: OLine7:= "O50_DRUM_RST(Q305.6)                          ";
+     306: OLine7:= "O50_SPARE_Q306_6(Q306.6)                      ";
+     307: OLine7:= "O70_CAM_LGHT1_ON(Q307.6)                      ";
+     308: OLine7:= "O70_SPARE_Q308_6(Q308.6)                      ";
+     309: OLine7:= "O70_SPARE_Q309_6(Q309.6)                      ";
+     1050:OLine7:= "O10A_ORING_HORZ_CYL_REV(Q1050.6)              ";
+     1051:OLine7:= "O10A_BDY_SING_CYL_CLSE(Q1051.6)               ";
+     1052:OLine7:= "O10A_SPARE_Q1052_6(Q1052.6)                   ";
+     1053:OLine7:= "O10A_SPARE_Q1053_6(Q1053.6)                   ";
+     1060:OLine7:= "O10B_ORING_HORZ_CYL_REV(Q1060.6)              ";
+     1061:OLine7:= "O10B_BDY_SING_CYL_CLSE(Q1061.6)               ";
+     1062:OLine7:= "O10B_SPARE_Q1062_6(Q1062.6)                   ";
+     1063:OLine7:= "O10B_SPARE_Q1063_6(Q1063.6)                   ";
+     1150:OLine7:= "O30_RH_REJ_CYL_REV(Q1150.6)                   ";
+     1151:OLine7:= "O50_LH_REJ_CYL_FWD_REV(Q1151.6)               ";
+     1152:OLine7:= "O70_RH_REJ_CYL_FWD_REV(Q1152.6)               ";
+     1153:OLine7:= "O80_SPARE_Q1153_6(Q1153.6)                    ";
      ELSE
      	OLine7 := " ";
      END_CASE
@@ -966,34 +966,34 @@ END_VAR
 	1150: Out_Lamp7:=O30_RH_REJ_CYL_REV_Q1150_6;
 	1151: Out_Lamp7:=O50_LH_REJ_CYL_REV_Q1151_6;
 	1152: Out_Lamp7:=O70_RH_REJ_CYL_REV_Q1152_6;
-	1153: Out_Lamp7:=O30_SPARE_Q1153_6;
+	1153: Out_Lamp7:=O70_AIR_PURGE_ON_Q1153_6;
    ELSE
        Out_Visibility_7:=FALSE;	
    END_CASE 
 	 
      CASE OP_Arr_OP10P[Output_Page_num] OF	
-     300: OLine8:= "O10_BARLIGHT_OP2	Q300.7			";
-     301: OLine8:= "O10A_SPARE_Q301.7	Q301.7          ";
-     302: OLine8:= "O10_TWR_LMP_YELW	Q302.7          ";
-     303: OLine8:= "O10B_SPARE_Q303.7	Q303.7          ";
-     304: OLine8:= "O30_SPARE_Q304.7	Q304.7          ";
-     305: OLine8:= "O50_SPARE_Q305.7	Q305.7          ";
-     306: OLine8:= "O50_BARLIGHT_OP1	Q306.7          ";
-     307: OLine8:= "O70_CAM_LGHT2_ON	Q307.7          ";
-     308: OLine8:= "O70_SPARE_Q308.7	Q308.7          ";
-     309: OLine8:= "O70_SPARE_Q309.7	Q309.7          ";
-     1050:OLine8:= "O10A_ORING_HORZ_CYL_FWD	Q1050.7 ";
-     1051:OLine8:= "O10A_BDY_SING_CYL_OPN	Q1051.7     ";
-     1052:OLine8:= "O10A_SPARE_Q1052.7	Q1052.7     ";
-     1053:OLine8:= "O10A_SPARE_Q1053.7	Q1053.7     ";
-     1060:OLine8:= "O10B_ORING_HORZ_CYL_FWD	Q1060.7 ";
-     1061:OLine8:= "O10B_BDY_SING_CYL_OPN	Q1061.7     ";
-     1062:OLine8:= "O10B_SPARE_Q1062.7	Q1062.7     ";
-     1063:OLine8:= "O10B_SPARE_Q1063.7	Q1063.7     ";
-     1150:OLine8:= "O30_RH_REJ_CYL_FWD	Q1150.7     ";
-     1151:OLine8:= "O50_SPARE_Q1151.7	Q1151.7         ";
-     1152:OLine8:= "O70_SPARE_Q1152.7	Q1152.7         ";
-     1153:OLine8:= "O80_SPARE_Q1153.7	Q1153.7         ";
+     300: OLine8:= "O10_BARLIGHT_OP2(Q300.7)	       ";
+     301: OLine8:= "O10A_SPARE_Q301_7(Q301.7)          ";
+     302: OLine8:= "O10_TWR_LMP_YELW(Q302.7)           ";
+     303: OLine8:= "O10B_SPARE_Q303_7(Q303.7)          ";
+     304: OLine8:= "O30_SPARE_Q304_7(Q304.7)           ";
+     305: OLine8:= "O50_SPARE_Q305_7(Q305.7)           ";
+     306: OLine8:= "O50_BARLIGHT_OP1(Q306.7)           ";
+     307: OLine8:= "O70_CAM_LGHT2_ON(Q307.7)           ";
+     308: OLine8:= "O70_SPARE_Q308_7(Q308.7)           ";
+     309: OLine8:= "O70_SPARE_Q309_7(Q309.7)           ";
+     1050:OLine8:= "O10A_ORING_HORZ_CYL_FWD(Q1050.7)   ";
+     1051:OLine8:= "O10A_BDY_SING_CYL_OPN(Q1051.7)     ";
+     1052:OLine8:= "O10A_SPARE_Q1052_7(Q1052.7)        ";
+     1053:OLine8:= "O10A_SPARE_Q1053_7(Q1053.7)        ";
+     1060:OLine8:= "O10B_ORING_HORZ_CYL_FWD(Q1060.7)   ";
+     1061:OLine8:= "O10B_BDY_SING_CYL_OPN(Q1061.7)     ";
+     1062:OLine8:= "O10B_SPARE_Q1062_7(Q1062.7)        ";
+     1063:OLine8:= "O10B_SPARE_Q1063_7(Q1063.7)        ";
+     1150:OLine8:= "O30_RH_REJ_CYL_FWD(Q1150.7)        ";
+     1151:OLine8:= "O50_SPARE_Q1151_7(Q1151.7)         ";
+     1152:OLine8:= "O70_SPARE_Q1152_7(Q1152.7)         ";
+     1153:OLine8:= "O80_SPARE_Q1153_7(Q1153.7)         ";
      ELSE
      	OLine8 := " ";
      END_CASE
@@ -1030,14 +1030,14 @@ END_VAR
    401:  Line1:= " I90_DOOR7_CLOSE_FB(I401.0)           ";
    402:  Line1:= " I90_DOOR15_CLOSE_FB(I402.0)          ";
    403:  Line1:= " I120_ATC_STN_POKE_YOKE_3(I403.0)     ";
-   404:  Line1:="I90_LHS_ESTOP1_FB(I404.0)			  "  ;
+   404:  Line1:="I90_LHS_ESTOP1_FB(I404.0)	      "  ;
    405:  Line1:="I90_XTS_48VSMPS1_DC_OK(I405.0)        " ;
    1200: Line1:= " I90_RET_LH_GRIPR_CYL_CLSE(I1200.0)   ";
    1201: Line1:= " I90_LH_MOVR_SUP_HORZ_CYL_REV(I1201.0)";
    1210: Line1:= " I90_LH1_REJ_SLIDE_REV(I1210.0)       ";
-   1211: Line1:= " I90_SPARE_I1211.0(I1211.0)           ";
+   1211: Line1:= " I90_SPARE_I1211_0(I1211.0)           ";
    1220: Line1:= " I120_PUSH_CYL_REV(I1220.0)           ";
-   1221: Line1:= " I120_SPARE_I1221.0(I1221.0)          ";
+   1221: Line1:= " I120_REJ_BIN_PRSNCE(I1221.0)          ";
    ELSE
      Line1:= " ";	
    END_CASE
@@ -1055,7 +1055,7 @@ END_VAR
 	1210: Lamp1:=I90_LH1_REJ_SLIDE_REV_I1210_0;
 	1211: Lamp1:=I90_SPARE_I1211_0;
 	1220: Lamp1:=I120_PUSH_CYL_REV_I1220_0 ;
-	1221: Lamp1:=I120_SPARE_I1221_0 ;
+	1221: Lamp1:=I120_REJ_BIN_PRSNCE_I1221_0 ;
    ELSE
        Visibility_1:=FALSE;	
    END_CASE
@@ -1070,9 +1070,9 @@ END_VAR
    1200: Line2:= " I90_RET_LH_GRIPR_CYL_OPN(I1200.1)    ";
    1201: Line2:= " I90_LH_MOVR_SUP_HORZ_CYL_FWD(I1201.1)";
    1210: Line2:= " I90_LH1_REJ_SLIDE_FWD(I1210.1)       ";
-   1211: Line2:= " I90_SPARE_I1211.1(I1211.1)           ";
+   1211: Line2:= " I90_SPARE_I1211_1(I1211.1)           ";
    1220: Line2:= " I120_PUSH_CYL_FWD(I1220.1)           ";
-   1221: Line2:= " I120_SPARE_I1221.1(I1221.1)          ";
+   1221: Line2:= " I120_SPARE_I1221_1(I1221.1)          ";
    ELSE
      Line2:= " ";	
    END_CASE
@@ -1101,14 +1101,14 @@ END_VAR
    401:  Line3:= " I90_DOOR9_CLOSE_FB(I401.2)           ";
    402:  Line3:= " I110_RESRVR_LW_LVL(I402.2)           ";
    403:  Line3:= " I120_ATC_SLAVE_MODL1(I403.2)         ";
-   404:Line3:="I90_LHS_ESTOP3_FB(I404.2)             " ;
-   405:Line3:="I90_XTS_48VSMPS3_DC_OK(I405.2)        " ;
+   404:  Line3:= "I90_LHS_ESTOP3_FB(I404.2)             " ;
+   405:  Line3:= "I90_XTS_48VSMPS3_DC_OK(I405.2)        " ;
    1200: Line3:= " I90_RET_RH_GRIPR_CYL_CLSE(I1200.2)   ";
    1201: Line3:= " I90_RH_MOVR_SUP_VERT_CYL_DWN(I1201.2)";
    1210: Line3:= " I90_RH1_REJ_SLIDE_REV(I1210.2)       ";
-   1211: Line3:= " I90_SPARE_I1211.2(I1211.2)           ";
+   1211: Line3:= " I90_SPARE_I1211_2(I1211.2)           ";
    1220: Line3:= " I120_LH_SING_CYL_REV(I1220.2)        ";
-   1221: Line3:= " I120_SPARE_I1221.2(I1221.2)          ";
+   1221: Line3:= " I120_SPARE_I1221_2(I1221.2)          ";
    ELSE
      Line3:= " ";	
    END_CASE
@@ -1142,9 +1142,9 @@ END_VAR
    1200: Line4:= " I90_RET_RH_GRIPR_CYL_OPN(I1200.3)   ";
    1201: Line4:= " I90_RH_MOVR_SUP_VERT_CYL_UP(I1201.3)";
    1210: Line4:= " I90_RH1_REJ_SLIDE_FWD(I1210.3)      ";
-   1211: Line4:= " I90_SPARE_I1211.3(I1211.3)          ";
+   1211: Line4:= " I90_SPARE_I1211_3(I1211.3)          ";
    1220: Line4:= " I120_LH_SING_CYL_FWD(I1220.3)       ";
-   1221: Line4:= " I120_SPARE_I1221.3(I1221.3)         ";
+   1221: Line4:= " I120_SPARE_I1221_3(I1221.3)         ";
    ELSE
      Line4:= " ";	
    END_CASE
@@ -1172,15 +1172,15 @@ END_VAR
    400:  Line5:= " I90_DOOR3_CLOSE_FB(I400.4)           ";
    401:  Line5:= " I90_DOOR11_CLOSE_FB(I401.4)          ";
    402:  Line5:= " I120_ATC_DECLAMP_FB(I402.4)          ";
-   403:  Line5:= " I120_LH_GRPR_CLSE(I403.4)            ";
+   403:  Line5:= " I120_SPARE_I403_4(I403.4)            ";
    404:Line5:="I90_RHS_ESTOP2_FB(I404.4)             " ;
    405:Line5:="I120_LH_LOCKSPRING_GRPR_CLSE(I405.4)  " ;
    1200: Line5:= " I90_POSTN_SLIDE_CYL_REV(I1200.4)     ";
    1201: Line5:= " I90_RH_MOVR_SUP_HORZ_CYL_REV(I1201.4)";
    1210: Line5:= " I90_LH2_REJ_SLIDE_REV(I1210.4)       ";
-   1211: Line5:= " I90_SPARE_I1211.4(I1211.4)           ";
-   1220: Line5:= " I120_LH_LOCKSPRING_GRPR_CLSE(I1220.4)";
-   1221: Line5:= " I120_SPARE_I1221.4(I1221.4)          ";
+   1211: Line5:= " I90_SPARE_I1211_4(I1211.4)           ";
+   1220: Line5:= " I120_CAMERA_SLIDE_CYL_REV(I1220.4)";
+   1221: Line5:= " I120_SPARE_I1221_4(I1221.4)          ";
    ELSE
      Line5:= " ";	
    END_CASE
@@ -1198,7 +1198,7 @@ END_VAR
 	1201:Lamp5:=I90_RH_MOVR_SUP_HORZ_CYL_REV_I1201_4  ;
 	1210:Lamp5:=I90_LH2_REJ_SLIDE_REV_I1210_4;
 	1211:Lamp5:=I90_SPARE_I1211_4 ;
-	1220:Lamp5:=I120_CAMERA_SLIDECYL_REV_I1220_4;
+	1220:Lamp5:=I120_CAMERA_SLIDE_CYL_REV_I1220_4;
 	1221:Lamp5:=I120_SPARE_I1221_4 ;
    ELSE
        Visibility_5:=FALSE;	
@@ -1208,15 +1208,15 @@ END_VAR
    400:  Line6:= " I90_DOOR4_CLOSE_FB(I400.5)            ";
    401:  Line6:= " I90_DOOR12_CLOSE_FB(I401.5)           ";
    402:  Line6:= " I120_ATC_CLAMP_FB(I402.5)             ";
-   403:  Line6:= " I120_LH_GRPR_OPN(I403.5)              ";
+   403:  Line6:= " I120_SPARE_I403_5(I403.5)              ";
    404:Line6:="I90_RHS_ESTOP3_FB(I404.5)             " ;
    405:Line6:="I120_LH_LOCKSPRING_GRPR_OPN(I405.5)   " ;
    1200: Line6:= " I90_POSTN_SLIDE_CYL_FWD(I1200.5)      ";
    1201: Line6:= " I90_RH_MOVR_SUP_HORZ_CYL_FWD(I1201.5) ";
    1210: Line6:= " I90_LH2_REJ_SLIDE_FWD(I1210.5)        ";
-   1211: Line6:= " I90_SPARE_I1211.5(I1211.5)            ";
-   1220: Line6:= " I120_LH_LOCKSPRING_GRPR_OPN(I1220.5)  ";
-   1221: Line6:= " I120_SPARE_I1221.5(I1221.5)           ";
+   1211: Line6:= " I90_SPARE_I1211_5(I1211.5)            ";
+   1220: Line6:= " I120_CAMERA_SLIDECYL_FWD(I1220.5)  ";
+   1221: Line6:= " I120_SPARE_I1221_5(I1221.5)           ";
    ELSE
      Line6:= " ";	
    END_CASE
@@ -1235,7 +1235,7 @@ END_VAR
 	1201:Lamp6:=I90_RH_MOVR_SUP_HORZ_CYL_FWD_I1201_5  ;
 	1210:Lamp6:=I90_LH2_REJ_SLIDE_FWD_I1210_5;
 	1211:Lamp6:=I90_SPARE_I1211_5 ;
-	1220:Lamp6:=I120_CAMERA_SLIDECYL_FWD_I1220_5;
+	1220:Lamp6:=I120_CAMERA_SLIDE_CYL_FWD_I1220_5;
 	1221:Lamp6:=I120_SPARE_I1221_5  ;
    ELSE
        Visibility_6:=FALSE;	
@@ -1244,20 +1244,19 @@ END_VAR
    400:  Line7:= " I90_DOOR5_CLOSE_FB(I400.6)           ";
    401:  Line7:= " I90_DOOR13_CLOSE_FB(I401.6)          ";
    402:  Line7:= " I120_ATC_STN_POKE_YOKE_1(I402.6)     ";
-   403:  Line7:= " I120_RH_GRPR_CLSE(I403.6)            ";
-   404:Line7:="I90_SPARE_I404.6(I404.6)              " ;
+   403:  Line7:= " I120_SPARE_I403_6(I403.6)            ";
+   404:Line7:="I90_SPARE_I404_6(I404.6)              " ;
    405:Line7:="I120_RH_LOCKSPRING_GRPR_CLSE(I405.6)  " ;
    1200: Line7:= " I90_LH_MOVR_SUP_VERT_CYL_DWN(I1200.6)";
-   1201: Line7:= " I90_SPARE_I1201.6(I1201.6)           ";
+   1201: Line7:= " I90_SPARE_I1201_6(I1201.6)           ";
    1210: Line7:= " I90_RH2_REJ_SLIDE_REV(I1210.6)       ";
-   1211: Line7:= " I90_SPARE_I1211.6(I1211.6)           ";
-   1220: Line7:= " I120_RH_LOCKSPRING_GRPR_CLSE(I1220.6)";
-   1221: Line7:= " I120_SPARE_I1221.6(I1221.6)          ";
+   1211: Line7:= " I90_SPARE_I1211_6(I1211.6)           ";
+   1220: Line7:= " I120_SLAVE1_PRSN_PARK_TRAY(I1220.6)";
+   1221: Line7:= " I120_SPARE_I1221_6(I1221.6)          ";
    ELSE
      Line7:= " ";	
    END_CASE
    
-  
     Visibility_7:=TRUE;
    
    CASE IP_Arr_OP90P[Input_Page_num] OF
@@ -1271,7 +1270,7 @@ END_VAR
 	1201:Lamp7:=I90_SPARE_I1201_6  ;
 	1210:Lamp7:=I90_RH2_REJ_SLIDE_REV_I1210_6;
 	1211:Lamp7:=I90_SPARE_I1211_6 ;
-	1220:Lamp7:=I120_SPARE_I1220_6;
+	1220:Lamp7:=I120_SLAVE1_PRSN_PARK_TRAY_I1220_6;
 	1221:Lamp7:=I120_SPARE_I1221_6  ;
    ELSE
        Visibility_7:=FALSE;	
@@ -1282,14 +1281,14 @@ END_VAR
    401:  Line8:= " I90_DOOR14_CLOSE_FB(I401.7)         ";
    402:  Line8:= " I120_ATC_STN_POKE_YOKE_2(I402.7)    ";
    403:  Line8:= " I90_RESET_FB_I403_7I403.7)            ";
-   404:Line8:="I90_SPARE_I404.7(I404.7)              " ;
+   404:Line8:="I90_SPARE_I404_7(I404.7)              " ;
    405:Line8:="I120_RH_LOCKSPRING_GRPR_OPN(I405.7)   " ;
    1200: Line8:= " I90_LH_MOVR_SUP_VERT_CYL_UP(I1200.7)";
-   1201: Line8:= " I90_SPARE_I1201.7(I1201.7)          ";
+   1201: Line8:= " I90_SPARE_I1201_7(I1201.7)          ";
    1210: Line8:= " I90_RH2_REJ_SLIDE_FWD(I1210.7)      ";
-   1211: Line8:= " I90_SPARE_I1211.7(I1211.7)          ";
-   1220: Line8:= " I120_RH_LOCKSPRING_GRPR_OPN(I1220.7)";
-   1221: Line8:= " I120_SPARE_I1221.7(I1221.7)         ";
+   1211: Line8:= " I90_SPARE_I1211_7(I1211.7)          ";
+   1220: Line8:= " I120_SLAVE2_PRSN_PARK_TRAY(I1220.7)";
+   1221: Line8:= " I120_SPARE_I1221_7(I1221.7)         ";
    ELSE
      Line8:= " ";	
    END_CASE
@@ -1307,7 +1306,7 @@ END_VAR
 	1201:Lamp8:=I90_SPARE_I1201_7 ;
 	1210:Lamp8:=I90_RH2_REJ_SLIDE_FWD_I1210_7;
 	1211:Lamp8:=I90_SPARE_I1211_7 ;
-	1220:Lamp8:=I120_SPARE_I1220_7;
+	1220:Lamp8:=I120_SLAVE2_PRSN_PARK_TRAY_I1220_7;
 	1221:Lamp8:=I120_SPARE_I1221_7   ;
    ELSE
        Visibility_8:=FALSE;	
@@ -1315,8 +1314,8 @@ END_VAR
    
     CASE OP_Arr_OP90P[Output_Page_num] OF
     400:  OLine1:= "O90_VISN_LGHT1_ON(Q400.0)            ";
-    401:  OLine1:= "O90_SPARE_Q401.0(Q401.0)             ";
-    402:  OLine1:= "O110_SPARE_Q402.0(Q402.0)            ";
+    401:  OLine1:= "O90_SPARE_Q401_0(Q401.0)             ";
+    402:  OLine1:= "O110_SPARE_Q402_0(Q402.0)            ";
     403:  OLine1:= "O120_TWR_LMP_RD(Q403.0)              ";
     1240: OLine1:= "O90_RET_LH_GRIPR_CYL_CLSE(Q1240.0)   ";
     1241: OLine1:= "O90_POSTN_SLIDE_CYL_REV(Q1241.0)     ";
@@ -1324,6 +1323,8 @@ END_VAR
     1250: OLine1:= "O90_LH1_REJ_SLIDE_REV(Q1250.0)       ";
     1251: OLine1:= "O90_RH2_REJ_SLIDE_REV(Q1251.0)       ";
     1260: OLine1:= "O110_LH_OIL_DISPN_ON(Q1260.0)        ";
+    1261: OLine1:= "O120_TOOL_CHO_UNLOCK(Q1261.0)        ";
+    1262: OLine1:= "O120_CAMERA_SLIDE_CYL_REV(Q1262.0)   ";
     ELSE
       OLine1:= " ";	
     END_CASE
@@ -1347,8 +1348,8 @@ END_VAR
 	
     CASE OP_Arr_OP90P[Output_Page_num] OF
     400:  OLine2:= "O90_VISN_LGHT2_ON(Q400.1)            ";
-    401:  OLine2:= "O90_SPARE_Q401.1(Q401.1)             ";
-    402:  OLine2:= "O110_SPARE_Q402.1(Q402.1)            ";
+    401:  OLine2:= "O90_SPARE_Q401_1(Q401.1)             ";
+    402:  OLine2:= "O110_SPARE_Q402_1(Q402.1)            ";
     403:  OLine2:= "O120_TWR_LMP_GN(Q403.1)              ";
     1240: OLine2:= "O90_RET_LH_GRIPR_CYL_OPN(Q1240.1)    ";
     1241: OLine2:= "O90_POSTN_SLIDE_CYL_FWD(Q1241.1)     ";
@@ -1356,16 +1357,18 @@ END_VAR
     1250: OLine2:= "O90_LH1_REJ_SLIDE_FWD(Q1250.1)       ";
     1251: OLine2:= "O90_RH2_REJ_SLIDE_FWD(Q1251.1)       ";
     1260: OLine2:= "O110_LH_OIL_SPIN_ON(Q1260.1)         ";
+    1261: OLine2:= "O120_TOOL_CHO_LOCK(Q1261.1)          ";
+    1262: OLine2:= "O120_CAMERA_SLIDE_CYL_FWD(Q1262.1)   ";
     ELSE
       OLine2:= " ";	
     END_CASE  
   Out_Visibility_2:=TRUE;
    
    CASE OP_Arr_OP90P[Output_Page_num] OF
-	400:  Out_Lamp2:=O90_VISN_LGHT2_ON_Q400_1;
-	401:  Out_Lamp2:=O90_SPARE_Q401_1;
-	402:  Out_Lamp2:=O110_SPARE_Q402_1;
-	403:  Out_Lamp2:=O120_TWR_LMP_GN_Q403_1;
+    400:  Out_Lamp2:=O90_VISN_LGHT2_ON_Q400_1;
+    401:  Out_Lamp2:=O90_SPARE_Q401_1;
+    402:  Out_Lamp2:=O110_SPARE_Q402_1;
+    403:  Out_Lamp2:=O120_TWR_LMP_GN_Q403_1;
    1240:  Out_Lamp2:=O90_RET_LH_GRIPR_CYL_OPN_Q1240_1;
    1241:  Out_Lamp2:=O90_POSTN_SLIDE_CYL_FWD_Q1241_1;
    1242:  Out_Lamp2:=O90_RH_MOVR_SUP_HORZ_CYL_FWD_Q1242_1;
@@ -1380,25 +1383,27 @@ END_VAR
     
     CASE OP_Arr_OP90P[Output_Page_num] OF
     400:  OLine3:= "O90_LH_DOOR_OPN(Q400.2)              ";
-    401:  OLine3:= "O90_SPARE_Q401.2(Q401.2)             ";
-    402:  OLine3:= "O110_SPARE_Q402.2(Q402.2)            ";
+    401:  OLine3:= "O90_SPARE_Q401_2(Q401.2)             ";
+    402:  OLine3:= "O110_SPARE_Q402_2(Q402.2)            ";
     403:  OLine3:= "O120_TWR_LMP_YELW(Q403.2)            ";
     1240: OLine3:= "O90_RET_RH_GRIPR_CYL_CLSE(Q1240.2)   ";
     1241: OLine3:= "O90_LH_MOVR_SUP_VERT_CYL_DWN(Q1241.2)";
-    1242: OLine3:= "O90_SPARE_Q1242.2(Q1242.2)           ";
+    1242: OLine3:= "O90_SPARE_Q1242_2(Q1242.2)           ";
     1250: OLine3:= "O90_RH1_REJ_SLIDE_REV(Q1250.2)       ";
     1251: OLine3:= "O90_RH_REJ_AIR_PURGE(Q1251.2)        ";
-    1260: OLine3:= "O110_RH_OIL_DISPN_ON(Q1260.2)        ";
+    1260: OLine3:= "O120_RH_OIL_DISPN_ON(Q1260.2)        ";
+    1261: OLine3:= "O110_PUSH_CYL_REV(Q1261.2)           ";
+    1262: OLine3:= "O120_SPARE_Q1262_2(Q1262.2)          ";
     ELSE
       OLine3:= " ";	
     END_CASE
     
-	Out_Visibility_3:=TRUE;	
+      Out_Visibility_3:=TRUE;	
    CASE OP_Arr_OP90P[Output_Page_num] OF
-	400:  Out_Lamp3:=O90_LH_DOOR_OPN_Q400_2;
-	401:  Out_Lamp3:=O90_SPARE_Q401_2;
-	402:  Out_Lamp3:=O110_SPARE_Q402_2;
-	403:  Out_Lamp3:=O120_TWR_LMP_YELW_Q403_2;
+   400:  Out_Lamp3:=O90_LH_DOOR_OPN_Q400_2;
+   401:  Out_Lamp3:=O90_SPARE_Q401_2;
+   402:  Out_Lamp3:=O110_SPARE_Q402_2;
+   403:  Out_Lamp3:=O120_TWR_LMP_YELW_Q403_2;
    1240:  Out_Lamp3:=O90_RET_RH_GRIPR_CYL_CLSE_Q1240_2;
    1241:  Out_Lamp3:=O90_LH_MOVR_SUP_VERT_CYL_DWN_Q1241_2;
    1242:  Out_Lamp3:=O90_SPARE_Q1242_2;
@@ -1413,15 +1418,17 @@ END_VAR
    
     CASE OP_Arr_OP90P[Output_Page_num] OF
     400:  OLine4:= "O90_RH_DOOR_OPN(Q400.3)             ";
-    401:  OLine4:= "O90_SPARE_Q401.3(Q401.3)            ";
-    402:  OLine4:= "O110_SPARE_Q402.3(Q402.3)           ";
+    401:  OLine4:= "O90_SPARE_Q401_3(Q401.3)            ";
+    402:  OLine4:= "O110_SPARE_Q402_3(Q402.3)           ";
     403:  OLine4:= "O120_TWR_LMP_BUZZ(Q403.3)           ";
     1240: OLine4:= "O90_RET_RH_GRIPR_CYL_OPN(Q1240.3)   ";
     1241: OLine4:= "O90_LH_MOVR_SUP_VERT_CYL_UP(Q1241.3)";
-    1242: OLine4:= "O90_SPARE_Q1242.3(Q1242.3)          ";
+    1242: OLine4:= "O90_SPARE_Q1242_3(Q1242.3)          ";
     1250: OLine4:= "O90_RH1_REJ_SLIDE_FWD(Q1250.3)      ";
-    1251: OLine4:= "O90_SPARE_Q1251.3(Q1251.3)          ";
+    1251: OLine4:= "O90_SPARE_Q1251_3(Q1251.3)          ";
     1260: OLine4:= "O110_RH_OIL_SPIN_ON(Q1260.3)        ";
+    1261: OLine4:= "O120_PUSH_CYL_FWD(Q1261.3)          ";
+    1262: OLine4:= "O120_SPARE_Q1262_3(Q1262.3)         ";
     ELSE
       OLine4:= " ";	
     END_CASE
@@ -1429,18 +1436,18 @@ END_VAR
     Out_Visibility_4:=TRUE;
    
    CASE OP_Arr_OP90P[Output_Page_num] OF
-	400:  Out_Lamp4:=O90_RH_DOOR_OPN_Q400_3;
-	401:  Out_Lamp4:=O90_SPARE_Q401_3;
-	402:  Out_Lamp4:=O110_SPARE_Q402_3;
-	403:  Out_Lamp4:=O120_TWR_LMP_BUZZ_Q403_3;
-   1240:  Out_Lamp4:=O90_RET_RH_GRIPR_CYL_OPN_Q1240_3;
-   1241:  Out_Lamp4:=O90_LH_MOVR_SUP_VERT_CYL_UP_Q1241_3;
-   1242:  Out_Lamp4:=O90_SPARE_Q1242_3;
-   1250:  Out_Lamp4:=O90_RH1_REJ_SLIDE_FWD_Q1250_3;
-   1251:  Out_Lamp4:=O90_SPARE_Q1251_3;
-   1260:  Out_Lamp4:=O110_RH_OIL_SPIN_ON_Q1260_3;
-   1261:  Out_Lamp4:=O120_PUSH_CYL_FWD_Q1261_3;
-   1262:  Out_Lamp4:=O120_SPARE_Q1262_3;
+   400:  Out_Lamp4:=O90_RH_DOOR_OPN_Q400_3;
+   401:  Out_Lamp4:=O90_SPARE_Q401_3;
+   402:  Out_Lamp4:=O110_SPARE_Q402_3;
+   403:  Out_Lamp4:=O120_TWR_LMP_BUZZ_Q403_3;
+   1240: Out_Lamp4:=O90_RET_RH_GRIPR_CYL_OPN_Q1240_3;
+   1241: Out_Lamp4:=O90_LH_MOVR_SUP_VERT_CYL_UP_Q1241_3;
+   1242: Out_Lamp4:=O90_SPARE_Q1242_3;
+   1250: Out_Lamp4:=O90_RH1_REJ_SLIDE_FWD_Q1250_3;
+   1251: Out_Lamp4:=O90_SPARE_Q1251_3;
+   1260: Out_Lamp4:=O110_RH_OIL_SPIN_ON_Q1260_3;
+   1261: Out_Lamp4:=O120_PUSH_CYL_FWD_Q1261_3;
+   1262: Out_Lamp4:=O120_SPARE_Q1262_3;
    ELSE
        Out_Visibility_4:=FALSE;
    END_CASE 
@@ -1449,32 +1456,34 @@ END_VAR
 	
     CASE OP_Arr_OP90P[Output_Page_num] OF
     400:  OLine5:= "O90_FRNT_DOOR_OPN(Q400.4)            ";
-    401:  OLine5:= "O110_RH_OIL_DISPN_FRL_VLVE_ON_Q401_4(Q401.4) ";
+    401:  OLine5:= "O110_RH_OIL_DISPN_FRL_VLVE_ON(Q401.4) ";
     402:  OLine5:= "O120_VISN_LGHT1_ON(Q402.4)           ";
-    403:  OLine5:= "O120_SPARE_Q403.4(Q403.4)            ";
+    403:  OLine5:= "O120_SPARE_Q403_4(Q403.4)            ";
     1240: OLine5:= "O90_POS_LOCK_CYL1_VLVE_1(Q1240.4)    ";
     1241: OLine5:= "O90_LH_MOVR_SUP_HORZ_CYL_REV(Q1241.4)";
-    1242: OLine5:= "O90_SPARE_Q1242.4(Q1242.4)           ";
-    1250: OLine5:= "O90_SPARE_Q1250.4(Q1250.4)           ";
-    1251: OLine5:= "O90_SPARE_Q1251.4(Q1251.4)           ";
+    1242: OLine5:= "O90_SPARE_Q1242_4(Q1242.4)           ";
+    1250: OLine5:= "O90_SPARE_Q1250_4(Q1250.4)           ";
+    1251: OLine5:= "O90_SPARE_Q1251_4(Q1251.4)           ";
     1260: OLine5:= "O120_LH_GRPR_CLSE(Q1260.4)           ";
+    1261: OLine5:= "O120_LH_SING_CYL_REV(Q1261.4)        ";
+    1262: OLine5:= "O120_SPARE_Q1262_4(Q1262.4)          ";
     ELSE
       OLine5:= " ";	
     END_CASE
 	
    CASE OP_Arr_OP90P[Output_Page_num] OF
-	400:  Out_Lamp5:=O90_FRNT_DOOR_OPN_Q400_4;
-	401:  Out_Lamp5:=O110_RH_OIL_DISPN_FRL_VLVE_ON_Q401_4;
-	402:  Out_Lamp5:=O120_VISN_LGHT1_ON_Q402_4;
-	403:  Out_Lamp5:=O120_SPARE_Q403_4;
-   1240:  Out_Lamp5:=O90_POS_LOCK_CYL1_VLVE_1_Q1240_4;
-   1241:  Out_Lamp5:=O90_LH_MOVR_SUP_HORZ_CYL_REV_Q1241_4;
-   1242:  Out_Lamp5:=O90_SPARE_Q1242_4;
-   1250:  Out_Lamp5:=O90_SPARE_Q1250_4;
-   1251:  Out_Lamp5:=O90_SPARE_Q1251_4;
-   1260:  Out_Lamp5:=O120_LH_GRPR_CLSE_Q1260_4;
-   1261:  Out_Lamp5:=O120_LH_SING_CYL_REV_Q1261_4;
-   1262:  Out_Lamp5:=O120_SPARE_Q1262_4;
+   400:  Out_Lamp5:=O90_FRNT_DOOR_OPN_Q400_4;
+   401:  Out_Lamp5:=O110_RH_OIL_DISPN_FRL_VLVE_ON_Q401_4;
+   402:  Out_Lamp5:=O120_VISN_LGHT1_ON_Q402_4;
+   403:  Out_Lamp5:=O120_SPARE_Q403_4;
+   1240: Out_Lamp5:=O90_POS_LOCK_CYL1_VLVE_1_Q1240_4;
+   1241: Out_Lamp5:=O90_LH_MOVR_SUP_HORZ_CYL_REV_Q1241_4;
+   1242: Out_Lamp5:=O90_SPARE_Q1242_4;
+   1250: Out_Lamp5:=O90_SPARE_Q1250_4;
+   1251: Out_Lamp5:=O90_SPARE_Q1251_4;
+   1260: Out_Lamp5:=O120_LH_GRPR_CLSE_Q1260_4;
+   1261: Out_Lamp5:=O120_LH_SING_CYL_REV_Q1261_4;
+   1262: Out_Lamp5:=O120_SPARE_Q1262_4;
    ELSE          
        Out_Visibility_5:=FALSE;
    END_CASE 
@@ -1484,32 +1493,34 @@ END_VAR
     
     CASE OP_Arr_OP90P[Output_Page_num] OF
     400:  OLine6:= "O90_BACK_DOOR_OPN(Q400.5)            ";
-    401:  OLine6:= "O20_RH_OIL_DISPN_FRL_VLVE_ON_Q401_5(Q401.5)";
+    401:  OLine6:= "O20_RH_OIL_DISPN_FRL_VLVE_ON(Q401.5)";
     402:  OLine6:= "O120_VISN_LGHT2_ON(Q402.5)           ";
-    403:  OLine6:= "O120_SPARE_Q403.5(Q403.5)            ";
+    403:  OLine6:= "O120_SPARE_Q403_5(Q403.5)            ";
     1240: OLine6:= "O90_POS_LOCK_CYL1_VLVE_2(Q1240.5)    ";
     1241: OLine6:= "O90_LH_MOVR_SUP_HORZ_CYL_FWD(Q1241.5)";
-    1242: OLine6:= "O90_SPARE_Q1242.5(Q1242.5)           ";
+    1242: OLine6:= "O90_SPARE_Q1242_5(Q1242.5)           ";
     1250: OLine6:= "O90_LH1_REJ_AIR_PURGE(Q1250.5)       ";
-    1251: OLine6:= "O90_SPARE_Q1251.5(Q1251.5)           ";
+    1251: OLine6:= "O90_SPARE_Q1251_5(Q1251.5)           ";
     1260: OLine6:= "O120_LH_GRPR_OPN(Q1260.5)            ";
+    1261: OLine6:= "O120_LH_SING_CYL_FWD(Q1261.5)        ";
+    1262: OLine6:= "O120_SPARE_Q1262_5(Q1262.5)          ";
     ELSE
       OLine6:= " ";	
     END_CASE
 		
    CASE OP_Arr_OP90P[Output_Page_num] OF
-	400:  Out_Lamp6:=O90_BACK_DOOR_OPN_Q400_5;
-	401:  Out_Lamp6:=O20_RH_OIL_DISPN_FRL_VLVE_ON_Q401_5;
-	402:  Out_Lamp6:=O120_VISN_LGHT2_ON_Q402_5;
-	403:  Out_Lamp6:=O120_SPARE_Q403_5;
-   1240:  Out_Lamp6:=O90_POS_LOCK_CYL1_VLVE_2_Q1240_5;
-   1241:  Out_Lamp6:=O90_LH_MOVR_SUP_HORZ_CYL_FWD_Q1241_5;
-   1242:  Out_Lamp6:=O90_SPARE_Q1242_5;
-   1250:  Out_Lamp6:=O90_LH1_REJ_AIR_PURGE_Q1250_5;
-   1251:  Out_Lamp6:=O90_SPARE_Q1251_5;
-   1260:  Out_Lamp6:=O120_LH_GRPR_OPN_Q1260_5;
-   1261:  Out_Lamp6:=O120_LH_SING_CYL_FWD_Q1261_5;
-   1262:  Out_Lamp6:= O120_SPARE_Q1262_5;
+   400:  Out_Lamp6:=O90_BACK_DOOR_OPN_Q400_5;
+   401:  Out_Lamp6:=O20_RH_OIL_DISPN_FRL_VLVE_ON_Q401_5;
+   402:  Out_Lamp6:=O120_VISN_LGHT2_ON_Q402_5;
+   403:  Out_Lamp6:=O120_SPARE_Q403_5;
+   1240: Out_Lamp6:=O90_POS_LOCK_CYL1_VLVE_2_Q1240_5;
+   1241: Out_Lamp6:=O90_LH_MOVR_SUP_HORZ_CYL_FWD_Q1241_5;
+   1242: Out_Lamp6:=O90_SPARE_Q1242_5;
+   1250: Out_Lamp6:=O90_LH1_REJ_AIR_PURGE_Q1250_5;
+   1251: Out_Lamp6:=O90_SPARE_Q1251_5;
+   1260: Out_Lamp6:=O120_LH_GRPR_OPN_Q1260_5;
+   1261: Out_Lamp6:=O120_LH_SING_CYL_FWD_Q1261_5;
+   1262: Out_Lamp6:= O120_SPARE_Q1262_5;
    ELSE          
        Out_Visibility_6:=FALSE;
    END_CASE 
@@ -1517,48 +1528,52 @@ END_VAR
 	Out_Visibility_7:=TRUE;
     
     CASE OP_Arr_OP90P[Output_Page_num] OF
-    400:  OLine7:= "O90_IPC_P_S_Q400_6(Q400.6)             ";
-    401:  OLine7:= "O110_LH_OIL_DISPN_FRL_VLVE_ON_Q401_6(Q401.6) ";
+    400:  OLine7:= "O90_IPC_P_S(Q400.6)             ";
+    401:  OLine7:= "O110_LH_OIL_DISPN_FRL_VLVE_ON(Q401.6) ";
     402:  OLine7:= "O120_BARLIGHT_OP1(Q402.6)            ";
-    403:  OLine7:= "O120_SPARE_Q403.6(Q403.6)            ";
+    403:  OLine7:= "O120_SPARE_Q403_6(Q403.6)            ";
     1240: OLine7:= "O90_POS_LOCK_CYL2_VLVE_1(Q1240.6)    ";
     1241: OLine7:= "O90_RH_MOVR_SUP_VERT_CYL_DWN(Q1241.6)";
-    1242: OLine7:= "O90_SPARE_Q1242.6(Q1242.6)           ";
+    1242: OLine7:= "O90_SPARE_Q1242_6(Q1242.6)           ";
     1250: OLine7:= "O90_LH2_REJ_SLIDE_REV(Q1250.6)       ";
-    1251: OLine7:= "O90_SPARE_Q1251.6(Q1251.6)           ";
-    1260: OLine7:= "O120_RH_GRPR_CLSE(Q1260.6)           ";
+    1251: OLine7:= "O90_SPARE_Q1251_6(Q1251.6)           ";
+    1260: OLine7:= "O120_LH_REJ_AIR_PURGE(Q1260.6)       ";
+    1261: OLine7:= "O120_RH_GRPR_CLSE(Q1261.6)           ";
+    1262: OLine7:= "O120_SPARE_Q1262_6(Q1262.6)          ";
     ELSE
       OLine7:= " ";	
     END_CASE
     	
    CASE OP_Arr_OP90P[Output_Page_num] OF
-	400:  Out_Lamp7:=O90_IPC_P_S_Q400_6;
-	401:  Out_Lamp7:=O110_LH_OIL_DISPN_FRL_VLVE_ON_Q401_6;
-	402:  Out_Lamp7:=O120_BARLIGHT_OP1_Q402_6;
-	403:  Out_Lamp7:=O120_SPARE_Q403_6;
-   1240:  Out_Lamp7:=O90_POS_LOCK_CYL2_VLVE_1_Q1240_6;
-   1241:  Out_Lamp7:=O90_RH_MOVR_SUP_VERT_CYL_DWN_Q1241_6;
-   1242:  Out_Lamp7:=O90_SPARE_Q1242_6;
-   1250:  Out_Lamp7:=O90_LH2_REJ_SLIDE_REV_Q1250_6;
-   1251:  Out_Lamp7:=O90_SPARE_Q1251_6;
-   1260:  Out_Lamp7:=O120_RH_GRPR_CLSE_Q1260_6;
-   1261:  Out_Lamp7:=O120_LH_REJ_AIR_PURGE_Q1261_6;
-   1262:  Out_Lamp7:=O120_SPARE_Q1262_6;
+   400:  Out_Lamp7:=O90_IPC_P_S_Q400_6;
+   401:  Out_Lamp7:=O110_LH_OIL_DISPN_FRL_VLVE_ON_Q401_6;
+   402:  Out_Lamp7:=O120_BARLIGHT_OP1_Q402_6;
+   403:  Out_Lamp7:=O120_SPARE_Q403_6;
+   1240: Out_Lamp7:=O90_POS_LOCK_CYL2_VLVE_1_Q1240_6;
+   1241: Out_Lamp7:=O90_RH_MOVR_SUP_VERT_CYL_DWN_Q1241_6;
+   1242: Out_Lamp7:=O90_SPARE_Q1242_6;
+   1250: Out_Lamp7:=O90_LH2_REJ_SLIDE_REV_Q1250_6;
+   1251: Out_Lamp7:=O90_SPARE_Q1251_6;
+   1260: Out_Lamp7:=O120_RH_GRPR_CLSE_Q1260_6;
+   1261: Out_Lamp7:=O120_LH_REJ_AIR_PURGE_Q1261_6;
+   1262: Out_Lamp7:=O120_SPARE_Q1262_6;
    ELSE
        Out_Visibility_7:=FALSE;
    END_CASE 
    
     CASE OP_Arr_OP90P[Output_Page_num] OF
-    400:  OLine8:= "O90_SPARE_Q400.7(Q400.7)            ";
-    401:  OLine8:= "O20_LH_OIL_DISPN_FRL_VLVE_ON_Q401_7(Q401.7)";
+    400:  OLine8:= "O90_SPARE_Q400_7(Q400.7)            ";
+    401:  OLine8:= "O20_LH_OIL_DISPN_FRL_VLVE_ON(Q401.7)";
     402:  OLine8:= "O120_BARLIGHT_OP2(Q402.7)           ";
-    403:  OLine8:= "O120_SPARE_Q403.7(Q403.7)           ";
+    403:  OLine8:= "O120_SPARE_Q403_7(Q403.7)           ";
     1240: OLine8:= "O90_POS_LOCK_CYL2_VLVE_2(Q1240.7)   ";
     1241: OLine8:= "O90_RH_MOVR_SUP_VERT_CYL_UP(Q1241.7)";
-    1242: OLine8:= "O90_SPARE_Q1242.7(Q1242.7)          ";
+    1242: OLine8:= "O90_SPARE_Q1242_7(Q1242.7)          ";
     1250: OLine8:= "O90_LH2_REJ_SLIDE_FWD(Q1250.7)      ";
-    1251: OLine8:= "O90_SPARE_Q1251.7(Q1251.7)          ";
+    1251: OLine8:= "O90_SPARE_Q1251_7(Q1251.7)          ";
     1260: OLine8:= "O120_RH_GRPR_OPN(Q1260.7)           ";
+    1261: OLine8:= "O120_RH_REJ_AIR_PURGE(Q1261.7)      ";
+    1262: OLine8:= "O120_SPARE_Q1262_7(Q1262.7)         ";
     ELSE
       OLine8:= " ";	
     END_CASE
@@ -1566,161 +1581,52 @@ END_VAR
     Out_Visibility_8:=TRUE;
    
    CASE OP_Arr_OP90P[Output_Page_num] OF
-	400:  Out_Lamp8:=O90_SPARE_Q400_7;
-	401:  Out_Lamp8:=O20_LH_OIL_DISPN_FRL_VLVE_ON_Q401_7;
-	402:  Out_Lamp8:=O120_BARLIGHT_OP2_Q402_7;
-	403:  Out_Lamp8:=O120_SPARE_Q403_7;
-   1240:  Out_Lamp8:=O90_POS_LOCK_CYL2_VLVE_2_Q1240_7;
-   1241:  Out_Lamp8:=O90_RH_MOVR_SUP_VERT_CYL_UP_Q1241_7;
-   1242:  Out_Lamp8:=O90_SPARE_Q1242_7;
-   1250:  Out_Lamp8:=O90_LH2_REJ_SLIDE_FWD_Q1250_7;
-   1251:  Out_Lamp8:=O90_SPARE_Q1251_7;
-   1260:  Out_Lamp8:=O120_RH_GRPR_OPN_Q1260_7;
-   1261:  Out_Lamp8:=O120_RH_REJ_AIR_PURGE_Q1261_7;
-   1262:  Out_Lamp8:=O120_SPARE_Q1262_7;
+   400:  Out_Lamp8:=O90_SPARE_Q400_7;
+   401:  Out_Lamp8:=O20_LH_OIL_DISPN_FRL_VLVE_ON_Q401_7;
+   402:  Out_Lamp8:=O120_BARLIGHT_OP2_Q402_7;
+   403:  Out_Lamp8:=O120_SPARE_Q403_7;
+   1240: Out_Lamp8:=O90_POS_LOCK_CYL2_VLVE_2_Q1240_7;
+   1241: Out_Lamp8:=O90_RH_MOVR_SUP_VERT_CYL_UP_Q1241_7;
+   1242: Out_Lamp8:=O90_SPARE_Q1242_7;
+   1250: Out_Lamp8:=O90_LH2_REJ_SLIDE_FWD_Q1250_7;
+   1251: Out_Lamp8:=O90_SPARE_Q1251_7;
+   1260: Out_Lamp8:=O120_RH_GRPR_OPN_Q1260_7;
+   1261: Out_Lamp8:=O120_RH_REJ_AIR_PURGE_Q1261_7;
+   1262: Out_Lamp8:=O120_SPARE_Q1262_7;
    ELSE           
        Out_Visibility_8:=FALSE;	
    END_CASE   
    
-
  3: CASE IP_Arr_OP160P[Input_Page_num] OF
     700: Line1:= "I130_LH_ATC_DECLAMP_FB(I700.0)";
     701: Line1:= "I130_RH_ATC_DECLAMP_FB(I701.0)";
     702: Line1:= "I140_ATC1_DECLAMP_FB(I702.0)  ";
-    703: Line1:= "I140_SPARE_I703.0(I703.0)     ";
-    704: Line1:= "I140_SPARE_I704.0(I704.0)     ";
+    703: Line1:= "I140_SPARE_I703_0(I703.0)     ";
+    704: Line1:= "I140_SPARE_I704_0(I704.0)     ";
     705: Line1:= "I140_ATC2_DECLAMP_FB(I705.0)  ";
-    706: Line1:= "I140_SPARE_I706.0(I706.0)     ";
-    707: Line1:= "I140_SPARE_I707.0(I707.0)     ";
+    706: Line1:= "I140_SPARE_I706_0(I706.0)     ";
+    707: Line1:= "I140_SPARE_I707_0(I707.0)     ";
     708: Line1:= "I140_ATC3_DECLAMP_FB(I708.0)  ";
-    709: Line1:= "I140_SPARE_I709.0(I709.0)     ";
+    709: Line1:= "I140_SPARE_I709_0(I709.0)     ";
+    710: Line1:= "I140_SPARE_I710_0(I710.0)"     ;
+    711: Line1:= "I160_ATC1_STN_POKE_YOKE_1(I711.0)" ;
+    712: Line1:= "I160_RH_COMP_PP_GRPR_CLSE(I712.0)" ;
+    //713: Line1:="I160_SPARE_I713_0(I713.0)" ;
+    714: Line1:= "I10A_DRUM_FEED_ALRM(I714.0)" ;
+    715: Line1:= "I160_SPARE_I715_0(I715.0)";
+    1300:Line1:= "I130_LH_ROTRY_0_DEG(I1300.0)" ;
+    1301:Line1:= "I140_HORZ_SUP1_CYL_REV(I1301.0)" ;
+    1310:Line1:= "I140_HORZ_SUP2_CYL_REV(I1310.0)" ;
+    1311:Line1:= "I140_VERT_SUP3_CYL_REV(I1311.0)" ;
+    1320:Line1:= "I160_SLIDE_CYL_REV(I1320.0)" ;
+    1321:Line1:= "I160_SPARE_I1321_0(I1321.0)" ;
+    1330:Line1:= "I160_LH_PALLET_LOCK_CYL_UNLOCK(I1330.0)" ;
+    1331:Line1:= "I160_REJ_BOX_DOOR_CLSE(I1331.0)";
     ELSE
       Line1:= " ";	
     END_CASE
-       
-       
-    CASE IP_Arr_OP160P[Input_Page_num] OF
-    700: Line2:= "I130_LH_ATC_CLAMP_FB(I700.1)";
-    701: Line2:= "I130_RH_ATC_CLAMP_FB(I701.1)";
-    702: Line2:= "I140_ATC1_CLAMP_FB(I702.1)  ";
-    703: Line2:= "I140_SPARE_I703.1(I703.1)   ";
-    704: Line2:= "I140_LK_TST_2_PAS(I704.1)   ";
-    705: Line2:= "I140_ATC2_CLAMP_FB(I705.1)  ";
-    706: Line2:= "I140_LK_TST_3_PAS(I706.1)   ";
-    707: Line2:= "I140_LK_TST_4_PAS(I707.1)   ";
-    708: Line2:= "I140_ATC3_CLAMP_FB(I708.1)  ";
-    709: Line2:= "I140_SPARE_I709.1(I709.1)   ";
-    ELSE
-      Line2:= " ";	
-    END_CASE
-    
-    CASE IP_Arr_OP160P[Input_Page_num] OF
-    700: Line3:= "I130_LH_ATC_STN_POKE_YOKE_1(I700.2)";
-    701: Line3:= "I130_RH_ATC_STN_POKE_YOKE_1(I701.2)";
-    702: Line3:= "I140_ATC1_STN_POKE_YOKE_1(I702.2)  ";
-    703: Line3:= "I140_SPARE_I703.2(I703.2)          ";
-    704: Line3:= "I140_LK_TST_2_FL(I704.2)           ";
-    705: Line3:= "I140_ATC2_STN_POKE_YOKE_1(I705.2)  ";
-    706: Line3:= "I140_LK_TST_3_FL(I706.2)           ";
-    707: Line3:= "I140_LK_TST_4_FL(I707.2)           ";
-    708: Line3:= "I140_ATC3_STN_POKE_YOKE_1(I708.2)  ";
-    709: Line3:= "I140_SPARE_I709.2(I709.2)          ";
-    ELSE
-      Line3:= " ";	
-    END_CASE
-    
-    CASE IP_Arr_OP160P[Input_Page_num] OF
-    700: Line4:= "I130_LH_ATC_STN_POKE_YOKE_2(I700.3)";
-    701: Line4:= "I130_RH_ATC_STN_POKE_YOKE_2(I701.3)";
-    702: Line4:= "I140_ATC1_STN_POKE_YOKE_2(I702.3)  ";
-    703: Line4:= "I140_LK_TST_1_PAS(I703.3)          ";
-    704: Line4:= "I140_LK_TST_2_REF_PRT_FL(I704.3)   ";
-    705: Line4:= "I140_ATC2_STN_POKE_YOKE_2(I705.3)  ";
-    706: Line4:= "I140_LK_TST_3_REF_PRT_FL(I706.3)   ";
-    707: Line4:= "I140_LK_TST_4_REF_PRT_FL(I707.3)   ";
-    708: Line4:= "I140_ATC3_STN_POKE_YOKE_2(I708.3)  ";
-    709: Line4:= "I140_LK_TST_5_PAS(I709.3)          ";
-    ELSE
-      Line4:= " ";	
-    END_CASE
-    
-    CASE IP_Arr_OP160P[Input_Page_num] OF
-    700: Line5:= "I130_LH_ATC_STN_POKE_YOKE_3(I700.4)";
-    701: Line5:= "I130_RH_ATC_STN_POKE_YOKE_3(I701.4)";
-    702: Line5:= "I140_ATC1_STN_POKE_YOKE_3(I702.4)  ";
-    703: Line5:= "I140_LK_TST_1_FL(I703.4)           ";
-    704: Line5:= "I140_LK_TST_2_WARNG(I704.4)        ";
-    705: Line5:= "I140_ATC2_STN_POKE_YOKE_3(I705.4)  ";
-    706: Line5:= "I140_LK_TST_3_WARNG(I706.4)        ";
-    707: Line5:= "I140_LK_TST_4_WARNG(I707.4)        ";
-    708: Line5:= "I140_ATC3_STN_POKE_YOKE_3(I708.4)  ";
-    709: Line5:= "I140_LK_TST_5_FL(I709.4)           ";
-    ELSE
-      Line5:= " ";	
-    END_CASE
-    
-    CASE IP_Arr_OP160P[Input_Page_num] OF
-    700: Line6:= "I130_LH_ATC_STN_POKE_YOKE_4(I700.5)";
-    701: Line6:= "I130_RH_ATC_STN_POKE_YOKE_4(I701.5)";
-    702: Line6:= "I140_ATC1_STN_POKE_YOKE_4(I702.5)  ";
-    703: Line6:= "I140_LK_TST_1_REF_PRT_FL(I703.5)   ";
-    704: Line6:= "I140_LK_TST_2_END_CYC(I704.5)      ";
-    705: Line6:= "I140_ATC2_STN_POKE_YOKE_4(I705.5)  ";
-    706: Line6:= "I140_LK_TST_3_END_CYC(I706.5)      ";
-    707: Line6:= "I140_LK_TST_4_END_CYC(I707.5)      ";
-    708: Line6:= "I140_ATC3_STN_POKE_YOKE_4(I708.5)  ";
-    709: Line6:= "I140_LK_TST_5_REF_PRT_FL(I709.5)   ";
-    ELSE
-      Line6:= " ";	
-    END_CASE
-    
-    CASE IP_Arr_OP160P[Input_Page_num] OF
-    700: Line7:= "I130_LH_ATC_SLAVE_MODL1(I700.6)";
-    701: Line7:= "I130_RH_ATC_SLAVE_MODL1(I701.6)";
-    702: Line7:= "I140_ATC1_SLAVE_MODL1(I702.6)  ";
-    703: Line7:= "I140_LK_TST_1_WARNG(I703.6)    ";
-    704: Line7:= "I140_SPARE_I704.6(I704.6)      ";
-    705: Line7:= "I140_ATC2_SLAVE_MODL1(I705.6)  ";
-    706: Line7:= "I140_SPARE_I706.6(I706.6)      ";
-    707: Line7:= "I140_SPARE_I707.6(I707.6)      ";
-    708: Line7:= "I140_ATC3_SLAVE_MODL1(I708.6)  ";
-    709: Line7:= "I140_LK_TST_5_WARNG(I709.6)    ";
-    ELSE
-      Line7:= " ";	
-    END_CASE
-    
-    CASE IP_Arr_OP160P[Input_Page_num] OF
-    700: Line8:= "I130_LH_ATC_SLAVE_MODL2(I700.7)";
-    701: Line8:= "I130_RH_ATC_SLAVE_MODL2(I701.7)";
-    702: Line8:= "I140_ATC1_SLAVE_MODL2(I702.7)  ";
-    703: Line8:= "I140_LK_TST_1_END_CYC(I703.7)  ";
-    704: Line8:= "I140_SPARE_I704.7(I704.7)      ";
-    705: Line8:= "I140_ATC2_SLAVE_MODL2(I705.7)  ";
-    706: Line8:= "I140_SPARE_I706.7(I706.7)      ";
-    707: Line8:= "I140_SPARE_I707.7(I707.7)      ";
-    708: Line8:= "I140_ATC3_SLAVE_MODL2(I708.7)  ";
-    709: Line8:= "I140_LK_TST_5_END_CYC(I709.7)  ";
-    ELSE
-      Line8:= " ";	
-    END_CASE
-    
-    CASE OP_Arr_OP160P[Output_Page_num] OF
-    700: OLine1:= "O140_LK_TST1 _RST(Q700.0)  "; 
-    701: OLine1:= "O140_LK_TST1 _SEL7(Q701.0) ";
-    702: OLine1:= "O140_LK_TST2 _SEL6(Q702.0) ";
-    703: OLine1:= "O140_LK_TST3 _SEL5(Q703.0) ";
-    704: OLine1:= "O140_LK_TST4 _SEL4(Q704.0) ";
-    705: OLine1:= "O140_LK_TST5 _SEL3(Q705.0) ";
-    706: OLine1:= "O140_LK_TST6 _SEL2(Q706.0) ";
-    707: OLine1:= "O150_BARLIGHT_OP2(Q707.0)  ";
-    708: OLine1:= "O160_VFD_FWD(Q708.0)       ";
-    709: OLine1:= "O10A_DRUM_RUN_IND(Q709.0)  ";
-    ELSE
-      OLine1:= " ";	
-    END_CASE
-    
-	  Visibility_1:=TRUE;
-   
+  Visibility_1:=TRUE;
+      
    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp1:=I130_LH_ATC_DECLAMP_FBI700_0 ;
 	701: Lamp1:=I130_RH_ATC_DECLAMP_FBI701_0 ;
@@ -1735,7 +1641,7 @@ END_VAR
 	710: Lamp1:=I140_SPARE_I710_0 ;
 	711: Lamp1:=I160_ATC1_STN_POKE_YOKE_1I711_0 ;
 	712: Lamp1:=I160_RH_COMP_PP_GRPR_CLSEI712_0 ;
-	713: Lamp1:=I160_SPARE_I713_0 ;
+	//713: Lamp1:=I160_SPARE_I713_0 ;
 	714: Lamp1:=I10A_DRUM_FEED_ALRMI714_0 ;
 	715: Lamp1:=I160_SPARE_I715_0 ;
 	1300:Lamp1:=I130_LH_ROTRY_0_DEGI1300_0 ;
@@ -1749,11 +1655,38 @@ END_VAR
    ELSE
        Visibility_1:=FALSE;	
    END_CASE
-   
-   
-    Visibility_2:=TRUE;
-   
-   CASE IP_Arr_OP160P[Input_Page_num] OF
+  
+    CASE IP_Arr_OP160P[Input_Page_num] OF
+    700: Line2:= "I130_LH_ATC_CLAMP_FB(I700.1)";
+    701: Line2:= "I130_RH_ATC_CLAMP_FB(I701.1)";
+    702: Line2:= "I140_ATC1_CLAMP_FB(I702.1)  ";
+    703: Line2:= "I140_SPARE_I703_1(I703.1)   ";
+    704: Line2:= "I140_LK_TST_2_PAS(I704.1)   ";
+    705: Line2:= "I140_ATC2_CLAMP_FB(I705.1)  ";
+    706: Line2:= "I140_LK_TST_3_PAS(I706.1)   ";
+    707: Line2:= "I140_LK_TST_4_PAS(I707.1)   ";
+    708: Line2:= "I140_ATC3_CLAMP_FB(I708.1)  ";
+    709: Line2:= "I140_SPARE_I709_1(I709.1)   ";
+    710: Line2:= "I140_LK_TST_6_PAS(I710.1)" ;
+    711: Line2:= "I160_ATC1_STN_POKE_YOKE_2(I711.1)" ;
+    712: Line2:= "I160_RH_COMP_PP_GRPR_OPN(I712.1)" ;
+    //713: Line2:="I160_SPARE_I713_1(I713.1)" ;
+    714: Line2:= "I10A_SPARE_I714_1(I714.1)" ;
+    715: Line2:= "I160_SPARE_I715_1(I715.1) ";
+    1300:Line2:= "I130_LH_ROTRY_180_DEG(I1300.1)" ;
+    1301:Line2:= "I140_HORZ_SUP1_CYL_FWD(I1301.1)" ;
+    1310:Line2:= "I140_HORZ_SUP2_CYL_FWD(I1310.1)" ;
+    1311:Line2:= "I140_VERT_SUP3_CYL_FWD(I1311.1)" ;
+    1320:Line2:= "I160_SLIDE_CYL_FWD(I1320.1)" ;
+    1321:Line2:= "I160_SPARE_I1321_1(I1321.1)" ;
+    1330:Line2:= "I160_LH_PALLET_LOCK_CYL_LOCK(I1330.1)" ;
+    1331:Line2:= "I160_SAM_PART_BAG_DOOR_CLSE(I1331.1)" ;
+    ELSE
+      Line2:= " ";	
+    END_CASE
+       Visibility_2:=TRUE;
+
+    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp2:=I130_LH_ATC_CLAMP_FBI700_1 ;
 	701: Lamp2:=I130_RH_ATC_CLAMP_FBI701_1 ;
 	702: Lamp2:=I140_ATC1_CLAMP_FBI702_1 ;
@@ -1767,7 +1700,7 @@ END_VAR
 	710: Lamp2:=I140_LK_TST_6_PASI710_1 ;
 	711: Lamp2:=I160_ATC1_STN_POKE_YOKE_2I711_1 ;
 	712: Lamp2:=I160_RH_COMP_PP_GRPR_OPNI712_1 ;
-	713: Lamp2:=I160_SPARE_I713_1 ;
+	//713: Lamp2:=I160_SPARE_I713_1 ;
 	714: Lamp2:=I10A_SPARE_I714_1 ;
 	715: Lamp2:=I160_SPARE_I715_1 ;
 	1300:Lamp2:=I130_LH_ROTRY_180_DEGI1300_1 ;
@@ -1782,7 +1715,36 @@ END_VAR
        Visibility_2:=FALSE;	
    END_CASE
 
-    Visibility_3:=TRUE;
+    CASE IP_Arr_OP160P[Input_Page_num] OF
+    700: Line3:= "I130_LH_ATC_STN_POKE_YOKE_1(I700.2)";
+    701: Line3:= "I130_RH_ATC_STN_POKE_YOKE_1(I701.2)";
+    702: Line3:= "I140_ATC1_STN_POKE_YOKE_1(I702.2)  ";
+    703: Line3:= "I140_SPARE_I703_2(I703.2)          ";
+    704: Line3:= "I140_LK_TST_2_FL(I704.2)           ";
+    705: Line3:= "I140_ATC2_STN_POKE_YOKE_1(I705.2)  ";
+    706: Line3:= "I140_LK_TST_3_FL(I706.2)           ";
+    707: Line3:= "I140_LK_TST_4_FL(I707.2)           ";
+    708: Line3:= "I140_ATC3_STN_POKE_YOKE_1(I708.2)  ";
+    709: Line3:= "I140_SPARE_I709_2(I709.2)          ";
+    710: Line3:= "I140_LK_TST_6_FL(I710.2)" ;
+    711: Line3:= "I160_ATC1_STN_POKE_YOKE_3(I711.2)" ;
+    712: Line3:= "I160_AUTOBAG_READY(I712.2)" ;
+    713: Line3:= "I160_VFD_RDY(I713.2)" ;
+    714: Line3:= "I10A_DRUM_OFF_ON(I714.2)" ;
+    715: Line3:= "I160_SPARE_I715_2(I715.2)" ;
+    1300:Line3:= "I130_RH_ROTRY_0_DEG(I1300.2)" ;
+    1301:Line3:= "I140_VERT_SUP1_CYL_REV(I1301.2)" ;
+    1310:Line3:= "I140_VERT_SUP2_CYL_REV(I1310.2)" ;
+    1311:Line3:= "I140_WIPE3_CYL_REV(I1311.2)" ;
+    1320:Line3:= "I160_SLAVE1_PRSN_PARK_TRAY(I1320.2)" ;
+    1321:Line3:= "I160_SPARE_I1321_2(I1321.2)";
+    1330:Line3:= "I160_RH_PALLET_LOCK_CYL_UNLOCK(I1330.2)" ;
+    1331:Line3:= "I160_TROLLEY_FIXT_PRSN(I1331.2)" ; 
+    ELSE
+      Line3:= " ";	
+    END_CASE
+       Visibility_3:=TRUE;
+
    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp3:=I130_LH_ATC_STN_POKE_YOKE_1I700_2 ;
 	701: Lamp3:=I130_RH_ATC_STN_POKE_YOKE_1I701_2 ;
@@ -1811,9 +1773,36 @@ END_VAR
    ELSE
        Visibility_3:=FALSE;	
    END_CASE
-   
-   
-    Visibility_4:=TRUE;
+
+    CASE IP_Arr_OP160P[Input_Page_num] OF
+    700: Line4:= "I130_LH_ATC_STN_POKE_YOKE_2(I700.3)";
+    701: Line4:= "I130_RH_ATC_STN_POKE_YOKE_2(I701.3)";
+    702: Line4:= "I140_ATC1_STN_POKE_YOKE_2(I702.3)  ";
+    703: Line4:= "I140_LK_TST_1_PAS(I703.3)          ";
+    704: Line4:= "I140_LK_TST_2_REF_PRT_FL(I704.3)   ";
+    705: Line4:= "I140_ATC2_STN_POKE_YOKE_2(I705.3)  ";
+    706: Line4:= "I140_LK_TST_3_REF_PRT_FL(I706.3)   ";
+    707: Line4:= "I140_LK_TST_4_REF_PRT_FL(I707.3)   ";
+    708: Line4:= "I140_ATC3_STN_POKE_YOKE_2(I708.3)  ";
+    709: Line4:= "I140_LK_TST_5_PAS(I709.3)          ";
+    710: Line4:= "I140_LK_TST_6_REF_PRT_FL(I710.3)"   ;
+    711: Line4:= "I160_ATC1_STN_POKE_YOKE_4(I711.3)"  ;
+    //712: Line4:="I160_SPARE_I712_3(I712.3)"         ;
+    713: Line4:= "I160_SPARE_I713_3(I713.3)"          ;
+    714: Line4:= "I10A_DRUM_CONV_REV(I714.3)"         ;
+    715: Line4:= "I160_SPARE_I715_3(I715.3)"          ;
+    1300:Line4:= "I130_RH_ROTRY_180_DEG(I1300.3)"     ;
+    1301:Line4:= "I140_VERT_SUP1_CYL_FWD(I1301.3)"    ;
+    1310:Line4:= "I140_VERT_SUP2_CYL_FWD(I1310.3)"    ;
+    1311:Line4:= "I140_WIPE3_CYL_FWD(I1311.3)"        ;
+    1320:Line4:= "I160_SLAVE2_PRSN_PARK_TRAY(I1320.3)" ;
+    1321:Line4:= "I160_SPARE_I1321_3(I1321.3)"        ;
+    1330:Line4:= "I160_RH_PALLET_LOCK_CYL_LOCK(I1330.3)" ;
+    1331:Line4:= "I160_SAM_BOX_DOOR_CLSE(I1331.3)"    ;
+    ELSE
+      Line4:= " ";	
+    END_CASE
+       Visibility_4:=TRUE;
    
    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp4:=I130_LH_ATC_STN_POKE_YOKE_2I700_3 ;
@@ -1828,7 +1817,7 @@ END_VAR
 	709: Lamp4:=I140_LK_TST_5_PASI709_3 ;
 	710: Lamp4:=I140_LK_TST_6_REF_PRT_FLI710_3 ;
 	711: Lamp4:=I160_ATC1_STN_POKE_YOKE_4I711_3 ;
-	712: Lamp4:=I160_SPARE_I712_3 ;
+	//712: Lamp4:=I160_SPARE_I712_3 ;
 	713: Lamp4:=I160_SPARE_I713_3 ;
 	714: Lamp4:=I10A_DRUM_CONV_REV_I714_3 ;
 	715: Lamp4:=I160_SPARE_I715_3 ;
@@ -1843,8 +1832,36 @@ END_VAR
    ELSE
        Visibility_4:=FALSE;	
    END_CASE
-   
-    Visibility_5:=TRUE;
+    
+    CASE IP_Arr_OP160P[Input_Page_num] OF
+    700: Line5:= "I130_LH_ATC_STN_POKE_YOKE_3(I700.4)";
+    701: Line5:= "I130_RH_ATC_STN_POKE_YOKE_3(I701.4)";
+    702: Line5:= "I140_ATC1_STN_POKE_YOKE_3(I702.4)  ";
+    703: Line5:= "I140_LK_TST_1_FL(I703.4)           ";
+    704: Line5:= "I140_LK_TST_2_WARNG(I704.4)        ";
+    705: Line5:= "I140_ATC2_STN_POKE_YOKE_3(I705.4)  ";
+    706: Line5:= "I140_LK_TST_3_WARNG(I706.4)        ";
+    707: Line5:= "I140_LK_TST_4_WARNG(I707.4)        ";
+    708: Line5:= "I140_ATC3_STN_POKE_YOKE_3(I708.4)  ";
+    709: Line5:= "I140_LK_TST_5_FL(I709.4)           ";
+    710: Line5:= "I140_LK_TST_6_WARNG(I710.4)" ;
+    711: Line5:= "I160_ATC1_SLAVE_TOOL1(I711.4)" ;
+    //712: Line5:="I160_SPARE_I712_4(I712.4)" ;
+    713: Line5:= "I160_SPARE_I713_4(I713.4)" ;
+    714: Line5:= "I10A_DRUM_CONV_FWD(I714.4)" ;
+    715: Line5:= "I160_SPARE_I715_4(I715.4)" ;
+    //1300:Line5:="I130_SPARE_I1300_4(I1300.4)" ;
+    1301:Line5:= "I140_WIPE1_CYL_REV(I1301.4)" ;
+    1310:Line5:= "I140_WIPE2_CYL_REV(I1310.4)" ;
+    1311:Line5:= "I140_LEAKTEST_PRESS_SW(I1311.4)" ;
+    1320:Line5:= "I160_FIXT_COMP1_PRSN(I1320.4)" ;
+    1321:Line5:= "I160_SPARE_I1321_4(I1321.4)" ;
+    1330:Line5:= "I160_SPARE_I1330_4(I1330.4)" ;
+    1331:Line5:= "I160_SPARE_I1331_4(I1331.4)" ;
+    ELSE
+      Line5:= " ";	
+    END_CASE
+       Visibility_5:=TRUE;
    
    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp5:=I130_LH_ATC_STN_POKE_YOKE_3I700_4 ;
@@ -1859,11 +1876,11 @@ END_VAR
 	709: Lamp5:=I140_LK_TST_5_FLI709_4 ;
 	710: Lamp5:=I140_LK_TST_6_WARNGI710_4 ;
 	711: Lamp5:=I160_ATC1_SLAVE_TOOL1I711_4 ;
-	712: Lamp5:=I160_SPARE_I712_4 ;
+	//712: Lamp5:=I160_SPARE_I712_4 ;
 	713: Lamp5:=I160_SPARE_I713_4 ;
 	714: Lamp5:=I10A_DRUM_CONV_FWD_I714_4 ;
 	715: Lamp5:=I160_SPARE_I715_4 ;
-	1300:Lamp5:=I130_SPARE_I1300_4 ;
+	//1300:Lamp5:=I130_SPARE_I1300_4 ;
 	1301:Lamp5:=I140_WIPE1_CYL_REVI1301_4 ;
 	1310:Lamp5:=I140_WIPE2_CYL_REVI1310_4 ;
 	1311:Lamp5:=I140_LEAKTEST_PRESS_SWI1311_4 ;
@@ -1875,9 +1892,35 @@ END_VAR
        Visibility_5:=FALSE;	
    END_CASE
    
-   
-    
-    Visibility_6:=TRUE;
+    CASE IP_Arr_OP160P[Input_Page_num] OF
+    700: Line6:= "I130_LH_ATC_STN_POKE_YOKE_4(I700.5)";
+    701: Line6:= "I130_RH_ATC_STN_POKE_YOKE_4(I701.5)";
+    702: Line6:= "I140_ATC1_STN_POKE_YOKE_4(I702.5)  ";
+    703: Line6:= "I140_LK_TST_1_REF_PRT_FL(I703.5)   ";
+    704: Line6:= "I140_LK_TST_2_END_CYC(I704.5)      ";
+    705: Line6:= "I140_ATC2_STN_POKE_YOKE_4(I705.5)  ";
+    706: Line6:= "I140_LK_TST_3_END_CYC(I706.5)      ";
+    707: Line6:= "I140_LK_TST_4_END_CYC(I707.5)      ";
+    708: Line6:= "I140_ATC3_STN_POKE_YOKE_4(I708.5)  ";
+    709: Line6:= "I140_LK_TST_5_REF_PRT_FL(I709.5)   ";
+    710: Line6:= "I140_LK_TST_6_END_CYC(I710.5)" ;
+    711: Line6:= "I160_ATC1_SLAVE_TOOL2(I711.5)" ;
+    712: Line6:= "I160_AUTOBAG_ERR_STOP(I712.5)" ;
+    713: Line6:= "I160_SPARE_I713_5(I713.5)";
+    714: Line6:= "I10A_ROB_MAN_AUTO_MODE(I714.5)" ;
+    715: Line6:= "I160_SPARE_I715_5(I715.5)" ;
+    //1300:Line6:="I130_SPARE_I1300_5(I1300.5)" ;
+    1301:Line6:= "I140_WIPE1_CYL_FWD(I1301.5)" ;
+    1310:Line6:= "I140_WIPE2_CYL_FWD(I1310.5)" ;
+    1311:Line6:= "I140_SPARE_I1311_5(I1311.5)" ;
+    1320:Line6:= "I160_FIXT_COMP2_PRSN(I1320.5)" ;
+    1321:Line6:= "I160_SPARE_I1321_5(I1321.5)" ;
+    1330:Line6:= "I160_CONV_BDY_PRSN1_SEN(I1330.5)" ;
+    1331:Line6:= "I160_SPARE_I1331_5(I1321.5)" ;
+    ELSE
+      Line6:= " ";	
+    END_CASE   
+       Visibility_6:=TRUE;
    
    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp6:=I130_LH_ATC_STN_POKE_YOKE_4I700_5 ;
@@ -1896,7 +1939,7 @@ END_VAR
 	713: Lamp6:=I160_SPARE_I713_5 ;
 	714: Lamp6:=I10A_ROB_MAN_AUTO_MODE_I714_5 ;
 	715: Lamp6:=I160_SPARE_I715_5 ;
-	1300:Lamp6:=I130_SPARE_I1300_5 ;
+	//1300:Lamp6:=I130_SPARE_I1300_5 ;
 	1301:Lamp6:=I140_WIPE1_CYL_FWDI1301_5 ;
 	1310:Lamp6:=I140_WIPE2_CYL_FWDI1310_5 ;
 	1311:Lamp6:=I140_SPARE_I1311_5 ;
@@ -1908,8 +1951,35 @@ END_VAR
        Visibility_6:=FALSE;	
    END_CASE
    
-   
-    Visibility_7:=TRUE;
+    CASE IP_Arr_OP160P[Input_Page_num] OF
+    700: Line7:= "I130_LH_ATC_SLAVE_MODL1(I700.6)";
+    701: Line7:= "I130_RH_ATC_SLAVE_MODL1(I701.6)";
+    702: Line7:= "I140_ATC1_SLAVE_MODL1(I702.6)  ";
+    703: Line7:= "I140_LK_TST_1_WARNG(I703.6)    ";
+    704: Line7:= "I140_SPARE_I704_6(I704.6)      ";
+    705: Line7:= "I140_ATC2_SLAVE_MODL1(I705.6)  ";
+    706: Line7:= "I140_SPARE_I706_6(I706.6)      ";
+    707: Line7:= "I140_SPARE_I707_6(I707.6)      ";
+    708: Line7:= "I140_ATC3_SLAVE_MODL1(I708.6)  ";
+    709: Line7:= "I140_LK_TST_5_WARNG(I709.6)    ";
+    710: Line7:= "I160_ATC_DECLAMP_FB(I710.6)" ;
+    711: Line7:= "I160_FIXT_LH_COMP_PP_GRPR_CLSE(I711.6)" ;
+    712: Line7:= "I20_RESRVR_LW_LVL(I712.6)" ;
+    713: Line7:= "I160_SPARE_I713_6(I713.6)" ;
+    714: Line7:= "I160_SPARE_I714_6(I714.6)" ;
+    715: Line7:= "I160_SPARE_I715_6(I715.6)" ;
+    //1300:Line7:="I130_SPARE_I1300_6(I1300.6)" ;
+    1301:Line7:= "I140_SPARE_I1301_6(I1301.6)" ;
+    1310:Line7:= "I140_HORZ_SUP3_CYL_REV(I1310_6)" ;
+    1311:Line7:= "I160_MOVR_REM_CYL_REV(I1311_6)" ;
+    1320:Line7:= "I160_SPARE_I1320_6(I1320.6)" ;
+    1321:Line7:= "I160_SPARE_I1321_6(I1321.6)" ;
+    1330:Line7:= "I160_CONV_BDY_PRSN2_SEN(I1330_6)" ;
+    1331:Line7:= "I160_SPARE_I1331_6(I1331.6)" ;
+    ELSE
+      Line7:= " ";	
+    END_CASE
+       Visibility_7:=TRUE;
    
    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp7:=I130_LH_ATC_SLAVE_MODL1I700_6 ;
@@ -1928,7 +1998,7 @@ END_VAR
 	713: Lamp7:=I160_SPARE_I713_6 ;
 	714: Lamp7:=I160_SPARE_I714_6 ;
 	715: Lamp7:=I160_SPARE_I715_6 ;
-	1300:Lamp7:=I130_SPARE_I1300_6 ;
+	//1300:Lamp7:=I130_SPARE_I1300_6 ;
 	1301:Lamp7:=I140_SPARE_I1301_6 ;
 	1310:Lamp7:=I140_HORZ_SUP3_CYL_REVI1310_6 ;
 	1311:Lamp7:=I160_MOVR_REM_CYL_REVI1311_6 ;
@@ -1939,9 +2009,36 @@ END_VAR
    ELSE
        Visibility_7:=FALSE;	
    END_CASE
-   
-   
-    Visibility_8:=TRUE;
+    
+    CASE IP_Arr_OP160P[Input_Page_num] OF
+    700: Line8:= "I130_LH_ATC_SLAVE_MODL2(I700.7)";
+    701: Line8:= "I130_RH_ATC_SLAVE_MODL2(I701.7)";
+    702: Line8:= "I140_ATC1_SLAVE_MODL2(I702.7)  ";
+    703: Line8:= "I140_LK_TST_1_END_CYC(I703.7)  ";
+    704: Line8:= "I140_SPARE_I704.7(I704.7)      ";
+    705: Line8:= "I140_ATC2_SLAVE_MODL2(I705.7)  ";
+    706: Line8:= "I140_SPARE_I706.7(I706.7)      ";
+    707: Line8:= "I140_SPARE_I707.7(I707.7)      ";
+    708: Line8:= "I140_ATC3_SLAVE_MODL2(I708.7)  ";
+    709: Line8:= "I140_LK_TST_5_END_CYC(I709.7)  ";
+    710: Line8:= "I160_ATC_CLAMP_FB(I710.7)" ;
+    711: Line8:= "I160_FIXT_LH_COMP_PP_GRPR_OPN(I711.7)" ;
+    712: Line8:= "I20_OILTANK_PRES_SW_FB(I712.7)" ;
+    713: Line8:= "I160_SPARE_I713_7(I713.7)" ;
+    714: Line8:= "I160_SPARE_I714_7(I714.7)" ;
+    715: Line8:= "I160_SPARE_I715_7(I715.7)" ;
+    //1300:Line8:="I130_SPARE_I1300_7(I1300.7)" ;
+    1301:Line8:= "I140_SPARE_I1301_7(I1301.7)" ;
+    1310:Line8:= "I140_HORZ_SUP3_CYL_FWD(I1310.7)" ;
+    1311:Line8:= "I160_MOVR_REM_CYL_FWD(I1311.7)" ;
+    1320:Line8:= "I160_SPARE_I1320_7(I1320.7)" ;
+    1321:Line8:= "I160_SPARE_I1321_7(I1321.7)" ;
+    1330:Line8:= "I160_SPARE_I1330_7(I1330.7)" ;
+    1331:Line8:= "I160_SPARE_I1331_7(I1331.7)" ;
+    ELSE
+      Line8:= " ";	
+    END_CASE
+       Visibility_8:=TRUE;
    
    CASE IP_Arr_OP160P[Input_Page_num] OF
 	700: Lamp8:=I130_LH_ATC_SLAVE_MODL2I700_7 ;
@@ -1960,7 +2057,7 @@ END_VAR
 	713: Lamp8:=I160_SPARE_I713_7 ;
 	714: Lamp8:=I160_SPARE_I714_7 ;
 	715: Lamp8:=I160_SPARE_I715_7 ;
-	1300:Lamp8:=I130_SPARE_I1300_7 ;
+	//1300:Lamp8:=I130_SPARE_I1300_7 ;
 	1301:Lamp8:=I140_SPARE_I1301_7 ;
 	1310:Lamp8:=I140_HORZ_SUP3_CYL_FWDI1310_7 ;
 	1311:Lamp8:=I160_MOVR_REM_CYL_FWDI1311_7 ;
@@ -1970,6 +2067,53 @@ END_VAR
 	1331:Lamp8:=I160_SPARE_I1331_7 ;
    ELSE
        Visibility_8:=FALSE;	
+   END_CASE
+ 
+    CASE OP_Arr_OP160P[Output_Page_num] OF
+    700: OLine1:= "O140_LK_TST1 _RST(Q700.0)  "; 
+    701: OLine1:= "O140_LK_TST1 _SEL7(Q701.0) ";
+    702: OLine1:= "O140_LK_TST2 _SEL6(Q702.0) ";
+    703: OLine1:= "O140_LK_TST3 _SEL5(Q703.0) ";
+    704: OLine1:= "O140_LK_TST4 _SEL4(Q704.0) ";
+    705: OLine1:= "O140_LK_TST5 _SEL3(Q705.0) ";
+    706: OLine1:= "O140_LK_TST6 _SEL2(Q706.0) ";
+    707: OLine1:= "O150_BARLIGHT_OP2(Q707.0)  ";
+    708: OLine1:= "O160_VFD_FWD(Q708.0)       ";
+    709: OLine1:= "O10A_DRUM_RUN_IND(Q709.0)  ";
+    1340: OLine1:= "O130_LH_ROTRY_0_DEG(Q1340.0)";
+    1341: OLine1:= "O140_HORZ_SUP1_CYL_REV(Q1341.0)";
+    1342: OLine1:= "O140_HORZ_SUP2_CYL_REV(Q1342.0)";
+    1343: OLine1:= "O140_HORZ_SUP3_CYL_REV(Q1343.0)";
+    1350: OLine1:= "O160_VISN_CHECK_AIR_PURGE(Q1350.0)";
+    1351: OLine1:= "O160_TOOL_CHO_UNLOCK(Q1351.0)";
+    1352: OLine1:= "O160_SPARE_Q1352_0(Q1352.0)";
+    1353: OLine1:= "O160_SPARE_Q1353_0(Q1353.0)";
+    ELSE
+      OLine1:= " ";	
+    END_CASE
+       Out_Visibility_1:=TRUE;
+   
+   CASE OP_Arr_OP160P[Output_Page_num] OF
+	700:  Out_Lamp1:=O140_LK_TST1_RST_Q700_0;
+	701:  Out_Lamp1:=O140_LK_TST1_SEL7_Q701_0;
+	702:  Out_Lamp1:=O140_LK_TST2_SEL6_Q702_0;
+	703:  Out_Lamp1:=O140_LK_TST3_SEL5_Q703_0;
+	704:  Out_Lamp1:=O140_LK_TST4_SEL4_Q704_0;
+	705:  Out_Lamp1:=O140_LK_TST5_SEL3_Q705_0;
+	706:  Out_Lamp1:=O140_LK_TST6_SEL2_Q706_0;
+	707:  Out_Lamp1:=O150_BARLIGHT_OP2_Q707_0;
+	708:  Out_Lamp1:=O160_VFD_FWD_Q708_0;
+	709:  Out_Lamp1:=O10A_DRUM_RUN_IND_Q709_0;
+	1340:  Out_Lamp1:=O130_LH_ROTRY_0_DEG_Q1340_0;
+	1341:  Out_Lamp1:=O140_HORZ_SUP1_CYL_REV_Q1341_0;
+	1342:  Out_Lamp1:=O140_HORZ_SUP2_CYL_REV_Q1342_0;
+	1343:  Out_Lamp1:=O140_HORZ_SUP3_CYL_REV_Q1343_0;
+	1350:  Out_Lamp1:=O160_VISN_CHECK_AIR_PURGE_Q1350_0;
+	1351:  Out_Lamp1:=O160_TOOL_CHO_UNLOCK_Q1351_0;
+	1352:  Out_Lamp1:=O160_SPARE_Q1352_0;
+	1353:  Out_Lamp1:=O160_SPARE_Q1353_0;
+   ELSE
+       Out_Visibility_1:=FALSE;	
    END_CASE
     
     CASE OP_Arr_OP160P[Output_Page_num] OF
@@ -1983,126 +2127,18 @@ END_VAR
     707: OLine2:= "O160_CHECKER_LGHT_ON(Q707.1)";
     708: OLine2:= "O160_VFD_REV(Q708.1)        ";
     709: OLine2:= "O160_SPARE_Q709.1(Q709.1)   ";
+   1340: OLine2:= "O130_LH_ROTRY_180_DEG(Q1340.1)";
+   1341: OLine2:= "O140_HORZ_SUP1_CYL_FWD(Q1341.1)";
+   1342: OLine2:= "O140_HORZ_SUP2_CYL_FWD(Q1342.1)";
+   1343: OLine2:= "O140_HORZ_SUP3_CYL_FWD(Q1343.1)";
+   1350: OLine2:= "O160_FIXT_PP_GRPR_CLSE_OPN(Q1350.1)";
+   1351: OLine2:= "O160_TOOL_CHO_LOCK(Q1351.1)";
+   1352: OLine2:= "O160_SPARE_Q1352_1(Q1352.1)";
+   1353: OLine2:= "O160_SPARE_Q1353_1(Q1353.1)";
     ELSE
       OLine2:= " ";	
     END_CASE
-    
-    CASE OP_Arr_OP160P[Output_Page_num] OF
-    700: OLine3:= "O140_LK_TST1 _SEL1(Q700.2)    ";
-    701: OLine3:= "O140_LK_TST2 _STRT(Q701.2)    ";
-    702: OLine3:= "O140_LK_TST3 _RST(Q702.2)     ";
-    703: OLine3:= "O140_LK_TST3 _SEL7(Q703.2)    ";
-    704: OLine3:= "O140_LK_TST4 _SEL6(Q704.2)    ";
-    705: OLine3:= "O140_LK_TST5 _SEL5(Q705.2)    ";
-    706: OLine3:= "O140_LK_TST6 _SEL4(Q706.2)    ";
-    707: OLine3:= "O160_FUME_EXTRTR_ON(Q707.2)   ";
-    708: OLine3:= "O160_VFD_STOP(Q708.2)         ";
-    709: OLine3:= "O10A_ROB_MAN_AUTO_MODE(Q709.2)";
-    ELSE
-      OLine3:= " ";	
-    END_CASE
-    
-    CASE OP_Arr_OP160P[Output_Page_num] OF
-    700: OLine4:= "O140_LK_TST1 _SEL2(Q700.3)    ";
-    701: OLine4:= "O140_LK_TST2 _SEL1(Q701.3)    ";
-    702: OLine4:= "O140_LK_TST3 _STRT(Q702.3)    ";
-    703: OLine4:= "O140_LK_TST4 _RST(Q703.3)     ";
-    704: OLine4:= "O140_LK_TST4 _SEL7(Q704.3)    ";
-    705: OLine4:= "O140_LK_TST5 _SEL6(Q705.3)    ";
-    706: OLine4:= "O140_LK_TST6 _SEL5(Q706.3)    ";
-    707: OLine4:= "O160_MC_LMP_ON(Q707.3)        ";
-    708: OLine4:= "O160_BOT_MC_LMP_ON(Q708.3)    ";
-    709: OLine4:= "O10B_ROB_MAN_AUTO_MODE(Q709.3)";
-    ELSE
-      OLine4:= " ";	
-    END_CASE
-    
-    CASE OP_Arr_OP160P[Output_Page_num] OF
-    700: OLine5:= "O140_LK_TST1 _SEL3(Q700.4)     ";
-    701: OLine5:= "O140_LK_TST2 _SEL2(Q701.4)     ";
-    702: OLine5:= "O140_LK_TST3 _SEL1(Q702.4)     ";
-    703: OLine5:= "O140_LK_TST4 _STRT(Q703.4)     ";
-    704: OLine5:= "O140_LK_TST5_RST(Q704.4)       ";
-    705: OLine5:= "O140_LK_TST5 _SEL7(Q705.4)     ";
-    706: OLine5:= "O140_LK_TST6 _SEL6(Q706.4)     ";
-    707: OLine5:= "O160_AUTOBAG_CNT_CMPLTD(Q707.4)";
-    708: OLine5:= "O10A_DRUM_MTR_FWD(Q708.4)      ";
-    709: OLine5:= "O120_ROB_MAN_AUTO_MODE(Q709.4) ";
-    ELSE
-      OLine5:= " ";	
-    END_CASE
-    
-    CASE OP_Arr_OP160P[Output_Page_num] OF
-    700: OLine6:= "O140_LK_TST1 _SEL4(Q700.5)        ";
-    701: OLine6:= "O140_LK_TST2 _SEL3(Q701.5)        ";
-    702: OLine6:= "O140_LK_TST3 _SEL2(Q702.5)        ";
-    703: OLine6:= "O140_LK_TST4 _SEL1(Q703.5)        ";
-    704: OLine6:= "O140_LK_TST5 _STRT(Q704.5)        ";
-    705: OLine6:= "O140_LK_TST6 _RST(Q705.5)         ";
-    706: OLine6:= "O140_LK_TST6 _SEL7(Q706.5)        ";
-    707: OLine6:= "O160_SAMPLE_PART_DOR_OPN(Q707.5) ";
-    708: OLine6:= "O10A_DRUM_RST(Q708.5)             ";
-    709: OLine6:= "O160_SPARE_Q709.5(Q709.5)         ";
-    ELSE
-      OLine6:= " ";	
-    END_CASE
-    
-    CASE OP_Arr_OP160P[Output_Page_num] OF
-    700: OLine7:= "O140_LK_TST1 _SEL5(Q700.6)    ";
-    701: OLine7:= "O140_LK_TST2 _SEL4(Q701.6)    ";
-    702: OLine7:= "O140_LK_TST3 _SEL3(Q702.6)    ";
-    703: OLine7:= "O140_LK_TST4 _SEL2(Q703.6)    ";
-    704: OLine7:= "O140_LK_TST5 _SEL1(Q704.6)    ";
-    705: OLine7:= "O140_LK_TST6 _STRT(Q705.6)    ";
-    706: OLine7:= "O150_VISN_LGHT_ON(Q706.6)     ";
-    707: OLine7:= "O160_REJ_BIN_DOR_OPN(Q707.6) ";
-    708: OLine7:= "O10A_DRUM_EXT_SPEED(Q708.6)   ";
-    709: OLine7:= "O160_SPARE_Q709.6(Q709.6)     ";
-    ELSE
-      OLine7:= " ";	
-    END_CASE
-    
-    CASE OP_Arr_OP160P[Output_Page_num] OF
-    700: OLine8:= "O140_LK_TST1 _SEL6(Q700.7)";
-    701: OLine8:= "O140_LK_TST2 _SEL5(Q701.7)";
-    702: OLine8:= "O140_LK_TST3 _SEL4(Q702.7)";
-    703: OLine8:= "O140_LK_TST4 _SEL3(Q703.7)";
-    704: OLine8:= "O140_LK_TST5 _SEL2(Q704.7)";
-    705: OLine8:= "O140_LK_TST6 _SEL1(Q705.7)";
-    706: OLine8:= "O150_BARLIGHT_OP1(Q706.7) ";
-    707: OLine8:= "O160_SPARE(Q707.7)        ";
-    708: OLine8:= "O160_SPARE_Q708.7(Q708.7) ";
-    709: OLine8:= "O160_SPARE_Q709.7(Q709.7) ";
-    ELSE
-      OLine8:= " ";	
-    END_CASE
-	
-	  Out_Visibility_1:=TRUE;
-   
-   CASE OP_Arr_OP160P[Output_Page_num] OF
-	700:  Out_Lamp1:=O140_LK_TST1_RST_Q700_0;
-	701:  Out_Lamp1:=O140_LK_TST1_SEL7_Q701_0;
-	702:  Out_Lamp1:=O140_LK_TST2_SEL6_Q702_0;
-	703:  Out_Lamp1:=O140_LK_TST3_SEL5_Q703_0;
-	704:  Out_Lamp1:=O140_LK_TST4_SEL4_Q704_0;
-	705:  Out_Lamp1:=O140_LK_TST5_SEL3_Q705_0;
-	706:  Out_Lamp1:=O140_LK_TST6_SEL2_Q706_0;
-	707:  Out_Lamp1:=O150_BARLIGHT_OP2_Q707_0;
-	708:  Out_Lamp1:=O160_VFD_FWD_Q708_0;
-	709:  Out_Lamp1:=O10A_DRUM_RUN_IND_Q709_0;
-	340:  Out_Lamp1:=O130_LH_ROTRY_0_DEG_Q1340_0;
-	341:  Out_Lamp1:=O140_HORZ_SUP1_CYL_REV_Q1341_0;
-	342:  Out_Lamp1:=O140_HORZ_SUP2_CYL_REV_Q1342_0;
-	343:  Out_Lamp1:=O140_HORZ_SUP3_CYL_REV_Q1343_0;
-	350:  Out_Lamp1:=O160_VISN_CHECK_AIR_PURGE_Q1350_0;
-	351:  Out_Lamp1:=O160_TOOL_CHO_UNLOCK_Q1351_0;
-	352:  Out_Lamp1:=O160_SPARE_Q1352_0;
-	353:  Out_Lamp1:=O160_SPARE_Q1353_0;
-   ELSE
-       Out_Visibility_1:=FALSE;	
-   END_CASE
-   
-    Out_Visibility_2:=TRUE;
+       Out_Visibility_2:=TRUE;
    
    CASE OP_Arr_OP160P[Output_Page_num] OF
 	700:  Out_Lamp2:=O140_LK_TST1_STRT_Q700_1;
@@ -2115,19 +2151,41 @@ END_VAR
 	707:  Out_Lamp2:=O160_CHECKER_LGHT_ON_Q707_1;
 	708:  Out_Lamp2:=O160_VFD_REV_Q708_1;
 	709:  Out_Lamp2:=O160_SPARE_Q709_1_Q709_1;
-    340:  Out_Lamp2:=O130_LH_ROTRY_180_DEG_Q1340_1;
-	341:  Out_Lamp2:=O140_HORZ_SUP1_CYL_FWD_Q1341_1;
-	342:  Out_Lamp2:=O140_HORZ_SUP2_CYL_FWD_Q1342_1;
-	343:  Out_Lamp2:=O140_HORZ_SUP3_CYL_FWD_Q1343_1;
-	350:  Out_Lamp2:=O160_FIXT_PP_GRPR_CLSE_OPN_Q1350_1;
-	351:  Out_Lamp2:=O160_TOOL_CHO_LOCK_Q1351_1;
-	352:  Out_Lamp2:=O160_SPARE_Q1352_1;
-	353:  Out_Lamp2:=O160_SPARE_Q1353_1;
+        1340:  Out_Lamp2:=O130_LH_ROTRY_180_DEG_Q1340_1;
+	1341:  Out_Lamp2:=O140_HORZ_SUP1_CYL_FWD_Q1341_1;
+	1342:  Out_Lamp2:=O140_HORZ_SUP2_CYL_FWD_Q1342_1;
+	1343:  Out_Lamp2:=O140_HORZ_SUP3_CYL_FWD_Q1343_1;
+	1350:  Out_Lamp2:=O160_FIXT_PP_GRPR_CLSE_OPN_Q1350_1;
+	1351:  Out_Lamp2:=O160_TOOL_CHO_LOCK_Q1351_1;
+	1352:  Out_Lamp2:=O160_SPARE_Q1352_1;
+	1353:  Out_Lamp2:=O160_SPARE_Q1353_1;
    ELSE
        Out_Visibility_2:=FALSE;	
    END_CASE 
-   
-    Out_Visibility_3:=TRUE;
+
+    CASE OP_Arr_OP160P[Output_Page_num] OF
+    700: OLine3:= "O140_LK_TST1 _SEL1(Q700.2)    ";
+    701: OLine3:= "O140_LK_TST2 _STRT(Q701.2)    ";
+    702: OLine3:= "O140_LK_TST3 _RST(Q702.2)     ";
+    703: OLine3:= "O140_LK_TST3 _SEL7(Q703.2)    ";
+    704: OLine3:= "O140_LK_TST4 _SEL6(Q704.2)    ";
+    705: OLine3:= "O140_LK_TST5 _SEL5(Q705.2)    ";
+    706: OLine3:= "O140_LK_TST6 _SEL4(Q706.2)    ";
+    707: OLine3:= "O160_FUME_EXTRTR_ON(Q707.2)   ";
+    708: OLine3:= "O160_VFD_STOP(Q708.2)         ";
+    709: OLine3:= "O10A_ROB_MAN_AUTO_MODE(Q709.2)";
+   1340: OLine3:= "O130_RH_ROTRY_0_DEG(Q1340.2)";
+   1341: OLine3:= "O140_VERT_SUP1_CYL_REV(Q1341.2)";
+   1342: OLine3:= "O140_VERT_SUP2_CYL_REV(Q1342.2)";
+   1343: OLine3:= "O140_VERT_SUP3_CYL_REV(Q1343.2)";
+   1350: OLine3:= "O160_LH_COMP_PP_GRPR_CLSE_OPN(Q1350.2)";
+   1351: OLine3:= "O160_LH_PALLET_LOCK_CYL_UNLOCK(Q1351.2)";
+   1352: OLine3:= "OP160_MOVR_REM_CYL_REV(Q1352.2)";
+   1353: OLine3:= "O160_SPARE_Q1353_2(Q1353.2)";
+    ELSE
+      OLine3:= " ";	
+    END_CASE
+       Out_Visibility_3:=TRUE;
 	
    CASE OP_Arr_OP160P[Output_Page_num] OF
 	700:  Out_Lamp3:=O140_LK_TST1_SEL1_Q700_2;
@@ -2140,19 +2198,41 @@ END_VAR
 	707:  Out_Lamp3:=O160_FUME_EXTRTR_ON_Q707_2;
 	708:  Out_Lamp3:=O160_VFD_STOP_Q708_2;
 	709:  Out_Lamp3:=O10A_ROB_MAN_AUTO_MODE_Q709_2;
-    340:  Out_Lamp3:=O130_RH_ROTRY_0_DEG_Q1340_2;
-	341:  Out_Lamp3:=O140_VERT_SUP1_CYL_REV_Q1341_2;
-	342:  Out_Lamp3:=O140_VERT_SUP2_CYL_REV_Q1342_2;
-	343:  Out_Lamp3:=O140_VERT_SUP3_CYL_REV_Q1343_2;
-	350:  Out_Lamp3:=O160_LH_COMP_PP_GRPR_CLSE_OPN_Q1350_2;
-	351:  Out_Lamp3:=O160_LH_PALLET_LOCK_CYL_UNLOCK_Q1351_2;
-	352:  Out_Lamp3:=OP160_MOVR_REM_CYL_REV_Q1352_2;
-	353:  Out_Lamp3:=O160_SPARE_Q1353_2;
+   1340:  Out_Lamp3:=O130_RH_ROTRY_0_DEG_Q1340_2;
+	1341:  Out_Lamp3:=O140_VERT_SUP1_CYL_REV_Q1341_2;
+	1342:  Out_Lamp3:=O140_VERT_SUP2_CYL_REV_Q1342_2;
+	1343:  Out_Lamp3:=O140_VERT_SUP3_CYL_REV_Q1343_2;
+	1350:  Out_Lamp3:=O160_LH_COMP_PP_GRPR_CLSE_OPN_Q1350_2;
+	1351:  Out_Lamp3:=O160_LH_PALLET_LOCK_CYL_UNLOCK_Q1351_2;
+	1352:  Out_Lamp3:=OP160_MOVR_REM_CYL_REV_Q1352_2;
+	1353:  Out_Lamp3:=O160_SPARE_Q1353_2;
    ELSE
        Out_Visibility_3:=FALSE;
    END_CASE 
-   
-    Out_Visibility_4:=TRUE;
+    
+    CASE OP_Arr_OP160P[Output_Page_num] OF
+    700: OLine4:= "O140_LK_TST1 _SEL2(Q700.3)    ";
+    701: OLine4:= "O140_LK_TST2 _SEL1(Q701.3)    ";
+    702: OLine4:= "O140_LK_TST3 _STRT(Q702.3)    ";
+    703: OLine4:= "O140_LK_TST4 _RST(Q703.3)     ";
+    704: OLine4:= "O140_LK_TST4 _SEL7(Q704.3)    ";
+    705: OLine4:= "O140_LK_TST5 _SEL6(Q705.3)    ";
+    706: OLine4:= "O140_LK_TST6 _SEL5(Q706.3)    ";
+    707: OLine4:= "O160_MC_LMP_ON(Q707.3)        ";
+    708: OLine4:= "O160_BOT_MC_LMP_ON(Q708.3)    ";
+    709: OLine4:= "O10B_ROB_MAN_AUTO_MODE(Q709.3)";
+   1340: OLine4:= "O130_RH_ROTRY_180_DEG(Q1340.3)";
+   1341: OLine4:= "O140_VERT_SUP1_CYL_FWD(Q1341.3)";
+   1342: OLine4:= "O140_VERT_SUP2_CYL_FWD(Q1342.3)";
+   1343: OLine4:= "O140_VERT_SUP3_CYL_FWD(Q1343.3)";
+   1350: OLine4:= "O160_RH_COMP_PP_GRPR_CLSE_OPN(Q1350.3)";
+   1351: OLine4:= "O160_LH_PALLET_LOCK_CYL_LOCK(Q1351.3)";
+   1352: OLine4:= "OP160_MOVR_REM_CYL_FWD(Q1352.3)";
+   1353: OLine4:= "O160_SPARE_Q1353_3(Q1353.3)";
+    ELSE
+      OLine4:= " ";	
+    END_CASE
+        Out_Visibility_4:=TRUE;
    
    CASE OP_Arr_OP160P[Output_Page_num] OF
 	700:  Out_Lamp4:=O140_LK_TST1_SEL2_Q700_3;
@@ -2165,19 +2245,41 @@ END_VAR
 	707:  Out_Lamp4:=O160_MC_LMP_ON_Q707_3;
 	708:  Out_Lamp4:=O160_BOT_MC_LMP_ON_Q708_3;
 	709:  Out_Lamp4:=O10B_ROB_MAN_AUTO_MODE_Q709_3;
-	340:  Out_Lamp4:=O130_RH_ROTRY_180_DEG_Q1340_3;
-	341:  Out_Lamp4:=O140_VERT_SUP1_CYL_FWD_Q1341_3;
-	342:  Out_Lamp4:=O140_VERT_SUP2_CYL_FWD_Q1342_3;
-	343:  Out_Lamp4:=O140_VERT_SUP3_CYL_FWD_Q1343_3;
-	350:  Out_Lamp4:=O160_RH_COMP_PP_GRPR_CLSE_OPN_Q1350_3;
-	351:  Out_Lamp4:=O160_LH_PALLET_LOCK_CYL_LOCK_Q1351_3;
-	352:  Out_Lamp4:= OP160_MOVR_REM_CYL_FWD_Q1352_3;
-	353:  Out_Lamp4:=O160_SPARE_Q1353_3;
+	1340: Out_Lamp4:=O130_RH_ROTRY_180_DEG_Q1340_3;
+	1341: Out_Lamp4:=O140_VERT_SUP1_CYL_FWD_Q1341_3;
+	1342: Out_Lamp4:=O140_VERT_SUP2_CYL_FWD_Q1342_3;
+	1343: Out_Lamp4:=O140_VERT_SUP3_CYL_FWD_Q1343_3;
+	1350: Out_Lamp4:=O160_RH_COMP_PP_GRPR_CLSE_OPN_Q1350_3;
+	1351: Out_Lamp4:=O160_LH_PALLET_LOCK_CYL_LOCK_Q1351_3;
+	1352: Out_Lamp4:= OP160_MOVR_REM_CYL_FWD_Q1352_3;
+	1353: Out_Lamp4:=O160_SPARE_Q1353_3;
    ELSE
        Out_Visibility_4:=FALSE;
    END_CASE 
-   
-    Out_Visibility_5:=TRUE;
+    
+    CASE OP_Arr_OP160P[Output_Page_num] OF
+    700: OLine5:= "O140_LK_TST1 _SEL3(Q700.4)     ";
+    701: OLine5:= "O140_LK_TST2 _SEL2(Q701.4)     ";
+    702: OLine5:= "O140_LK_TST3 _SEL1(Q702.4)     ";
+    703: OLine5:= "O140_LK_TST4 _STRT(Q703.4)     ";
+    704: OLine5:= "O140_LK_TST5_RST(Q704.4)       ";
+    705: OLine5:= "O140_LK_TST5 _SEL7(Q705.4)     ";
+    706: OLine5:= "O140_LK_TST6 _SEL6(Q706.4)     ";
+    707: OLine5:= "O160_AUTOBAG_CNT_CMPLTD(Q707.4)";
+    708: OLine5:= "O10A_DRUM_MTR_FWD(Q708.4)      ";
+    709: OLine5:= "O120_ROB_MAN_AUTO_MODE(Q709.4) ";
+   1340: OLine5:= "O130_LH_TOOL_CHO_UNLOCK(Q1340.4)";
+   1341: OLine5:= "O140_TOOL1_CHO_UNLOCK(Q1341.4)";
+   1342: OLine5:= "O140_TOOL2_CHO_UNLOCK(Q1342.4)";
+   1343: OLine5:= "O140_TOOL3_CHO_UNLOCK(Q1343.4)";
+   1350: OLine5:= "O160_SLIDE_CYL_REV(Q1350.4)";
+   1351: OLine5:= "O160_RH_PALLET_LOCK_CYL_UNLOCK(Q1351.4)";
+   1352: OLine5:= "O160_SPARE_Q1352_4(Q1352.4)";
+   1353: OLine5:= "O160_SPARE_Q1353_4(Q1353.4)";
+    ELSE
+      OLine5:= " ";	
+    END_CASE
+       Out_Visibility_5:=TRUE;
 	
     CASE OP_Arr_OP160P[Output_Page_num] OF
 	700:  Out_Lamp5:=O140_LK_TST1_SEL3_Q700_4;
@@ -2190,21 +2292,43 @@ END_VAR
 	707:  Out_Lamp5:=O160_AUTOBAG_CNT_CMPLTD_Q707_4;
 	708:  Out_Lamp5:=O10A_DRUM_MTR_FWD_Q708_4;
 	709:  Out_Lamp5:=O120_ROB_MAN_AUTO_MODE_Q709_4;
-	340:  Out_Lamp5:=O130_LH_TOOL_CHO_UNLOCK_Q1340_4;
-	341:  Out_Lamp5:=O140_TOOL1_CHO_UNLOCK_Q1341_4;
-	342:  Out_Lamp5:=O140_TOOL2_CHO_UNLOCK_Q1342_4;
-	343:  Out_Lamp5:=O140_TOOL3_CHO_UNLOCK_Q1343_4;
-	350:  Out_Lamp5:=O160_SLIDE_CYL_REV_Q1350_4;
-	351:  Out_Lamp5:=O160_RH_PALLET_LOCK_CYL_UNLOCK_Q1351_4;
-	352:  Out_Lamp5:=O160_SPARE_Q1352_4;
-	353:  Out_Lamp5:=O160_SPARE_Q1353_4;
+	1340: Out_Lamp5:=O130_LH_TOOL_CHO_UNLOCK_Q1340_4;
+	1341: Out_Lamp5:=O140_TOOL1_CHO_UNLOCK_Q1341_4;
+	1342: Out_Lamp5:=O140_TOOL2_CHO_UNLOCK_Q1342_4;
+	1343: Out_Lamp5:=O140_TOOL3_CHO_UNLOCK_Q1343_4;
+	1350: Out_Lamp5:=O160_SLIDE_CYL_REV_Q1350_4;
+	1351: Out_Lamp5:=O160_RH_PALLET_LOCK_CYL_UNLOCK_Q1351_4;
+	1352: Out_Lamp5:=O160_SPARE_Q1352_4;
+	1353: Out_Lamp5:=O160_SPARE_Q1353_4;
    ELSE
        Out_Visibility_5:=FALSE;
    END_CASE 
-   
-    Out_Visibility_6:=TRUE;
+    
+    CASE OP_Arr_OP160P[Output_Page_num] OF
+    700: OLine6:= "O140_LK_TST1 _SEL4(Q700.5)        ";
+    701: OLine6:= "O140_LK_TST2 _SEL3(Q701.5)        ";
+    702: OLine6:= "O140_LK_TST3 _SEL2(Q702.5)        ";
+    703: OLine6:= "O140_LK_TST4 _SEL1(Q703.5)        ";
+    704: OLine6:= "O140_LK_TST5 _STRT(Q704.5)        ";
+    705: OLine6:= "O140_LK_TST6 _RST(Q705.5)         ";
+    706: OLine6:= "O140_LK_TST6 _SEL7(Q706.5)        ";
+    707: OLine6:= "O160_SAMPLE_PART_DOR_OPN(Q707.5) ";
+    708: OLine6:= "O10A_DRUM_RST(Q708.5)             ";
+    709: OLine6:= "O160_SPARE_Q709_5(Q709.5)         ";
+   1340: OLine6:= "O130_LH_TOOL_CHO_LOCK(Q1340.5)";
+   1341: OLine6:= "O140_TOOL1_CHO_LOCK(Q1341.5)";
+   1342: OLine6:= "O140_TOOL2_CHO_LOCK(Q1342.5)";
+   1343: OLine6:= "O140_TOOL3_CHO_LOCK(Q1343.5)";
+   1350: OLine6:= "O160_SLIDE_CYL_FWD(Q1350.5)";
+   1351: OLine6:= "O160_RH_PALLET_LOCK_CYL_LOCK(Q1351.5)";
+   1352: OLine6:= "O160_SPARE_Q1352_5(Q1352.5)";
+   1353: OLine6:= "O160_SPARE_Q1353_5(Q1353.5)";
+    ELSE
+      OLine6:= " ";	
+    END_CASE
+       Out_Visibility_6:=TRUE;
 	
-   CASE OP_Arr_OP160P[Output_Page_num] OF
+    CASE OP_Arr_OP160P[Output_Page_num] OF
 	700:  Out_Lamp6:=O140_LK_TST1_SEL4_Q700_5;
 	701:  Out_Lamp6:=O140_LK_TST2_SEL3_Q701_5;
 	702:  Out_Lamp6:=O140_LK_TST3_SEL2_Q702_5;
@@ -2215,19 +2339,41 @@ END_VAR
 	707:  Out_Lamp6:=O160_SAMPLE_PART_DOOR_OPN_Q707_5;
 	708:  Out_Lamp6:=O10A_DRUM_RST_Q708_5;
 	709:  Out_Lamp6:=O160_SPARE_Q709_5;
-	340:  Out_Lamp6:=O130_LH_TOOL_CHO_LOCK_Q1340_5;
-	341:  Out_Lamp6:=O140_TOOL1_CHO_LOCK_Q1341_5;
-	342:  Out_Lamp6:=O140_TOOL2_CHO_LOCK_Q1342_5;
-	343:  Out_Lamp6:=O140_TOOL3_CHO_LOCK_Q1343_5;
-	350:  Out_Lamp6:=O160_SLIDE_CYL_FWD_Q1350_5;
-	351:  Out_Lamp6:=O160_RH_PALLET_LOCK_CYL_LOCK_Q1351_5;
-	352:  Out_Lamp6:=O160_SPARE_Q1352_5;
-	353:  Out_Lamp6:=O160_SPARE_Q1353_5;
+	1340: Out_Lamp6:=O130_LH_TOOL_CHO_LOCK_Q1340_5;
+	1341: Out_Lamp6:=O140_TOOL1_CHO_LOCK_Q1341_5;
+	1342: Out_Lamp6:=O140_TOOL2_CHO_LOCK_Q1342_5;
+	1343: Out_Lamp6:=O140_TOOL3_CHO_LOCK_Q1343_5;
+	1350: Out_Lamp6:=O160_SLIDE_CYL_FWD_Q1350_5;
+	1351: Out_Lamp6:=O160_RH_PALLET_LOCK_CYL_LOCK_Q1351_5;
+	1352: Out_Lamp6:=O160_SPARE_Q1352_5;
+	1353: Out_Lamp6:=O160_SPARE_Q1353_5;
    ELSE           
        Out_Visibility_6:=FALSE;
    END_CASE 
-    
-	Out_Visibility_7:=TRUE;
+       
+    CASE OP_Arr_OP160P[Output_Page_num] OF
+    700: OLine7:= "O140_LK_TST1 _SEL5(Q700.6)    ";
+    701: OLine7:= "O140_LK_TST2 _SEL4(Q701.6)    ";
+    702: OLine7:= "O140_LK_TST3 _SEL3(Q702.6)    ";
+    703: OLine7:= "O140_LK_TST4 _SEL2(Q703.6)    ";
+    704: OLine7:= "O140_LK_TST5 _SEL1(Q704.6)    ";
+    705: OLine7:= "O140_LK_TST6 _STRT(Q705.6)    ";
+    706: OLine7:= "O150_VISN_LGHT_ON(Q706.6)     ";
+    707: OLine7:= "O160_REJ_BIN_DOR_OPN(Q707.6) ";
+    708: OLine7:= "O10A_DRUM_EXT_SPEED(Q708.6)   ";
+    709: OLine7:= "O160_SPARE_Q709_6(Q709.6)     ";
+   1340: OLine7:= "O130_RH_TOOL_CHO_UNLOCK(Q1340.6)";
+   1341: OLine7:= "O140_WIPE1_CYL_REV(Q1341.6)";
+   1342: OLine7:= "O140_WIPE2_CYL_REV(Q1342.6)";
+   1343: OLine7:= "O140_WIPE3_CYL_REV(Q1343.6)";
+   1350: OLine7:= "O160_SPARE_Q1350_6(Q1350.6)";
+   1351: OLine7:= "O160_SPARE_Q1351_6(Q1351.6)";
+   1352: OLine7:= "O160_SPARE_Q1352_6(Q1352.6)";
+   1353: OLine7:= "O160_SPARE_Q1353_6(Q1353.6)";
+    ELSE
+      OLine7:= " ";	
+    END_CASE
+       Out_Visibility_7:=TRUE;
 	
    CASE OP_Arr_OP160P[Output_Page_num] OF
 	700:  Out_Lamp7:=O140_LK_TST1_SEL5_Q700_6;
@@ -2240,19 +2386,41 @@ END_VAR
 	707:  Out_Lamp7:=O160_REJ_BIN_DOOR_OPN_Q707_6;
 	708:  Out_Lamp7:=O10A_DRUM_EXT_SPEED_Q708_6;
 	709:  Out_Lamp7:=O160_SPARE_Q709_6;
-	340:  Out_Lamp7:=O130_RH_TOOL_CHO_UNLOCK_Q1340_6;
-	341:  Out_Lamp7:=O140_WIPE1_CYL_REV_Q1341_6;
-	342:  Out_Lamp7:=O140_WIPE2_CYL_REV_Q1342_6;
-	343:  Out_Lamp7:=O140_WIPE3_CYL_REV_Q1343_6;
-	350:  Out_Lamp7:=O160_SPARE_Q1350_6;
-	351:  Out_Lamp7:=O160_SPARE_Q1351_6;
-	352:  Out_Lamp7:=O160_SPARE_Q1352_6;
-	353:  Out_Lamp7:=O160_SPARE_Q1353_6;
+	1340: Out_Lamp7:=O130_RH_TOOL_CHO_UNLOCK_Q1340_6;
+	1341: Out_Lamp7:=O140_WIPE1_CYL_REV_Q1341_6;
+	1342: Out_Lamp7:=O140_WIPE2_CYL_REV_Q1342_6;
+	1343: Out_Lamp7:=O140_WIPE3_CYL_REV_Q1343_6;
+	1350: Out_Lamp7:=O160_SPARE_Q1350_6;
+	1351: Out_Lamp7:=O160_SPARE_Q1351_6;
+	1352: Out_Lamp7:=O160_SPARE_Q1352_6;
+	1353: Out_Lamp7:=O160_SPARE_Q1353_6;
    ELSE
        Out_Visibility_7:=FALSE;
    END_CASE 
-   
-    Out_Visibility_8:=TRUE;
+    
+    CASE OP_Arr_OP160P[Output_Page_num] OF
+    700: OLine8:= "O140_LK_TST1_SEL6(Q700.7)";
+    701: OLine8:= "O140_LK_TST2_SEL5(Q701.7)";
+    702: OLine8:= "O140_LK_TST3_SEL4(Q702.7)";
+    703: OLine8:= "O140_LK_TST4_SEL3(Q703.7)";
+    704: OLine8:= "O140_LK_TST5_SEL2(Q704.7)";
+    705: OLine8:= "O140_LK_TST6_SEL1(Q705.7)";
+    706: OLine8:= "O150_BARLIGHT_OP1(Q706.7) ";
+    707: OLine8:= "O160_SPARE(Q707.7)        ";
+    708: OLine8:= "O160_SPARE_Q708_7(Q708.7) ";
+    709: OLine8:= "O160_SPARE_Q709_7(Q709.7) ";
+   1340: OLine8:= "O130_RH_TOOL_CHO_LOCK(Q1340.7)";
+   1341: OLine8:= "O140_WIPE1_CYL_FWD(Q1341.7)";
+   1342: OLine8:= "O140_WIPE2_CYL_FWD(Q1342.7)";
+   1343: OLine8:= "O140_WIPE3_CYL_FWD(Q1343.7)";
+   1350: OLine8:= "O160_SPARE_Q1350_7(Q1350.7)";
+   1351: OLine8:= "O160_SPARE_Q1351_7(Q1351.7)";
+   1352: OLine8:= "O160_SPARE_Q1352_7(Q1352.7)";
+   1353: OLine8:= "O160_SPARE_Q1353_7(Q1353.7)";
+    ELSE
+      OLine8:= " ";	
+    END_CASE	
+       Out_Visibility_8:=TRUE;
    
    CASE OP_Arr_OP160P[Output_Page_num] OF
 	700:  Out_Lamp8:=O140_LK_TST1_SEL6_Q700_7;
@@ -2265,22 +2433,23 @@ END_VAR
 	707:  Out_Lamp8:=O160_SPARE_Q707_7;
 	708:  Out_Lamp8:=O160_SPARE_Q708_7;
 	709:  Out_Lamp8:=O160_SPARE_Q709_7;
-	340:  Out_Lamp8:=O130_RH_TOOL_CHO_LOCK_Q1340_7;
-	341:  Out_Lamp8:=O140_WIPE1_CYL_FWD_Q1341_7;
-	342:  Out_Lamp8:=O140_WIPE2_CYL_FWD_Q1342_7;
-	343:  Out_Lamp8:=O140_WIPE3_CYL_FWD_Q1343_7;
-	350:  Out_Lamp8:=O160_SPARE_Q1350_7;
-	351:  Out_Lamp8:=O160_SPARE_Q1351_7;
-	352:  Out_Lamp8:=O160_SPARE_Q1352_7;
-	353:  Out_Lamp8:=O160_SPARE_Q1353_7;
+	1340: Out_Lamp8:=O130_RH_TOOL_CHO_LOCK_Q1340_7;
+	1341: Out_Lamp8:=O140_WIPE1_CYL_FWD_Q1341_7;
+	1342: Out_Lamp8:=O140_WIPE2_CYL_FWD_Q1342_7;
+	1343: Out_Lamp8:=O140_WIPE3_CYL_FWD_Q1343_7;
+	1350: Out_Lamp8:=O160_SPARE_Q1350_7;
+	1351: Out_Lamp8:=O160_SPARE_Q1351_7;
+	1352: Out_Lamp8:=O160_SPARE_Q1352_7;
+	1353: Out_Lamp8:=O160_SPARE_Q1353_7;
    ELSE
        Out_Visibility_8:=FALSE;	
-   END_CASE   
+   END_CASE 
+  
  4: CASE IP_Arr_OP10A[Input_Page_num] OF
       100:Line1:="I10A_HPR_UNIT_ALRM(I100.0)    ";
       101:Line1:="I10A_HPR_DOOR_SELCTN(I101.0)  ";
       102:Line1:="I10A_LNR_TRK1_CHO_MOD1(I102.0)";
-      103:Line1:="I10A_SPARE_I103.0(I103.0)     ";
+      103:Line1:="I10A_SPARE_I103_0(I103.0)     ";
       ELSE
       	Line1:= " ";
       END_CASE
@@ -2289,7 +2458,7 @@ END_VAR
       100:Line2:="I10A_SPARE_I100.1(I100.1)      ";
       101:Line2:="I10A_SPARE_I101.1(I101.1)      ";
       102:Line2:="I10A_LNR_TRK1_CHO_MOD2(I102.1) ";
-      103:Line2:="I10A_SPARE_I103.1(I103.1)      ";
+      103:Line2:="I10A_SPARE_I103_1(I103.1)      ";
       ELSE
       	Line2 := " ";
       END_CASE
@@ -2298,7 +2467,7 @@ END_VAR
       100:Line3:="I10A_HPR_LOW_LVL_SEN(I100.2)   ";
       101:Line3:="I10A_BDY_BOWL_LOW_LVL(I101.2)  ";
       102:Line3:="I10A_LNR_TRK2_CHO_MOD1(I102.2) ";
-      103:Line3:="I10A_SPARE_I103.2(I103.2)      ";
+      103:Line3:="I10A_SPARE_I103_2(I103.2)      ";
       ELSE
       	Line3 := " ";
       END_CASE
@@ -2307,13 +2476,16 @@ END_VAR
       100:Line4:="I10A_HPR_SOL_DOOR_SW_FB(I100.3)";
       101:Line4:="I10A_BDY_BWL_RUN(I101.3)       ";
       102:Line4:="I10A_LNR_TRK2_CHO_MOD2(I102.3) ";
-      103:Line4:="I10A_SPARE_I103.3(I103.3)      ";
+      103:Line4:="I10A_SPARE_I103_3(I103.3)      ";
       ELSE
       	Line4 := " ";
       END_CASE
       
       CASE IP_Arr_OP10A[Input_Page_num] OF
-      100:Line5:="I10A_HPR_OFF_ON(I100.4)";			
+      100:Line5:="I10A_HPR_OFF_ON(I100.4)";
+      101:Line5:="I10A_BDY_LNR1_RUN(I101.4)";
+      102:Line5:="I10A_SPARE_I102_4(I102.4)";
+      103:Line5:="I10A_SPARE_I103_4(I103.4)";
       ELSE
       	Line5:= " ";
       END_CASE
@@ -2321,8 +2493,8 @@ END_VAR
       CASE IP_Arr_OP10A[Input_Page_num] OF
       100:Line6:="I10A_BDY_BOWL_OFF_ON(I100.5)  ";
       101:Line6:="I10A_BDY_LNR2_RUN(I101.5)     ";
-      102:Line6:="I10A_LNR_TRK3_CHO_MOD2(I102.5)";
-      103:Line6:="I10A_SPARE_I103.5(I103.5)     ";
+      102:Line6:="I10A_SPARE_I102_5(I102.5)";
+      103:Line6:="I10A_SPARE_I103_5(I103.5)     ";
       ELSE
       	Line6 := " ";
       END_CASE
@@ -2331,7 +2503,7 @@ END_VAR
       100:Line7:="I10A_BDY_LNR1_OFF_ON(I100.6)     ";
       101:Line7:="I10A_BDY_LNR_FEED1_OVRFLW(I101.6)";
       102:Line7:="I10A_LH_BDY_CONT_FB(I102.6)      ";
-      103:Line7:="I10A_SPARE_I103.6(I103.6)        ";
+      103:Line7:="I10A_SPARE_I103_6(I103.6)        ";
       ELSE
       	Line7 := " ";
       END_CASE
@@ -2340,7 +2512,7 @@ END_VAR
       100:Line8:="I10A_BDY_LNR2_OFF_ON(I100.7)     ";
       101:Line8:="I10A_BDY_LNR_FEED2_OVRFLW(I101.7)";
       102:Line8:="I10A_RH_BDY_CONT_FB(I102.7)      ";
-      103:Line8:="I10A_SPARE_I103.7(I103.7)        ";
+      103:Line8:="I10A_SPARE_I103_7(I103.7)        ";
       ELSE
       	Line8 := " ";
       END_CASE
@@ -2397,7 +2569,7 @@ END_VAR
    CASE IP_Arr_OP10A[Input_Page_num] OF
 	100: Lamp5:=I10A_HPR_OFF_ON_I100_4 ;
 	101: Lamp5:=I10A_BDY_LNR1_RUN_I101_4 ;
-	102: Lamp5:=I10A_LNR_TRK3_CHO_MOD1_I102_4 ;
+	102: Lamp5:=I10A_SPARE_I102_4 ;
 	103: Lamp5:=I10A_SPARE_I103_4;
    ELSE
        Visibility_5:=FALSE;	
@@ -2409,7 +2581,7 @@ END_VAR
    CASE IP_Arr_OP10A[Input_Page_num] OF
 	100: Lamp6:=I10A_BDY_BOWL_OFF_ON_I100_5 ;
 	101: Lamp6:=I10A_BDY_LNR2_RUN_I101_5 ;
-	102: Lamp6:=I10A_LNR_TRK3_CHO_MOD2_I102_5 ;
+	102: Lamp6:=I10A_SPARE_I102_5 ;
 	103: Lamp6:=I10A_SPARE_I103_5;
    ELSE
        Visibility_6:=FALSE;	
@@ -2444,8 +2616,8 @@ END_VAR
 	 CASE OP_Arr_OP10A[Output_Page_num] OF
      100:OLine1:="O10A_HPR_MTR_FWD(Q100.0)  ";
      101:OLine1:="O10A_BDY_BOWL_ON(Q101.0)  ";
-     102:OLine1:="O10A_SPARE_Q102.0(Q102.0) ";
-     103:OLine1:="O10A_SPARE_Q103.0(Q103.0) ";
+     102:OLine1:="O10A_SPARE_Q102_0(Q102.0) ";
+     103:OLine1:="O10A_SPARE_Q103_0(Q103.0) ";
      ELSE
      	OLine1:= " ";
      END_CASE
@@ -2453,8 +2625,8 @@ END_VAR
      CASE OP_Arr_OP10A[Output_Page_num] OF
      100:OLine2:="O10A_HPR_RST(Q100.1)         ";
      101:OLine2:="O10A_BDY_LNR_FEED1_ON(Q101.1)";
-     102:OLine2:="O10A_SPARE_Q102.1(Q102.1)    ";
-     103:OLine2:="O10A_SPARE_Q103.1(Q103.1)    ";
+     102:OLine2:="O10A_SPARE_Q102_1(Q102.1)    ";
+     103:OLine2:="O10A_SPARE_Q103_1(Q103.1)    ";
      ELSE
      	OLine2:= " ";
      END_CASE
@@ -2462,8 +2634,8 @@ END_VAR
      CASE OP_Arr_OP10A[Output_Page_num] OF
      100:OLine3:="O10A_EXT_SPEED(Q100.2)       ";
      101:OLine3:="O10A_BDY_LNR_FEED2_ON(Q101.2)";
-     102:OLine3:="O10A_SPARE_Q102.2(Q102.2)    ";
-     103:OLine3:="O10A_SPARE_Q103.2(Q103.2)    ";
+     102:OLine3:="O10A_SPARE_Q102_2(Q102.2)    ";
+     103:OLine3:="O10A_SPARE_Q103_2(Q103.2)    ";
      ELSE
      	OLine3:= " ";
      END_CASE
@@ -2471,14 +2643,17 @@ END_VAR
      CASE OP_Arr_OP10A[Output_Page_num] OF
      100:OLine4:="O10A_SPARE_Q100.3(Q100.3)      ";
      101:OLine4:="O10A_BDY_LNR1_AIR_PURGE(Q101.3)";
-     102:OLine4:="O10A_SPARE_Q102.3(Q102.3)      ";
-     103:OLine4:="O10A_SPARE_Q103.3(Q103.3)      ";
+     102:OLine4:="O10A_SPARE_Q102_3(Q102.3)      ";
+     103:OLine4:="O10A_SPARE_Q103_3(Q103.3)      ";
      ELSE
      	OLine4:= " ";
      END_CASE
      
      CASE OP_Arr_OP10A[Output_Page_num] OF
      100:OLine5:="O10A_HPR_DOOR_SELCTN_IND(Q100.4)";
+   //101:OLine5:="O10A_BDY_LNR2_AIRPURGE(Q101.4)";
+     102:OLine5:="O10A_SPARE_Q102_4(Q102.4)";
+     103:OLine5:="O10A_SPARE_Q103_4(Q103.4)";
      ELSE
      	OLine5:= " ";
      END_CASE
@@ -2486,26 +2661,26 @@ END_VAR
      CASE OP_Arr_OP10A[Output_Page_num] OF
      100:OLine6:="O10A_HPR_TWR_LMP_RED(Q100.5)";
      101:OLine6:="O10A_HPR_DOOR_OPN(Q101.5)   ";
-     102:OLine6:="O10A_SPARE_Q102.5(Q102.5)   ";
-     103:OLine6:="O10A_SPARE_Q103.5(Q103.5)   ";
+     102:OLine6:="O10A_SPARE_Q102_5(Q102.5)   ";
+     103:OLine6:="O10A_SPARE_Q103_5(Q103.5)   ";
      ELSE
      	OLine6:= " ";
      END_CASE
      
      CASE OP_Arr_OP10A[Output_Page_num] OF
      100:OLine7:="O10A_HPR_TWR_LMP_GREEN(Q100.6)";
-     101:OLine7:="O10A_SPARE_Q101.6(Q101.6)     ";
-     102:OLine7:="O10A_SPARE_Q102.6(Q102.6)     ";
-     103:OLine7:="O10A_SPARE_Q103.6(Q103.6)     ";
+     101:OLine7:="O10A_SPARE_Q101_6(Q101.6)     ";
+     102:OLine7:="O10A_SPARE_Q102_6(Q102.6)     ";
+     103:OLine7:="O10A_SPARE_Q103_6(Q103.6)     ";
      ELSE
      	OLine7:= " ";
      END_CASE
      
      CASE OP_Arr_OP10A[Output_Page_num] OF
-     100:OLine8:="O10A_SPARE_Q100.7(Q100.7)";
-     101:OLine8:="O10A_SPARE_Q101.7(Q101.7)";
-     102:OLine8:="O10A_SPARE_Q102.7(Q102.7)";
-     103:OLine8:="O10A_SPARE_Q103.7(Q103.7)";
+     100:OLine8:="O10A_SPARE_Q100_7(Q100.7)";
+     101:OLine8:="O10A_SPARE_Q101_7(Q101.7)";
+     102:OLine8:="O10A_SPARE_Q102_7(Q102.7)";
+     103:OLine8:="O10A_SPARE_Q103_7(Q103.7)";
      ELSE
      	OLine8:= " ";
      END_CASE
@@ -2557,7 +2732,7 @@ END_VAR
 	
     CASE OP_Arr_OP10A[Output_Page_num] OF
 	100:  Out_Lamp5:=O10A_HPR_DOOR_SELCTN_IND_Q100_4; 
-	101:  Out_Lamp5:=O10A_BDY_LNR2_AIR_PURGE_Q101_4; 
+	//101:  Out_Lamp5:=O10A_BDY_LNR2_AIR_PURGE_Q101_4; 
 	102:  Out_Lamp5:=O10A_SPARE_Q102_4; 
 	103:  Out_Lamp5:=O10A_SPARE_Q103_4; 	 
    ELSE
@@ -2601,16 +2776,16 @@ END_VAR
     200: Line1:= "I10B_HPR_UNIT_ALRM(I200.0)     ";
     201: Line1:= "I10B_HPR_DOOR_SELCTN(I201.0)   ";
     202: Line1:= "I10B_LNR_TRK1_CHO_MOD1(I202.0) ";
-    203: Line1:= "I10B_SPARE_I203.0(I203.0)      ";
+    203: Line1:= "I10B_SPARE_I203_0(I203.0)      ";
     ELSE
     	Line1 := " ";
     END_CASE
     
     CASE IP_Arr_OP10B[Input_Page_num] OF
-    200: Line2:= "I10B_SPARE_I200.1(I200.1)     ";
-    201: Line2:= "I10B_SPARE_I201.1(I201.1)     ";
+    200: Line2:= "I10B_SPARE_I200_1(I200.1)     ";
+    201: Line2:= "I10B_SPARE_I201_1(I201.1)     ";
     202: Line2:= "I10B_LNR_TRK1_CHO_MOD2(I202.1)";
-    203: Line2:= "I10B_SPARE_I203.1(I203.1)     ";
+    203: Line2:= "I10B_SPARE_I203_1(I203.1)     ";
     ELSE
     	Line2 := " ";
     END_CASE
@@ -2619,7 +2794,7 @@ END_VAR
     200: Line3:= "I10B_HPR_LOW_LVL_SEN(I200.2)   ";
     201: Line3:= "I10B_BDY_BOWL_LOW_LVL(I201.2)  ";
     202: Line3:= "I10B_LNR_TRK2_CHO_MOD1(I202.2) ";
-    203: Line3:= "I10B_SPARE_I203.2(I203.2)      ";
+    203: Line3:= "I10B_SPARE_I203_2(I203.2)      ";
     ELSE
     	Line3 := " ";
     END_CASE
@@ -2628,7 +2803,7 @@ END_VAR
     200: Line4:= "I10B_HPR_SOL_DOOR_SW_FB(I200.3)";
     201: Line4:= "I10B_BDY_BWL_RUN(I201.3)       ";
     202: Line4:= "I10B_LNR_TRK2_CHO_MOD2(I202.3) ";
-    203: Line4:= "I10B_SPARE_I203.3(I203.3)      ";
+    203: Line4:= "I10B_SPARE_I203_3(I203.3)      ";
     ELSE
     	Line4 := " ";
     END_CASE
@@ -2636,8 +2811,8 @@ END_VAR
     CASE IP_Arr_OP10B[Input_Page_num] OF
     200: Line5:= "I10B_HPR_OFF_ON(I200.4)       ";
     201: Line5:= "I10B_BDY_LNR1_RUN(I201.4)     ";
-    202: Line5:= "I10B_LNR_TRK3_CHO_MOD1(I202.4)";
-    203: Line5:= "I10B_SPARE_I203.4(I203.4)     ";
+    202: Line5:= "I10B_SPARE_I202_4(I202.4)";
+    203: Line5:= "I10B_SPARE_I203_4(I203.4)     ";
     ELSE
     	Line5 := " ";
     END_CASE
@@ -2645,8 +2820,8 @@ END_VAR
     CASE IP_Arr_OP10B[Input_Page_num] OF
     200: Line6:= "I10B_BDY_BOWL_OFF_ON(I200.5)   ";
     201: Line6:= "I10B_BDY_LNR2_RUN(I201.5)      ";
-    202: Line6:= "I10B_LNR_TRK3_CHO_MOD2(I202.5) ";
-    203: Line6:= "I10B_SPARE_I203.5(I203.5)      ";
+    202: Line6:= "I10B_SPARE_I202_5(I202.5) ";
+    203: Line6:= "I10B_SPARE_I203_5(I203.5)      ";
     ELSE
     	Line6 := " ";
     END_CASE
@@ -2654,8 +2829,8 @@ END_VAR
     CASE IP_Arr_OP10B[Input_Page_num] OF
     200: Line7:= "I10B_BDY_LNR1_OFF_ON(I200.6)      ";
     201: Line7:= "I10B_BDY_LNR_FEED1_OVRFLW(I201.6) ";
-    202: Line7:= "I10B_SPARE_I202.6(I202.6)         ";
-    203: Line7:= "I10B_SPARE_I203.6(I203.6)         ";
+    202: Line7:= "I10B_SPARE_I202_6(I202.6)         ";
+    203: Line7:= "I10B_SPARE_I203_6(I203.6)         ";
     ELSE
     	Line7 := " ";
     END_CASE
@@ -2663,8 +2838,8 @@ END_VAR
     CASE IP_Arr_OP10B[Input_Page_num] OF
     200: Line8:= "I10B_BDY_LNR2_OFF_ON(I200.7)     ";
     201: Line8:= "I10B_BDY_LNR_FEED2_OVRFLW(I201.7)";
-    202: Line8:= "I10B_SPARE_I202.7(I202.7)        ";
-    203: Line8:= "I10B_SPARE_I203.7(I203.7)        ";
+    202: Line8:= "I10B_SPARE_I202_7(I202.7)        ";
+    203: Line8:= "I10B_SPARE_I203_7(I203.7)        ";
     ELSE
     	Line8 := " ";
     END_CASE
@@ -2721,7 +2896,7 @@ END_VAR
    CASE IP_Arr_OP10B[Input_Page_num] OF
 	200: Lamp5:=I10B_HPR_OFF_ON_I200_4 ;
 	201: Lamp5:=I10B_BDY_LNR1_RUN_I201_4 ;
-	202: Lamp5:=I10B_LNR_TRK3_CHO_MOD1_I202_4 ;
+	202: Lamp5:=I10B_SPARE_I202_4 ;
 	203: Lamp5:=I10B_SPARE_I203_4;
    ELSE
        Visibility_5:=FALSE;	
@@ -2733,7 +2908,7 @@ END_VAR
    CASE IP_Arr_OP10B[Input_Page_num] OF
 	200: Lamp6:=I10B_BDY_BOWL_OFF_ON_I200_5 ;
 	201: Lamp6:=I10B_BDY_LNR2_RUN_I201_5 ;
-	202: Lamp6:=I10B_LNR_TRK3_CHO_MOD2_I202_5 ;
+	202: Lamp6:=I10B_SPARE_I202_5 ;
 	203: Lamp6:=I10B_SPARE_I203_5 ;
    ELSE
        Visibility_6:=FALSE;	
@@ -2767,8 +2942,8 @@ END_VAR
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF	
   200: OLine1:= " O10B_HPR_MTR_FWD(Q200.0) ";
   201: OLine1:= " O10B_BDY_BOWL_ON(Q201.0) ";
-  202: OLine1:= " O10B_SPARE_Q202.0(Q202.0)";
-  203: OLine1:= " O10B_SPARE_Q203.0(Q203.0)";
+  202: OLine1:= " O10B_SPARE_Q202_0(Q202.0)";
+  203: OLine1:= " O10B_SPARE_Q203_0(Q203.0)";
   ELSE
       OLine1 := " ";
   END_CASE
@@ -2776,8 +2951,8 @@ END_VAR
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF
   200: OLine2:= "O10B_HPR_RST(Q200.1)         ";
   201: OLine2:= "O10B_BDY_LNR_FEED1_ON(Q201.1)";
-  202: OLine2:= "O10B_SPARE_Q202.1(Q202.1)    ";
-  203: OLine2:= "O10B_SPARE_Q203.1(Q203.1)    ";
+  202: OLine2:= "O10B_SPARE_Q202_1(Q202.1)    ";
+  203: OLine2:= "O10B_SPARE_Q203_1(Q203.1)    ";
   ELSE
     OLine2 := " ";
   END_CASE
@@ -2785,8 +2960,8 @@ END_VAR
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF
   200: OLine3:= "O10B_EXT_SPEED(Q200.2)       ";
   201: OLine3:= "O10B_BDY_LNR_FEED2_ON(Q201.2)";
-  202: OLine3:= "O10B_SPARE_Q202.2(Q202.2)    ";
-  203: OLine3:= "O10B_SPARE_Q203.2(Q203.2)    ";
+  202: OLine3:= "O10B_SPARE_Q202_2(Q202.2)    ";
+  203: OLine3:= "O10B_SPARE_Q2032_(Q203.2)    ";
   ELSE
     OLine3 := " ";
   END_CASE
@@ -2794,17 +2969,17 @@ END_VAR
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF
   200: OLine4:= "O10B_SPARE_Q200.3(Q200.3)      ";
   201: OLine4:= "O10B_BDY_LNR1_AIR_PURGE(Q201.3)";
-  202: OLine4:= "O10B_SPARE_Q202.3(Q202.3)      ";
-  203: OLine4:= "O10B_SPARE_Q203.3(Q203.3)      ";
+  202: OLine4:= "O10B_SPARE_Q202_3(Q202.3)      ";
+  203: OLine4:= "O10B_SPARE_Q203_3(Q203.3)      ";
   ELSE
     OLine4 := " ";
   END_CASE
   
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF
   200: OLine5:= "O10B_HPR_DOOR_SELCTN_IND(Q200.4)";
-  201: OLine5:= "O10B_BDY_LNR2_AIR_PURGE(Q201.4) ";
-  202: OLine5:= "O10B_SPARE_Q202.4(Q202.4)       ";
-  203: OLine5:= "O10B_SPARE_Q203.4(Q203.4)       ";
+  //201: OLine5:= "O10B_BDY_LNR2_AIR_PURGE(Q201.4) ";
+  202: OLine5:= "O10B_SPARE_Q202_4(Q202.4)       ";
+  203: OLine5:= "O10B_SPARE_Q203_4(Q203.4)       ";
   ELSE
      OLine5 := " ";
   END_CASE
@@ -2812,26 +2987,26 @@ END_VAR
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF
   200: OLine6:= "O10B_HPR_TWR_LMP_RED(Q200.5)";
   201: OLine6:= "O10B_HPR_DOOR_OPN(Q201.5)   ";
-  202: OLine6:= "O10B_SPARE_Q202.5(Q202.5)   ";
-  203: OLine6:= "O10B_SPARE_Q203.5(Q203.5)   ";
+  202: OLine6:= "O10B_SPARE_Q202_5(Q202.5)   ";
+  203: OLine6:= "O10B_SPARE_Q203_5(Q203.5)   ";
   ELSE
      OLine6 := " ";
   END_CASE
   
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF
   200: OLine7:= "O10B_HPR_TWR_LMP_GREEN(Q200.6)";
-  201: OLine7:= "O10B_SPARE_Q201.6(Q201.6)     ";
-  202: OLine7:= "O10B_SPARE_Q202.6(Q202.6)     ";
-  203: OLine7:= "O10B_SPARE_Q203.6(Q203.6)     ";
+  201: OLine7:= "O10B_SPARE_Q201_6(Q201.6)     ";
+  202: OLine7:= "O10B_SPARE_Q202_6(Q202.6)     ";
+  203: OLine7:= "O10B_SPARE_Q203_6(Q203.6)     ";
   ELSE
       OLine7 := " ";
   END_CASE
   
   CASE OP_Arr_OP10B_JB[Output_Page_num] OF	 
-  200: OLine8:= "O10B_SPARE_Q200.7(Q200.7)";
-  201: OLine8:= "O10B_SPARE_Q201.7(Q201.7)";
-  202: OLine8:= "O10B_SPARE_Q202.7(Q202.7)";
-  203: OLine8:= "O10B_SPARE_Q203.7(Q203.7)";
+  200: OLine8:= "O10B_SPARE_Q200_7(Q200.7)";
+  201: OLine8:= "O10B_SPARE_Q201_7(Q201.7)";
+  202: OLine8:= "O10B_SPARE_Q202_7(Q202.7)";
+  203: OLine8:= "O10B_SPARE_Q203_7(Q203.7)";
   ELSE
       OLine8 := " ";
   END_CASE	
@@ -2924,12 +3099,12 @@ END_VAR
        Out_Visibility_8:=FALSE;	
    END_CASE 
  6: CASE IP_Arr_OP90JB[Input_Page_num] OF
-    500: Line1:=" I90_SPARE_I500.0(I500.0)       ";
+    500: Line1:=" I90_SPARE_I500_0(I500.0)       ";
     501: Line1:=" I90_CONV1_FWD(I501.0)          ";
     502: Line1:=" I90_CONV1_TRK3_CHO_MOD2(I502.0)";
     503: Line1:=" I90_CONV2_REV(I503.0)          ";
     504: Line1:=" I90_CONV2_TRK3_CHO_MOD1(I504.0)";
-    505: Line1:=" I90_SPARE_I505.0(I505.0)       ";
+    505: Line1:=" I90_SPARE_I505_0(I505.0)       ";
     else
      Line1:=" ";
     end_case 
@@ -2937,10 +3112,10 @@ END_VAR
     CASE IP_Arr_OP90JB[Input_Page_num] OF
     500: Line2:="I90_HPR1_LOW_LVL_FB(I500.1)        ";
     501: Line2:="I90_VBF1_CONV1_TRK1_OVERFLW(I501.1)";
-    502: Line2:="I90_SPARE_I502.1(I502.1)           ";
+    502: Line2:="I90_SPARE_I502_1(I502.1)           ";
     503: Line2:="I90_CONV2_FWD(I503.1)              ";
     504: Line2:="I90_CONV2_TRK3_CHO_MOD2(I504.1)    ";
-    505: Line2:="I90_SPARE_I505.1(I505.1)           ";
+    505: Line2:="I90_SPARE_I505_1(I505.1)           ";
     else
      Line2:=" ";
     end_case 
@@ -2951,7 +3126,7 @@ END_VAR
     502: Line3:="I90_HPR2_LOW_LVL_FB(I502.2)        ";
     503: Line3:="I90_VBF1_CONV2_TRK1_OVERFLW(I503.2)";
     504: Line3:="I90_VBF1_CONV_TRK_OVERFLW_2(I504.2)";
-    505: Line3:="I90_SPARE_I505.2(I505.2)           ";
+    505: Line3:="I90_SPARE_I505_2(I505.2)           ";
     else
      Line3:=" ";
     end_case 
@@ -2962,7 +3137,7 @@ END_VAR
     502: Line4:="I90_HPR2_SOL_DOOR_SW_FB(I502.3)    ";
     503: Line4:="I90_VBF1_CONV2_TRK2_OVERFLW(I503.3)";
     504: Line4:="I90_VBF2_CONV_TRK_OVERFLW_2(I504.3)";
-    505: Line4:="I90_SPARE_I505.3(I505.3)           ";
+    505: Line4:="I90_SPARE_I505_3(I505.3)           ";
     else
      Line4:=" ";
     end_case 
@@ -2972,8 +3147,8 @@ END_VAR
     501: Line5:="I90_CONV1_TRK1_CHO_MOD2(I501.4)";
     502: Line5:="I90_BOWL2_RDY(I502.4)          ";
     503: Line5:="I90_CONV2_TRK1_CHO_MOD1(I503.4)";
-    504: Line5:="I90_SPARE_I504.4(I504.4)       ";
-    505: Line5:="I90_SPARE_I505.4(I505.4)       ";
+    504: Line5:="I90_SPARE_I504_4(I504.4)       ";
+    505: Line5:="I90_SPARE_I505_4(I505.4)       ";
     else
      Line5:=" ";
     end_case 
@@ -2983,8 +3158,8 @@ END_VAR
     501: Line6:="I90_CONV1_TRK2_CHO_MOD1(I501.5) ";
     502: Line6:="I90_BOWL2_LOW_LVL(I502.5)       ";
     503: Line6:="I90_CONV2_TRK1_CHO_MOD2(I503.5) ";
-    504: Line6:="I90_SPARE_I504.5(I504.5)        ";
-    505: Line6:="I90_SPARE_I505.5(I505.5)        ";
+    504: Line6:="I90_SPARE_I504_5(I504.5)        ";
+    505: Line6:="I90_SPARE_I505_5(I505.5)        ";
     else
      Line6:=" ";
     end_case 
@@ -2994,8 +3169,8 @@ END_VAR
     501: Line7:="I90_CONV1_TRK2_CHO_MOD2(I501.6)";
     502: Line7:="I90_BOWL2_OFF_ON(I502.6)       ";
     503: Line7:="I90_CONV2_TRK2_CHO_MOD1(I503.6)";
-    504: Line7:="I90_SPARE_I504.6(I504.6)       ";
-    505: Line7:="I90_SPARE_I505.6(I505.6)       ";
+    504: Line7:="I90_SPARE_I504_6(I504.6)       ";
+    505: Line7:="I90_SPARE_I505_6(I505.6)       ";
     else
      Line7:=" ";
     end_case 
@@ -3005,8 +3180,8 @@ END_VAR
     501: Line8:="I90_CONV1_TRK3_CHO_MOD1(I501.7) ";
     502: Line8:="I90_HPR2_OFF_ON(I502.7)         ";
     503: Line8:="I90_CONV2_TRK2_CHO_MOD2(I503.7) ";
-    504: Line8:="I90_SPARE_I504.7(I504.7)        ";
-    505: Line8:="I90_SPARE_I505.7(I505.7)        ";
+    504: Line8:="I90_SPARE_I504_7(I504.7)        ";
+    505: Line8:="I90_SPARE_I505_7(I505.7)        ";
     else
      Line8:=" ";
     END_CASE 
@@ -3125,8 +3300,8 @@ END_VAR
     CASE OP_Arr_OP90[Output_Page_num] OF
     500: OLine1:=" O90_HPR1_ENABLE(Q500.0)  ";
     501: OLine1:=" O90_HPR2_ENABLE(Q501.0)  ";
-    502: OLine1:=" O90_SPARE_Q502.0(Q502.0) ";
-    503: OLine1:=" O90_SPARE_Q503.0(Q503.0) ";
+    502: OLine1:=" O90_SPARE_Q502_0(Q502.0) ";
+    503: OLine1:=" O90_SPARE_Q503_0(Q503.0) ";
     else
      OLine1:=" ";
     end_case 
@@ -3134,8 +3309,8 @@ END_VAR
     CASE OP_Arr_OP90[Output_Page_num] OF
     500: OLine2:="O90_BOWL1_ENABLE(Q500.1)";
     501: OLine2:="O90_BOWL2_ENABLE(Q501.1)";
-    502: OLine2:="O90_SPARE_Q502.1(Q502.1)";
-    503: OLine2:="O90_SPARE_Q503.1(Q503.1)";
+    502: OLine2:="O90_SPARE_Q502_1(Q502.1)";
+    503: OLine2:="O90_SPARE_Q503_1(Q503.1)";
     else
      OLine2:=" ";
     end_case 
@@ -3143,8 +3318,8 @@ END_VAR
     CASE OP_Arr_OP90[Output_Page_num] OF
     500: OLine3:="O90_HPR1_TWR_LMP_RED(Q500.2)";
     501: OLine3:="O90_HPR2_TWR_LMP_RED(Q501.2)";
-    502: OLine3:="O90_SPARE_Q502.2(Q502.2)    ";
-    503: OLine3:="O90_SPARE_Q503.2(Q503.2)    ";
+    502: OLine3:="O90_SPARE_Q502_2(Q502.2)    ";
+    503: OLine3:="O90_SPARE_Q503_2(Q503.2)    ";
     else
      OLine3:=" ";
     end_case 
@@ -3152,8 +3327,8 @@ END_VAR
     CASE OP_Arr_OP90[Output_Page_num] OF
     500: OLine4:="O90_HPR1_TWR_LMP_GREEN(Q500.3)";
     501: OLine4:="O90_HPR2_TWR_LMP_GREEN(Q501.3)";
-    502: OLine4:="O90_SPARE_Q502.3(Q502.3)      ";
-    503: OLine4:="O90_SPARE_Q503.3(Q503.3)      ";
+    502: OLine4:="O90_SPARE_Q502_3(Q502.3)      ";
+    503: OLine4:="O90_SPARE_Q503_3(Q503.3)      ";
     else
      OLine4:=" ";
     end_case 
@@ -3161,8 +3336,8 @@ END_VAR
     CASE OP_Arr_OP90[Output_Page_num] OF
     500: OLine5:="O90_BOWL1_AIR_PURGE1(Q500.4)";
     501: OLine5:="O90_BOWL2_AIR_PURGE1(Q501.4)";
-    502: OLine5:="O90_SPARE_Q502.4(Q502.4)    ";
-    503: OLine5:="O90_SPARE_Q503.4(Q503.4)    ";
+    502: OLine5:="O90_SPARE_Q502_4(Q502.4)    ";
+    503: OLine5:="O90_SPARE_Q503_4(Q503.4)    ";
     else
      OLine5:=" ";
     end_case 
@@ -3170,8 +3345,8 @@ END_VAR
     CASE OP_Arr_OP90[Output_Page_num] OF
     500: OLine6:="O90_BOWL1_AIR_PURGE2(Q500.5)";
     501: OLine6:="O90_BOWL2_AIR_PURGE2(Q501.5)";
-    502: OLine6:="O90_SPARE_Q502.5(Q502.5)    ";
-    503: OLine6:="O90_SPARE_Q503.5(Q503.5)    ";
+    502: OLine6:="O90_SPARE_Q502_5(Q502.5)    ";
+    503: OLine6:="O90_SPARE_Q503_5(Q503.5)    ";
     else
      OLine6:=" ";
     end_case 
@@ -3179,17 +3354,17 @@ END_VAR
     CASE OP_Arr_OP90[Output_Page_num] OF
     500: OLine7:="O90_HPR1_DOOR_OPN(Q500.6)";
     501: OLine7:="O90_HPR2_DOOR_OPN(Q501.6)";
-    502: OLine7:="O90_SPARE_Q502.6(Q502.6) ";
-    503: OLine7:="O90_SPARE_Q503.6(Q503.6) ";
+    502: OLine7:="O90_SPARE_Q502_6(Q502.6) ";
+    503: OLine7:="O90_SPARE_Q503_6(Q503.6) ";
     else
      OLine7:=" ";
     end_case 
     
     CASE OP_Arr_OP90[Output_Page_num] OF
-    500: OLine8:="O90_SPARE_Q500.7(Q500.7)";
-    501: OLine8:="O90_SPARE_Q501.7(Q501.7)";
-    502: OLine8:="O90_SPARE_Q502.7(Q502.7)";
-    503: OLine8:="O90_SPARE_Q503.7(Q503.7)";
+    500: OLine8:="O90_SPARE_Q500_7(Q500.7)";
+    501: OLine8:="O90_SPARE_Q501_7(Q501.7)";
+    502: OLine8:="O90_SPARE_Q502_7(Q502.7)";
+    503: OLine8:="O90_SPARE_Q503_7(Q503.7)";
     else
      OLine8:=" ";
     END_CASE 
@@ -3280,10 +3455,10 @@ END_VAR
        Out_Visibility_8:=FALSE;	
    END_CASE
  7:	CASE IP_Arr_OP120_JB[Input_Page_num] OF
-    600: Line1:="I120_SPARE_600.0(I600.0)        ";
+    600: Line1:="I120_SPARE_600_0(I600.0)        ";
     601: Line1:="I120_CONV_FWD(I601.0)           ";
     602: Line1:="I120_CONV_TRK3_CHO_MOD2(I602.0) ";
-    603: Line1:="I120_SPARE_I603.0(I603.0)       ";
+    603: Line1:="I120_SPARE_I603_0(I603.0)       ";
     else
      Line1:=" ";
     end_case 
@@ -3291,8 +3466,8 @@ END_VAR
     CASE IP_Arr_OP120_JB[Input_Page_num] OF
     600: Line2:="I120_HPR_LOW_LVL_FB(I600.1)       ";
     601: Line2:="I120_VBF_CONV_TRK1_OVERFLW(I601.1)";
-    602: Line2:="I120_VBFCONVTRKOVERFLW2(I602.1)   ";
-    603: Line2:="I120_SPARE_I603.1(I603.1)         ";
+    602: Line2:="I120_VBF_CONV_TRK_OVERFLW2(I602.1)   ";
+    603: Line2:="I120_SPARE_I603_1(I603.1)         ";
     else
      Line2:=" ";
     end_case 
@@ -3300,8 +3475,8 @@ END_VAR
     CASE IP_Arr_OP120_JB[Input_Page_num] OF
     600: Line3:="I120_HPR_SOL_DOOR_SW_FB(I600.2)   ";
     601: Line3:="I120_VBF_CONV_TRK2_OVERFLW(I601.2)";
-    602: Line3:="I120_SPARE_I602.2(I602.2)         ";
-    603: Line3:="I120_SPARE_I603.2(I603.2)         ";
+    602: Line3:="I120_SPARE_I602_2(I602.2)         ";
+    603: Line3:="I120_SPARE_I603_2(I603.2)         ";
     else
      Line3:=" ";
     end_case 
@@ -3309,8 +3484,8 @@ END_VAR
     CASE IP_Arr_OP120_JB[Input_Page_num] OF
     600: Line4:="I120_BOWL_RDY(I600.3)          ";
     601: Line4:="I120_CONV_TRK1_CHO_MOD1(I601.3)";
-    602: Line4:="I120_SPARE_I602.3(I602.3)      ";
-    603: Line4:="I120_SPARE_I603.3(I603.3)      ";
+    602: Line4:="I120_SPARE_I602_3(I602.3)      ";
+    603: Line4:="I120_SPARE_I603_3(I603.3)      ";
     else
      Line4:=" ";
     end_case 
@@ -3318,8 +3493,8 @@ END_VAR
     CASE IP_Arr_OP120_JB[Input_Page_num] OF
     600: Line5:="I120_BOWL_LOW_LVL(I600.4)      ";
     601: Line5:="I120_CONV_TRK1_CHO_MOD2(I601.4)";
-    602: Line5:="I120_SPARE_I602.4(I602.4)      ";
-    603: Line5:="I120_SPARE_I603.4(I603.4)      ";
+    602: Line5:="I120_SPARE_I602_4(I602.4)      ";
+    603: Line5:="I120_SPARE_I603_4(I603.4)      ";
     else
      Line5:=" ";
     end_case 
@@ -3327,8 +3502,8 @@ END_VAR
     CASE IP_Arr_OP120_JB[Input_Page_num] OF
     600: Line6:="I120_BOWL_OFF_ON(I600.5)       ";
     601: Line6:="I120_CONV_TRK2_CHO_MOD1(I601.5)";
-    602: Line6:="I120_SPARE_I602.5(I602.5)      ";
-    603: Line6:="I120_SPARE_I603.5(I603.5)      ";
+    602: Line6:="I120_SPARE_I602_5(I602.5)      ";
+    603: Line6:="I120_SPARE_I603_5(I603.5)      ";
     else
      Line6:=" ";
     end_case 
@@ -3336,8 +3511,8 @@ END_VAR
     CASE IP_Arr_OP120_JB[Input_Page_num] OF
     600: Line7:="I120_HPR_OFF_ON(I600.6)        ";
     601: Line7:="I120_CONV_TRK2_CHO_MOD2(I601.6)";
-    602: Line7:="I120_SPARE_I602.6(I602.6)      ";
-    603: Line7:="I120_SPARE_I603.6(I603.6)      ";
+    602: Line7:="I120_SPARE_I602_6(I602.6)      ";
+    603: Line7:="I120_SPARE_I603_6(I603.6)      ";
     else
      Line7:=" ";
     end_case 
@@ -3345,8 +3520,8 @@ END_VAR
     CASE IP_Arr_OP120_JB[Input_Page_num] OF
     600: Line8:="I120_CONV_REV(I600.7)           ";
     601: Line8:="I120_CONV_TRK3_CHO_MOD1(I601.7) ";
-    602: Line8:="I120_SPARE_I602.7(I602.7)       ";
-    603: Line8:="I120_SPARE_I603.7(I603.7)       ";
+    602: Line8:="I120_SPARE_I602_7(I602.7)       ";
+    603: Line8:="I120_SPARE_I603_7(I603.7)       ";
     else
      Line8:=" ";
     END_CASE 
@@ -3366,8 +3541,8 @@ END_VAR
    
    CASE IP_Arr_OP120_JB[Input_Page_num] OF
 	600: Lamp2:=I120_HPR_LOW_LVL_FBI600_1 ;
-	601: Lamp2:=I120_VBF_CONV_TRK1_OVERFLWI601_1 ;
-	602: Lamp2:=I120_VBFCONVTRKOVERFLW2I602_1 ;
+	601: Lamp2:=I120_VBF_CONV_TRK1_OVERFLW_I601_1 ;
+	602: Lamp2:=I120_VBF_CONV_TRK_OVERFLW2_I602_1 ;
 	603: Lamp2:=I120_SPARE_I603_1;
    ELSE
        Visibility_2:=FALSE;	
@@ -3446,27 +3621,27 @@ END_VAR
     
     CASE OP_Arr_OP120[Output_Page_num] OF
     600: OLine1:="O120_HPR_ENABLE(Q600.0)   ";
-    601: OLine1:="O120_SPARE_Q601.0(Q601.0) ";
-    602: OLine1:="O120_SPARE_Q602.0(Q602.0) ";
-    603: OLine1:="O120_SPARE_Q603.0(Q603.0) ";
+    601: OLine1:="O120_SPARE_Q601_0(Q601.0) ";
+    602: OLine1:="O120_SPARE_Q602_0(Q602.0) ";
+    603: OLine1:="O120_SPARE_Q603_0(Q603.0) ";
     else
      OLine1:=" ";
     end_case 
     
     CASE OP_Arr_OP120[Output_Page_num] OF
     600: OLine2:="O120_BOWL_ENABLE(Q600.1) ";
-    601: OLine2:="O120_SPARE_Q601.1(Q601.1)";
-    602: OLine2:="O120_SPARE_Q602.1(Q602.1)";
-    603: OLine2:="O120_SPARE_Q603.1(Q603.1)";
+    601: OLine2:="O120_SPARE_Q601_1(Q601.1)";
+    602: OLine2:="O120_SPARE_Q602_1(Q602.1)";
+    603: OLine2:="O120_SPARE_Q603_1(Q603.1)";
     else
      OLine2:=" ";
     end_case 
     
     CASE OP_Arr_OP120[Output_Page_num] OF
     600: OLine3:="O120_HPR_TWR_LMP_RED(Q600.2)";
-    601: OLine3:="O120_SPARE_Q601.2(Q601.2)   ";
-    602: OLine3:="O120_SPARE_Q602.2(Q602.2)   ";
-    603: OLine3:="O120_SPARE_Q603.2(Q603.2)   ";
+    601: OLine3:="O120_SPARE_Q601_2(Q601.2)   ";
+    602: OLine3:="O120_SPARE_Q602_2(Q602.2)   ";
+    603: OLine3:="O120_SPARE_Q603_2(Q603.2)   ";
     else
      OLine3:=" ";
     end_case 
@@ -3482,36 +3657,36 @@ END_VAR
     
     CASE OP_Arr_OP120[Output_Page_num] OF
     600: OLine5:="O120_BOWL_AIR_PURGE1(Q600.4)";
-    601: OLine5:="O120_SPARE_Q601.4(Q601.4)   ";
-    602: OLine5:="O120_SPARE_Q602.4(Q602.4)   ";
-    603: OLine5:="O120_SPARE_Q603.4(Q603.4)   ";
+    601: OLine5:="O120_SPARE_Q601_4(Q601.4)   ";
+    602: OLine5:="O120_SPARE_Q602_4(Q602.4)   ";
+    603: OLine5:="O120_SPARE_Q603_4(Q603.4)   ";
     else
      OLine5:=" ";
     end_case 
     
     CASE OP_Arr_OP120[Output_Page_num] OF
     600: OLine6:="O120_BOWL_AIR_PURGE2(Q600.5)";
-    601: OLine6:="O120_SPARE_Q601.5(Q601.5)   ";
-    602: OLine6:="O120_SPARE_Q602.5(Q602.5)   ";
-    603: OLine6:="O120_SPARE_Q603.5(Q603.5)   ";
+    601: OLine6:="O120_SPARE_Q601_5(Q601.5)   ";
+    602: OLine6:="O120_SPARE_Q602_5(Q602.5)   ";
+    603: OLine6:="O120_SPARE_Q603_5(Q603.5)   ";
     else
      OLine6:=" ";
     end_case 
     
     CASE OP_Arr_OP120[Output_Page_num] OF
     600: OLine7:="O120_HPR_DOOR_OPN(Q600.6)";
-    601: OLine7:="O120_SPARE_Q601.6(Q601.6)";
-    602: OLine7:="O120_SPARE_Q602.6(Q602.6)";
-    603: OLine7:="O120_SPARE_Q603.6(Q603.6)";
+    601: OLine7:="O120_SPARE_Q601_6(Q601.6)";
+    602: OLine7:="O120_SPARE_Q602_6(Q602.6)";
+    603: OLine7:="O120_SPARE_Q603_6(Q603.6)";
     else
      OLine7:=" ";
     end_case 
     
     CASE OP_Arr_OP120[Output_Page_num] OF
-    600: OLine8:="O120_SPARE_Q600.7(Q600.7)";
-    601: OLine8:="O120_SPARE_Q601.7(Q601.7)";
-    602: OLine8:="O120_SPARE_Q602.7(Q602.7)";
-    603: OLine8:="O120_SPARE_Q603.7(Q603.7)";
+    600: OLine8:="O120_SPARE_Q600_7(Q600.7)";
+    601: OLine8:="O120_SPARE_Q601_7(Q601.7)";
+    602: OLine8:="O120_SPARE_Q602_7(Q602.7)";
+    603: OLine8:="O120_SPARE_Q603_7(Q603.7)";
     else
      OLine8:=" ";
     END_CASE 
@@ -3626,7 +3801,7 @@ END_VAR
     400: Line3:="IS90_DOORSW_SET3_CH1(IS400.2)";
     401: Line3:="IS90_LHS_ESTOP_CH1(IS401.2)  ";
     402: Line3:="IS90_RESET_IS402_2(IS402.2)  ";
-    700: Line3:="IS160_SPARE_IS700.2(IS700.2) ";
+    700: Line3:="IS160_SPARE_IS700_2(IS700.2) ";
     else
      Line3:=" ";
     end_case 
@@ -3635,8 +3810,8 @@ END_VAR
     CASE Safety_IP[Input_Page_num] OF
     400: Line4:="IS90_DOORSW_SET4_CH1(IS400.3)";
     401: Line4:="IS90_RHS_ESTOP_CH1(IS401.3)  ";
-    402: Line4:="IS90_SPARE_IS402.3(IS402.3)  ";
-    700: Line4:="IS160_SPARE_IS700.3(IS700.3) ";
+    402: Line4:="IS90_SPARE_IS402_3(IS402.3)  ";
+    700: Line4:="IS160_SPARE_IS700_3(IS700.3) ";
     else
      Line4:=" ";
     end_case 
@@ -3644,8 +3819,8 @@ END_VAR
     CASE Safety_IP[Input_Page_num] OF
     400: Line5:="IS90_DOORSW_SET1_CH2(IS400.4)";
     401: Line5:="IS90_DOORSW_SET5_CH2(IS401.4)";
-    402: Line5:="IS90_SPARE_IS402.4(IS402.4)  ";
-    700: Line5:="IS160_SPARE_IS700.4(IS700.4) ";
+    402: Line5:="IS90_SPARE_IS402_4(IS402.4)  ";
+    700: Line5:="IS160_SPARE_IS700_4(IS700.4) ";
     else
      Line5:=" ";
     end_case 
@@ -3653,8 +3828,8 @@ END_VAR
     CASE Safety_IP[Input_Page_num] OF
     400: Line6:="IS90_DOORSW_SET2_CH2(IS400.5)";
     401: Line6:="IS90_DOORSW_SET6_CH2(IS401.5)";
-    402: Line6:="IS90_SPARE_IS402.5(IS402.5)  ";
-    700: Line6:="IS160_SPARE_IS700.5(IS700.5) ";
+    402: Line6:="IS90_SPARE_IS402_5(IS402.5)  ";
+    700: Line6:="IS160_SPARE_IS700_5(IS700.5) ";
     else
      Line6:=" ";
     end_case 
@@ -3662,8 +3837,8 @@ END_VAR
     CASE Safety_IP[Input_Page_num] OF
     400: Line7:="IS90_DOORSW_SET3_CH2(IS400.6)";
     401: Line7:="IS90_LHS_ESTOP_CH2(IS401.6)  ";
-    402: Line7:="IS90_SPARE_IS402.6(IS402.6)  ";
-    700: Line7:="IS160_SPARE_IS700.6(IS700.6) ";
+    402: Line7:="IS90_SPARE_IS402_6(IS402.6)  ";
+    700: Line7:="IS160_SPARE_IS700_6(IS700.6) ";
     else
      Line7:=" ";
     end_case 
@@ -3671,8 +3846,8 @@ END_VAR
     CASE Safety_IP[Input_Page_num] OF
     400: Line8:="IS90_DOORSW_SET4_CH2(IS400.7)";
     401: Line8:="IS90_RHS_ESTOP_CH2(IS401.7)  ";
-    402: Line8:="IS90_SPARE_IS402.7(IS402.7)  ";
-    700: Line8:="IS160_SPARE_IS700.7(IS700.7) ";
+    402: Line8:="IS90_SPARE_IS402_7(IS402.7)  ";
+    700: Line8:="IS160_SPARE_IS700_7(IS700.7) ";
     else
      Line8:=" ";
     END_CASE 
@@ -3846,10 +4021,10 @@ END_CASE
 IF panel_num = 1 THEN
 i:= IP_Arr_OP10P[Input_Page_num];
 j:= OP_Arr_OP10P[Output_Page_num];	
- IF Input_Page_num >= 26 THEN
+ IF Input_Page_num >= 24 THEN
 	Input_Page_num:=0;
  END_IF
- IF Output_Page_num >= 21 THEN
+ IF Output_Page_num >= 22 THEN
 	Output_Page_num:=0;
  END_IF	
 END_IF
@@ -3860,7 +4035,7 @@ j:= OP_Arr_OP90P[Output_Page_num];
  IF Input_Page_num >= 12 THEN
 	Input_Page_num:=0;
  END_IF
- IF Output_Page_num >= 10 THEN
+ IF Output_Page_num >= 12 THEN
 	Output_Page_num:=0;
  END_IF	
 END_IF
@@ -3868,10 +4043,10 @@ END_IF
 IF panel_num = 3 THEN
 i:= IP_Arr_OP160P[Input_Page_num];
 j:= OP_Arr_OP160P[Output_Page_num];	
- IF Input_Page_num >= 9 THEN
+ IF Input_Page_num >= 24 THEN
 	Input_Page_num:=0;
  END_IF
- IF Output_Page_num >= 9 THEN
+ IF Output_Page_num >= 18 THEN
 	Output_Page_num:=0;
  END_IF	
 END_IF
@@ -3938,7 +4113,7 @@ END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="IO_Diag">
-      <LineId Id="3" Count="3848" />
+      <LineId Id="3" Count="4023" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

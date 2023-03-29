@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="OP10_ROBO_STUS" Id="{25edbb42-5981-4954-a11d-6ffa1336557b}">
+    <Declaration><![CDATA[TYPE OP10_ROBO_STUS :
+STRUCT
+	BDY_PCK_POSITION			: BOOL;
+	BDY_S_PCK_POSITION			: BOOL;
+	BDY_CMR_CHK_POS				: BOOL;
+	BDY_S_ORNG_POS				: BOOL;
+	BDY_ORNG_PLC_POS			: BOOL;
+	BDY_MVE_PLC_POS				: BOOL;
+	ROBO_SAFE_POS				: BOOL;
+	ROBO_REJ_POS				: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

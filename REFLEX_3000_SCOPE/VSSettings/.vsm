@@ -6,7 +6,7 @@
     <Node>
       <Title>YT Scope Project</Title>
       <Expanded>False</Expanded>
-      <FileName>C:\RAYFLEX_3000\REFLEX_3000_TSM\REFLEX_3000_SCOPE\YT Scope Project.tcscopex</FileName>
+      <FileName>D:\Training\Program Backup\Titan Project backup\REFLEX_3000_TSM_PLC\REFLEX_3000_TSM\REFLEX_3000_SCOPE\YT Scope Project.tcscopex</FileName>
       <Children>
         <Node>
           <Title>DataPool</Title>
@@ -20,31 +20,7 @@
               <Children />
             </Node>
             <Node>
-              <Title>ActPos (1)</Title>
-              <Expanded>False</Expanded>
-              <FileName></FileName>
-              <Children />
-            </Node>
-            <Node>
-              <Title>ActPos (2)</Title>
-              <Expanded>False</Expanded>
-              <FileName></FileName>
-              <Children />
-            </Node>
-            <Node>
-              <Title>SetPos</Title>
-              <Expanded>False</Expanded>
-              <FileName></FileName>
-              <Children />
-            </Node>
-            <Node>
-              <Title>SetPos (1)</Title>
-              <Expanded>False</Expanded>
-              <FileName></FileName>
-              <Children />
-            </Node>
-            <Node>
-              <Title>SetPos (2)</Title>
+              <Title>ActTorque</Title>
               <Expanded>False</Expanded>
               <FileName></FileName>
               <Children />
@@ -57,60 +33,25 @@
           <FileName></FileName>
           <Children>
             <Node>
-              <Title>Axis Group_AMI8000</Title>
+              <Title>Axis Group</Title>
               <Expanded>False</Expanded>
               <FileName></FileName>
               <Children>
                 <Node>
-                  <Title>ActPos_OP30_VERTICAL</Title>
+                  <Title>ActPos</Title>
                   <Expanded>False</Expanded>
                   <FileName></FileName>
                   <Children />
                 </Node>
+              </Children>
+            </Node>
+            <Node>
+              <Title>Axis Group (1)</Title>
+              <Expanded>False</Expanded>
+              <FileName></FileName>
+              <Children>
                 <Node>
-                  <Title>SetPos_OP30_VERTICAL</Title>
-                  <Expanded>False</Expanded>
-                  <FileName></FileName>
-                  <Children />
-                </Node>
-                <Node>
-                  <Title>ActPos_OP50_VERTICAL</Title>
-                  <Expanded>False</Expanded>
-                  <FileName></FileName>
-                  <Children />
-                </Node>
-                <Node>
-                  <Title>SetPos_OP50_VERTICAL</Title>
-                  <Expanded>False</Expanded>
-                  <FileName></FileName>
-                  <Children />
-                </Node>
-                <Node>
-                  <Title>ActPos__OP50_HORIZONTAL</Title>
-                  <Expanded>False</Expanded>
-                  <FileName></FileName>
-                  <Children />
-                </Node>
-                <Node>
-                  <Title>SetPos_OP50_HORIZONTAL</Title>
-                  <Expanded>False</Expanded>
-                  <FileName></FileName>
-                  <Children />
-                </Node>
-                <Node>
-                  <Title>Marker</Title>
-                  <Expanded>False</Expanded>
-                  <FileName></FileName>
-                  <Children />
-                </Node>
-                <Node>
-                  <Title>Time Marker</Title>
-                  <Expanded>False</Expanded>
-                  <FileName></FileName>
-                  <Children />
-                </Node>
-                <Node>
-                  <Title>Time Marker (1)</Title>
+                  <Title>ActTorque</Title>
                   <Expanded>False</Expanded>
                   <FileName></FileName>
                   <Children />

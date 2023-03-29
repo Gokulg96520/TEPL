@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="Master1_IO_Map" Id="{263a00eb-fffc-4145-a524-ff0099822003}" SpecialFunc="None">
+  <POU Name="Master1_IO_Map" Id="{550ec2e5-2633-4544-b329-9c249878a68a}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM Master1_IO_Map
 VAR
 	BYTE_AS_BIT_0: BYTE_AS_BIT;
@@ -52,7 +52,7 @@ VAR
 	OP10_MAS1_PORT8_BYTE2_DO_MODULE_3 AT %Q* : BYTE;
     OP10_MAS1_PORT8_BYTE3_DO_MODULE_3 AT %Q* : BYTE;
 	OP10_MAS1_PORT8_BYTE4_DO_MODULE_3 AT %Q* : BYTE;
-	
+
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -790,7 +790,7 @@ END_VAR
                                 <v n="Id">45L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10A_ORING_LH_PUSHR_CYL_REV_FWD_I1010_4"</v>
+                                <v n="Operand">"I10A_ORING_LH_PUSHR_CYL_REV_I1010_4"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -838,7 +838,7 @@ END_VAR
                                 <v n="Id">48L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10A_ORING_RH_PUSHR_CYL_REV_FWD_I1010_7"</v>
+                                <v n="Operand">"I10A_ORING_RH_PUSHR_CYL_REV_I1010_7"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1041,7 +1041,7 @@ END_VAR
                         <l2 n="OutputItems" cet="Operand">
                           <n />
                           <o>
-                            <v n="Operand">"I10A_SPARE_I1021_0"</v>
+                            <v n="Operand">"I10A_BOWL_TRK_INDXR_POS2_I1021_0"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -1057,7 +1057,7 @@ END_VAR
                             <v n="Id">59L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I10A_SPARE_I1021_1"</v>
+                            <v n="Operand">"I10A_BOWL_TRK_INDXR_POS3_I1021_1"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -1263,7 +1263,7 @@ END_VAR
                                 <v n="Id">72L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10A_SPARE_I1020_4"</v>
+                                <v n="Operand">"I10A_ORING_RH_GRPR_OPN_I1020_4"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1279,7 +1279,7 @@ END_VAR
                                 <v n="Id">73L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10A_SPARE_I1020_5"</v>
+                                <v n="Operand">"I10A_ORING_RH_PUSHR_CYL_FWD_I1020_5"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1295,7 +1295,7 @@ END_VAR
                                 <v n="Id">74L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10A_SPARE_I1020_6"</v>
+                                <v n="Operand">"I10A_ORING_REJ_BIN_PRSNCE_I1020_6"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1311,7 +1311,7 @@ END_VAR
                                 <v n="Id">75L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10A_SPARE_I1020_7"</v>
+                                <v n="Operand">"I10A_BOWL_TRK_INDXR_POS1_I1020_7"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1736,7 +1736,7 @@ END_VAR
                                 <v n="Id">99L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_ORING_LH_PUSHR_CYL_REV_FWD_I1030_4"</v>
+                                <v n="Operand">"I10B_ORING_LH_PUSHR_CYL_REV_I1030_4"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1752,7 +1752,7 @@ END_VAR
                                 <v n="Id">100L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_ORING_RH_GRPR_CLSE_I1030_5"</v>
+                                <v n="Operand">"I10B_ORING_RH_GRPR_OPN_I1030_5"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1768,7 +1768,7 @@ END_VAR
                                 <v n="Id">101L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_ORING_RH_GRPR_OPN_I1030_6"</v>
+                                <v n="Operand">"I10B_ORING_RH_GRPR_CLSE_I1030_6"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1784,7 +1784,7 @@ END_VAR
                                 <v n="Id">102L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_ORING_RH_PUSHR_CYL_REV_FWD_I1030_7"</v>
+                                <v n="Operand">"I10B_ORING_RH_PUSHR_CYL_REV_I1030_7"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -1987,7 +1987,7 @@ END_VAR
                         <l2 n="OutputItems" cet="Operand">
                           <n />
                           <o>
-                            <v n="Operand">"I10B_SPARE_I1041_0"</v>
+                            <v n="Operand">"I10B_BOWL_TRK_INDXR_POS2_I1041_0"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -2003,7 +2003,7 @@ END_VAR
                             <v n="Id">113L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I10B_SPARE_I1041_1"</v>
+                            <v n="Operand">"I10B_BOWL_TRK_INDXR_POS3_I1041_1"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -2209,7 +2209,7 @@ END_VAR
                                 <v n="Id">126L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_SPARE_I1040_4"</v>
+                                <v n="Operand">"I10B_ORING_RH_GRPR_OPN_I1040_4"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -2225,7 +2225,7 @@ END_VAR
                                 <v n="Id">127L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_SPARE_I1040_5"</v>
+                                <v n="Operand">"I10B_ORING_RH_PUSHR_CYL_FWD_I1040_5"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -2241,7 +2241,7 @@ END_VAR
                                 <v n="Id">128L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_SPARE_I1040_6"</v>
+                                <v n="Operand">"I10B_ORING_REJ_BIN_PRSNCE_I1040_6"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -2257,7 +2257,7 @@ END_VAR
                                 <v n="Id">129L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I10B_SPARE_I1040_7"</v>
+                                <v n="Operand">"I10B_BOWL_TRK_INDXR_POS1_I1040_7"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -3033,7 +3033,7 @@ END_VAR
                             </o>
                             <o t="BoxTreeOperand">
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10A_DRUM_FEED_AIRPURGE_ON_Q1052_0"</v>
+                                <v n="Operand">"O10A_SPARE_Q1052_0"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -3052,7 +3052,7 @@ END_VAR
                             </o>
                             <o t="BoxTreeOperand">
                               <o n="Operand" t="Operand">
-                                <v n="Operand">"O10A_SPARE_Q1052_1"</v>
+                                <v n="Operand">"O10A_DRUM_FEED_AIRPURGE_ON_Q1052_1"</v>
                                 <v n="Type">"BOOL"</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -5260,7 +5260,7 @@ END_VAR
                         </o>
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"O30_SPARE_Q1153_2"</v>
+                            <v n="Operand">"O30_AIR_PURGE_ON_Q1153_2"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -5279,7 +5279,7 @@ END_VAR
                         </o>
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"O30_AIR_PURGE_ON_Q1153_3"</v>
+                            <v n="Operand">"O30_SPARE_Q1153_3"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -5317,7 +5317,7 @@ END_VAR
                         </o>
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"O70_AIR_PURGE_ON_Q1153_5"</v>
+                            <v n="Operand">"O30_SPARE_Q1153_5"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -5336,7 +5336,7 @@ END_VAR
                         </o>
                         <o t="BoxTreeOperand">
                           <o n="Operand" t="Operand">
-                            <v n="Operand">"O30_SPARE_Q1153_6"</v>
+                            <v n="Operand">"O70_AIR_PURGE_ON_Q1153_6"</v>
                             <v n="Type">"BOOL"</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>

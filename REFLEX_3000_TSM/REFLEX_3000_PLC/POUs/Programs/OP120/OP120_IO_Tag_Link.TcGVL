@@ -1,8 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP120_IO_Tag_Link" Id="{45b001f9-d60d-4c7a-99d0-72f5d6c5e00f}">
-    <Declaration><![CDATA[{attribute 'qualified_only'}
+  <GVL Name="OP120_IO_Tag_Link" Id="{ae1ae2c3-d5c8-42c2-9ef5-8e97b5a66dc4}">
+    <Declaration><![CDATA[
 VAR_GLOBAL
+	
+
+
+	
 	
 //Robot Inputs
 OP120_SO_Mirror_Auto_enable AT %I*:BOOL;
@@ -163,6 +167,30 @@ OP120_EI_Spare29 AT%Q*:BOOL;
 OP120_EI_Spare30 AT%Q*:BOOL;
 
 
+//Registerin
+OP120_Robo_In6001 AT%I*:UINT;
+OP120_Robo_In6002 AT%I*:UINT;
+OP120_Robo_In6003 AT%I*:UINT;
+OP120_Robo_In6004 AT%I*:UINT;
+OP120_Robo_In6005 AT%I*:UINT;
+OP120_Robo_In6006 AT%I*:UINT;
+OP120_Robo_In6007 AT%I*:UINT;
+OP120_Robo_In6008 AT%I*:UINT;
+OP120_Robo_In6009 AT%I*:UINT;
+OP120_Robo_In6010 AT%I*:UINT;
+OP120_Robo_In6011 AT%I*:UINT;
+OP120_Robo_In6012 AT%I*:UINT;
+
+OP120_Robo_Out6001 AT%Q*:UINT;
+OP120_Robo_Out6002 AT%Q*:UINT;
+OP120_Robo_Out6003 AT%Q*:UINT;
+OP120_Robo_Out6004 AT%Q*:UINT;
+OP120_Robo_Out6005 AT%Q*:UINT;
+OP120_Robo_Out6006 AT%Q*:UINT;
+OP120_Robo_Out6007 AT%Q*:UINT;
+OP120_Robo_Out6008 AT%Q*:UINT;
+OP120_Robo_Out6009 AT%Q*:UINT;
+OP120_Robo_Out6010 AT%Q*:UINT;
 
 
 END_VAR]]></Declaration>

@@ -1,71 +1,225 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP130_Initialization_Seq" Id="{6aa9f027-32e5-46b1-be61-28bc463a96d7}" SpecialFunc="None">
+  <POU Name="OP130_Initialization_Seq" Id="{cf9366a5-5ec2-4a47-b647-2f5bb5c2020d}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP130_Initialization_Seq
 VAR
+	temp3: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF (OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_Stepper_Control.Axis_In_Home AND OP130_GVL.CR130_LH_Rot_Cyl.Position1 AND OP130_GVL.CR130_RH_Rot_Cyl.Position1 )THEN
-OP130_Temp_Home_OK:=TRUE;
-OP130_HomeRunning:=FALSE;
-OP130_Homing_Seq:=0;
+      <ST><![CDATA[IF OP130_LH_HomeOK AND OP130_GVL.SR130_Stepper_Control.Axis_In_Home AND OP130_RH_HomeOK THEN
+   OP130_Temp_Home_OK:=TRUE;
+   OP130_HomeRunning:=FALSE;
 ELSE
-	//OP130_Temp_Home_OK:=FALSE;
-	
+	OP130_Temp_Home_OK:=FALSE;	
 END_IF
 
-CASE OP130_Homing_Seq OF
-	0: IF (OP130_Auto AND NOT OP130_HomeRunning AND  NOT OP130_ErrorActive AND  NOT OP130_AutoRunning AND NOT OP130_StepRunning	 AND NOT OP130_Temp_Home_OK) THEN
-		OP130_HomeRunning:=TRUE;
-		OP130_Homing_Seq:=10;	
-	   END_IF
-	10:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
-		IF (OP130_GVL.CR130_LH_Rot_Cyl.Position1 AND OP130_GVL.CR130_RH_Rot_Cyl.Position1)  THEN 
-			OP130_Homing_Seq:=20;
-			ELSE
-				OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd1:= TRUE;
-				OP130_GVL.CR130_RH_Rot_Cyl.HomingCmd1:= TRUE;
-				
-				IF (OP130_GVL.CR130_LH_Rot_Cyl.Position1 AND OP130_GVL.CR130_RH_Rot_Cyl.Position1 ) THEN
-					OP130_Homing_Seq:=20;
-				END_IF
-		END_IF
-		
-	END_IF
-	20:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
-        IF (OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home)=TRUE THEN
-			OP130_Homing_Seq:=30;
-			ELSE
-				OP130_GVL.SR130_LH_Servo_Control.Axis_Home_Cmd:= TRUE;
-				OP130_GVL.SR130_RH_Servo_Control.Axis_Home_Cmd:= TRUE;
-				IF (OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home AND OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home)=TRUE THEN
-				OP130_Homing_Seq:=30;
-				OP130_GVL.SR130_LH_Servo_Control.Axis_Home_Cmd:= FALSE;
-				OP130_GVL.SR130_RH_Servo_Control.Axis_Home_Cmd:= FALSE;
-				END_IF
-				
-				END_IF
-				END_IF
-		30:	IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
-			IF (OP130_GVL.SR130_Stepper_Control.Axis_In_Home) THEN
-			OP130_Homing_Seq:=40;
-			ELSE
-				OP130_GVL.SR130_Stepper_Control.Axis_Home_Cmd:=TRUE;
-				IF(OP130_GVL.SR130_Stepper_Control.Axis_In_Home) THEN
-					OP130_Homing_Seq:=40;
-				END_IF
-				END_IF
-				END_IF
-				
-			40:	
-			OP130_Homing_Seq:=0;
-			OP130_HomeRunning:=FALSE;
+IF (OP130_GVL.SR130_LH_Servo_Control.Axis_In_Home AND OP130_GVL.CR130_LH_Rot_Cyl.Position1 AND SR130_Clm_Stepper.bHomeDone AND SR130_Clm_Stepper.baxis_in_home_pos) THEN
+	OP130_LH_HomeOK:=TRUE;
+	OP130_Homing_Seq:=0;
+ELSE
+	OP130_LH_HomeOK:=FALSE;
+END_IF
+
+IF (OP130_GVL.SR130_RH_Servo_Control.Axis_In_Home AND OP130_GVL.CR130_RH_Rot_Cyl.Position1) THEN
+	OP130_RH_HomeOK:=TRUE;
+	OP130_RH_Homing_Seq:=0;
+ELSE
+	OP130_RH_HomeOK:=FALSE;
+END_IF
 	
-END_CASE]]></ST>
+CASE OP130_Homing_Seq OF
+	
+	0: IF (OP130_Auto AND NOT OP130_HomeRunning AND  NOT OP130_ErrorActive AND  NOT OP130_AutoRunning AND NOT OP130_StepRunning AND NOT OP130_Temp_Home_OK	) THEN
+		OP130_HomeRunning:=TRUE;
+		OP130_Homing_Seq:=10;
+        OP130_RH_Homing_Seq:=10;	
+	   END_IF
+	   
+	   10:IF SR130_stManualModeAxis_LH_Vert_Servo.actualPosition >=61  THEN
+		  OP130_Homing_Seq:=20;
+	      ELSE
+		   OP130_Homing_Seq:=90;
+		  END_IF
+	   
+	   20: IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		    
+			  SR130_LH_Servo_Control.Position :=SR130_HMI_Servo_CylWork_Position;
+			  SR130_LH_Servo_Control.velocity :=SR130_HMI_Servo_CylWork_Velocity;
+		      OP130_Homing_Seq:=30;
+	   END_IF
+	   
+	   30: IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		    
+			SR130_LH_Servo_Control.ABSmove_Start := TRUE;
+			 OP130_Homing_Seq:=35;
+	   END_IF
+	   
+	   35 : IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		   	   SR130_Stepper_Control.Bsethome:=1;
+			   IF SR130_Stepper_Control.Axis_In_Home THEN
+				  OP130_Homing_Seq:=40; 
+			   END_IF
+	        END_IF
+	   
+	   40:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		   IF OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos THEN
+			 SR130_LH_Servo_Control.ABSmove_Start := FALSE;
+			 OP130_Homing_Seq:=50;
+		   END_IF
+	      END_IF
+	   
+	   50:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		   IF CR130_LH_Rot_Cyl.Position2 THEN
+			   OP130_Homing_Seq:=60; 
+		  ELSE
+		   OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd2:= TRUE;
+		   OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd1:= FALSE;
+	      END_IF
+	      END_IF
+		  
+	   60:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		    
+			 SR130_LH_Servo_Control.Position := SR130_HMI_Servo_Rotation_Position;
+			 SR130_LH_Servo_Control.Velocity := SR130_HMI_Servo_Rotation_Velocity;
+		     OP130_Homing_Seq:=70;
+	      END_IF
+		  
+	   70: IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		     
+		      SR130_LH_Servo_Control.ABSmove_Start := TRUE;
+			  OP130_Homing_Seq:=75;
+			 END_IF
+	   
+	   75:IF  OP130_GVL.SR130_LH_Servo_Control.Axis_In_Pos THEN 
+		      SR130_LH_Servo_Control.ABSmove_Start := FALSE;
+              OP130_Homing_Seq:=80;
+	      END_IF
+	   
+	   
+	   80:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+		      IF OP130_GVL.CR130_LH_Rot_Cyl.Position1 THEN
+			     OP130_Homing_Seq:=90;
+			   ELSE
+				OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd1:= TRUE;
+				OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd2:= FALSE;
+		       END_IF
+	       END_IF
+	
+	   90:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN  
+			   SR130_LH_Servo_Control.position := 0.0;
+			   SR130_LH_Servo_Control.Velocity := 10;
+		       OP130_Homing_Seq:=100;
+	      END_IF
+	
+	100:IF (OP130_HomeRunning AND OP130_HMI_Homing)THEN 
+       		
+			SR130_LH_Servo_Control.ABSmove_Start := TRUE;
+			OP130_Homing_Seq:=115;
+			END_IF
+			
+	115:IF SR130_LH_Servo_Control.Axis_In_Pos THEN
+		  
+		   SR130_LH_Servo_Control.ABSmove_Start := FALSE;
+		   SR130_Stepper_Control.Bsethome := TRUE;
+			IF SR130_Clm_Stepper.bHomeDone AND SR130_Clm_Stepper.baxis_in_home_pos THEN
+			    OP130_Homing_Seq:=116;
+            END_IF
+		END_IF
+	
+    116: IF OP130_LH_HomeOK AND OP130_RH_HomeOK THEN
+		    OP130_Homing_Seq:=120;
+	     END_IF
+
+	120: OP130_HomeRunning:=FALSE;
+		 OP130_Homing_Seq:=0;
+		
+	
+END_CASE
+
+
+
+
+
+IF NOT OP130_HomeRunning THEN
+	
+	OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd1:= FALSE;
+	OP130_GVL.CR130_LH_Rot_Cyl.HomingCmd2:= FALSE;
+	OP130_GVL.CR130_RH_Rot_Cyl.HomingCmd1:= FALSE;
+	OP130_GVL.CR130_RH_Rot_Cyl.HomingCmd2:= FALSE;
+				
+END_IF]]></ST>
     </Implementation>
     <LineIds Name="OP130_Initialization_Seq">
-      <LineId Id="3" Count="55" />
+      <LineId Id="3" Count="2" />
+      <LineId Id="8" Count="2" />
+      <LineId Id="158" Count="0" />
+      <LineId Id="11" Count="5" />
+      <LineId Id="157" Count="0" />
+      <LineId Id="17" Count="2" />
+      <LineId Id="21" Count="4" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="26" Count="4" />
+      <LineId Id="179" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="33" Count="6" />
+      <LineId Id="131" Count="1" />
+      <LineId Id="41" Count="1" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="43" Count="1" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="121" Count="1" />
+      <LineId Id="124" Count="2" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="47" Count="5" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="53" Count="7" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="140" Count="1" />
+      <LineId Id="64" Count="1" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="66" Count="2" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="77" Count="8" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="147" Count="1" />
+      <LineId Id="94" Count="1" />
+      <LineId Id="146" Count="0" />
+      <LineId Id="96" Count="1" />
+      <LineId Id="150" Count="0" />
+      <LineId Id="98" Count="1" />
+      <LineId Id="149" Count="0" />
+      <LineId Id="100" Count="1" />
+      <LineId Id="152" Count="0" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="188" Count="1" />
+      <LineId Id="185" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="151" Count="0" />
+      <LineId Id="166" Count="0" />
+      <LineId Id="175" Count="0" />
+      <LineId Id="173" Count="0" />
+      <LineId Id="170" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="171" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="107" Count="1" />
+      <LineId Id="162" Count="3" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="178" Count="0" />
+      <LineId Id="110" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

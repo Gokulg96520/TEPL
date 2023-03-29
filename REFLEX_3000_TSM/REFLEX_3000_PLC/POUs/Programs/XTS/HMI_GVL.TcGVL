@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="HMI_GVL" Id="{840e9b43-6a74-4c06-95fe-a717a2bdd860}">
+    <Declaration><![CDATA[//{attribute 'qualified_only'}
+VAR_GLOBAL
+		
+END_VAR
+VAR_GLOBAL PERSISTENT
+	ZERO_POS_NO								: INT :=1;
+	OP10A_XTS_POS_NO						: INT;
+	OP10B_XTS_POS_NO						: INT;
+	OP20_XTS_POS_NO					        : INT;
+	OP30_XTS_POS_NO                         : INT;
+	OP40_XTS_POS_NO                         : INT;
+	OP50_XTS_POS_NO                         : INT;
+	OP60_XTS_POS_NO                         : INT;
+	OP70_XTS_POS_NO                         : INT;
+	OP80_XTS_POS_NO                         : INT;
+	OP90_XTS_POS_NO                         : INT;
+	OP110_XTS_POS_NO                        : INT;
+	OP120_XTS_POS_NO                        : INT;
+	OP130_XTS_POS_NO                        : INT;
+	OP140_XTS_POS_NO                     	: INT;
+	OP140_P1_XTS_POS_NO                    	: INT;	
+	OP140_P2_XTS_POS_NO                    	: INT;	
+	OP140_P3_XTS_POS_NO                    	: INT;	
+	OP150A_LH_XTS_POS_NO					: INT;
+	OP150A_RH_XTS_POS_NO					: INT;
+	OP150B_LH_XTS_POS_NO					: INT;
+	OP150B_RH_XTS_POS_NO					: INT;
+	OP150C_LH_XTS_POS_NO					: INT;
+	OP150C_RH_XTS_POS_NO					: INT;		
+	OP160_XTS_POS_NO                        : INT;
+	AUTO_WITH_XTS							: BOOL;
+	
+	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

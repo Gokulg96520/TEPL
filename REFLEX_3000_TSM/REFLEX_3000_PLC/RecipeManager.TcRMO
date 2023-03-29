@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <RecipeManager Name="RecipeManager" Id="{90d52022-af10-4284-9fd1-a6986cf64597}">
+    <XmlArchive>
+      <Data>
+        <o xml:space="preserve" t="RecipeManObject">
+          <o n="LMGuids" t="LanguageModelGuidHelper">
+            <d n="NamesAndGuids" t="Hashtable" ckt="String" cvt="Guid">
+              <v>GVL_RECIPEMANAGEMENT_3300</v>
+              <v>56b0eee8-d514-416d-9250-7287bdf59058</v>
+              <v>RECIPEFACTORY</v>
+              <v>c74072d5-ac1d-4cdf-81ab-17fd5d7c6210</v>
+              <v>RECIPEMANAGEMENTINIT</v>
+              <v>48d1a05f-7568-483b-bbae-46a3b0476b5f</v>
+              <v>RECIPEFACTORYFREERECIPE</v>
+              <v>d80c6fdc-b6c9-4e08-9139-51946fb8174f</v>
+              <v>RECIPEFACTORYFB_INIT</v>
+              <v>c0d78ae1-e2eb-41aa-91f7-7e209201ed23</v>
+              <v>RECIPEFACTORYCREATERECIPE</v>
+              <v>8b897d60-702e-4437-af6d-4b379e21b121</v>
+              <v>RECIPEMANAGEMENTINITFB_INIT</v>
+              <v>85615d8e-226d-4a17-9326-191136b872cb</v>
+              <v>RECIPEMANAGEMENTINITINITIALIZE</v>
+              <v>b96dcc0d-2751-4407-a546-e2f398463bf8</v>
+              <v>RECIPEMANAGEMENTINITFB_REINIT</v>
+              <v>9809fdd1-19c7-4ad4-a230-5e3048bc9e76</v>
+            </d>
+          </o>
+          <o n="StorageSettings" t="RecipeManagerStorageSettings">
+            <v n="StorageType">1U</v>
+            <v n="LoadType">0U</v>
+            <v n="WriteType">0U</v>
+            <v n="FileExtension">".txtrecipe"</v>
+            <v n="FilePath">"C:\TwinCAT\RecipeManagement"</v>
+            <v n="TokenSeparator">":="</v>
+            <v n="ColumnList">"0|1|5|6"</v>
+            <v n="AutoSaveRecipes">true</v>
+          </o>
+          <v n="RecipesInPlc">true</v>
+          <v n="RecipesInPlcAssigned">false</v>
+        </o>
+      </Data>
+      <TypeList>
+        <Type n="Boolean">System.Boolean</Type>
+        <Type n="Guid">System.Guid</Type>
+        <Type n="Hashtable">System.Collections.Hashtable</Type>
+        <Type n="LanguageModelGuidHelper">{3bce4913-f2c1-4b54-84e8-6d7ec1809176}</Type>
+        <Type n="RecipeManagerStorageSettings">{9af4bea6-fc90-45e0-8fd7-eb50506b56da}</Type>
+        <Type n="RecipeManObject">{09ecc42e-586d-4a08-932f-5bdcac20bb55}</Type>
+        <Type n="String">System.String</Type>
+        <Type n="UInt32">System.UInt32</Type>
+      </TypeList>
+    </XmlArchive>
+  </RecipeManager>
+</TcPlcObject>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="Master4_IO" Id="{7c98d7ee-abc9-4089-98c4-a78bb96dd5e3}">
+  <GVL Name="Master4_IO" Id="{3f248132-2363-46d0-a07b-bd4e172276ad}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 //port1					

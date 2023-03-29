@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP30_MAIN" Id="{31c79d8c-32da-4354-a3ea-535813c7937b}" SpecialFunc="None">
+  <POU Name="OP30_MAIN" Id="{4e7946b8-6670-4017-989b-cea9b4a9946c}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP30_MAIN
 VAR
 	OP30_Modeselection_FB: Mode_Selection_Block1;
@@ -8,15 +8,17 @@ VAR
 	Pulse_1s: BOOL;
 	Times: LREAL;
 	Pge_NUM : INT;
+	Gen_Timer	: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
 OP30_Manual();
 OP30_AUTOSEQUENCE();
-OP30_CONVEYOR();
+OP30_Conveyor_Cam_Seq();
 OP30_Error();
 OP30_Initialize_Seq();
+OP30_Camera_FB();
 
 //MOdeselection From HMI
 
@@ -38,11 +40,11 @@ ELSE
   SR30_CONV_servo.bEnable:=FALSE;
   SR30_HORI_servo.bEnable:=FALSE;
   SR30_VERT_servo.bEnable:=FALSE;	
-END_IF *)
-
-IF SR30_CONV_servo.bAxisError THEN//OR SR30_HORI_servo.bAxisError OR SR30_VERT_servo.bAxisError THEN
+END_IF*)
+(*
+IF SR30_CONV_servo.bAxisError OR SR30_HORI_servo.bAxisError OR SR30_VERT_servo.bAxisError THEN
 	OP30_ErrorActive:=TRUE;
-END_IF
+END_IF*)
 	
 OP30_Modeselection_FB(
 	ModeWord:= , 
@@ -63,11 +65,19 @@ OP30_Modeselection_FB(
 	StepRunning:=OP30_StepRunning , 
 	StartEnable:=OP30_StartEnable  , 
 	MachineStop:=OP30_Machine_Stop );
-	
-TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#1S , Q=>Pulse_1s, ET=> );	]]></ST>
+		
+OP30_Safety_OK:=OperationEnable;	
+
+IF OP30_Stop_Request AND NOT OP30_STN_ENABLE THEN
+	OP30_Machine_Stop:=1;
+END_IF
+Gen_Timer(IN:=OP30_Machine_Stop,PT:=T#5S);
+IF Gen_Timer.Q THEN
+	OP30_Machine_Stop:=0;
+END_IF]]></ST>
     </Implementation>
     <LineIds Name="OP30_MAIN">
-      <LineId Id="3" Count="52" />
+      <LineId Id="3" Count="61" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

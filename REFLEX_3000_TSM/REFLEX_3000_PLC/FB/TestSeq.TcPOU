@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="TestSeq" Id="{6d60a8ae-eef6-4767-bf0a-4a48095fe6aa}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK TestSeq
+VAR_INPUT
+	
+	Test1_ProgNO:INT;
+	Test2_ProgNO:INT;
+	TestOk:BOOL;
+	TestNOK:BOOL;
+	StartEnable:BOOL;
+	ResultIN:STRING;
+	
+	
+	
+	
+END_VAR
+VAR_OUTPUT
+	StartOP:BOOL;
+	Test_ProgNO:INT;
+	
+	
+END_VAR
+VAR
+	StepNO:INT;
+	SeqRunning:BOOL;
+	
+END_VAR
+VAR_IN_OUT
+	SeqStart:BOOL;
+	SeqCompleted:BOOL;
+	Test1OK:BOOL;
+	Test1NOK:BOOL;
+	Test2Ok:BOOL;
+	Test2NOK:BOOL;
+	Test1Result:STRING;
+	Test2Result:STRING;
+	CompOK:BOOL;
+	CompNOK:BOOL;
+	ResultOK:BOOL;
+	ResultNOK:BOOL;
+	Result_Data:STRING;
+	ATEQCompleted:BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF  NOT StartEnable THEN
+	StepNO:=0;
+END_IF
+CASE StepNO OF
+	0: SeqStart:=FALSE;
+	StartOP:=FALSE;
+	SeqRunning:=FALSE;
+	ATEQCompleted:=FALSE;
+	ResultNOK:=FALSE;
+	ResultOK:=FALSE;
+	SeqCompleted:=FALSE;
+	StepNO:=10;
+	10:IF StartEnable AND SeqStart THEN
+ 			 			
+	SeqRunning:=TRUE;
+	SeqStart:=FALSE;
+	StepNO:=20;
+	END_IF;
+20: IF StartEnable AND SeqRunning THEN
+	
+		Test_ProgNO:=Test1_ProgNO;
+		
+		StepNO:=30;
+	END_IF
+30: IF StartEnable AND SeqRunning THEN
+	
+		StartOP:=TRUE;
+		StepNO:=40;
+		
+END_IF
+40: IF ATEQCompleted AND StartEnable THEN
+StartOP:=FALSE;	
+
+	IF (TestOk AND NOT TestNOK) THEN
+		ResultOK:=TRUE;
+		ResultNOK:=FALSE;
+	ELSIF (TestNOk AND NOT TestOK) THEN
+		ResultNOK:=TRUE;
+		ResultOK:=FALSE;
+	END_IF
+		IF (ResultOK OR ResultNOK) THEN
+			StepNO:=50;
+		
+		END_IF
+		END_IF
+50: IF StartEnable THEN
+	ATEQCompleted:=FALSE;
+	Result_Data:=ResultIN;
+	StepNO:=60;
+END_IF
+60:
+		 IF StartEnable  THEN
+			SeqCompleted:=TRUE;
+			StepNO:=70;  
+		 END_IF
+70: IF NOT SeqCompleted THEN
+		ResultNOK:=FALSE;
+		ResultOK:=FALSE;
+		Result_Data:='';
+		StepNO:=0;
+		END_IF
+
+	
+	
+	
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="TestSeq">
+      <LineId Id="3" Count="4" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="100" Count="4" />
+      <LineId Id="8" Count="19" />
+      <LineId Id="106" Count="1" />
+      <LineId Id="28" Count="12" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="41" Count="17" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <DUT Name="Acquisition_Status_Scanner" Id="{5826d27b-6729-47b1-b8aa-8fafeb960700}">
+    <Declaration><![CDATA[TYPE Acquisition_Status_Scanner  :
+STRUCT
+	Trigger_ready		: BOOL;
+	Triger_Acknowledge  : BOOL;
+	Acquiring 			: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,22 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP120_AutoSequence" Id="{f73c1b6b-7bc7-4fff-8a80-b59a7a34cfef}" SpecialFunc="None">
+  <POU Name="OP120_AutoSequence" Id="{0e2fded1-dc72-4cba-adf7-c74fbc4cb423}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP120_AutoSequence
 VAR
 	OP120_AutoSeq:INT;
+	OP120_Moverinstationtrig: R_TRIG;
+	continuousrunplsdelete: BOOL;
+	dry_run: BOOL;
+	fix_lh: INT;
+	fix_rh: INT;
+	op120_cycle_time_fb :FB_cycleTime;
+	OP120_Cycle_time : UDINT;
+	OP120_ROBO_ERR   :TON;
 	
-	
-	OP120_Lock_Push_Dly: TON;
 END_VAR
-]]></Declaration>
+
+VAR PERSISTENT
+	OP120_ROBO_ERR_TIME: TIME;
+END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF (NOT OP120_Auto OR  OP120_ErrorActive OR OP120_HomeRunning ) THEN
+      <ST><![CDATA[IF (NOT OP120_Auto OR  OP120_ErrorActive OR OP120_HomeRunning OR OP120_Machine_Stop ) THEN
 	OP120_GVL.OP120_AutoRunning:= FALSE;
 	OP120_ComponentOk:=FALSE;
 	OP120_ComponentNok:=FALSE;
+	OP120_OperationCompleted:=FALSE;
+	OP120_PushPlace:=FALSE;
+	Part_Picked:=FALSE;
+	Ready_for_next_singulation:=FALSE;
 	OP120_AutoSeq:= 10;
-
+	OP120_MoverPresent:=FALSE;
+    Op120_PartSingulated:=FALSE;
+	OP120_GVL.OP120_Vaccuum_OP_Port5_Byte1 :=1;
+	OP120_GVL.OP120_Vaccuum_OP_Port6_Byte1 :=1;
 END_IF
+
+
+OP120_ROBO_ERR(IN:=	NOT(OP120_SO_Auto_Operation_Enable AND OP120_SO_Mirror_Auto_enable AND OP120_SO_Servo_ON_OFF_Status) , PT:=OP120_ROBO_ERR_TIME, Q=> , ET=> );
+
 
 CASE OP120_AutoSeq OF 
 	10:IF (OP120_Auto) THEN		// Check Automode Selected
@@ -28,7 +48,7 @@ CASE OP120_AutoSeq OF
 	30:IF (NOT OP120_HomeRunning) THEN		//Check No Homerunning
 		OP120_AutoSeq :=40;
 		END_IF
-    40:IF (NOT OP120_GVL.OP120_Temp_Home_OK)THEN	//Check Machine in Home
+    40:IF ( OP120_GVL.OP120_Temp_Home_OK)THEN	//Check Machine in Home
 		OP120_AutoSeq:= 50;
 		END_IF
 	50:IF ( NOT OP120_OperationCompleted) THEN		// Check Operation Completed Reset
@@ -38,8 +58,9 @@ CASE OP120_AutoSeq OF
 		OP120_AutoSeq:=70;
 		END_IF
 	70:IF (NOT OP120_ComponentNok) THEN 	// Check Component NOk Reset
-		OP120_AutoSeq:= 80;
+		   OP120_AutoSeq:= 120;
 		END_IF
+		
     120:IF  (AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP120_GVL.OP120_HMI_CycleStart_PB )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
 		    OP120_GVL.OP120_HomeCondition_OK:=TRUE;
 	 			IF( OP120_GVL.OP120_HomeCondition_OK AND OP120_AutoSelected) THEN
@@ -52,106 +73,177 @@ CASE OP120_AutoSeq OF
 				END_IF;
 		 END_IF
 		 IF ((OP120_GVL.OP120_AutoRunning OR OP120_GVL.OP120_StepRunning) AND OP120_GVL.OP120_StartEnable) THEN
-					OP120_AutoSeq:= 130;
+			OP120_Prev_Comp_Status:=1;
+		    OP120_Sing_AutoSeq:=10;
+		    OP120_AutoSeq:= 140;
 		END_IF
-	130:IF (OP120_Prev_Stat_Operation_Completed=TRUE) THEN // Check Previous Station Completed
-		             OP120_AutoSeq:= 140;
-	END_IF
-	140: IF (OP120_Prev_Comp_Status=1) THEN  // Check Compoent Status in Previuos Station
-		OP120_Prev_LH_COMP_OK:=TRUE;
-		OP120_Prev_RH_COMP_OK:=TRUE;
 		
-		ELSIF (OP120_Prev_Comp_Status=2)THEN 
-		OP120_Prev_LH_COMP_NOK:=TRUE;
-		OP120_Prev_RH_COMP_OK:=TRUE;
 		
-		ELSIF (OP120_Prev_Comp_Status=3)THEN 
-		OP120_Prev_LH_COMP_OK:=TRUE;
-		OP120_Prev_RH_COMP_NOK:=TRUE;
-		
-		ELSIF (OP120_Prev_Comp_Status=4)THEN 
-		OP120_Prev_LH_COMP_NOK:=TRUE;
-		OP120_Prev_RH_COMP_NOK:=TRUE;
-		
-		END_IF
-		IF (OP120_Prev_LH_COMP_OK OR OP120_Prev_LH_COMP_NOK) AND (OP120_Prev_RH_COMP_OK OR OP120_Prev_RH_COMP_NOK) THEN
-			 OP120_AutoSeq:= 150;
-		END_IF
-	150:IF OP120_GVL.OP120_StartEnable THEN
-		OP120_AutoSeq:= 160;
-	END_IF
+	140: IF OP120_STN_ENABLE AND fix_lh <> 110 AND fix_rh <> 110 THEN   //// waiting for station enable and previous component status
+         	OP120_AutoSeq:= 200;
+			
+         ELSIF OP120_STN_ENABLE AND fix_lh =110 AND fix_rh =110 THEN
+           OP120_Prev_LH_COMP_OK:=TRUE;
+	       OP120_Prev_RH_COMP_OK:=TRUE;
+           OP120_Prev_LH_COMP_NOK:=FALSE;
+           OP120_Prev_RH_COMP_NOK:=FALSE;
+		  
+         ELSIF OP120_STN_ENABLE AND fix_lh = 110 AND fix_rh =111 THEN
+           OP120_Prev_LH_COMP_OK:=TRUE;
+	       OP120_Prev_RH_COMP_OK:=FALSE;
+           OP120_Prev_LH_COMP_NOK:=FALSE;
+           OP120_Prev_RH_COMP_NOK:=TRUE;
+		   
+         ELSIF OP120_STN_ENABLE AND fix_lh = 111 AND fix_rh =110 THEN
+           OP120_Prev_LH_COMP_OK:=FALSE;
+	       OP120_Prev_RH_COMP_OK:=TRUE;
+		   OP120_Prev_LH_COMP_NOK:=TRUE;
+           OP120_Prev_RH_COMP_NOK:=FALSE;
+          END_IF 
+		  
+          IF (OP120_Prev_LH_COMP_OK OR OP120_Prev_LH_COMP_NOK) AND (OP120_Prev_RH_COMP_OK OR OP120_Prev_RH_COMP_NOK) THEN
+			 
+			  OP120_Lock_AutoSeq:=10;
+			  
+	          OP120_AutoSeq:= 150;
+		  END_IF	
+  
+	150:	IF OP120_StartEnable AND OP120_STN_ENABLE OR continuousrunplsdelete THEN /// waiting for station enable
+			IF continuousrunplsdelete THEN
+	           OP120_STN_ENABLE := TRUE;
+	        END_IF
+            OP120_MoverPresent:=TRUE;
+			OP120_AutoSeq:= 160;
+			END_IF
 	
-	160:IF OP120_GVL.OP120_StartEnable AND OP120_IO_Tag_Link.OP120_EO_Spring_Pick_Completed  THEN
-		OP120_Comp_Picked:=TRUE;
-		OP120_Camera_OK:=FALSE;
-		
-		 OP120_AutoSeq:= 160;		
-	END_IF
-		
-	170:IF OP120_GVL.OP120_StartEnable AND OP120_IO_Tag_Link.OP120_EO_Spring_Place_Pos_Reached THEN
-		
-		 OP120_AutoSeq:= 170;
-		 END_IF
-	180:IF OP120_GVL.OP120_StartEnable  THEN
-		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd2:=TRUE;
-		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd1:=FALSE;
-		IF (OP120_GVL.CR120_Horizontal_Push_Cyl.Position2) THEN
-		OP120_AutoSeq:= 180;
-		END_IF
-		END_IF
-	190:IF OP120_GVL.OP120_StartEnable THEN 
-		
-	OP120_Lock_Push_Dly(IN:=OP120_AutoSeq= 180 , PT:= , Q=> , ET=> );
-		IF OP120_Lock_Push_Dly.Q THEN
-		OP120_AutoSeq:= 190;
-		END_IF
-		END_IF
-		
-	200:IF OP120_GVL.OP120_StartEnable  THEN 
-		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd1:=TRUE;
-		OP120_GVL.CR120_Horizontal_Push_Cyl.AutoCmd2:=FALSE;
-		IF (OP120_GVL.CR120_Horizontal_Push_Cyl.Position1) THEN
-		OP120_Lring_Placed:=TRUE;
-		OP120_AutoSeq:= 200;
-		END_IF
-		END_IF
-		
-	210:IF OP120_GVL.OP120_StartEnable THEN 
-		 OP120_IO_Tag_Link.OP120_EI_Insertion_Complete:=TRUE;
-		OP120_AutoSeq:= 210;
-	END_IF
-		
-	220:IF OP120_GVL.OP120_StartEnable AND  OP120_IO_Tag_Link.OP120_EO_Spring_Place_Completed THEN 	
-		OP120_Lring_Placed:=FALSE;
-		OP120_AutoSeq:= 220;		
-	END_IF
-	230:IF (OP120_GVL.OP120_StartEnable)  THEN 
-		OP120_OperationCompleted:=TRUE;	
-		OP120_AutoSeq:= 250;
-	END_IF
-		
+	160:	IF OP120_StartEnable THEN
+		       OP120_AutoSeq:= 170;
+        	END_IF
+			
+170:     IF OP120_OperationCompleted  AND (OP120_STN_MOVER>0 OR dry_run) THEN // waiting for operation complete feedback
+	     	IF OP120_LH_Comp_OK AND OP120_rH_Comp_OK THEN
+	     		MOVER_CMP_STATUS[OP120_CURR_MOVER][1]:=120;	
+                 MOVER_CMP_STATUS[OP120_CURR_MOVER][2]:=120;
+	     	    IF MOVER_CMP_STATUS[OP120_CURR_MOVER][1]=120 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]=120 AND MOVER_CMP_STATUS[OP120_STN_MOVER][1] <> 110 AND MOVER_CMP_STATUS[OP120_STN_MOVER][2]<>110 THEN
+	     		STATION_DONE[OP120_CURR_MOVER][OP120_XTS_POS_NO]			:= TRUE;
+				   IF continuousrunplsdelete THEN
+	                  OP120_STN_ENABLE := FALSE;
+	               END_IF		   
+	     		   OP120_AutoSeq:= 250;
+				END_IF
+	     	 ELSIF OP120_LH_Comp_NOK AND OP120_rH_Comp_OK THEN	
+	     		   MOVER_CMP_STATUS[OP120_CURR_MOVER][1]:=121;	
+                    MOVER_CMP_STATUS[OP120_CURR_MOVER][2]:=120;
+	     	       IF MOVER_CMP_STATUS[OP120_CURR_MOVER][1]=121 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]=120 
+						AND MOVER_CMP_STATUS[OP120_CURR_MOVER][1] <> 110 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]<>110 THEN
+	     		    STATION_DONE[OP120_CURR_MOVER][OP120_XTS_POS_NO]			:= TRUE;
+	     		      OP120_AutoSeq:= 250;
+	     		    END_IF
+               ELSIF OP120_LH_Comp_OK AND OP120_rH_Comp_NOK THEN	
+	     			MOVER_CMP_STATUS[OP120_CURR_MOVER][1]:=120;	
+                     MOVER_CMP_STATUS[OP120_CURR_MOVER][2]:=121;
+	     	        IF MOVER_CMP_STATUS[OP120_CURR_MOVER][1]=120 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]=121 
+						AND MOVER_CMP_STATUS[OP120_CURR_MOVER][1] <> 110 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]<>110 THEN
+	     		    STATION_DONE[OP120_CURR_MOVER][OP120_XTS_POS_NO]			:= TRUE;
+	     		       OP120_AutoSeq:= 250;
+	     		     END_IF	
+	     	  ELSIF OP120_LH_Comp_NOK AND OP120_rH_Comp_NOK THEN	
+	     		    MOVER_CMP_STATUS[OP120_CURR_MOVER][1]:=121;	
+                     MOVER_CMP_STATUS[OP120_CURR_MOVER][2]:=121;
+	     	        IF MOVER_CMP_STATUS[OP120_CURR_MOVER][1]=121 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]=121 
+						AND MOVER_CMP_STATUS[OP120_CURR_MOVER][1] <> 110 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]<>110 THEN
+	     		  STATION_DONE[OP120_CURR_MOVER][OP120_XTS_POS_NO]			:= TRUE;
+	     		       OP120_AutoSeq:= 250;
+                      END_IF
+	             END_IF
+	     END_IF
 
-	
-	250:		// Reset All Bits							
-         OP120_LH_Comp_OK:=FALSE;
+	200:MOVER_CMP_STATUS[OP120_CURR_MOVER][1]:=121;	
+        MOVER_CMP_STATUS[OP120_CURR_MOVER][2]:=121;
+		IF MOVER_CMP_STATUS[OP120_CURR_MOVER][1]=121 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]=121 
+			AND MOVER_CMP_STATUS[OP120_CURR_MOVER][1] <> 110 AND MOVER_CMP_STATUS[OP120_CURR_MOVER][2]<>110 THEN
+		STATION_DONE[OP120_CURR_MOVER][OP120_XTS_POS_NO]			:= TRUE;
+			OP120_AutoSeq:= 250;
+		END_IF
+		
+	250:// Reset All Bits							
+//        IF NOT OP120_STN_ENABLE THEN         reseting all bits for next cycle
+		 OP120_LH_Comp_OK:=FALSE;
          OP120_LH_Comp_NOK:=FALSE;
          OP120_RH_Comp_OK:=FALSE;
          OP120_RH_Comp_NOK:=FALSE;
          OP120_LH_AutoSeq:=0;
-		OP120_RH_AutoSeq:=0;
-		OP120_AutoSeq:= 10;
-			
-	
+		 OP120_RH_AutoSeq:=0;
+		 OP120_OperationCompleted:=FALSE;
+		 OP120_AutoSeq:= 140;
+//		END_IF
+END_CASE
 
-			
-			
-		
-		
+OP120_Moverinstationtrig(CLK:= OP120_MoverinStation, Q=> );
+op120_cycle_time_fb(i_b_startTime:=OP120_STN_ENABLE , i_b_stopTime:= NOT OP120_STN_ENABLE , o_t_StationTime=>OP120_Cycle_time );
 
-END_CASE]]></ST>
+dry_run:=All_Station_Dry_Run;
+//staus FOR movers 
+IF  dry_run THEN
+	fix_lh :=110;
+	fix_rh :=110;
+ELSE 
+	fix_lh := MOVER_CMP_STATUS[OP120_STN_MOVER][1];
+	fix_rh := MOVER_CMP_STATUS[OP120_STN_MOVER][2];
+END_IF
+
+
+//############################		OP120 STATION ENABLE CONDITION		##########################
+
+	OP120_STN_MOVER					:= MOVER_POSITION[OP120_XTS_POS_NO];
+	IF AUTO_WITH_XTS THEN
+	IF OP120_STN_MOVER>0  AND NOT OP120_STN_ENABLE THEN		
+	IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP120_STN_MOVER][1]=5 AND MOVER_CMP_STATUS[OP120_STN_MOVER][2]=5)THEN
+	OP120_STN_ENABLE					:= MOVER_POS_RECHED[OP120_STN_MOVER] AND ((MOVER_CMP_STATUS[OP120_STN_MOVER][1]=110)OR 
+										(MOVER_CMP_STATUS[OP120_STN_MOVER][2]=110))AND STATION_ENABLE_CONTROL;
+	ELSE
+		STATION_DONE[OP120_STN_MOVER][OP120_XTS_POS_NO]			:= TRUE;		
+	END_IF
+	ELSE
+	OP120_STN_ENABLE					:= FALSE;
+	END_IF
+	END_IF																			
+
+
+
+
+
+]]></ST>
     </Implementation>
     <LineIds Name="OP120_AutoSequence">
-      <LineId Id="3" Count="137" />
+      <LineId Id="3" Count="6" />
+      <LineId Id="235" Count="0" />
+      <LineId Id="10" Count="2" />
+      <LineId Id="325" Count="0" />
+      <LineId Id="324" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="349" Count="3" />
+      <LineId Id="14" Count="20" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="280" Count="0" />
+      <LineId Id="39" Count="15" />
+      <LineId Id="279" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="81" Count="24" />
+      <LineId Id="219" Count="0" />
+      <LineId Id="106" Count="4" />
+      <LineId Id="252" Count="1" />
+      <LineId Id="251" Count="0" />
+      <LineId Id="111" Count="12" />
+      <LineId Id="258" Count="1" />
+      <LineId Id="254" Count="0" />
+      <LineId Id="124" Count="37" />
+      <LineId Id="337" Count="0" />
+      <LineId Id="163" Count="11" />
+      <LineId Id="275" Count="1" />
+      <LineId Id="175" Count="10" />
+      <LineId Id="309" Count="14" />
+      <LineId Id="199" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

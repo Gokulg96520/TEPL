@@ -1,0 +1,356 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Servo_Conveyor_FB_OP90" Id="{531a781d-d725-4623-aa55-b6423c0613b8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Servo_Conveyor_FB_OP90
+VAR_INPUT
+	Conveyor_Prgrm_Start			: BOOL;
+	Conveyor_Prgrm_Reset			: BOOL;
+	Conveyor_Continuous_Run			: BOOL;	
+	Camera_Trigger_OK				: BOOL;	
+	Conveyor_Bypass					: BOOL;
+	Fwd_Time_IP						: INT;
+	Rev_Time_IP						: INT;
+	Conveyor_FWD_Speed				: REAL;
+	Conveyor_REV_Speed				: REAL;
+	Conveyor_FWD_Position			: REAL;
+	Conveyor_REV_Position			: REAL;	
+	Velocity_mode					: BOOL;
+	LH_Work_Sensor					: BOOL;
+	LH_Home_Sensor					: BOOL;
+	RH_Work_Sensor					: BOOL;
+	RH_Home_Sensor					: BOOL;	
+	LH_Camera_OK					: BOOL;
+	LH_Camera_NOK					: BOOL;	
+	RH_Camera_OK					: BOOL;
+	RH_Camera_NOK					: BOOL;
+	Track_Overflow					: BOOL;
+	//Track_Sensor_FB					: BOOL;
+END_VAR
+VAR_OUTPUT
+	Camera_Trigger_ACK				: BOOL;	
+	LH_Work_Coil					: BOOL;
+	LH_Home_Coil					: BOOL;
+	RH_Work_Coil					: BOOL;
+	RH_Home_Coil					: BOOL;	
+	Ready_to_Pick					: BOOL;
+	Drum_ON							: BOOL;
+	Step_Num						: INT;
+END_VAR
+VAR_IN_OUT
+	Camera_trigger						: BOOL;
+	One_Cycle							: BOOL;
+	Pick_Done						    : BOOL;
+	Track_Sensor_FB					    : BOOL;
+	Conveyor_Servo_Control_Structure	:  Servo_Control;
+END_VAR
+VAR
+	Conveyor_Speed  : REAL;
+	Cyl_Delay 		: TON;
+	Cyl_Temp 		: BOOL;
+	temp_3			: BOOL;
+	cam_ok 			: BOOL;
+	con_step_no 	: INT;	
+	t1				: ton;
+	t2				: ton;
+	t3				: ton;
+	t4				: ton;	
+	count_nok   	: INT;
+	forward			: BOOL;
+	reverse			: BOOL;
+	fwd_time		: INT;
+	rev_time		: INT;
+	temp            : BOOL;
+	VeloCity_Frwd   : REAL := 200;
+	Track_Count		: TON;
+	Temp_1 : R_TRIG;
+	Temp_Cont : BOOL;
+	Conti_run : TON;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT Conveyor_Prgrm_Start OR Conveyor_Servo_Control_Structure.Axis_Error THEN
+	con_step_no:=10;
+	Camera_Trigger_ACK:=0;
+	Ready_to_Pick:=FALSE;
+	Conveyor_Servo_Control_Structure.VELmove_Start:=FALSE;
+END_IF
+
+IF Conveyor_Bypass THEN
+	con_step_no:=10;
+	Ready_to_Pick:=1;
+	IF Pick_Done THEN
+		Pick_Done:=0;
+		Ready_to_Pick:=0;
+	END_IF
+END_IF
+
+IF forward THEN
+	Conveyor_Speed:=Conveyor_FWD_Speed;
+END_IF
+IF reverse THEN
+	Conveyor_Speed:=Conveyor_REV_Speed;
+END_IF
+
+Conti_run(IN:=(con_step_no=25),PT:=T#2S);
+
+CASE con_step_no OF
+		10: IF Conveyor_Prgrm_Start THEN
+				con_step_no:=15;
+			END_IF
+			
+		15: LH_Home_Coil:=1;
+			RH_Home_Coil:=1;	
+			IF LH_Home_Sensor AND RH_Home_Sensor THEN
+				LH_Home_Coil:=0;
+				RH_Home_Coil:=0;
+				con_step_no:= 70;
+			END_IF
+		
+        20:	Ready_to_Pick :=FALSE;
+			Pick_Done:= FALSE;
+			Conveyor_Servo_Control_Structure.Velocity:= VeloCity_Frwd;		
+			Conveyor_Servo_Control_Structure.VELmove_Start:=FALSE;
+			IF NOT Conveyor_Servo_Control_Structure.VELmove_Start THEN
+				con_step_no:= 25;
+			END_IF	
+			
+		25:	Drum_ON:=1;
+			Conveyor_Servo_Control_Structure.VELmove_Start:=TRUE;	
+			IF Track_Sensor_FB THEN
+				Conveyor_Servo_Control_Structure.VELmove_Start:=FALSE;
+				Drum_ON	   :=FALSE;
+				con_step_no:= 80;
+			END_IF
+	
+		70: IF NOT Conveyor_Servo_Control_Structure.VELmove_Start THEN
+			  Camera_trigger :=TRUE;
+			  con_step_no	 := 75;
+			END_IF	
+					
+		75:	IF Camera_Trigger_OK AND NOT Conveyor_Servo_Control_Structure.VELmove_Start AND Conveyor_Servo_Control_Structure.Axis_ready THEN
+				IF LH_Camera_OK AND RH_Camera_OK THEN
+				 con_step_no:= 100;
+				 Camera_Trigger_ACK:=1;
+				 fwd_time:=Fwd_Time_IP;
+				 count_nok:=0;	
+				ELSIF (LH_Camera_NOK) OR (RH_Camera_NOK) AND count_nok<5 THEN
+				 count_nok := count_nok +1;
+				 con_step_no:= 76;	
+				ELSIF count_nok>=5 THEN
+	             fwd_time:=3000;
+				 con_step_no:= 80; 
+				END_IF
+			END_IF	
+			
+		76:	IF LH_Camera_NOK AND NOT Conveyor_Servo_Control_Structure.VELmove_Start THEN
+				IF LH_Home_Sensor THEN
+					LH_Work_Coil:=TRUE;
+					Cyl_Temp:=1;
+				END_IF	
+				IF Cyl_Delay.Q THEN
+					con_step_no:= 77;
+				END_IF	
+			ELSIF LH_Camera_OK AND RH_Camera_NOK THEN
+				con_step_no:= 78;
+			END_IF	
+			
+			
+		77: 	IF  LH_Work_Sensor THEN
+					LH_Work_Coil:=0;
+					LH_Home_Coil:=1;
+				END_IF	
+				IF LH_Home_Sensor AND NOT LH_Work_Coil AND count_nok<5 THEN
+					LH_Home_Coil:=0;
+					fwd_time:=Fwd_Time_IP;
+				    con_step_no:= 80;
+				END_IF
+                IF  LH_Home_Sensor AND NOT LH_Work_Coil AND count_nok>=5 THEN
+					LH_Home_Coil:=0;
+					fwd_time:=3000;
+					count_nok:=0;
+					//Camera_Trigger_ACK:=1;
+				    con_step_no:= 80;	
+				END_IF
+
+		78:	IF RH_Camera_NOK AND NOT Conveyor_Servo_Control_Structure.VELmove_Start THEN	
+				IF RH_Home_Sensor THEN
+					RH_Work_Coil:=TRUE;
+					Cyl_Temp:=1;
+				END_IF	
+				IF Cyl_Delay.Q THEN
+					con_step_no:= 79;
+				END_IF				
+			END_IF		
+			
+		79: 	IF RH_Work_Sensor THEN
+					RH_Work_Coil:=0;
+					RH_Home_Coil:=1;				
+				END_IF
+				IF RH_Home_Sensor AND NOT RH_Work_Coil AND count_nok<5 THEN
+					RH_Home_Coil:=0;					
+					fwd_time:=Fwd_Time_IP;
+				    con_step_no:= 80;
+				END_IF
+				IF RH_Home_Sensor AND NOT RH_Work_Coil AND count_nok>=5 THEN
+					fwd_time:=3000;
+					count_nok:=0;
+					RH_Home_Coil:=0;
+				    con_step_no:= 80;	
+				END_IF
+			
+		80: 	IF Velocity_mode THEN
+					IF fwd_time=3000 THEN
+			       		count_nok:=0;	
+					END_IF
+                	Conveyor_Servo_Control_Structure.Velocity:= Conveyor_Speed;				
+					forward:=TRUE;
+					Conveyor_Servo_Control_Structure.VELmove_Start:=TRUE;	
+					IF t2.Q THEN
+    					forward:=FALSE;
+						Conveyor_Servo_Control_Structure.VELmove_Start:=FALSE;
+						Camera_Trigger_ACK:=1;
+						con_step_no:= 90;
+					END_IF
+				ELSE
+					Conveyor_Servo_Control_Structure.Velocity:=Conveyor_FWD_Speed;
+					Conveyor_Servo_Control_Structure.Position:=Conveyor_FWD_Position;
+					Conveyor_Servo_Control_Structure.RELmove_Start:=1;
+					Camera_Trigger_ACK:=1;
+					con_step_no:= 85;
+				END_IF	
+				
+		85 : 	IF NOT Conveyor_Servo_Control_Structure.RELmove_Start THEN 
+					con_step_no:= 90;
+				END_IF	
+		
+		90: IF Velocity_mode THEN
+				Conveyor_Servo_Control_Structure.Velocity:= Conveyor_Speed;
+				reverse:=TRUE;
+				Conveyor_Servo_Control_Structure.VELmove_Start:=TRUE;
+				IF t3.Q THEN
+ 					reverse:=FALSE;
+					Conveyor_Servo_Control_Structure.VELmove_Start:=FALSE;
+					Camera_Trigger_ACK:=0;
+					IF NOT Camera_Trigger_ACK THEN
+						con_step_no:= 70;
+					END_IF	
+				END_IF
+			ELSE
+				Conveyor_Servo_Control_Structure.Velocity:=ABS(Conveyor_REV_Speed);
+				Conveyor_Servo_Control_Structure.Position:=(-Conveyor_REV_Position);
+				Conveyor_Servo_Control_Structure.RELmove_Start:=1;
+				Camera_Trigger_ACK:=0;
+					IF NOT Camera_Trigger_ACK THEN
+						con_step_no:= 92;
+					END_IF
+			END_IF
+			
+			
+		92 : 	IF NOT Conveyor_Servo_Control_Structure.RELmove_Start THEN 
+					con_step_no:= 70;
+				END_IF
+				
+		100: IF NOT Conveyor_Servo_Control_Structure.VELmove_Start THEN
+				// Camera_Trigger_ACK:=1;
+				 Ready_to_Pick:=TRUE;
+			 END_IF	
+			 IF Pick_Done OR Conveyor_Continuous_Run THEN
+				 Ready_to_Pick :=FALSE;
+				 Pick_Done:= FALSE;
+				 con_step_no:= 80;
+			 END_IF	
+
+		101: IF LH_Home_Sensor AND RH_Home_Sensor THEN
+					LH_Work_Coil:=TRUE;
+					RH_Work_Coil:=TRUE;
+					Cyl_Temp:=1;
+				END_IF	
+				IF Cyl_Delay.Q THEN
+					con_step_no:= 102;
+				END_IF	
+
+		102: IF RH_Work_Sensor AND LH_Work_Sensor THEN
+					RH_Work_Coil:=0;
+					LH_Work_Coil:=0;
+					RH_Home_Coil:=1;
+					LH_Home_Coil:=1;				
+				END_IF
+				IF RH_Home_Sensor AND LH_Home_Sensor AND NOT RH_Work_Coil AND NOT LH_Work_Coil AND count_nok<5 THEN
+					RH_Home_Coil:=0;	
+					LH_Home_Coil:=0;				
+					fwd_time:=Fwd_Time_IP;
+				    con_step_no:= 80;
+				END_IF	
+				IF RH_Home_Sensor AND LH_Home_Sensor AND NOT RH_Work_Coil AND NOT LH_Work_Coil AND count_nok>=5 THEN
+					RH_Home_Coil:=0;	
+					LH_Home_Coil:=0;				
+					fwd_time:=3000;
+				    con_step_no:= 80;
+				END_IF		
+END_CASE
+
+
+(*IF Track_Sensor_FB AND NOT Conveyor_Servo_Control_Structure.VELmove_Start THEN
+	con_step_no:= 20;
+	Track_Sensor_FB:=0;
+END_IF*)
+
+Step_Num:=con_step_no;
+	
+Temp_1(CLK:=Track_Count.Q );
+temp:=1;
+rev_time:=Rev_Time_IP;
+
+t2(IN:=forward ,PT:=INT_TO_TIME(fwd_time));
+t3(IN:=reverse ,PT:=INT_TO_TIME(rev_time));
+
+Cyl_Delay(IN:=Cyl_Temp,PT:=T#600MS);
+IF Cyl_Delay.Q THEN
+	Cyl_Temp:=0;
+END_IF
+
+IF One_Cycle THEN
+	con_step_no := 80;
+	One_Cycle	:=0;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="Servo_Conveyor_FB_OP90">
+      <LineId Id="74" Count="1" />
+      <LineId Id="604" Count="0" />
+      <LineId Id="76" Count="18" />
+      <LineId Id="536" Count="1" />
+      <LineId Id="95" Count="17" />
+      <LineId Id="467" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="468" Count="0" />
+      <LineId Id="114" Count="8" />
+      <LineId Id="124" Count="7" />
+      <LineId Id="327" Count="0" />
+      <LineId Id="132" Count="4" />
+      <LineId Id="143" Count="13" />
+      <LineId Id="325" Count="1" />
+      <LineId Id="157" Count="0" />
+      <LineId Id="324" Count="0" />
+      <LineId Id="158" Count="13" />
+      <LineId Id="328" Count="0" />
+      <LineId Id="172" Count="46" />
+      <LineId Id="401" Count="0" />
+      <LineId Id="219" Count="12" />
+      <LineId Id="330" Count="0" />
+      <LineId Id="396" Count="0" />
+      <LineId Id="232" Count="0" />
+      <LineId Id="397" Count="0" />
+      <LineId Id="233" Count="4" />
+      <LineId Id="398" Count="2" />
+      <LineId Id="238" Count="2" />
+      <LineId Id="245" Count="1" />
+      <LineId Id="248" Count="44" />
+      <LineId Id="535" Count="0" />
+      <LineId Id="293" Count="4" />
+      <LineId Id="309" Count="4" />
+      <LineId Id="315" Count="8" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

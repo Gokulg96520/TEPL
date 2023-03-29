@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP30_HMI_TAGS" Id="{1a02a8f8-a9e3-4bda-be82-2346dc462c88}">
+  <GVL Name="OP30_HMI_TAGS" Id="{ec9ccb42-df5e-4fea-8cdf-5dae1a3820e1}">
     <Declaration><![CDATA[VAR_GLOBAL
 	
 OP30_GIUDE_GRP_Manual_Axis: stManualModeAxis; 

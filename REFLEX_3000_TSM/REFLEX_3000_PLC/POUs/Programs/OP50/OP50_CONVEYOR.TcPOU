@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP50_CONVEYOR" Id="{91a597fe-6a6f-4887-b5f9-23d2a5fdac82}" SpecialFunc="None">
+  <POU Name="OP50_CONVEYOR" Id="{3fd1b300-c8e9-497f-b82f-a06f060ec58b}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP50_CONVEYOR
 VAR
 	con_step_no : INT;
@@ -18,40 +18,64 @@ VAR
 	check:BOOL;
 	check1:ton;
 	fwd_time : INT :=500;
+	rev_time : INT :=500;
 	count_nok :INT;
 	forward: BOOL;
 	reverse: BOOL;
+		temp_3 : BOOl;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF (NOT OP50_AutoSelected OR  OP50_ErrorActive) THEN
-	OP50_AutoRunning:= FALSE;
+      <ST><![CDATA[IF (NOT OP50_AutoSelected OR OP50_ErrorActive ) THEN
 	SR50_CONV_servo_ctrl.VELmove_Start:=FALSE;
 	forward:=FALSE;
 	reverse:=FALSE;
 	con_step_no:= 10;
 END_IF	
 
+OP50_Model:=Model;
+
+
+IF MANUAL_SELECTED AND OP50_ManualSelected THEN               
+	IF I50_DRUM_CONV_REV_I306_3 THEN
+		SR50_Conv_servo_status.targetVelocity:=OP50_Conv_Rev_Speed_6_3;
+		SR50_CONV_servo_ctrl.VELmove_Start:=I50_DRUM_CONV_REV_I306_3;
+ 	ELSIF I50_DRUM_CONV_FWD_I306_4 THEN
+		SR50_Conv_servo_status.targetVelocity:=OP50_Conv_Fwd_Speed_7_89;
+		SR50_CONV_servo_ctrl.VELmove_Start:=I50_DRUM_CONV_FWD_I306_4;	
+	ELSE 	
+		SR50_CONV_servo_ctrl.VELmove_Start:=0;   	
+	END_IF  	
+END_IF
+             
+IF OP50_Model='6.3' THEN
+	fwd_time:=OP50_Conv_Fwd_Time_6_3;
+	rev_time:=OP50_Conv_Rev_Time_6_3;
+	IF forward THEN
+		OP50_Conveyor_Speed:=OP50_Conv_Fwd_Speed_6_3;
+	END_IF
+	IF reverse THEN
+		OP50_Conveyor_Speed:=OP50_Conv_Rev_Speed_6_3;
+	END_IF
+END_IF
+
+IF OP50_Model='7.89' THEN
+	fwd_time:=OP50_Conv_Fwd_Time_7_89;
+	rev_time:=OP50_Conv_Rev_Time_7_89;
+	IF forward THEN
+		OP50_Conveyor_Speed:=OP50_Conv_Fwd_Speed_7_89;
+	END_IF
+	IF reverse THEN
+		OP50_Conveyor_Speed:=OP50_Conv_Rev_Speed_7_89;
+	END_IF
+END_IF
+
 CASE con_step_no OF
 		10: IF (OP50_AutoSelected) THEN		// Check Automode Selected
-				con_step_no:=20;
+				con_step_no:=65;
 	        END_IF
-		
-	    20:IF (NOT OP50_ErrorActive) THEN		//Check No error
-		       con_step_no:=50;
-      	   END_IF
 		   
-      	50:IF ( NOT OP50_OperationCompleted) THEN		// Check Operation Completed Reset
-      		   con_step_no:=60;
-      	   END_IF
-		   
-		60:IF ( OP50_AutoRunning OR AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP50_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
-				con_step_no:= 65;
-				OP50_AutoRunning:=TRUE;
-		   END_IF
-		   
-        65:	 SR50_CONV_servo_ctrl.Velocity:= 500;
-		//	fwd_time:=4000;			
+        65:	SR50_CONV_servo_ctrl.Velocity:= OP50_Conveyor_Speed;		
 			forward:=TRUE;
 			SR50_CONV_servo_ctrl.VELmove_Start:=TRUE;	
 			IF t2.Q THEN
@@ -67,69 +91,62 @@ CASE con_step_no OF
 			  END_IF
 			END_IF	
 					
-		75:	IF (LH_Cam_OK AND RH_Cam_OK) AND NOT SR50_CONV_servo_ctrl.VELmove_Start AND SR50_CONV_servo_ctrl.Axis_ready THEN
-				IF t4.Q THEN
+		75:	IF cam_ok AND NOT SR50_CONV_servo_ctrl.VELmove_Start AND SR50_CONV_servo_ctrl.Axis_ready THEN
+				IF LH_Cam_OK AND RH_Cam_OK THEN
 				 con_step_no:= 90;
+				 fwd_time:=OP50_Conv_Fwd_Time_6_3;
 				 count_nok:=0;	
-				END_IF
-			ELSIF (NOT LH_Cam_OK OR NOT RH_Cam_OK) AND count_nok<5 THEN
+				ELSIF (NOT LH_Cam_OK OR NOT RH_Cam_OK) AND count_nok<5 THEN
 				 count_nok := count_nok +1;
-				 con_step_no:= 77;	
-			ELSIF count_nok>=5 THEN
+				 con_step_no:= 76;	
+				ELSIF count_nok>=5 THEN
 	             fwd_time:=5000;
 				 con_step_no:= 80; 
-			END_IF
+				END_IF
+			END_IF	
 			
-		76:	 IF NOT RH_Cam_OK AND NOT SR50_CONV_servo_ctrl.VELmove_Start THEN
-				CR50_RH_Rej_Cyl.AutoCmd1:=TRUE;
-				IF I50_LH_REJ_CYL_FWD_I1101_2  THEN
-					CR50_RH_Rej_Cyl.AutoCmd1:=FALSE;
-					CR50_RH_Rej_Cyl.AutoCmd2:=TRUE;					
+		76:	 IF NOT LH_Cam_OK AND NOT SR50_CONV_servo_ctrl.VELmove_Start THEN
+				CR50_LH_Rej_Cyl.AutoCmd2:=TRUE;
+				IF  I50_LH_REJ_CYL_FWD_I1101_2  THEN
+					CR50_LH_Rej_Cyl.AutoCmd1:=1;
+					CR50_LH_Rej_Cyl.AutoCmd2:=0;					
 				END_IF
-				IF I50_LH_REJ_CYL_REV_I1101_3  AND count_nok<5 THEN
-					CR50_RH_Rej_Cyl.AutoCmd2:=FALSE;
-					fwd_time:=1000;
+				IF I50_LH_REJ_CYL_REV_I1101_3 AND count_nok<5 AND NOT CR50_LH_Rej_Cyl.AutoCmd2 THEN
+					CR50_LH_Rej_Cyl.AutoCmd2:=0;
+					fwd_time:=OP50_Conv_Fwd_Time_6_3;
 				    con_step_no:= 77;
 				END_IF
-                IF count_nok<5 THEN
-					fwd_time:=1000;
-				    con_step_no:= 77;
-				ELSE 
+                IF count_nok>5 THEN
 					fwd_time:=5000;
 				    con_step_no:= 77;	
 				END_IF
-			ELSE
-				fwd_time:=1000;
+			ELSIF LH_Cam_OK THEN
 				con_step_no:= 77;
 			END_IF	
 			
-	   77:	IF NOT LH_Cam_OK AND NOT SR50_CONV_servo_ctrl.VELmove_Start THEN	
-				CR50_LH_Rej_Cyl.AutoCmd1:=TRUE;
-				IF I50_LH_REJ_CYL_REV_I1101_3  THEN
-					CR50_LH_Rej_Cyl.AutoCmd1:=FALSE;
-					CR50_LH_Rej_Cyl.AutoCmd2:=TRUE;				
+	   77:	IF NOT RH_Cam_OK AND NOT SR50_CONV_servo_ctrl.VELmove_Start THEN	
+				CR50_RH_Rej_Cyl.AutoCmd2:=TRUE;
+				IF  I50_RH_REJ_CYL_FWD_I1101_4 THEN
+					CR50_RH_Rej_Cyl.AutoCmd1:=1;
+					CR50_RH_Rej_Cyl.AutoCmd2:=0;				
 				END_IF
-				IF I50_LH_REJ_CYL_REV_I1101_3 AND count_nok<5 THEN
-					CR50_LH_Rej_Cyl.AutoCmd2:=FALSE;					
-					fwd_time:=1000;
+				IF I50_RH_REJ_CYL_REV_I1101_5 AND count_nok<5 AND NOT CR50_RH_Rej_Cyl.AutoCmd2 THEN
+					CR50_RH_Rej_Cyl.AutoCmd2:=0;					
+					fwd_time:=OP50_Conv_Fwd_Time_6_3;
 				    con_step_no:= 80;
 				END_IF
-				IF count_nok<5 THEN
-					fwd_time:=1000;
-				    con_step_no:= 80;
-				ELSE 
+				IF count_nok>5 THEN
 					fwd_time:=5000;
 				    con_step_no:= 80;	
 				END_IF
-			ELSE
-				fwd_time:=1000;
+			ELSIF RH_Cam_OK THEN
 				con_step_no:= 80;
-			END_IF			
+			END_IF		
 			
 		80: 	IF fwd_time=5000 THEN
 			       count_nok:=0;	
 				END_IF
-                SR50_CONV_servo_ctrl.Velocity:= 500;				
+                SR50_CONV_servo_ctrl.Velocity:= OP50_Conveyor_Speed;				
 				forward:=TRUE;
 				SR50_CONV_servo_ctrl.VELmove_Start:=TRUE;	
 				IF t2.Q THEN
@@ -137,8 +154,8 @@ CASE con_step_no OF
 					SR50_CONV_servo_ctrl.VELmove_Start:=FALSE;
 					con_step_no:= 70;
 				END_IF
-		
-		90: 	SR50_CONV_servo_ctrl.Velocity:= -100;
+		        
+		90: 	SR50_CONV_servo_ctrl.Velocity:= OP50_Conveyor_Speed;
 				reverse:=TRUE;
 				SR50_CONV_servo_ctrl.VELmove_Start:=TRUE;
 				IF t3.Q THEN
@@ -148,7 +165,7 @@ CASE con_step_no OF
 				END_IF		
 				
 		100: OP50_pick_ready:=TRUE;
-			 IF OP50_pick_done THEN
+			 IF OP50_pick_done or temp_3 THEN
 				 OP50_pick_ready :=FALSE;
 				 OP50_pick_done:=FALSE;
 				 con_step_no:= 80;
@@ -162,16 +179,22 @@ IF cam_trig AND con_step_no=70  THEN
 	cam_ok:=FALSE;
 END_IF
 IF t1.Q THEN
+	LH_Cam_OK:=1;
+	RH_Cam_OK:=1;
 	cam_ok:=temp;
 	cam_trig :=FALSE;
 END_IF
 
 t2(IN:=forward ,PT:=INT_TO_TIME(fwd_time));
-t3(IN:=reverse ,PT:=T#500MS);
+t3(IN:=reverse ,PT:=INT_TO_TIME(rev_time));
 t4(IN:=cam_ok,PT:=T#1S);]]></ST>
     </Implementation>
     <LineIds Name="OP50_CONVEYOR">
-      <LineId Id="3" Count="143" />
+      <LineId Id="3" Count="5" />
+      <LineId Id="13" Count="2" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="215" Count="10" />
+      <LineId Id="27" Count="139" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

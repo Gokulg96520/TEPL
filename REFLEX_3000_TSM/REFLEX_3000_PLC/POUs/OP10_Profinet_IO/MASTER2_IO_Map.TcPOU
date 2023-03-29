@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="MASTER2_IO_Map" Id="{ba300da2-b565-456b-9ffe-e1ce8d5d7667}" SpecialFunc="None">
+  <POU Name="MASTER2_IO_Map" Id="{7f66d372-364b-4c22-80c0-c6bc97964263}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MASTER2_IO_Map
 VAR
 	BYTE_AS_BIT_0: BYTE_AS_BIT;
@@ -157,7 +157,7 @@ END_VAR
                             <v n="Id">10L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I50_SPARE_I1101_6"</v>
+                            <v n="Operand">"I50_LH_GRIP_CLSE_I1101_7"</v>
                             <v n="Type">""</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -173,7 +173,7 @@ END_VAR
                             <v n="Id">11L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I50_LH_GRIP_CLSE_I1101_7"</v>
+                            <v n="Operand">"I50_RH_GRIP_CLSE_I1110_1"</v>
                             <v n="Type">""</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -315,7 +315,7 @@ END_VAR
                                 <v n="Id">20L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I30_SPARE_I1100_6"</v>
+                                <v n="Operand">"I30_TOP_REJ_BIN_PRSNCE_I1100_6"</v>
                                 <v n="Type">""</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -331,7 +331,7 @@ END_VAR
                                 <v n="Id">21L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I30_SPARE_I1100_7"</v>
+                                <v n="Operand">"I30_BOT_REJ_BIN_PRSNCE_I1100_7"</v>
                                 <v n="Type">""</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>
@@ -534,7 +534,7 @@ END_VAR
                         <l2 n="OutputItems" cet="Operand">
                           <n />
                           <o>
-                            <v n="Operand">"I70_SPARE_I1111_0"</v>
+                            <v n="Operand">"I50_TOP_REJ_BIN_PRSNCE_I1111_0"</v>
                             <v n="Type">""</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -550,7 +550,7 @@ END_VAR
                             <v n="Id">32L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I70_SPARE_I1111_1"</v>
+                            <v n="Operand">"I50_BOT_REJ_BIN_PRSNCE_I1111_1"</v>
                             <v n="Type">""</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -566,7 +566,7 @@ END_VAR
                             <v n="Id">33L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I70_SPARE_I1111_2"</v>
+                            <v n="Operand">"I70_TOP_REJ_BIN_PRSNCE_I1111_2"</v>
                             <v n="Type">""</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -582,7 +582,7 @@ END_VAR
                             <v n="Id">34L</v>
                           </o>
                           <o>
-                            <v n="Operand">"I70_SPARE_I1111_3"</v>
+                            <v n="Operand">"I70_BOT_REJ_BIN_PRSNCE_I1111_3"</v>
                             <v n="Type">""</v>
                             <v n="Comment">""</v>
                             <v n="SymbolComment">""</v>
@@ -708,7 +708,7 @@ END_VAR
                                 <v n="Id">42L</v>
                               </o>
                               <o>
-                                <v n="Operand">"I50_RH_GRIP_CLSE_I1110_1"</v>
+                                <v n="Operand">"I50_SPARE_I1101_6"</v>
                                 <v n="Type">""</v>
                                 <v n="Comment">""</v>
                                 <v n="SymbolComment">""</v>

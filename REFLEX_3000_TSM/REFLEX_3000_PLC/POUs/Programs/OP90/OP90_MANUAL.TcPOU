@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP90_MANUAL" Id="{19348f74-d561-41d1-b15d-f85ee9af621f}" SpecialFunc="None">
+  <POU Name="OP90_MANUAL" Id="{3d7e9d37-61b3-4758-81d2-0eee940cfc69}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP90_MANUAL
 VAR
 // VISION
@@ -146,13 +146,11 @@ VAR
 
 	Temp3: BOOL;
 	Temp4: BOOL;
+	OP90_MOVER_HOME: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-MACHINE_ENABLE:= OperationEnable ;
-
-IF MANUAL_SELECTED THEN
+      <ST><![CDATA[IF OP90_MANUAL_SELECTED THEN
 	
 OP90_M_VISIN1_LGT								:=	OP90_H_VISIN1_LGT; 		 // Q400.0 VISION 1 MANUAL ON
 OP90_M_VISIN2_LGT								:=	OP90_H_VISIN2_LGT; 	 	 // Q400.1 VISION 2 MANUAL ON
@@ -431,17 +429,17 @@ END_IF
 // CYLINDER FUNTIONAL BLOCK
 
 OP90_LH_GRIPPER(													// OP90_LH_GRIPPER_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 									
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 									
 	Sensor1:= I90_RET_LH_GRIPR_CYL_CLSE_I1200_0,                                             
-	Sensor2:= I90_RET_LH_GRIPR_CYL_OPN_I1200_1,
+	Sensor2:= I90_RET_LH_GRIPR_CYL_OPN_I1200_1 OR OP90_LH_GRP_BYPASS,
 	ManualPB1:= OP90_M_LH_GRP_MANUALPB1, 
 	ManualPB2:= OP90_M_LH_GRP_MANUALPB2, 
 	AutoCmd1:= OP90_A_LH_GRP_AUTCMD1, 
 	AutoCmd2:= OP90_A_LH_GRP_AUTCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:=1, 
 	SafeWork:=1, 
 	HomingCmd1:= OP90_LH_GRP_HOMING1, 
@@ -457,7 +455,7 @@ OP90_LH_GRIPPER(													// OP90_LH_GRIPPER_CYLINDER_FB
 	AlarmSolenoid1=> OP90_LH_GRIPPER_A3, 
 	AlarmSolenoid2=> OP90_LH_GRIPPER_A4, 
 	AllSignal=> OP90_LH_GRIPPER_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.0, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -466,17 +464,17 @@ OP90_LH_GRIPPER(													// OP90_LH_GRIPPER_CYLINDER_FB
 	
 	
 OP90_RH_GRIPPER(													//OP90_RH_GRIPPER_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
 	Sensor1:= I90_RET_RH_GRIPR_CYL_CLSE_I1200_2, 
-	Sensor2:= I90_RET_RH_GRIPR_CYL_OPN_I1200_3, 
+	Sensor2:= I90_RET_RH_GRIPR_CYL_OPN_I1200_3 OR OP90_RH_GRP_BYPASS, 
 	ManualPB1:= OP90_M_RH_GRP_MANUALPB1, 
 	ManualPB2:= OP90_M_RH_GRP_MANUALPB2, 
 	AutoCmd1:= OP90_A_RH_GRP_AUTCMD1, 
 	AutoCmd2:= OP90_A_RH_GRP_AUTCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	HomingCmd1:= OP90_RH_GRP_HOMING1, 
@@ -492,7 +490,7 @@ OP90_RH_GRIPPER(													//OP90_RH_GRIPPER_CYLINDER_FB
 	AlarmSolenoid1=> OP90_RH_GRIPPER_A3, 
 	AlarmSolenoid2=> OP90_RH_GRIPPER_A4, 
 	AllSignal=> OP90_RH_GRIPPER_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.1, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -501,22 +499,22 @@ OP90_RH_GRIPPER(													//OP90_RH_GRIPPER_CYLINDER_FB
 
 //OP90_POS1_LCK_CYLINDER_SAFE_WRK/HOME
 	
-	OP90_POS1_LCK_CYL.SafeWork	:= OP90_POS_SLIDE_CYL.Sensor2;
+	OP90_POS1_LCK_CYL.SafeWork	:= OP90_POS_SLIDE_CYL.Sensor2 OR OP90_POS_SLIDE_CYL.Sensor1;
 
 OP90_POS1_LCK_CYL(														//OP90_POS1_LCK_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= , 												//O90_POS_LOCK_CYL1_VLVE_1_Q1240_4
-	Sensor2:= O90_POS_LOCK_CYL1_VLVE_2_Q1240_5, 
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:= NOT O90_POS_LOCK_CYL2_VLVE_2_Q1240_7, 												//O90_POS_LOCK_CYL1_VLVE_1_Q1240_4
+	Sensor2:= O90_POS_LOCK_CYL2_VLVE_2_Q1240_7, 
 	ManualPB1:= OP90_M_POS1_LCK_HOME, 
 	ManualPB2:= OP90_M_POS1_LCK_WORK, 
 	AutoCmd1:= , 
 	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE AND Temp3, 
+	OperationEnable:= OperationEnable AND Temp3, 
 	SafeHome:= TRUE, 
-	SafeWork:= TRUE , 
+	SafeWork:= , 
 	HomingCmd1:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
@@ -530,7 +528,7 @@ OP90_POS1_LCK_CYL(														//OP90_POS1_LCK_CYLINDER_FB
 	AlarmSolenoid1=> OP90_POS1_LCK_CYL_A3, 
 	AlarmSolenoid2=> OP90_POS1_LCK_CYL_A4, 
 	AllSignal=> OP90_POS1_LCK_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=>OP90A_CYLINDER_ERR.2 , 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -539,22 +537,22 @@ OP90_POS1_LCK_CYL(														//OP90_POS1_LCK_CYLINDER_FB
 
 //OP90_POS2_LCK_CYLINDER_SAFE_WRK/HOME
 	
-	OP90_POS2_LCK_CYL.SafeWork	:= OP90_POS_SLIDE_CYL.Sensor1;	
+	OP90_POS2_LCK_CYL.SafeWork	:= OP90_POS_SLIDE_CYL.Sensor2 OR OP90_POS_SLIDE_CYL.Sensor1;	
 	
 OP90_POS2_LCK_CYL(														//OP90_OP90_POS2_LCK_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= , 													//O90_POS_LOCK_CYL2_VLVE_1_Q1240_6
-	Sensor2:= O90_POS_LOCK_CYL2_VLVE_2_Q1240_7, 
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:= NOT O90_POS_LOCK_CYL1_VLVE_2_Q1240_5, 													//O90_POS_LOCK_CYL2_VLVE_1_Q1240_6
+	Sensor2:= O90_POS_LOCK_CYL1_VLVE_2_Q1240_5, 
 	ManualPB1:= OP90_M_POS2_LCK_HOME, 
 	ManualPB2:= OP90_M_POS2_LCK_WORK, 
 	AutoCmd1:= , 
 	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE AND Temp3, 
+	OperationEnable:= OperationEnable AND Temp3, 
 	SafeHome:= TRUE, 
-	SafeWork:=1 , 
+	SafeWork:=, 
 	HomingCmd1:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
@@ -568,7 +566,7 @@ OP90_POS2_LCK_CYL(														//OP90_OP90_POS2_LCK_CYLINDER_FB
 	AlarmSolenoid1=> OP90_POS2_LCK_CYL_A3, 
 	AlarmSolenoid2=> OP90_POS2_LCK_CYL_A4, 
 	AllSignal=> OP90_POS2_LCK_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=>OP90A_CYLINDER_ERR.3 , 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -580,19 +578,19 @@ OP90_POS2_LCK_CYL(														//OP90_OP90_POS2_LCK_CYLINDER_FB
 	OP90_POS_SLIDE_CYL.SafeWork := OP90_POS2_LCK_CYL.Sensor1 AND OP90_POS1_LCK_CYL.Sensor1;
 	
 OP90_POS_SLIDE_CYL(													//OP90_POS_SLIDE_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I90_POSTN_SLIDE_CYL_REV_I1200_4, 
-	Sensor2:= I90_POSTN_SLIDE_CYL_FWD_I1200_5, 
+	Auto:= OP90_AUTO_SELECTED OR OP90_STEP_SELECTED, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:= I90_POSTN_SLIDE_CYL_FWD_I1200_5, 
+	Sensor2:= I90_POSTN_SLIDE_CYL_REV_I1200_4, 
 	ManualPB1:= OP90_M_MVE_POS1, 
 	ManualPB2:= OP90_M_MVE_POS2, 
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:=1 , 
-	SafeWork:=1 , 
+	AutoCmd1:= OP90_POS_SLIDE_CYL.auto AND OP90_POS1_V6_3, 
+	AutoCmd2:= OP90_POS_SLIDE_CYL.auto AND OP90_POS2_V7_89, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:=1, 
+	SafeWork:=1, 
 	HomingCmd1:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
@@ -606,7 +604,7 @@ OP90_POS_SLIDE_CYL(													//OP90_POS_SLIDE_CYLINDER_FB
 	AlarmSolenoid1=> OP90_POS_SLIDE_CYL_A3, 
 	AlarmSolenoid2=> OP90_POS_SLIDE_CYL_A4, 
 	AllSignal=> OP90_POS_SLIDE_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.4, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -615,23 +613,23 @@ OP90_POS_SLIDE_CYL(													//OP90_POS_SLIDE_CYLINDER_FB
 
 //OP90_SUP_HORZP1_CYLINDER_SAFE_WRK/HOME
 	OP90_SUP_HORZP1_CYL.SafeHome := OP90_SUP_VERTP1_CYL.Sensor1;
-	OP90_SUP_HORZP1_CYL.SafeWork := OP90_SUP_VERTP1_CYL.Sensor1 AND OP90_MOVER_HOME ;
+	OP90_SUP_HORZP1_CYL.SafeWork := OP90_SUP_VERTP1_CYL.Sensor1;(* AND OP90_MOVER_HOME ;*)
 	
 OP90_SUP_HORZP1_CYL(													//OP90_SUP_HORZP1_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
 	Sensor1:= I90_LH_MOVR_SUP_HORZ_CYL_REV_I1201_0, 
 	Sensor2:= I90_LH_MOVR_SUP_HORZ_CYL_FWD_I1201_1, 
 	ManualPB1:= OP90_M_MVR_SUP_HORZP1_HOME, 	
 	ManualPB2:= OP90_M_MVR_SUP_HORZP1_WRK, 	
 	AutoCmd1:= OP90_A_MVR_SUP_HORZP1_HME, 
 	AutoCmd2:= OP90_A_MVR_SUP_HORZP1_WRK, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
-	HomingCmd1:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= OP90_SUP_HORZP1_CYL_HOME1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -644,7 +642,7 @@ OP90_SUP_HORZP1_CYL(													//OP90_SUP_HORZP1_CYLINDER_FB
 	AlarmSolenoid1=> OP90_SUP_HORZP1_CYL_A3, 
 	AlarmSolenoid2=> OP90_SUP_HORZP1_CYL_A4, 
 	AllSignal=> OP90_SUP_HORZP1_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.5, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -657,20 +655,20 @@ OP90_SUP_HORZP1_CYL(													//OP90_SUP_HORZP1_CYLINDER_FB
 	OP90_SUP_VERTP1_CYL.SafeWork := OP90_SUP_HORZP1_CYL.Sensor1 OR OP90_SUP_HORZP1_CYL.Sensor2;
 
 OP90_SUP_VERTP1_CYL(												//OP90_SUP_VERTP1_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I90_LH_MOVR_SUP_VERT_CYL_DWN_I1200_6, 
-	Sensor2:= I90_LH_MOVR_SUP_VERT_CYL_UP_I1200_7, 
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:=  I90_RH_MOVR_SUP_VERT_CYL_DWN_I1201_2, 
+	Sensor2:=  I90_RH_MOVR_SUP_VERT_CYL_UP_I1201_3, 
 	ManualPB1:= OP90_M_MVR_SUP_VERTP1_HOME,	 
 	ManualPB2:= OP90_M_MVR_SUP_VERTP1_WRK,	 
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
-	HomingCmd1:= , 
+	AutoCmd1:= OP90_A_MVR_SUP_VERTP1_HME, 
+	AutoCmd2:= OP90_A_MVR_SUP_VERTP1_WRK, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= OP90_SUP_VERTP1_CYL_HOME1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -683,7 +681,7 @@ OP90_SUP_VERTP1_CYL(												//OP90_SUP_VERTP1_CYLINDER_FB
 	AlarmSolenoid1=> OP90_SUP_VERTP1_CYL_A3, 
 	AlarmSolenoid2=> OP90_SUP_VERTP1_CYL_A4, 
 	AllSignal=> OP90_SUP_VERTP1_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.6, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -692,23 +690,23 @@ OP90_SUP_VERTP1_CYL(												//OP90_SUP_VERTP1_CYLINDER_FB
 
 //OP90_SUP_HORZP2_CYLINDER_SAFE_WRK/HOME
 	OP90_SUP_HORZP2_CYL.SafeHome := OP90_SUP_VERTP2_CYL.Sensor1;
-	OP90_SUP_HORZP2_CYL.SafeWork := OP90_SUP_VERTP2_CYL.Sensor1 AND OP90_MOVER_HOME ;
+	OP90_SUP_HORZP2_CYL.SafeWork := OP90_SUP_VERTP2_CYL.Sensor1;(* AND OP90_MOVER_HOME ;*)
 	
 OP90_SUP_HORZP2_CYL(															//OP90_SUP_HORZP2_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
 	Sensor1:= I90_RH_MOVR_SUP_HORZ_CYL_REV_I1201_4, 
 	Sensor2:= I90_RH_MOVR_SUP_HORZ_CYL_FWD_I1201_5, 
 	ManualPB1:= OP90_M_MVR_SUP_HORZP2_HOME,
 	ManualPB2:= OP90_M_MVR_SUP_HORZP2_WRK, 
 	AutoCmd1:= OP90_A_MVR_SUP_HORZP2_HME,  
 	AutoCmd2:= OP90_A_MVR_SUP_HORZP2_WRK,  
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
-	HomingCmd1:= , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= OP90_SUP_HORZP2_CYL_HOME1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -721,7 +719,7 @@ OP90_SUP_HORZP2_CYL(															//OP90_SUP_HORZP2_CYLINDER_FB
 	AlarmSolenoid1=> OP90_SUP_HORZP2_CYL_A3, 
 	AlarmSolenoid2=> OP90_SUP_HORZP2_CYL_A4, 
 	AllSignal=> OP90_SUP_HORZP2_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=>OP90A_CYLINDER_ERR.7 , 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -734,20 +732,20 @@ OP90_SUP_HORZP2_CYL(															//OP90_SUP_HORZP2_CYLINDER_FB
 	OP90_SUP_VERTP2_CYL.SafeWork := OP90_SUP_HORZP2_CYL.Sensor1 OR OP90_SUP_HORZP2_CYL.Sensor2;
 	
 OP90_SUP_VERTP2_CYL(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I90_RH_MOVR_SUP_VERT_CYL_DWN_I1201_2, 
-	Sensor2:= I90_RH_MOVR_SUP_VERT_CYL_UP_I1201_3, 
+	Auto:= OP90_AUTO_RUNNING OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:= I90_LH_MOVR_SUP_VERT_CYL_DWN_I1200_6,
+	Sensor2:= I90_LH_MOVR_SUP_VERT_CYL_UP_I1200_7, 
 	ManualPB1:= OP90_M_MVR_SUP_VERTP2_HOME,
 	ManualPB2:= OP90_M_MVR_SUP_VERTP2_WRK, 
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
-	HomingCmd1:= , 
+	AutoCmd1:= OP90_A_MVR_SUP_VERTP2_HME, 
+	AutoCmd2:= OP90_A_MVR_SUP_VERTP2_WRK, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
+	HomingCmd1:= OP90_SUP_VERTP2_CYL_HOME1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -760,7 +758,7 @@ OP90_SUP_VERTP2_CYL(
 	AlarmSolenoid1=> OP90_SUP_VERTP2_CYL_A3, 
 	AlarmSolenoid2=> OP90_SUP_VERTP2_CYL_A4, 
 	AllSignal=> OP90_SUP_VERTP2_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.8, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -768,33 +766,33 @@ OP90_SUP_VERTP2_CYL(
 	Status:= OP90_SUP_VERTP2_CYL_STUS);
 	
 OP90_LH_REJP1_CYL(														//OP90_LH_REJP1_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I90_LH1_REJ_SLIDE_REV_I1210_0, 
-	Sensor2:= I90_LH1_REJ_SLIDE_FWD_I1210_1, 
+	Auto:= OP90_AUTO_SELECTED OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:= I90_LH1_REJ_SLIDE_FWD_I1210_1, 
+	Sensor2:= I90_LH1_REJ_SLIDE_REV_I1210_0 , 
 	ManualPB1:= OP90_M_LH_REJP1_HOME, 
 	ManualPB2:= OP90_M_LH_REJP1_WRK, 	
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= TRUE, 
-	SafeWork:= TRUE, 
+	AutoCmd1:= OP90_A_LH_REJP1_HOME, 
+	AutoCmd2:= OP90_A_LH_REJP1_WORK, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= 1, 
+	SafeWork:= 1, 
 	HomingCmd1:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5, 
-	Solenoid1=> O90_LH1_REJ_SLIDE_REV_Q1250_0, 
-	Solenoid2=> O90_LH1_REJ_SLIDE_FWD_Q1250_1 , 
+	Solenoid1=> O90_LH1_REJ_SLIDE_FWD_Q1250_1, 
+	Solenoid2=> O90_LH1_REJ_SLIDE_REV_Q1250_0, 
 	AlarmSensor1=> OP90_LH_REJP1_CYL_A1, 
 	AlarmSensor2=> OP90_LH_REJP1_CYL_A2, 
 	AlarmSolenoid1=> OP90_LH_REJP1_CYL_A3, 
 	AlarmSolenoid2=> OP90_LH_REJP1_CYL_A4, 
 	AllSignal=> OP90_LH_REJP1_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.9, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -802,33 +800,33 @@ OP90_LH_REJP1_CYL(														//OP90_LH_REJP1_CYLINDER_FB
 	Status:= OP90_LH_REJP1_CYL_STUS);
 	
 OP90_RH_REJP1_CYL(													//OP90_RH_REJP1_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I90_RH1_REJ_SLIDE_REV_I1210_2, 
-	Sensor2:= I90_RH1_REJ_SLIDE_FWD_I1210_3, 
+	Auto:= OP90_AUTO_SELECTED OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:= I90_RH1_REJ_SLIDE_FWD_I1210_3, 
+	Sensor2:= I90_RH1_REJ_SLIDE_REV_I1210_2, 
 	ManualPB1:= OP90_M_RH_REJP1_HOME, 
 	ManualPB2:= OP90_M_RH_REJP1_WRK,  
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= TRUE, 
-	SafeWork:= TRUE, 
+	AutoCmd1:= OP90_A_RH_REJP1_HOME, 
+	AutoCmd2:= OP90_A_RH_REJP1_WORK, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= 1, 
+	SafeWork:= 1, 
 	HomingCmd1:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5, 
-	Solenoid1=> O90_RH1_REJ_SLIDE_REV_Q1250_2, 
-	Solenoid2=> O90_RH1_REJ_SLIDE_FWD_Q1250_3 , 
+	Solenoid1=> O90_RH1_REJ_SLIDE_FWD_Q1250_3, 
+	Solenoid2=> O90_RH1_REJ_SLIDE_REV_Q1250_2, 
 	AlarmSensor1=> OP90_RH_REJP1_CYL_A1, 
 	AlarmSensor2=> OP90_RH_REJP1_CYL_A2, 
 	AlarmSolenoid1=> OP90_RH_REJP1_CYL_A3, 
 	AlarmSolenoid2=> OP90_RH_REJP1_CYL_A4, 
 	AllSignal=> OP90_RH_REJP1_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.10, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -836,19 +834,19 @@ OP90_RH_REJP1_CYL(													//OP90_RH_REJP1_CYLINDER_FB
 	Status:= OP90_RH_REJP1_CYL_STUS);
 	
 OP90_LH_REJP2_CYL(														//OP90_LH_REJP2_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I90_LH2_REJ_SLIDE_REV_I1210_4, 
-	Sensor2:= I90_LH2_REJ_SLIDE_FWD_I1210_5, 
+	Auto:= OP90_AUTO_SELECTED OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
+	Sensor1:= I90_LH2_REJ_SLIDE_REV_I1210_4 , 
+	Sensor2:= I90_LH2_REJ_SLIDE_FWD_I1210_5 , 
 	ManualPB1:= OP90_M_LH_REJP2_HOME, 
 	ManualPB2:= OP90_M_LH_REJP2_WRK,  
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= TRUE, 
-	SafeWork:= TRUE, 
+	AutoCmd1:= OP90_A_LH_REJP2_HOME, 
+	AutoCmd2:= OP90_A_LH_REJP2_WORK, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:=1 , 
+	SafeWork:= 1, 
 	HomingCmd1:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
@@ -856,13 +854,13 @@ OP90_LH_REJP2_CYL(														//OP90_LH_REJP2_CYLINDER_FB
 	TimeOut2:= 5, 
 	TimeOut3:= 5, 
 	Solenoid1=> O90_LH2_REJ_SLIDE_REV_Q1250_6, 
-	Solenoid2=> O90_LH2_REJ_SLIDE_FWD_Q1250_7 , 
+	Solenoid2=>  O90_LH2_REJ_SLIDE_FWD_Q1250_7, 
 	AlarmSensor1=> OP90_LH_REJP2_CYL_A1, 
 	AlarmSensor2=> OP90_LH_REJP2_CYL_A2, 
 	AlarmSolenoid1=> OP90_LH_REJP2_CYL_A3, 
 	AlarmSolenoid2=> OP90_LH_REJP2_CYL_A4, 
 	AllSignal=> OP90_LH_REJP2_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=>OP90A_CYLINDER_ERR.11 , 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -870,19 +868,19 @@ OP90_LH_REJP2_CYL(														//OP90_LH_REJP2_CYLINDER_FB
 	Status:= OP90_LH_REJP2_CYL_STUS);
 	
 OP90_RH_REJP2_CYL(															//OP90_RH_REJP2_CYLINDER_FB
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP90_AUTO_SELECTED OR OP90_STEP_RUNNING, 
+	Manual:= OP90_MANUAL_SELECTED, 
+	ErrorActive:= OP90_ERR, 
+	ResetPB:= OP90_RESET_PB, 
 	Sensor1:= I90_RH2_REJ_SLIDE_REV_I1210_6, 
 	Sensor2:= I90_RH2_REJ_SLIDE_FWD_I1210_7, 
 	ManualPB1:= OP90_M_RH_REJP2_HOME, 
 	ManualPB2:= OP90_M_RH_REJP2_WRK,  
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= TRUE, 
-	SafeWork:= TRUE, 
+	AutoCmd1:= OP90_A_RH_REJP2_HOME, 
+	AutoCmd2:= OP90_A_RH_REJP2_WORK, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= 1, 
+	SafeWork:= 1, 
 	HomingCmd1:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
@@ -890,13 +888,13 @@ OP90_RH_REJP2_CYL(															//OP90_RH_REJP2_CYLINDER_FB
 	TimeOut2:= 5, 
 	TimeOut3:= 5, 
 	Solenoid1=> O90_RH2_REJ_SLIDE_REV_Q1251_0, 
-	Solenoid2=>O90_RH2_REJ_SLIDE_FWD_Q1251_1 , 
+	Solenoid2=> O90_RH2_REJ_SLIDE_FWD_Q1251_1, 
 	AlarmSensor1=> OP90_RH_REJP2_CYL_A1, 
 	AlarmSensor2=> OP90_RH_REJP2_CYL_A2, 
 	AlarmSolenoid1=> OP90_RH_REJP2_CYL_A3, 
 	AlarmSolenoid2=> OP90_RH_REJP2_CYL_A4, 
 	AllSignal=> OP90_RH_REJP2_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP90A_CYLINDER_ERR.12, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
@@ -905,48 +903,8 @@ OP90_RH_REJP2_CYL(															//OP90_RH_REJP2_CYLINDER_FB
 ]]></ST>
     </Implementation>
     <LineIds Name="OP90_MANUAL">
-      <LineId Id="1096" Count="1" />
-      <LineId Id="3" Count="144" />
-      <LineId Id="891" Count="0" />
-      <LineId Id="148" Count="5" />
-      <LineId Id="902" Count="0" />
-      <LineId Id="155" Count="4" />
-      <LineId Id="893" Count="0" />
-      <LineId Id="160" Count="4" />
-      <LineId Id="901" Count="0" />
-      <LineId Id="166" Count="4" />
-      <LineId Id="894" Count="0" />
-      <LineId Id="171" Count="34" />
-      <LineId Id="895" Count="0" />
-      <LineId Id="206" Count="10" />
-      <LineId Id="896" Count="0" />
-      <LineId Id="217" Count="109" />
-      <LineId Id="903" Count="3" />
-      <LineId Id="331" Count="33" />
-      <LineId Id="907" Count="3" />
-      <LineId Id="369" Count="33" />
-      <LineId Id="911" Count="3" />
-      <LineId Id="407" Count="33" />
-      <LineId Id="915" Count="3" />
-      <LineId Id="445" Count="33" />
-      <LineId Id="919" Count="3" />
-      <LineId Id="483" Count="34" />
-      <LineId Id="923" Count="3" />
-      <LineId Id="522" Count="33" />
-      <LineId Id="927" Count="3" />
-      <LineId Id="560" Count="34" />
-      <LineId Id="931" Count="3" />
-      <LineId Id="599" Count="29" />
-      <LineId Id="935" Count="3" />
-      <LineId Id="633" Count="29" />
-      <LineId Id="939" Count="3" />
-      <LineId Id="667" Count="29" />
-      <LineId Id="943" Count="3" />
-      <LineId Id="701" Count="29" />
-      <LineId Id="947" Count="3" />
-      <LineId Id="735" Count="12" />
+      <LineId Id="6" Count="749" />
       <LineId Id="2" Count="0" />
-      <LineId Id="1095" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

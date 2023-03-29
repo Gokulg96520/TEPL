@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <Task Name="Robot_Comm_Task" Id="{25e97632-4fcd-4ca2-b266-770cea728a08}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>1000</CycleTime>
+    <Priority>19</Priority>
+    <PouCall>
+      <Name>Robot_232_Comm_Prgrm</Name>
+    </PouCall>
+    <TaskFBGuid>{bd422e45-4cff-4e7a-8ea7-56f750fe73e0}</TaskFBGuid>
+    <Fb_init>{54556840-e649-43b8-a043-e6de58cfd440}</Fb_init>
+    <Fb_exit>{ba994c58-f3e8-44da-8853-7952f8480755}</Fb_exit>
+    <CycleUpdate>{9ab3afb0-e703-4117-884b-fe5fd55c6133}</CycleUpdate>
+    <PostCycleUpdate>{def13db2-5609-4441-9992-eeaa358f3617}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

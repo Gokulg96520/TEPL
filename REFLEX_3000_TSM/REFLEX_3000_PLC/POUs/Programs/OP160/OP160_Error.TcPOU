@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_Error" Id="{1a2bea9f-f3cc-493a-8586-a5cd09cde2e7}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_Error
+VAR
+	Step_No: INT;
+	AutoStepErr_1: TON;
+	OP160_StepErr1: TON;
+	OP160_StepErr2: TON;
+	bdone: BOOL;
+	i: INT;
+	j: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bdone THEN
+	bdone:=TRUE;
+FOR i:=1500 TO 1600 BY 1 DO 
+	
+IF berror[i] THEN
+	OP160_ErrorActive:=TRUE;
+END_IF
+END_FOR
+bdone:=FALSE;
+END_IF
+
+IF OP130_HMI_Reset OR Servo_Reset THEN
+	FOR j:=1500 TO 1600 BY 1 DO 
+		
+	
+	berror[j]:=FALSE;
+	OP160_ErrorActive:=FALSE;
+	
+	END_FOR
+	temp:=false;
+END_IF
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_Error">
+      <LineId Id="56" Count="19" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

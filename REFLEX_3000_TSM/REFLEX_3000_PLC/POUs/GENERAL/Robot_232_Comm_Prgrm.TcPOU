@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Robot_232_Comm_Prgrm" Id="{91608d6d-309f-4344-b465-b63104407ab5}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM Robot_232_Comm_Prgrm
+VAR
+	BioMetric_In_All AT %I*: EL6inData22B;
+	BioMetric_Out_All AT %Q*: EL6outData22B;	
+	Bio_Metric		:SerialLineControl;
+	Error			: BOOL;
+	Error_ID		: ComError_t;
+	
+	Comm_Delay   : TON;
+	Initial		 : BOOL;
+	bSendDataRisingEdge: R_TRIG;
+	bSendData: BOOL;
+	fbSendString : SendString;
+	sSendStringData : STRING;
+	bSendBusy  : BOOL;
+	sSendError : ComError_t;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Comm_Delay(IN:= NOT Initial,PT:=T#15S);
+
+OP10_ROBO();
+OP160_Robo_Byte_Mapping();
+OP160_Robo_Inputs();
+OP120_Robo_Byte_Mapping();
+OP120_Robo_Inputs();
+
+IF Comm_Delay.Q THEN
+	Initial:=1;
+END_IF
+
+IF Initial THEN
+	Bio_Metric(Mode:= , 
+	pComIn:=(ADR(BioMetric_In_All)) , 
+	pComOut:=(ADR(BioMetric_Out_All)) , 
+	SizeComIn:=SIZEOF(BioMetric_In_All), 
+	Error=> Error, 
+	ErrorID=>Error_ID , 
+	TxBuffer:= SerialComm.TxBuffer_1, 
+	RxBuffer:=SerialComm.RxBuffer_1 );
+END_IF
+
+bSendDataRisingEdge(CLK:=bSendData);
+
+IF bSendDataRisingEdge.Q THEN
+
+	fbSendString(SendString:= sSendStringData,
+				TXBuffer:=SerialComm.TxBuffer_1,
+				Busy=>bSendBusy,
+				Error=>sSendError
+				);
+
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="Robot_232_Comm_Prgrm">
+      <LineId Id="32" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="79" Count="1" />
+      <LineId Id="33" Count="13" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="48" Count="10" />
+      <LineId Id="47" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

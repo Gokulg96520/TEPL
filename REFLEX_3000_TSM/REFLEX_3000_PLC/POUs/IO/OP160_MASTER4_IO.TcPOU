@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP160_MASTER4_IO" Id="{cb9c578b-ba92-47ec-9483-759cee649640}" SpecialFunc="None">
+  <POU Name="OP160_MASTER4_IO" Id="{97038f27-6e2d-456b-a4a2-f0a6494a05a7}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP160_MASTER4_IO
 VAR
 	OP160_MAS4_PORT1_BYTE1_DI_MODULE_1 AT %I* : BYTE;

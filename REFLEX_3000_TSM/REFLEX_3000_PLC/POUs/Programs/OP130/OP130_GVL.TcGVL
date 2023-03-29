@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP130_GVL" Id="{b4f1e74d-c701-494b-8f11-30febf45e2e2}">
+  <GVL Name="OP130_GVL" Id="{674de8d5-4b6f-4d27-805b-494b3abc19cf}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 	//GENERAL
@@ -30,7 +30,11 @@ OP130_AutoSeq:				INT;
 OP130_LH_AutoSeq: 			INT;
 OP130_RH_AutoSeq: 			INT;
 OP130_Homing_Seq:			INT;
+OP130_RH_Homing_Seq:		INT;
+OP130_STN_MOVER				: INT;
 OP130_Dry_Run:				BOOL;
+OP130_LH_HomeOK:			BOOL;
+OP130_RH_HomeOK:			BOOL;
 //Automatic_Run:				BOOL;
 OP130_Prev_Stat_Operation_Completed: BOOL;
 OP130_Prev_Comp_Status: INT;
@@ -62,8 +66,8 @@ CR130_LH_Rotart_Cyl_Status:	 INT;
 
 //Manual Control Inputs
 
-	CR130_LH_Rot_Cyl: Cylinder_Block;
-	CR130_RH_Rot_Cyl: Cylinder_Block;
+	CR130_LH_Rot_Cyl: Cylinder_Block_FOR_OP130;
+	CR130_RH_Rot_Cyl: Cylinder_Block_FOR_OP130;
 	SR130_LH_Vert_Servo: FB_Axis;
 	SR130_RH_Vert_Servo: FB_Axis;
 	
@@ -74,10 +78,12 @@ CR130_LH_Rotart_Cyl_Status:	 INT;
 	SR130_LH_Servo_Control:Servo_Control;
 	SR130_RH_Servo_Control:Servo_Control;
 	SR130_Stepper_Control:Servo_Control;
+
 	SR130_stManualModeAxis_LH_Vert_Servo:stManualModeAxis;
 	SR130_stManualModeAxis_RH_Vert_Servo:stManualModeAxis;
 	SR130_stManualModeAxis_Clamp_Stepper:stManualModeAxis;
-
+	SR130_LH_Abs_Move_Start:BOOL;
+	SR130_RH_Abs_Move_Start:BOOL;
 //HMI Tags(From HMI)
 OP130_HMI_AutoMode:						BOOL;
 OP130_HMI_ManualMOde:					BOOL;
@@ -90,9 +96,11 @@ OP130_HMI_RH_Rotary_Cyl_Work_PB:			BOOL;
 OP130_HMI_Cycle_Start:					BOOL;
 OP130_HMI_Reset:						BOOL;
 OP130_HMI_Homing:						BOOL;
-SR130_LH_Vert_Servo_Max_Lim:					BOOL;
-SR130_RH_Vert_Servo_Max_Lim:					BOOL;
-SR130_Clm_Vert_Max_Lim:					BOOL;
+
+SR130_RH_Vert_Servo_Max_Lim:					LREAL;
+
+SR130_RH_Vert_Servo_Min_Lim:					LREAL;
+SR130_Clm_Vert_Max_Lim:					LREAL;
 
 
  
@@ -139,15 +147,7 @@ OP130_ErrorWord_2:								 DINT;
 
 //Recipe Tags
 
-	//LH Servo
-SR130_HMI_LH_Servo_Work_Position:			LREAL;
-SR130_HMI_LH_Servo_Work_Velocity:			LREAL;
-SR130_HMI_LH_Servo_Lock_Position:			LREAL;
-SR130_HMI_LH_Servo_Lock_Velocity:			LREAL;
-SR130_HMI_LH_Servo_Rotation_Position:		LREAL;
-SR130_HMI_LH_Servo_Rotation_Velocity:		LREAL;
-SR130_HMI_LH_Servo_Torque_Low_Limit:			LREAL;
-SR130_HMI_LH_Servo_Torque_High_Limit:			LREAL;
+	
 		//RH Servo
 SR130_HMI_RH_Servo_Work_Position:			LREAL;
 SR130_HMI_RH_Servo_Work_Velocity:			LREAL;
@@ -157,13 +157,49 @@ SR130_HMI_RH_Servo_Rotation_Position:		LREAL;
 SR130_HMI_RH_Servo_Rotation_Velocity:		LREAL;
 SR130_HMI_RH_Servo_Torque_Low_Limit:		LREAL;
 SR130_HMI_RH_Servo_Torque_High_Limit:		LREAL;
+SR130_HMI_RH_Servo_CylWork_Position:		LREAL;
+SR130_HMI_RH_Servo_CylWork_Velocity:		LREAL;
+SR130_HMI_RH_Servo_CylHome_Position:		LREAL;
+SR130_HMI_RH_Servo_CylHome_Velocity:		LREAL;
 
 OP130_Torque_Monitor_Time:TIME;
 
 
 
+
 	OP130_Cycle_Time_Start: BOOL;
 	OP130_Cycle_Time_Stop: BOOL;
+	
+	SR130_LH_Servo_Halt_Cmd:BOOL;
+	SR130_RH_Servo_Halt_Cmd:BOOL;
+OP130_STN_ENABLE: BOOL;
+	
+END_VAR
+VAR_GLOBAL PERSISTENT
+	// Servo
+SR130_HMI_Servo_Work_Position:			LREAL;
+SR130_HMI_Servo_Work_Velocity:			LREAL;
+SR130_HMI_Servo_Lock_Position:			LREAL;
+SR130_HMI_Servo_Lock_Velocity:			LREAL;
+SR130_HMI_Servo_Rotation_Position:		LREAL;
+SR130_HMI_Servo_Rotation_Velocity:		LREAL;
+SR130_HMI_Servo_Torque_Low_Limit:		LREAL;
+SR130_HMI_Servo_Torque_High_Limit:		LREAL;
+SR130_HMI_Servo_CylWork_Position:		LREAL;
+SR130_HMI_Servo_CylWork_Velocity:		LREAL;
+SR130_HMI_Servo_CylHome_Position:		LREAL;
+SR130_HMI_Servo_CylHome_Velocity:		LREAL;
+SR130_LH_Vert_Servo_Max_Limit:			LREAL;
+SR130_LH_Vert_Servo_Min_Lim:			LREAL;
+SR130_Servo_Home_Position:				LREAL;
+SR130_Servo_Home_Velocity:				LREAL;
+
+//Torque limit
+
+OP130_HMI_Pull_LOw_Torque_Limit: INT;
+	OP130_HMI_Pull_High_Torque_Limit: INT;
+	OP130_HMI_Pull_Torque_Limit:LREAL;
+	
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

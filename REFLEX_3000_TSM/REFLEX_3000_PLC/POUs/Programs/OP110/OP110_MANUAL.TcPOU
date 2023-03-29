@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP110_MANUAL" Id="{f056707c-d34e-4c9e-8bc6-2110e376e7cf}" SpecialFunc="None">
+  <POU Name="OP110_MANUAL" Id="{7cbdcc3a-f387-4ff1-a476-b14a5e96bfb1}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP110_MANUAL
 VAR
 
@@ -55,23 +55,27 @@ OP110_VERT_SERVO_POSITION := SR20_Vert_servo.Actual_position;
 OP110_SERVO_POS_DONE	:= SR20_Vert_servo.bABS_Pos_done ;
 //SR20_Vert_servo.fTargetPosition := OP110_VERT_SERVO_TARGET;
 
-IF In_Range(SR20_Vert_servo_status.actualPosition,OP110_VERT_SERVO_SFE_WRK_POS,1) THEN
+IF In_Range(SR110_Vert_servo_status.actualPosition,OP110_VERT_SERVO_SFE_WRK_POS,1) THEN
 	OP110_SERVO_ON_SFE_WRK := TRUE;
 ELSE
 	OP110_SERVO_ON_SFE_WRK := FALSE;
 END_IF
 
-IF In_Range(SR20_Vert_servo_status.actualPosition,OP110_VERT_SERVO_HME_POS,1) THEN
+IF In_Range(SR110_Vert_servo_status.actualPosition,OP110_VERT_SERVO_HME_POS,1) THEN
 	OP110_SERVO_ON_HOME := TRUE;
 ELSE
 	OP110_SERVO_ON_HOME := FALSE;
 END_IF
 
-IF In_Range(SR20_Vert_servo_status.actualPosition,OP110_VERT_SERVO_WRK_POS,1) THEN
+IF In_Range(SR110_Vert_servo_status.actualPosition,OP110_VERT_SERVO_WRK_POS,2) THEN
 	OP110_SERVO_ON_WRK := TRUE;
 ELSE
 	OP110_SERVO_ON_WRK := FALSE;
 END_IF		
+
+OP110_VERT_SERVO_SFE_WRK_POS := OP110_HMI_Safe_Work;
+OP110_VERT_SERVO_HME_POS     := OP110_HMI_Safe_Home;
+OP110_VERT_SERVO_WRK_POS     := OP110_VERT_SERVO_WORK_POS;
 
 //SR20_Vert_servo_status.jogPos:=OP110_HMI_Jog_Pos;
 //SR20_Vert_servo_status.jogNeg:=OP110_HMI_Jog_Neg;
@@ -83,15 +87,17 @@ OP110_GVL.SR110_Vert_servo(
 	bEnable:=Servo_Enable, 
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:= OP110_ManualSelected OR MANUAL_SELECTED,
+	bManualMode:= OP110_ManualSelected AND MANUAL_SELECTED,
 	fHomePos:= , 
 	fOverride:= , 
-	fTargetPosition:= , 
-	fTargetVelocity:= , 
+	fTargetPosition:=SR110_Vert_servo_ctrl.Position , 
+	fTargetVelocity:=SR110_Vert_servo_ctrl.Velocity , 
 	fAcc:= , 
 	fDec:= ,
+	Servo_High_Limit:= OP110_HMI_High_Limit,	
+	Servo_Low_Limit:=  OP110_HMI_Low_Limit,	 
 	bmove_home:=SR110_Vert_servo_ctrl.Axis_Home_Cmd ,
-	baxis_in_home_pos=>SR20_Vert_servo_ctrl.Axis_In_Home ,
+	baxis_in_home_pos=>SR110_Vert_servo_ctrl.Axis_In_Home ,
 	Safe_move_Conditions:=Servo_Safety,
 	Axis:= SR110_Vert_servo_Axis , 
 	HME_WRITE_ADD:= 16#500E,	
@@ -120,23 +126,7 @@ IF MANUAL_SELECTED THEN
 END_IF]]></ST>
     </Implementation>
     <LineIds Name="OP110_MANUAL">
-      <LineId Id="3" Count="6" />
-      <LineId Id="131" Count="0" />
-      <LineId Id="10" Count="4" />
-      <LineId Id="130" Count="0" />
-      <LineId Id="15" Count="1" />
-      <LineId Id="127" Count="0" />
-      <LineId Id="17" Count="1" />
-      <LineId Id="128" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="129" Count="0" />
-      <LineId Id="20" Count="1" />
-      <LineId Id="125" Count="0" />
-      <LineId Id="22" Count="1" />
-      <LineId Id="126" Count="0" />
-      <LineId Id="24" Count="47" />
-      <LineId Id="109" Count="0" />
-      <LineId Id="72" Count="21" />
+      <LineId Id="3" Count="104" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

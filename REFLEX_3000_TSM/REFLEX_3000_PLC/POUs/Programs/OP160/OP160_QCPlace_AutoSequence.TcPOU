@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_QCPlace_AutoSequence" Id="{0c6b4028-9929-47fa-a20d-a4adf801917b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_QCPlace_AutoSequence
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+(*
+ CASE OP160_AutoPlaceSeq OF
+	 10: IF OP160_StartEnable THEN
+		 OP160_AutoPlaceSeq:=20;
+	 END_IF
+	 20:IF OP160_PartPicked AND OP160_StartEnable THEN
+		 OP160_AutoPlaceSeq:=30;
+	 END_IF
+	 30:IF OP160_StartEnable AND OP160_EO_QC_Place_Completed   THEN
+		 OP160_Part_Placed:=TRUE;
+		 
+		  OP160_AutoPlaceSeq:=40;
+	 END_IF
+	 
+	 40:IF OP160_StartEnable THEN
+		  OP160_Part_Placed:=FALSE;
+		  OP160_AutoPlaceSeq:=50;
+	 END_IF
+	 50:IF OP160_StartEnable THEN
+		 OP160_OperationCompleted:=TRUE;
+				 
+		  OP160_AutoPlaceSeq:=60;
+	 END_IF
+	 60:IF OP160_StartEnable THEN
+		 OP160_OperationCompleted:=FALSE;
+		 OP160_PartPicked:=FALSE;
+		 OP160_AutoPlaceSeq:=10;
+	 END_IF
+ END_CASE 
+*)]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_QCPlace_AutoSequence">
+      <LineId Id="5" Count="11" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="17" Count="1" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="21" Count="4" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="26" Count="3" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="54" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

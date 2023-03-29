@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP10A_Conveyor_Prog" Id="{5a028eb2-98a8-4b40-9947-d5db96723b9e}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP10A_Conveyor_Prog
+VAR
+	Conv_Cam_Step : INT;
+	Temp_Counter_LH : UINT;
+	Temp_Counter_RH : UINT;
+	Toggle_Pos : R_TRIG;
+	Toggle_Neg : F_TRIG;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE Conv_Cam_Step OF
+	10: 	OP10A_LH_Camera_OK :=0;
+            OP10A_LH_Camera_NOK:=0;
+	        OP10A_RH_Camera_OK :=0;
+	        OP10A_RH_Camera_NOK:=0;			
+			OP10A_Camera_Done	:=0;
+			//OP10A_LH_Clr_OK 		:=0;
+		   // OP10A_RH_Clr_OK 		:=0;		
+			//OP10A_LH_Size_OK		:=0;
+		    //OP10A_RH_Size_OK		:=0;	
+			Conv_Cam_Step		:=11;	
+	
+	11: IF (OP10A_Camera_Trigger AND (NOT OP10A_Camera_Done)) OR OP10A_Miss_Trigger THEN
+			OP10A_LH_Camera_Trigger:=1;
+			OP10A_RH_Camera_Trigger:=1;
+			Conv_Cam_Step		  :=15;	
+		END_IF
+
+	15:	IF Toggle_Pos.Q OR Toggle_Neg.Q THEN// (NOT OP10A_LH_Camera_Trigger) AND (NOT OP10A_RH_Camera_Trigger) THEN //(Temp_Counter_LH<OP10A_Camera_FB.OP10A_LH_Acquisition_ID AND Temp_Counter_RH<OP10A_Camera_FB.OP10A_RH_Acquisition_ID )THEN
+			OP10A_LH_Camera_Trigger:=0;
+			OP10A_RH_Camera_Trigger:=0;
+			OP10A_Camera_Trigger :=0;
+			OP10A_Miss_Trigger	:=0;
+			Conv_Cam_Step:=25;
+		END_IF  
+	   
+	25: IF OP10A_Camera_FB.OP10A_LH_Cam_Result[0]=1 AND OP10A_Camera_FB.OP10A_RH_Cam_Result[0]=1 THEN
+			OP10A_LH_Camera_OK:=1;
+			OP10A_RH_Camera_OK:=1;
+			Conv_Cam_Step    :=50;
+		ELSIF (OP10A_Camera_FB.OP10A_LH_Cam_Result[1]=1 OR OP10A_Camera_FB.OP10A_RH_Cam_Result[1]=1) THEN //AND ( OP10A_Camera_FB.OP10A_LH_Cam_Result[2]=1 AND OP10A_Camera_FB.OP10A_RH_Cam_Result[2]=1) THEN			
+			IF OP10A_Camera_FB.OP10A_LH_Cam_Result[0]=1 THEN
+				OP10A_LH_Camera_OK:=1;
+			END_IF
+			IF OP10A_Camera_FB.OP10A_RH_Cam_Result[0]=1 THEN
+				OP10A_RH_Camera_OK:=1;
+			END_IF
+			Conv_Cam_Step:=30;
+		END_IF	
+			
+   30: 	IF OP10A_Camera_FB.OP10A_LH_Cam_Result[1]=1 THEN
+	   		OP10A_LH_Camera_NOK:=1;
+  	    END_IF
+		IF OP10A_Camera_FB.OP10A_RH_Cam_Result[1]=1 THEN
+	   		OP10A_RH_Camera_NOK:=1;
+  	    END_IF
+		Conv_Cam_Step:=50;
+		
+   50:  OP10A_Camera_Done:=1;
+   		Temp_Counter_LH:=OP10A_Camera_FB.OP10A_LH_Acquisition_ID;
+		Temp_Counter_RH:=OP10A_Camera_FB.OP10A_RH_Acquisition_ID;
+		IF Conv_Step_no_10A>75 THEN
+			Conv_Cam_Step   :=10;
+			OP10A_Camera_Done:=0;
+		END_IF
+   	    
+END_CASE
+
+Toggle_Pos(CLK:=OP10A_Camera_FB.OP10A_LH_Inspection_Status.Inspection_Completed);
+Toggle_Neg(CLK:=OP10A_Camera_FB.OP10A_LH_Inspection_Status.Inspection_Completed);]]></ST>
+    </Implementation>
+    <LineIds Name="OP10A_Conveyor_Prog">
+      <LineId Id="3" Count="58" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

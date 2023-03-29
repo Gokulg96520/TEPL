@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP10_VARIABLE" Id="{260548e2-f0e9-4408-afba-f471bf03d2ef}">
+  <GVL Name="OP10_VARIABLE" Id="{4346a311-6177-4c40-8483-6b047fd92acd}">
     <Declaration><![CDATA[VAR_GLOBAL
 // FUNCTIONAL BLOCK
 									(*CYLINDER*)
@@ -23,17 +23,267 @@
 	OP10A_LH_REJ                                    : Cylinder_Block_HOMING;
 	OP10A_RH_REJ									: Cylinder_Block_HOMING;
 	OP10_BDY_SING_FRT                               : Cylinder_Block_HOMING;
-	OP10_BDY_SING_SEC								: Cylinder_Block_HOMING;	
+	OP10_BDY_SING_SEC								: Cylinder_Block_HOMING;
+
+
+// ROBO
+									(*OP10A*)
+	OP10A_ROBO_MODE_NO AT %Q*						: UINT;
+	OP10A_ROBO_VARIENT AT %Q*						: UINT	:=1;
+	OP10A_ROBO_STATUS								: OP10_ROBO_STUS;
+	OP10A_ROBO_CNTRL								: OP10_ROBO_CNTRL;
+	OP10A_GRP_STATUS								: OP10_GRP_STATUS;
+	OP10A_GRP_CNTRL									: OP10_GRP_CONTRL;								
+	OP10A_ROBO_PRGM_RST								: BOOL;
+    OP10A_A_BODY_READY_TO_PICK						: BOOL;
+    OP10A_A_PICK_PART_OK							: BOOL;
+    OP10A_A_PICK_PART_NOK                           : BOOL;
+    OP10A_A_CAMERA_OK                               : BOOL;
+    OP10A_A_CAMERA_NOK                              : BOOL;
+    OP10A_A_GRIPPER_ROTATE_COMPLETE                 : BOOL;
+    OP10A_A_READY_TO_INSERT_ORING                   : BOOL;
+    OP10A_A_ORING_INSERTION_DONE                    : BOOL;
+    OP10A_A_PLACE_IN_CONVEYOR                       : BOOL;
+    OP10A_A_PLACE_IN_REJECTION                      : BOOL;
+    OP10A_A_GRIPPER_OPEN                            : BOOL;
+    OP10A_A_GRIPPER_CLOSE                           : BOOL;
+    OP10A_BODY_READY_TO_PICK						: BOOL;
+    OP10A_PICK_PART_OK								: BOOL;
+    OP10A_PICK_PART_NOK                           	: BOOL;
+    OP10A_CAMERA_OK                               	: BOOL;
+    OP10A_CAMERA_NOK                              	: BOOL;
+    OP10A_GRIPPER_ROTATE_COMPLETE                 	: BOOL;
+    OP10A_READY_TO_INSERT_ORING                   	: BOOL;
+    OP10A_ORING_INSERTION_DONE                    	: BOOL;
+    OP10A_PLACE_IN_CONVEYOR                       	: BOOL;
+    OP10A_PLACE_IN_REJECTION                      	: BOOL;
+	OP10A_ROTATION_COMPLETE							: BOOL;
+	WITH_ORING_VARIIENT								: BOOL;
+    OP10A_GRIPPER_OPEN                            	: BOOL;
+    OP10A_GRIPPER_CLOSE                           	: BOOL;
+	OP10A_AUTO_ENABLE								: BOOL;
+	OP10A_START										: BOOL;
+	OP10A_STOP										: BOOL;
+	OP10A_STOP2										: BOOL;
+	OP10A_PRGM_RST									: BOOL;
+	OP10A_ERR_RST									: BOOL;
+	OP10A_CYCLE_STP									: BOOL;
+	OP10A_SERVO_OFF									: BOOL;
+	OP10A_SERVO_ON									: BOOL;
+	OP10A_OPERATION_ENABLE							: BOOL;
+	OP10A_MOVER_HOME								: BOOL;
+	OP10A_General_Output_reset						: BOOL;
+	OP10A_Machine_Lock								: BOOL;
+	OP10A_PLC_Heartbeat								: BOOL;
+	OP10A_Homing_Start								: BOOL;
+	OP10A_Pick_Zone_Safe							: BOOL;
+	OP10A_Camera_Zone_Safe							: BOOL;
+	OP10A_O_Ring_Zone_Safe							: BOOL;
+	OP10A_Place_Zone_Safe							: BOOL;
+	OP10A_Reject_Zone_Safe							: BOOL;
+	OP10A_Robot2_In_Pick_Sequence					: BOOL;
+	OP10_A_FRT_BDY_SING_WRK							: BOOL;
+	OP10_A_SEC_BDY_SING_WRK							: BOOL;
+	OP10_A_FRT_BDY_SING_HME							: BOOL;
+	OP10_A_SEC_BDY_SING_HME							: BOOL;
+	OP10A_Mirror_Auto_enable						: BOOL;
+	OP10A_Program_Execute							: BOOL;
+	OP10A_Program_Waiting							: BOOL;
+	OP10A_Program_Waiting2							: BOOL;
+	OP10A_Stop_Status								: BOOL;
+	OP10A_Program_Sel_enabled_OP					: BOOL;
+	OP10A_During_error								: BOOL;
+	OP10A_During_Cycle_Stop							: BOOL;
+	OP10A_Mirror_SRVO_Off							: BOOL;
+	OP10A_Servo_ON_OFF_Status						: BOOL;
+	OP10A_Auto_Operation_Enable						: BOOL;
+	OP10A_Moving_Home								: BOOL;
+	OP10A_Spare1									: BOOL;
+	OP10A_During_Machine_Lock						: BOOL;
+	OP10A_H_Error									: BOOL;
+	OP10A_L_Error									: BOOL;
+	OP10A_Caution									: BOOL;
+	OP10A_During_EMG_Stop							: BOOL;
+	OP10A_Teach_Mode								: BOOL;
+	OP10A_Auto_OP_Mode								: BOOL;
+	OP10A_Auto_Ext_Mode								: BOOL;
+	OP10A_TP_Enable									: BOOL;
+	OP10A_Heartbeat									: BOOL;
+	OP10A_Spare2									: BOOL;
+	OP10A_Rbt_In_Home								: BOOL;
+	OP10A_Rbt_In_Pick_Zone							: BOOL;
+	OP10A_Rbt_In_Camera_Zone						: BOOL;
+	OP10A_Rbt_In_O_Ring_Zone						: BOOL;
+	OP10A_Rbt_In_Place_Zone							: BOOL;
+	OP10A_Rbt_In_Reject_Zone						: BOOL;
+	OP10A_Spare7									: BOOL;
+	OP10A_Robot1_In_Pick_Sequence					: BOOL;
+	OP10A_Sequence_Running							: BOOL;
+	OP10A_Sequence_Completed						: BOOL;
+	OP10A_Part_Pick_Completed						: BOOL;
+	OP10A_Spare10									: BOOL;
+	OP10A_NOK_Part_Dropped							: BOOL;
+	OP10A_Spare11									: BOOL;
+	OP10A_Camera_Trigger							: BOOL;
+	OP10A_Spare12									: BOOL;
+	OP10A_O_Ring_Pick_Pos_Reached					: BOOL;
+	OP10A_Spare13									: BOOL;
+	OP10A_Part_Place_Conveyor						: BOOL;
+	OP10A_Spare5									: BOOL;
+	OP10A_Spare6									: BOOL;
+	OP10A_Step_Reached								: BOOL;
+	OP10A_StartOf_Sequence							: BOOL;
+	OP10A_ROBO_Gripper_Open							: BOOL;
+	OP10A_ROBO_Gripper_Close						: BOOL;
+	OP10A_Spare14									: BOOL;
+	OP10A_Spare15									: BOOL;
+	OP10A_Spare16									: BOOL;
+	OP10A_Spare17									: BOOL;
+	OP10A_Spare18									: BOOL;
+	OP10A_Spare19									: BOOL;
+	OP10A_Spare27									: BOOL;
+	OP10A_Spare26									: BOOL;
+	OP10A_CMP_PRS_ROBO								: BOOL;
+	OP10A_Spare24									: BOOL;
+	OP10A_Spare23									: BOOL;
+	OP10A_Spare22									: BOOL;
+	OP10A_Spare21									: BOOL;
+	OP10A_Spare20									: BOOL;
+
+	
+   								(*OP10B*)
+	OP10B_ROBO_MODE_NO AT %Q*						: UINT;
+	OP10B_ROBO_VARIENT AT %Q*						: UINT	:=1;
+	OP10B_ROBO_STATUS								: OP10_ROBO_STUS;
+	OP10B_GRP_STATUS								: OP10_GRP_STATUS;
+	OP10B_GRP_CNTRL									: OP10_GRP_CONTRL;							
+	OP10B_ROBO_CNTRL								: OP10_ROBO_CNTRL;
+	OP10B_ROBO_PRGM_RST								: BOOL;	
+    OP10B_A_BODY_READY_TO_PICK						: BOOL;
+    OP10B_A_PICK_PART_OK							: BOOL;
+    OP10B_A_PICK_PART_NOK                           : BOOL;
+    OP10B_A_CAMERA_OK                               : BOOL;
+    OP10B_A_CAMERA_NOK                              : BOOL;
+    OP10B_A_GRIPPER_ROTATE_COMPLETE                 : BOOL;
+    OP10B_A_READY_TO_INSERT_ORING                   : BOOL;
+    OP10B_A_ORING_INSERTION_DONE                    : BOOL;
+    OP10B_A_PLACE_IN_CONVEYOR                       : BOOL;
+    OP10B_A_PLACE_IN_REJECTION                      : BOOL;
+    OP10B_A_GRIPPER_OPEN                            : BOOL;
+    OP10B_A_GRIPPER_CLOSE                           : BOOL;
+	OP10B_ROTATION_COMPLETE							: BOOL;
+    OP10B_BODY_READY_TO_PICK						: BOOL;
+    OP10B_PICK_PART_OK								: BOOL;
+    OP10B_PICK_PART_NOK                           	: BOOL;
+    OP10B_CAMERA_OK                               	: BOOL;
+    OP10B_CAMERA_NOK                              	: BOOL;
+    OP10B_GRIPPER_ROTATE_COMPLETE                 	: BOOL;
+    OP10B_READY_TO_INSERT_ORING                   	: BOOL;
+    OP10B_ORING_INSERTION_DONE                    	: BOOL;
+    OP10B_PLACE_IN_CONVEYOR                       	: BOOL;
+    OP10B_PLACE_IN_REJECTION                      	: BOOL;
+    OP10B_GRIPPER_OPEN                            	: BOOL;
+    OP10B_GRIPPER_CLOSE                           	: BOOL;	
+	OP10B_AUTO_ENABLE								: BOOL;
+	OP10B_START										: BOOL;
+	OP10B_STOP										: BOOL;
+	OP10B_STOP2										: BOOL;
+	OP10B_PRGM_RST									: BOOL;
+	OP10B_ERR_RST									: BOOL;
+	OP10B_CYCLE_STP									: BOOL;
+	OP10B_SERVO_OFF									: BOOL;
+	OP10B_SERVO_ON									: BOOL;
+	OP10B_OPERATION_ENABLE							: BOOL;
+	OP10B_MOVER_HOME								: BOOL;
+	OP10B_General_Output_reset						: BOOL;
+	OP10B_Machine_Lock								: BOOL;
+	OP10B_PLC_Heartbeat								: BOOL;
+	OP10B_Homing_Start								: BOOL;
+	OP10B_Pick_Zone_Safe							: BOOL;
+	OP10B_Camera_Zone_Safe							: BOOL;
+	OP10B_O_Ring_Zone_Safe							: BOOL;
+	OP10B_Place_Zone_Safe							: BOOL;
+	OP10B_Reject_Zone_Safe							: BOOL;
+	OP10B_Robot2_In_Pick_Sequence					: BOOL;	
+
+	OP10B_Mirror_Auto_enable						: BOOL;
+	OP10B_Program_Execute							: BOOL;
+	OP10B_Program_Waiting							: BOOL;
+	OP10B_Program_Waiting2							: BOOL;
+	OP10B_Stop_Status								: BOOL;
+	OP10B_Program_Sel_enabled_OP					: BOOL;
+	OP10B_During_error								: BOOL;
+	OP10B_During_Cycle_Stop							: BOOL;
+	OP10B_Mirror_SRVO_Off							: BOOL;
+	OP10B_Servo_ON_OFF_Status						: BOOL;
+	OP10B_Auto_Operation_Enable						: BOOL;
+	OP10B_Moving_Home								: BOOL;
+	OP10B_Spare1									: BOOL;
+	OP10B_During_Machine_Lock						: BOOL;
+	OP10B_H_Error									: BOOL;
+	OP10B_L_Error									: BOOL;
+	OP10B_Caution									: BOOL;
+	OP10B_During_EMG_Stop							: BOOL;
+	OP10B_Teach_Mode								: BOOL;
+	OP10B_Auto_OP_Mode								: BOOL;
+	OP10B_Auto_Ext_Mode								: BOOL;
+	OP10B_TP_Enable									: BOOL;
+	OP10B_Heartbeat									: BOOL;
+	OP10B_Spare2									: BOOL;
+	OP10B_Rbt_In_Home								: BOOL;
+	OP10B_Rbt_In_Pick_Zone							: BOOL;
+	OP10B_Rbt_In_Camera_Zone						: BOOL;
+	OP10B_Rbt_In_O_Ring_Zone						: BOOL;
+	OP10B_Rbt_In_Place_Zone							: BOOL;
+	OP10B_Rbt_In_Reject_Zone						: BOOL;
+	OP10B_Spare7									: BOOL;
+	OP10B_Robot1_In_Pick_Sequence					: BOOL;
+	OP10B_Sequence_Running							: BOOL;
+	OP10B_Sequence_Completed						: BOOL;
+	OP10B_Part_Pick_Completed						: BOOL;
+	OP10B_Spare10									: BOOL;
+	OP10B_NOK_Part_Dropped							: BOOL;
+	OP10B_Spare11									: BOOL;
+	OP10B_Camera_Trigger							: BOOL;
+	OP10B_Spare12									: BOOL;
+	OP10B_O_Ring_Pick_Pos_Reached					: BOOL;
+	OP10B_Spare13									: BOOL;
+	OP10B_Part_Place_Conveyor						: BOOL;
+	OP10B_Spare5									: BOOL;
+	OP10B_Spare6									: BOOL;
+	OP10B_Step_Reached								: BOOL;
+	OP10B_StartOf_Sequence							: BOOL;
+	OP10B_ROBO_Gripper_Open							: BOOL;
+	OP10B_ROBO_Gripper_Close						: BOOL;
+	OP10B_Spare14									: BOOL;
+	OP10B_Spare15									: BOOL;
+	OP10B_Spare16									: BOOL;
+	OP10B_Spare17									: BOOL;
+	OP10B_Spare18									: BOOL;
+	OP10B_Spare19									: BOOL;
+	OP10B_Spare27									: BOOL;
+	OP10B_Spare26									: BOOL;
+	OP10B_CMP_PRS_ROBO								: BOOL;
+	OP10B_Spare24									: BOOL;
+	OP10B_Spare23									: BOOL;
+	OP10B_Spare22									: BOOL;
+	OP10B_Spare21									: BOOL;
+	OP10B_Spare20									: BOOL;	
 	
 									(*SERVO*)
 									(*OP10*)
+									
 	OP10_SRV_FRST_PCKBDY_CNT						: Servo_Control;
 	OP10_SRV_SCND_PCKBDY_CNT						: Servo_Control;
 	OP10_SRV_FRST_PCKBDY_STUS						: stManualModeAxis;
 	OP10_SRV_SCND_PCKBDY_STUS						: stManualModeAxis;
 	OP10_FRT_BDY_GPR								: FB_Axis_FESTO;
-	OP10_SEC_BDY_GPR								: FB_Axis_FESTO;	
-/////////////////
+	OP10_SEC_BDY_GPR								: FB_Axis_FESTO;
+	OP10_A_SRV_FST_BDYPCK_WRK						: BOOL;
+	OP10_A_SRV_FST_BDYPCK_HME						: BOOL;
+	OP10_A_SRV_SCND_BDYPCK_WRK						: BOOL;
+	OP10_A_SRV_SCND_BDYPCK_HME						: BOOL;	
+/////////////////				(*SERVO_OP10A*)
 	OP10A_LH_ROTY									: FB_Axis_FESTO;
 	OP10A_RH_ROTY									: FB_Axis_FESTO;
 	OP10A_LH_GRIPR									: FB_Axis_FESTO;
@@ -48,8 +298,33 @@
 	OP10A_SRV_RH_BDYANG_STUS                    	: stManualModeAxis;	
 	OP10A_SRV_LH_BDYGRP_STUS                    	: stManualModeAxis;	
 	OP10A_SRV_RH_BDYGRP_STUS                    	: stManualModeAxis;	
-	OP10A_SRV_O_CNVY_STUS	                    	: stManualModeAxis;	
-/////////////////
+	OP10A_SRV_O_CNVY_STUS	                    	: stManualModeAxis;
+	OP10A_A_SRV_LH_GRPWRK							: BOOL;
+	OP10A_A_SRV_LH_GRPHME							: BOOL;
+	OP10A_A_SRV_RH_GRPWRK							: BOOL;
+	OP10A_A_SRV_RH_GRPHME							: BOOL;
+	OP10A_SRV_LH_BDYANG_HME							: BOOL;	
+	OP10A_SRV_LH_BDYANG_CMR							: BOOL;	
+	OP10A_SRV_LH_BDYANG_FITRE						: BOOL;		
+	OP10A_SRV_LH_BDYANG_WRK							: BOOL;
+	OP10A_SRV_RH_BDYANG_HME							: BOOL;
+	OP10A_SRV_RH_BDYANG_CMR							: BOOL;
+	OP10A_SRV_RH_BDYANG_FITRE						: BOOL;	
+	
+	OP10A_SRV_RH_BDYANG_WRK							: BOOL;
+	OP10B_A_SRV_LH_GRPWRK							: BOOL;
+	OP10B_A_SRV_LH_GRPHME							: BOOL;
+	OP10B_A_SRV_RH_GRPWRK							: BOOL;
+	OP10B_A_SRV_RH_GRPHME							: BOOL;
+	OP10B_SRV_LH_BDYANG_HME							: BOOL;
+	OP10B_SRV_LH_BDYANG_CMR							: BOOL;
+	OP10B_SRV_LH_BDYANG_FITRE						: BOOL;	
+	OP10B_SRV_LH_BDYANG_WRK							: BOOL;
+	OP10B_SRV_RH_BDYANG_HME							: BOOL;
+	OP10B_SRV_RH_BDYANG_CMR							: BOOL;
+	OP10B_SRV_RH_BDYANG_FITRE						: BOOL;	
+	OP10B_SRV_RH_BDYANG_WRK							: BOOL;	
+/////////////////				(*SERVO_OP10B*) 
 	OP10B_LH_ROTY									: FB_Axis_FESTO;
 	OP10B_RH_ROTY									: FB_Axis_FESTO;
 	OP10B_LH_GRIPR									: FB_Axis_FESTO;
@@ -65,47 +340,93 @@
 	OP10B_SRV_LH_BDYGRP_STUS                    	: stManualModeAxis;	
 	OP10B_SRV_RH_BDYGRP_STUS                    	: stManualModeAxis;	
 	OP10B_SRV_O_CNVY_STUS	                        : stManualModeAxis;
+	OP10_SRV_FRST_PCKBDY_WRK_FB						: BOOL;
+	OP10_SRV_FRST_PCKBDY_HME_FB						: BOOL;
+	OP10_SRV_SCND_PCKBDY_WRK_FB						: BOOL;	
+	OP10_SRV_SCND_PCKBDY_HME_FB						: BOOL;	
+	OP10A_A_SRV_RH_GRPWRK_FB						: BOOL;	
+	OP10A_A_SRV_LH_GRPWRK_FB						: BOOL;	
+	OP10A_A_SRV_RH_GRPHME_FB						: BOOL;
+	OP10A_A_SRV_LH_GRPHME_FB						: BOOL;	
+	OP10A_SRV_LH_BDYANG_HME_FB						: BOOL;
+	OP10A_SRV_RH_BDYANG_HME_FB						: BOOL;
+	OP10A_SRV_RH_BDYANG_CMR_FB						: BOOL;
+	OP10A_SRV_RH_BDYANG_FITRE_FB					: BOOL;
+	OP10A_SRV_LH_BDYANG_CMR_FB						: BOOL;
+	OP10A_SRV_LH_BDYANG_FITRE_FB					: BOOL;	
+
 	
-// HOMING	
-	OP10A_O_LHGRIP_HMG1: BOOL;
-	OP10A_O_RHGRIP_HMG1: BOOL;
-	OP10A_O_LHPUSH_HMG1: BOOL;
-	OP10A_O_RHPUSH_HMG1: BOOL;
-	OP10A_O_VERT_HMG1: BOOL;
-	OP10A_O_DEGRE_HMG1: BOOL;
-	OP10A_O_HORZ_HMG1: BOOL;
-	OP10B_O_LHGRIP_HMG1: BOOL;
-	OP10B_O_RHGRIP_HMG1: BOOL;
-	OP10B_O_LHPUSH_HMG1: BOOL;
-	OP10B_O_RHPUSH_HMG1: BOOL;
-	OP10B_O_VERT_HMG1: BOOL;
-	OP10B_O_DEGRE_HMG1: BOOL;
-	OP10B_O_HORZ_HMG1: BOOL;
+	OP10A_SRV_LH_BDYANG_WRK_FB						: BOOL;
+	OP10A_SRV_RH_BDYANG_WRK_FB						: BOOL;
+	OP10A_SRV_RH_BDYANG_ZERO_FB						: BOOL;
+	OP10A_SRV_LH_BDYANG_ZERO_FB						: BOOL;
+	OP10B_A_SRV_LH_GRPWRK_FB						: BOOL;
+	OP10B_A_SRV_LH_GRPHME_FB						: BOOL;
+	OP10B_A_SRV_RH_GRPWRK_FB						: BOOL;
+	OP10B_A_SRV_RH_GRPHME_FB						: BOOL;
+	OP10B_SRV_LH_BDYANG_HME_FB						: BOOL;
+	OP10B_SRV_LH_BDYANG_CMR_FB						: BOOL;	
+	OP10B_SRV_LH_BDYANG_FITRE_FB					: BOOL;
+	OP10B_SRV_LH_BDYANG_WRK_FB						: BOOL;
+	OP10B_SRV_RH_BDYANG_HME_FB						: BOOL;
+	OP10B_SRV_RH_BDYANG_CMR_FB						: BOOL;
+	OP10B_SRV_RH_BDYANG_FITRE_FB					: BOOL;
+	OP10B_SRV_RH_BDYANG_WRK_FB						: BOOL;
+	OP10B_SRV_RH_BDYANG_ZERO_FB						: BOOL;
+	OP10B_SRV_LH_BDYANG_ZERO_FB						: BOOL;
+		
+// HOMING
+
+	OP10_FRT_CYL_INITZAL							: BOOL;
+	OP10_SEC_CYL_INITZAL							: BOOL;
 									(*OP10A*)
+	R1												: R_TRIG;							
+	OP10A_START_HOMNG								: BOOL;
+	OP10A_GRIPPER_HOME								: BOOL;	
+	OP10A_O_LHGRIP_HMG1								: BOOL;
+	OP10A_O_RHGRIP_HMG1								: BOOL;
+	OP10A_O_LHPUSH_HMG1								: BOOL;
+	OP10A_O_RHPUSH_HMG1								: BOOL;
+	OP10A_O_VERT_HMG1								: BOOL;
+	OP10A_O_DEGRE_HMG1								: BOOL;
+	OP10A_O_HORZ_HMG1								: BOOL;
 	OP10A_ALL_HOME									: BOOL;
 	OP10A_ROBO_SFE_HME								: BOOL;	
 	OP10A_ROBO_SFE_HME_FB							: BOOL;	
+	OP10A_GRP_REFERENCED							: BOOL;
 	OP10A_HME_1_5									: INT	:= 5;
 	OP10A_HME_5_10									: INT 	:= 10;	
 	OP10A_HME_10_15									: INT	:= 15;
 	OP10A_HME_15_20									: INT	:= 20;
 	OP10A_HME_20_25									: INT	:= 25;
-	OP10A_HME_25_30									: INT	:= 30;	
+	OP10A_HME_25_30									: INT	:= 30;
+	
 									(*OP10B*)
+	R2												: R_TRIG;									
+	OP10B_START_HOMNG								: BOOL;
+	OP10B_GRIPPER_HOME								: BOOL;										
 	OP10B_ALL_HOME									: BOOL;	
 	OP10B_ROBO_SFE_HME								: BOOL;
-	OP10B_ROBO_SFE_HME_FB							: BOOL;	
+	OP10B_O_LHGRIP_HMG1								: BOOL;
+	OP10B_O_RHGRIP_HMG1								: BOOL;
+	OP10B_O_LHPUSH_HMG1								: BOOL;
+	OP10B_O_RHPUSH_HMG1								: BOOL;
+	OP10B_O_VERT_HMG1								: BOOL;
+	OP10B_O_DEGRE_HMG1								: BOOL;
+	OP10B_O_HORZ_HMG1								: BOOL;	
+	OP10B_GRP_REFERENCED							: BOOL;	
 	OP10B_HME_1_5									: INT	:= 5;
 	OP10B_HME_5_10									: INT 	:= 10;	
 	OP10B_HME_10_15									: INT	:= 15;
 	OP10B_HME_15_20									: INT	:= 20;
 	OP10B_HME_20_25									: INT	:= 25;
 	OP10B_HME_25_30									: INT	:= 30;	
-	
+
 	
 // MANUAL
 
-									(*OP10A*)	
+									(*OP10A*)
+	OP10A_CYLINDER_ERR								: WORD;	
 	OP10A_O_CNVY_JOG_P								: BOOL;
 	OP10A_O_CNVY_JOG_N								: BOOL;
 	OP10B_O_CNVY_JOG_P								: BOOL;
@@ -118,6 +439,9 @@
 	OP10A_LH_ROTRY_JOG_P							: BOOL;
 	OP10A_RH_ROTRY_JOG_P							: BOOL;
 	OP10A_RH_ROTRY_JOG_N							: BOOL;
+	OP10A_CYL_PNP_CHECK								: BOOL;
+									(*OP10B*)	
+	OP10B_CYLINDER_ERR								: WORD;
 	OP10B_LH_GRP_JOG_P								: BOOL;
 	OP10B_LH_GRP_JOG_N								: BOOL;
 	OP10B_RH_GRP_JOG_P								: BOOL;
@@ -130,13 +454,23 @@
 	OP10_FRST_BDY_GRP_JOG_P							: BOOL;
 	OP10_SEC_BDY_GRP_JOG_P							: BOOL;
 	OP10_SEC_BDY_GRP_JOG_N							: BOOL;
+	OP10B_CYL_PNP_CHECK								: BOOL;
 	
-                                            		
+// DRY RUN	
+	OP10A_DRY_RUN									: BOOL;
+	OP10B_Dry_Run									: BOOL;                                            		
 // AUTO                                     		
                             (*CYLINDER*)
 							  (*OP10*)
 	OP10_SRV_ALL_HOME								: BOOL;
-							 (*OP10A*)	
+	OP10_LH_CMP_RDY_PCK								: BOOL;
+	OP10_RH_CMP_RDY_PCK								: BOOL;
+	OP10A_SING_CMR_TRIG								: BOOL;
+	OP10B_SING_CMR_TRIG								: BOOL;
+	OP10A_SING_CAM_DN								: BOOL;
+	OP10B_SING_CAM_DN								: BOOL;
+							 (*OP10A*)
+	OP10A_CYL_RDY_TO_PLC							: BOOL;	
 	OP10A_ALL_CYL_HOME_FB							: BOOL;
 	OP10A_SRV_ALL_HOME								: BOOL;
 	OP10A_O_0DEGRE_AUTOCMD1							: BOOL;
@@ -153,7 +487,12 @@
 	OP10A_A_RH_REJ_WRK								: BOOL;
 	OP10A_O_VERT_AUTOCMD1							: BOOL;
 	OP10A_O_VERT_AUTOCMD2							: BOOL;
+	OP10A_BDY1_PCK_BYPAS							: BOOL;
+	OP10A_BDY2_PCK_BYPAS							: BOOL;
+	OP10A_ORNG_RDY_PCK								: BOOL;
+	OP10A_ORNG_PCK_DN								: BOOL;
 							 (*OP10B*)
+	OP10B_CYL_RDY_TO_PLC							: BOOL;
 	OP10B_ALL_CYL_HOME_FB							: BOOL;
 	OP10B_SRV_ALL_HOME								: BOOL;
 	OP10B_O_0DEGRE_AUTOCMD1							: BOOL;
@@ -169,53 +508,200 @@
 	OP10B_A_RH_REJ_HOME								: BOOL;
 	OP10B_A_RH_REJ_WRK								: BOOL;
 	OP10B_O_VERT_AUTOCMD1							: BOOL;
-	OP10B_O_VERT_AUTOCMD2							: BOOL;  
+	OP10B_O_VERT_AUTOCMD2							: BOOL;
+	OP10B_BDY1_PCK_BYPAS							: BOOL;
+	OP10B_BDY2_PCK_BYPAS							: BOOL;
+	OP10B_ORNG_RDY_PCK								: BOOL;
+	OP10B_ORNG_PCK_DN								: BOOL;  
 
-/////////////////////////////////////////////////////////////////////////////////////              		
-							(*SERVO_OP10*)       	
-	OP10_A_SRV_FST_BDYPCK_WRK						: BOOL;
-	OP10_A_SRV_FST_BDYPCK_HME						: BOOL;
-	OP10_A_SRV_SCND_BDYPCK_WRK						: BOOL;
-	OP10_A_SRV_SCND_BDYPCK_HME						: BOOL;
 	
-							(*SERVO_OP10A*)
-	OP10A_A_SRV_LH_GRPWRK							: BOOL;
-	OP10A_A_SRV_LH_GRPHME							: BOOL;
-	OP10A_A_SRV_RH_GRPWRK							: BOOL;
-	OP10A_A_SRV_RH_GRPHME							: BOOL;
-	OP10A_SRV_LH_BDYANG_HME							: BOOL;	
-	OP10A_SRV_LH_BDYANG_WRK							: BOOL;
-	OP10A_SRV_RH_BDYANG_HME							: BOOL;
-	OP10A_SRV_RH_BDYANG_WRK							: BOOL;
-	OP10B_A_SRV_LH_GRPWRK							: BOOL;
-	OP10B_A_SRV_LH_GRPHME							: BOOL;
-	OP10B_A_SRV_RH_GRPWRK							: BOOL;
-	OP10B_A_SRV_RH_GRPHME							: BOOL;
-	OP10B_SRV_LH_BDYANG_HME							: BOOL;
-	OP10B_SRV_LH_BDYANG_WRK							: BOOL;
-	OP10B_SRV_RH_BDYANG_HME							: BOOL;
-	OP10B_SRV_RH_BDYANG_WRK							: BOOL;
-                              		
-							(*SERVO_OP10B*)                                            		
-	OP10_SRV_FRST_PCKBDY_WRK_FB						: BOOL;
-	OP10_SRV_FRST_PCKBDY_HME_FB						: BOOL;
-	OP10_SRV_SCND_PCKBDY_WRK_FB						: BOOL;	
-	OP10_SRV_SCND_PCKBDY_HME_FB						: BOOL;	
-	OP10A_A_SRV_RH_GRPWRK_FB						: BOOL;	
-	OP10A_A_SRV_LH_GRPWRK_FB						: BOOL;	
-	OP10A_A_SRV_RH_GRPHME_FB						: BOOL;
-	OP10A_A_SRV_LH_GRPHME_FB						: BOOL;	
-	OP10A_SRV_LH_BDYANG_HME_FB						: BOOL;
-	OP10A_SRV_RH_BDYANG_HME_FB						: BOOL;	
-	OP10A_SRV_LH_BDYANG_WRK_FB						: BOOL;	
-	OP10B_A_SRV_LH_GRPWRK_FB						: BOOL;
-	OP10B_A_SRV_LH_GRPHME_FB						: BOOL;
-	OP10B_A_SRV_RH_GRPWRK_FB						: BOOL;
-	OP10B_A_SRV_RH_GRPHME_FB						: BOOL;
-	OP10B_SRV_LH_BDYANG_HME_FB						: BOOL;
-	OP10B_SRV_LH_BDYANG_WRK_FB						: BOOL;
-	OP10B_SRV_RH_BDYANG_HME_FB						: BOOL;	
+// CAMERA
+								(*OP10A_CAMERA*)		
+	OP10A_CMR_DN_RSLT								: BOOL;
+	OP10A_LH_CMR_OK									: BOOL;
+	OP10A_LH_CMR_NOK								: BOOL;	
+	OP10A_RH_CMR_OK									: BOOL;
+	OP10A_RH_CMR_NOK								: BOOL;	
+								(*OP10B_CAMERA*)		
+	OP10B_CMR_DN_RSLT								: BOOL;
+	OP10B_LH_CMR_OK									: BOOL;
+	OP10B_LH_CMR_NOK								: BOOL;	
+	OP10B_RH_CMR_OK									: BOOL;
+	OP10B_RH_CMR_NOK								: BOOL;	
 	
+	
+	
+	
+	
+// WILL BE DELETED
+	OP10A_MODE_BLOCK: Mode_Selection_Block1;
+	OP10A_MODE_WORD: INT;
+	OP10A_AUTO_SELECTED: BOOL;
+	OP10A_MANUAL_SELECTED: BOOL;
+	OP10A_STEP_SELECTED: BOOL;
+	OP10A_AUTO_RUNNING: BOOL;
+	OP10A_STEP_RUNNING: BOOL;
+	OP10A_START_ENABLE: BOOL;
+	OP10A_MACHINE_STOP: BOOL;
+	OP10A_ERR: BOOL;
+
+	OP10B_MODE_BLOCK: Mode_Selection_Block1;
+	OP10B_MODE_WORD: INT;
+	OP10B_AUTO_SELECTED: BOOL;
+	OP10B_MANUAL_SELECTED: BOOL;
+	OP10B_STEP_SELECTED: BOOL;
+	OP10B_AUTO_RUNNING: BOOL;
+	OP10B_STEP_RUNNING: BOOL;
+	OP10B_START_ENABLE: BOOL;
+	OP10B_MACHINE_STOP: BOOL;
+	OP10B_ERR: BOOL; 
+
+	
+	CHECK				: BOOL;
+	
+	
+//Camera GVLs
+	OP10A_LH_Camera_Trigger		      : BOOL;
+	OP10A_LH_Camera_Job_Change_start   : BOOL;
+	OP10A_LH_Camera_Error			  : BOOL;
+	OP10A_LH_Camera_Ready			  : BOOL;
+	OP10A_LH_Camera_Online			  : BOOL;	
+	OP10A_LH_Job_Change_Complete		    : BOOL;
+	OP10A_LH_Job_Change_Error   		    : BOOL;
+	OP10A_LH_Picture_Taken      		    : BOOL;
+	OP10A_LH_Error_status				: STRING;
+	OP10A_LH_Target_Job_ID				: UINT;
+	OP10A_LH_Loaded_Job_ID		    	: UINT;
+
+	OP10A_RH_Camera_Trigger		      : BOOL;
+	OP10A_RH_Camera_Job_Change_start   : BOOL;
+	OP10A_RH_Camera_Error			  : BOOL;
+	OP10A_RH_Camera_Ready			  : BOOL;
+	OP10A_RH_Camera_Online			  : BOOL;	
+	OP10A_RH_Job_Change_Complete		: BOOL;
+	OP10A_RH_Job_Change_Error   		: BOOL;
+	OP10A_RH_Picture_Taken      		: BOOL;
+	OP10A_RH_Error_status				: STRING;
+	OP10A_RH_Target_Job_ID				: UINT;
+	OP10A_RH_Loaded_Job_ID		    	: UINT;
+
+	OP10B_LH_Camera_Trigger		      : BOOL;
+	OP10B_LH_Camera_Job_Change_start   : BOOL;
+	OP10B_LH_Camera_Error			  : BOOL;
+	OP10B_LH_Camera_Ready			  : BOOL;
+	OP10B_LH_Camera_Online			  : BOOL;	
+	OP10B_LH_Job_Change_Complete		    : BOOL;
+	OP10B_LH_Job_Change_Error   		    : BOOL;
+	OP10B_LH_Picture_Taken      		    : BOOL;
+	OP10B_LH_Error_status				: STRING;
+	OP10B_LH_Target_Job_ID				: UINT;
+	OP10B_LH_Loaded_Job_ID		    	: UINT;
+
+	OP10B_RH_Camera_Trigger		      : BOOL;
+	OP10B_RH_Camera_Job_Change_start   : BOOL;
+	OP10B_RH_Camera_Error			  : BOOL;
+	OP10B_RH_Camera_Ready			  : BOOL;
+	OP10B_RH_Camera_Online			  : BOOL;	
+	OP10B_RH_Job_Change_Complete		    : BOOL;
+	OP10B_RH_Job_Change_Error   		    : BOOL;
+	OP10B_RH_Picture_Taken      		    : BOOL;
+	OP10B_RH_Error_status				: STRING;
+	OP10B_RH_Target_Job_ID				: UINT;
+	OP10B_RH_Loaded_Job_ID		    	: UINT;
+
+	OP10A_Camera_Trigger_Ack: BOOL;
+	OP10A_Miss_Trigger: BOOL;
+	OP10A_LH_Camera_OK  : BOOL;
+	OP10A_LH_Camera_NOK : BOOL;
+	OP10A_RH_Camera_OK  : BOOL;
+	OP10A_RH_Camera_NOK : BOOL;
+	OP10A_Camera_Done	: BOOL;
+	
+	OP10B_Camera_Trigger_Ack: BOOL;
+	OP10B_Miss_Trigger: BOOL;
+	OP10B_LH_Camera_OK  : BOOL;
+	OP10B_LH_Camera_NOK : BOOL;
+	OP10B_RH_Camera_OK  : BOOL;
+	OP10B_RH_Camera_NOK : BOOL;
+	OP10B_Camera_Done	: BOOL;	
+	
+	Conv_Step_no_10A: INT;
+	Conv_Step_no_10B: INT;
+	
+//Empty Camera
+	OP10A_Empty_Cam_1_Camera_Trigger		    : BOOL;
+	OP10A_Empty_Cam_1_Camera_Job_Change_start   : BOOL;
+	OP10A_Empty_Cam_1_Camera_Error			  : BOOL;
+	OP10A_Empty_Cam_1_Camera_Ready			  : BOOL;
+	OP10A_Empty_Cam_1_Camera_Online			  : BOOL;	
+	
+	OP10B_Empty_Cam_2_Camera_Trigger		    : BOOL;
+	OP10B_Empty_Cam_2_Camera_Job_Change_start   : BOOL;
+	OP10B_Empty_Cam_2_Camera_Error			  : BOOL;
+	OP10B_Empty_Cam_2_Camera_Ready			  : BOOL;
+	OP10B_Empty_Cam_2_Camera_Online			  : BOOL;
+
+	OP10A_Body_OK			 :BOOL; 
+	OP10A_Body_NOK			 :BOOL; 
+	OP10A_Body_Window_0Deg	 :BOOL; 
+	OP10A_Body_Window_90Deg	 :BOOL;	
+	OP10B_Body_OK			 :Bool; 
+	OP10B_Body_NOK			 :Bool;  
+	OP10B_Body_Window_0Deg	 :BOOL; 
+	OP10B_Body_Window_90Deg	 :BOOL; 
+	
+	OP10A_Pick_Ready		 :BOOL;
+	OP10A_Pick_Done			 :BOOL;
+	
+	OP10B_Pick_Ready		 :BOOL;
+	OP10B_Pick_Done			 :BOOL;	
+	
+	OP10A_Sing_Seq  : INT;//Singulation Sequence
+	OP10B_Sing_Seq  : INT;	
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+
+	OP10_COMP_PICKED_1						: BOOL;
+	OP10_COMP_PICKED_2						: BOOL;
+	OP10A_SING_CAM_BYPASS					: BOOL;
+	OP10B_SING_CAM_BYPASS					: BOOL;
+//Drum_Feeder
+	OP10A_Drum_Feed_Motor_Speed		AT %Q*  : INT;	
+	OP10A_HMI_Drum_Feed_Mtr_Speed_IP		: INT;
+	OP10A_Drum_Feed_Mtr_Speed_Select		: BOOL;
+	OP10A_Drum_Feed_Mtr_Run_Fwd 			: BOOL;
+	OP10A_Drum_Feed_Mtr_Reset   			: BOOL;
+	
+//Drum_Feeder
+	OP10B_Drum_Feed_Motor_Speed		AT %Q*  : INT;	
+	OP10B_HMI_Drum_Feed_Mtr_Speed_IP		: INT;
+	OP10B_Drum_Feed_Mtr_Speed_Select		: BOOL;
+	OP10B_Drum_Feed_Mtr_Run_Fwd 			: BOOL;
+	OP10B_Drum_Feed_Mtr_Reset   			: BOOL;	
+	
+	OP10A_Conv_Fwd_Time_6_3			: INT:=750;
+	OP10A_Conv_Fwd_Speed_6_3		: INT:=150;
+	OP10A_Conv_Rev_Time_6_3			: INT:=500;
+	OP10A_Conv_Rev_Speed_6_3		: INT:=-100;     
+	OP10A_Conv_Fwd_Time_7_89		: INT:=750;
+	OP10A_Conv_Fwd_Speed_7_89		: INT:=150;
+	OP10A_Conv_Rev_Time_7_89		: INT:=500;
+	OP10A_Conv_Rev_Speed_7_89		: INT:=-100;			  
+	OP10A_Conveyor_Speed			: REAL;
+	OP10A_Model						: STRING[80];	
+
+	OP10B_Conv_Fwd_Time_6_3			: INT:=750;
+	OP10B_Conv_Fwd_Speed_6_3		: INT:=150;
+	OP10B_Conv_Rev_Time_6_3			: INT:=500;
+	OP10B_Conv_Rev_Speed_6_3		: INT:=-100;     
+	OP10B_Conv_Fwd_Time_7_89		: INT:=750;
+	OP10B_Conv_Fwd_Speed_7_89		: INT:=150;
+	OP10B_Conv_Rev_Time_7_89		: INT:=500;
+	OP10B_Conv_Rev_Speed_7_89		: INT:=-100;			  
+	OP10B_Conveyor_Speed			: REAL;
+	OP10B_Model						: STRING[80];	
+
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

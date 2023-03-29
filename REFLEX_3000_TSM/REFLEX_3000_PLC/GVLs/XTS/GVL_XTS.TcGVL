@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="GVL_XTS" Id="{f3a7baa4-e565-46e1-92bc-4894bb3c4b48}">
+    <Declaration><![CDATA[VAR_GLOBAL CONSTANT
+	nNumberOfMovers		: INT:=31;
+	nNumberOfStations	: INT:=35;
+
+END_VAR
+
+VAR_GLOBAL
+	Mover : ARRAY[1..nNumberOfMovers] OF AXIS_REF;
+	
+	fbXTSEnvironment	 : FB_TcIoXtsEnvironment;
+	CAGroup				 : AXES_GROUP_REF;
+	DEVSTATE  AT %I*	: UINT;
+	
+END_VAR
+VAR_GLOBAL PERSISTENT
+	retain_1: BOOL;
+	
+	
+// ALL MOVER STOP POSITIONS
+
+	
+	OP10A_STN_POSITION				:LREAL;
+	OP10B_STN_POSITION				:lREAL;
+	OP20_STN_POSITION               :lREAL;
+    OP30_STN_POSITION               :lREAL;
+	OP40_STN_POSITION               :LREAL;
+	OP50_STN_POSITION               :lREAL;
+	OP60_STN_POSITION               :lREAL;
+	OP70_STN_POSITION               :lREAL;
+	OP80_STN_POSITION               :lREAL;
+	OP90_STN_POSITION               :lREAL;
+	OP100_STN_POSITION              :lREAL;
+	OP110_STN_POSITION              :lREAL;
+	OP120_STN_POSITION              :lREAL;
+	OP130_STN_POSITION              :lREAL;
+	OP140_STN_POSITION              :lREAL;
+	OP150_STN_POSITION              :lREAL;
+	OP160_STN_POSITION              :LREAL;
+
+																	  
+																			 
+						                                                   
+                                                                      
+                                                                      
+																	   
+   	END_VAR                                                            
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                     ]]></Declaration>
+  </GVL>
+</TcPlcObject>

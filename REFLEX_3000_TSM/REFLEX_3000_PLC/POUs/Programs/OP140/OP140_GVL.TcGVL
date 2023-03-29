@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP140_GVL" Id="{82446e90-6f8c-4f7e-b875-b583b09ea683}">
+  <GVL Name="OP140_GVL" Id="{57ce64db-d8bc-4963-bc86-d7cbb83d3fdd}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 	//GENERAL
+OP140_DryRun				:BOOL;
 OP140_Auto:					BOOL;
 OP140_HomeRunning:			BOOL;
 OP140_ErrorActive:			BOOL;
@@ -24,32 +25,56 @@ OP140_ManualModeStatus:		INT;
 OP140_ManualModeWord:		INT;
 OP140_AutoRunning:			BOOL;
 OP140_StepRunning:			BOOL;
-OP140_StartEnable:   		BOOL;
-OP140_Machine_Stop: 		BOOL;
-OP140_AutoSeq:				INT;
-OP140_LH_AutoSeq: 			INT;
-OP140_RH_AutoSeq: 			INT;
-OP140_Homing_Seq:			INT;
+OP140_StartEnable  :        BOOL;
+OP140_StartEnable_1:   		BOOL;
+OP140_StartEnable_2:   		BOOL;
+OP140_StartEnable_3:   		BOOL;
+OP140_Machine_Stop : 		BOOL;
+OP140_TOOL_CHANGE_MODE_SELECTED: BOOL;
+
+
+OP140_Homing_Seq   :		INT;
 
 //Automatic_Run:				BOOL;
-OP140_Prev_Stat_Operation_Completed: BOOL;
-OP140_Prev_Comp_Status: INT;
-OP140_Prev_LH_COMP_OK:BOOL;
-OP140_Prev_LH_COMP_NOK:BOOL;
-OP140_Prev_RH_COMP_OK:BOOL;
-OP140_Prev_RH_COMP_NOK:BOOL;
-OP140_LH_Operation_Completed:BOOL;
-OP140_RH_Operation_Completed:BOOL;
 
-OP140_LH_Comp_OK: BOOL;
-OP140_LH_Comp_NOK: BOOL;
-OP140_RH_Comp_OK: BOOL;
-OP140_RH_Comp_NOK: BOOL;
+//auto 1
+OP140A1_Prev_LH_COMP_OK:BOOL;
+OP140A1_Prev_LH_COMP_NOK:BOOL;
+OP140A1_Prev_RH_COMP_OK:BOOL;
+OP140A1_Prev_RH_COMP_NOK:BOOL;
+OP140A1_LH_Comp_OK: BOOL;
+OP140A1_LH_Comp_NOK: BOOL;
+OP140A1_RH_Comp_OK: BOOL;
+OP140A1_RH_Comp_NOK: BOOL;
+
+//auto 2
+OP140A2_Prev_LH_COMP_OK:BOOL;
+OP140A2_Prev_LH_COMP_NOK:BOOL;
+OP140A2_Prev_RH_COMP_OK:BOOL;
+OP140A2_Prev_RH_COMP_NOK:BOOL;
+OP140A2_LH_Comp_OK: BOOL;
+OP140A2_LH_Comp_NOK: BOOL;
+OP140A2_RH_Comp_OK: BOOL;
+OP140A2_RH_Comp_NOK: BOOL;
+
+//auto 3
+
+OP140A3_Prev_LH_COMP_OK:BOOL;
+OP140A3_Prev_LH_COMP_NOK:BOOL;
+OP140A3_Prev_RH_COMP_OK:BOOL;
+OP140A3_Prev_RH_COMP_NOK:BOOL;
+OP140A3_LH_Comp_OK: BOOL;
+OP140A3_LH_Comp_NOK: BOOL;
+OP140A3_RH_Comp_OK: BOOL;
+OP140A3_RH_Comp_NOK: BOOL;
+
+
 
 
 //LH ATEQ Tags:
 OP140_LH_ATEQ_Result_Completed:BOOL;
 OP140_RH_ATEQ_Result_Completed:BOOL;
+
 //ModeSelection Outputs
 //OP140_AutoSelected:		    BOOL;
 OP140_ManualSelected:		BOOL;
@@ -100,10 +125,23 @@ OP140_ATEQ_Reset  :BOOL;
 OP140_ATEQ_Prog_No:INT;
 OP140_ATEQ_Result_Ok  :BOOL;
 OP140_ATEQ_Result_NOk  :BOOL;
-
-
-
-
+OP140_STN_ENABLE_1: BOOL;
+OP140_STN_ENABLE_2: BOOL;
+OP140_STN_ENABLE_3: BOOL;
+//ATEQ INPUTS and OUTPUTS
+	 OP140_ATEQ1_Auto_Start:BOOL;
+	 OP140_ATEQ2_Auto_Start:BOOL;
+	 OP140_ATEQ3_Auto_Start:BOOL;
+	 OP140_ATEQ4_Auto_Start:BOOL;
+	 OP140_ATEQ5_Auto_Start:BOOL;
+	 OP140_ATEQ6_Auto_Start:BOOL;
+	 OP140_ATEQ1_Auto_Prog_No:INT;
+	 OP140_ATEQ2_Auto_Prog_No:INT;
+	 OP140_ATEQ3_Auto_Prog_No:INT;
+	 OP140_ATEQ4_Auto_Prog_No:INT;
+	 OP140_ATEQ5_Auto_Prog_No:INT;
+	 OP140_ATEQ6_Auto_Prog_No:INT;
+//LEAK FB Prog NO OUt
 
 //HMI Tags(From HMI)
 OP140_HMI_AutoMode:						BOOL;
@@ -130,18 +168,85 @@ OP140_HMI_Wipe_Cyl3_Home_PB:			BOOL;
 OP140_HMI_Wipe_Cyl3_Work_PB:			BOOL;
 OP140_HMI_Cycle_Start:					BOOL;
 OP140_HMI_Homing:						BOOL;
-SR130_Vert_Servo_Max_Lim:					BOOL;
+
 SR130_Vert_Servo_Work_vel:BOOL;
 
-
-
+//LeakTestFB Tags
+OP140_Leak1_Seq_Start:BOOL;
+OP140_Leak1_Seq_Completed:BOOL;
+OP140_Leak2_Seq_Start:BOOL;
+OP140_Leak2_Seq_Completed:BOOL;
+OP140_Leak3_Seq_Start:BOOL;
+OP140_Leak3_Seq_Completed:BOOL;
 
 //Error
 OP140_ErrorWord_0:    							 DINT;
 OP140_ErrorWord_1:								 DINT;
 OP140_ErrorWord_2:								 DINT;
 
+OP140_HMI_Vert4_Work_Pos:LREAL;
+OP140_HMI_Vert4_Work_Vel:LREAL;
+OP140_HMI_Vert5_Work_Pos:LREAL;
+OP140_HMI_Vert5_Work_Vel:LREAL;
+OP140_HMI_Vert6_Work_Pos:LREAL;
+OP140_HMI_Vert6_Work_Vel:LREAL;
+
+	OP140_ATEQ1_ResultCompleted:BOOL;
+	 OP140_ATEQ2_ResultCompleted:BOOL;
+	 OP140_ATEQ3_ResultCompleted:BOOL;
+	 OP140_ATEQ4_ResultCompleted:BOOL;
+	 OP140_ATEQ5_ResultCompleted:BOOL;
+	 OP140_ATEQ6_ResultCompleted:BOOL;
+     OP140_ATEQ1_ResultOK:BOOL;
+	 OP140_ATEQ2_ResultOK:BOOL;
+	 OP140_ATEQ3_ResultOK:BOOL;
+	 OP140_ATEQ4_ResultOK:BOOL;
+	 OP140_ATEQ5_ResultOK:BOOL;
+	 OP140_ATEQ6_ResultOK:BOOL;
+	 OP140_ATEQ1_ResultNOK:BOOL;
+	 OP140_ATEQ2_ResultNOK:BOOL;
+	 OP140_ATEQ3_ResultNOK:BOOL;
+	 OP140_ATEQ4_ResultNOK:BOOL;
+	 OP140_ATEQ5_ResultNOK:BOOL;
+	 OP140_ATEQ6_ResultNOK:BOOL;
+	 
+	
+	OP140_Servo1_Safety:BOOL;
+	OP140_Servo2_Safety:BOOL;
+	OP140_Servo3_Safety:BOOL;
+	
+	
+	//ATEQ
+	OP140_ATEQ1_Auto_Prog_No_out: INT;
+	OP140_ATEQ2_Auto_Prog_No_out: INT;
+	OP140_ATEQ3_Auto_Prog_No_out: INT;
+	OP140_ATEQ4_Auto_Prog_No_out: INT;
+	OP140_ATEQ5_Auto_Prog_No_out: INT;
+	OP140_ATEQ6_Auto_Prog_No_out: INT;
+	
+	OP140_STN_MOVER: int;
 END_VAR
-]]></Declaration>
+
+VAR_GLOBAL PERSISTENT
+	anvar: BOOL;
+	//Recipe Tags
+
+OP140_HMI_Vert1_Work_Pos:LREAL;
+OP140_HMI_Vert1_Work_Vel:LREAL;
+OP140_HMI_Vert2_Work_Pos:LREAL;
+OP140_HMI_Vert2_Work_Vel:LREAL;
+OP140_HMI_Vert3_Work_Pos:LREAL;
+OP140_HMI_Vert3_Work_Vel:LREAL;
+OP140_ATEQ_Test_Prog1_No:INT;
+OP140_ATEQ_Test_Prog2_No:INT;
+SR140_Vert_Servo_Max_Lim:					LREAL;
+SR140_Vert_Servo_Min_Lim:					LREAL;
+OP140_HMI_Vert_SafeWork_Pos:LREAL;
+OP140_HMI_Vert1_SafeWork_Vel:LREAL;
+OP140_HMI_Vert_Home_Pos:LREAL;
+OP140_HMI_Vert_Home_Vel:LREAL;
+OP140_HMI_Vert_SafeHome_Pos:LREAL;
+OP140_HMI_Vert_SafeHome_Vel:LREAL;
+END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

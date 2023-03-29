@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP120_LockInsert_AutoSequence" Id="{9e976b91-90f3-4333-a40f-f61d78879f22}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP120_LockInsert_AutoSequence
+VAR
+	operation :INT;
+	Pushing_Dly: TON;
+	PushDly: TON;
+	PullDly:TON;
+	OP120_MoverDly: TON;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT OP120_StartEnable THEN
+	OP120_Lock_AutoSeq:=0;
+END_IF
+CASE OP120_Lock_AutoSeq OF 
+	
+	10:IF OP120_StartEnable THEN
+		OP120_Lock_AutoSeq:=20;
+	END_IF
+	
+	20:IF OP120_StartEnable AND CheckParkOK AND NOT OP120_EO_Spring_Pick_Completed THEN
+		OP120_GotoPick:=TRUE;
+		OP120_Lock_AutoSeq:=30;
+		robot_status :=1; ///// waiting for ready to pick command
+		ELSIF OP120_StartEnable AND OP120_EO_Spring_Pick_Completed THEN
+		OP120_Lock_AutoSeq:=35;	
+	END_IF
+	
+	30:IF OP120_StartEnable AND OP120_EO_Spring_Pick_Completed   THEN
+		  Part_Picked:=TRUE;
+		  Ready_for_next_singulation:=TRUE;
+		  OP120_GotoPick:=FALSE;
+		  OP120_Lock_AutoSeq:=35;
+		  robot_status :=2; // part picked and waiting for place ommmand
+		ELSIF OP120_StartEnable AND NOT  OP120_EO_Spring_Pick_Completed   THEN
+			robot_status :=3; /// waiting for part pick feedback
+	   END_IF
+	
+	35:IF OP120_StartEnable  THEN
+		OP120_Lock_AutoSeq:=36;
+	END_IF
+	
+	36: IF OP120_StartEnable AND OP120_MoverPresent THEN
+		   OP120_Lock_AutoSeq:=40;
+		ELSIF  OP120_StartEnable AND OP120_MoverPresent THEN
+           robot_status :=4; /// waiting for mover present feedback 
+	    END_IF
+	
+	40:IF OP120_StartEnable AND OP120_EO_Spring_Place_Pos_Reached THEN
+		OP120_PushPlace:=TRUE;
+		Part_Picked:=FALSE;
+		OP120_MoverPresent:=FALSE;
+		OP120_Lock_AutoSeq:=50;
+		ELSIF  OP120_StartEnable AND NOT  OP120_EO_Spring_Place_Pos_Reached THEN
+			     robot_status :=5; /// waiting for place pos reach feedback
+		
+	END_IF
+	
+	50:IF OP120_StartEnable AND OP120_PushPlace   THEN
+		CR120_Horizontal_Push_Cyl.AutoCmd2:=TRUE;
+		CR120_Horizontal_Push_Cyl.AutoCmd1:=FALSE;
+		IF CR120_Horizontal_Push_Cyl.Position2 AND PushDly.Q THEN
+		OP120_Lock_AutoSeq:=60;
+		ELSIF NOT  CR120_Horizontal_Push_Cyl.Position2 THEN
+			  robot_status :=6; /// waiting lock spring insert cyl work feedback
+	    END_IF
+	     
+	     END_IF
+		OP120_CURR_MOVER			:=OP120_STN_MOVER;
+	
+	60:IF OP120_StartEnable THEN
+		CR120_Horizontal_Push_Cyl.AutoCmd1:=TRUE;
+		CR120_Horizontal_Push_Cyl.AutoCmd2:=FALSE;
+		IF CR120_Horizontal_Push_Cyl.Position1 AND PullDly.Q THEN
+			OP120_LH_Comp_OK:=TRUE;
+	        OP120_rH_Comp_OK:=TRUE;
+		    OP120_Lock_AutoSeq:=70;
+		    OP120_PartPushed:=TRUE;
+		ELSIF NOT CR120_Horizontal_Push_Cyl.Position1 THEN	
+			robot_status :=7; /// waiting lock spring insert cyl home feedback
+	    END_IF
+	    END_IF
+	
+	70:IF OP120_StartEnable AND OP120_EO_Spring_Place_Completed THEN
+		OP120_PushPlace:=FALSE;
+		OP120_PartPushed:=FALSE;
+		Op120_PartPlaced:=TRUE;
+		OP120_Lock_AutoSeq:=80;
+		ELSIF NOT OP120_EO_Spring_Place_Completed THEN
+			  robot_status :=8; /// waiting for plae complete feedback from robot 
+		END_IF
+		
+	80: IF OP120_StartEnable AND NOT OP120_EO_Spring_Place_Completed AND OP120_MoverDly.q THEN
+		
+		Op120_PartPlaced:=FALSE;
+		OP120_Lock_AutoSeq:=81;
+		OP120_OperationCompleted:=TRUE;
+		operation:=operation+1;
+	    END_IF
+	
+	81 :IF  OP120_OperationCompleted THEN
+		  //  OP120_Lock_AutoSeq:=10;
+	END_IF
+	
+ 
+END_CASE
+
+PushDly(IN:=(OP120_Lock_AutoSeq=50 AND CR120_Horizontal_Push_Cyl.Position2 )  , PT:=T#0S , Q=> , ET=> );
+PullDly(IN:=(OP120_Lock_AutoSeq=60 AND CR120_Horizontal_Push_Cyl.Position1 )  , PT:=T#0S , Q=> , ET=> );
+
+
+OP120_MoverDly(IN:=(OP120_Lock_AutoSeq=80) , PT:=T#0.2S , Q=> , ET=> );]]></ST>
+    </Implementation>
+    <LineIds Name="OP120_LockInsert_AutoSequence">
+      <LineId Id="3" Count="3" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="7" Count="2" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="10" Count="2" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="124" Count="1" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="16" Count="3" />
+      <LineId Id="146" Count="2" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="21" Count="2" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="149" Count="1" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="24" Count="4" />
+      <LineId Id="151" Count="2" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="30" Count="5" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="38" Count="7" />
+      <LineId Id="156" Count="1" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="53" Count="2" />
+      <LineId Id="158" Count="1" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="57" Count="6" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="64" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

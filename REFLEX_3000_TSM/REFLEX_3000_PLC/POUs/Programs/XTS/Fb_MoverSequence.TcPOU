@@ -1,0 +1,2643 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Fb_MoverSequence" Id="{4694ddd5-1126-4ad4-b166-74d92f1e594a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Fb_MoverSequence
+VAR_INPUT
+	bRun								:BOOL;
+	bStop								:BOOL;
+	bPause								:BOOL;
+	rPosition							:ARRAY[0..nNumberOfStations] OF MC_lReal;
+	rVelocity							:ARRAY[0..nNumberOfStations] OF MC_lReal;
+	lrCaGap								:MC_LREAL := 100;
+	TonWait_PT							:ARRAY[1..20] OF TIME;
+	
+	MOVER_CONTINUE						: BOOL;
+	POS_BYPASS							: ARRAY[0..nNumberOfStations] OF BOOL;
+	XTS_STP_POS							: ARRAY[0..nNumberOfStations] OF LREAL;
+	ACTUAL_MOVER_MODULE_POS				: LREAL;
+	
+END_VAR
+VAR_OUTPUT
+	POSITION_DONE						: BOOL;
+END_VAR
+VAR
+	R_TRIG_Run							: R_trig;
+	R_TRIG_Stop							: R_trig;
+	R_TRIG_continue						: R_trig;	
+	mcMoveAbsoluteCA					: MC_MoveAbsoluteCA;
+	bStopCommandTriggered 				: BOOL;
+	TonWait_st							: ARRAY[1..20] OF tON;
+	mc_moverhalt						: MC_HaltCA;
+	i									: INT;
+
+	
+	axis_busy: BOOL;
+END_VAR
+
+VAR_IN_OUT
+	MoverAxis							:Axis_Ref;
+//	STATION_DONE						: STATION_DONE;
+	STATIONDONE							: ARRAY [0..nNumberOfStations] OF BOOL;
+	nMoverSequence						: INT;
+END_VAR
+
+VAR PERSISTENT
+
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[R_TRIG_Run(CLK:=bRun , Q=> );
+R_TRIG_Stop(CLK:=bStop , Q=> );
+R_TRIG_continue(CLK:=MOVER_CONTINUE , Q=> );
+
+IF R_TRIG_Run.Q THEN
+ 	bStopCommandTriggered :=TRUE;
+END_IF
+
+IF R_TRIG_Run.Q THEN
+		nMoverSequence:=0;
+END_IF
+
+	IF R_TRIG_continue.Q THEN
+	IF (nMoverSequence-1)>0 THEN
+		nMoverSequence :=nMoverSequence-1;
+	ELSE
+		nMoverSequence:=10;
+	END_IF
+	END_IF
+IF NOT bPause THEN
+	mc_moverhalt(
+	Axis:= MoverAxis, 
+	Execute:= FALSE , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+CASE nMoverSequence OF 
+	0: 
+	IF R_TRIG_Run.Q THEN
+		nMoverSequence :=10;
+	END_IF
+
+	10:
+	IF POS_BYPASS[1] THEN
+	nMoverSequence:=20;
+	ELSE
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[1], 
+	Velocity:= rVelocity [1], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[1]			:=FALSE;
+	IF 	STATIONDONE[1]=FALSE THEN
+	nMoverSequence :=11;
+	END_IF
+ 	END_IF
+
+	
+	11:
+	IF POS_BYPASS[1] THEN
+	nMoverSequence:=20;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[1], 
+	Velocity:= rVelocity [1], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> axis_busy, 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[1] THEN
+		nMoverSequence 							:=20;
+		STATIONDONE[1]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[1](IN:=FALSE , PT:=TonWait_PT[1] , Q=> , ET=> );
+	15:
+(*	TonWait_st[1](IN:=TRUE , PT:=TonWait_PT[1] , Q=> , ET=> );
+	IF TonWait_st[1].Q THEN
+		nMoverSequence :=20;
+	END_IF *)
+	
+
+	20:
+	IF POS_BYPASS[2] THEN
+	nMoverSequence:=30;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[2], 
+	Velocity:= rVelocity [2], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[2]			:=FALSE;
+	IF 	STATIONDONE[2]=FALSE THEN
+	nMoverSequence :=21;
+	END_IF
+	END_IF 
+
+	
+	21:
+	IF POS_BYPASS[2] THEN
+	nMoverSequence:=30;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[2], 
+	Velocity:= rVelocity [2], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[2] THEN
+		nMoverSequence 							:=30;
+		STATIONDONE[2]			:=FALSE;
+	END_IF
+	END_IF 
+
+//	TonWait_st[2](IN:=FALSE , PT:=TonWait_PT[2] , Q=> , ET=> );
+	25:
+(*	TonWait_st[2](IN:=TRUE , PT:=TonWait_PT[2] , Q=> , ET=> );
+	IF TonWait_st[2].Q THEN
+		nMoverSequence :=30;
+	END_IF *)
+	
+	
+
+	
+	30:
+	IF POS_BYPASS[3] THEN
+	nMoverSequence:=40;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[3], 
+	Velocity:= rVelocity [3], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[3]:= FALSE;
+	IF STATIONDONE[3]= FALSE THEN
+	nMoverSequence :=31;		
+	END_IF
+	END_IF
+	
+	31:
+	IF POS_BYPASS[3] THEN
+	nMoverSequence:=40;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[3], 
+	Velocity:= rVelocity [3], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[3] THEN
+		nMoverSequence :=40;
+		STATIONDONE[3]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[3](IN:=FALSE , PT:=TonWait_PT[3] , Q=> , ET=> );
+	
+	35:
+(*	TonWait_st[3](IN:=TRUE , PT:=TonWait_PT[3] , Q=> , ET=> );
+	IF TonWait_st[3].Q THEN
+		nMoverSequence :=40;
+	END_IF*)
+	
+	
+	40:
+	IF POS_BYPASS[4] THEN
+	nMoverSequence:=50;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[4], 
+	Velocity:= rVelocity [4], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[4]:= FALSE;
+	IF STATIONDONE[4]= FALSE THEN
+	nMoverSequence :=41;		
+	END_IF
+	END_IF
+	
+	
+	
+	41:
+	IF POS_BYPASS[4] THEN
+	nMoverSequence:=50;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[4], 
+	Velocity:= rVelocity [4], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[4] THEN
+		nMoverSequence :=50;
+		STATIONDONE[4]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[4](IN:=FALSE , PT:=TonWait_PT[4] , Q=> , ET=> );
+	
+	45:
+(*	TonWait_st[4](IN:=TRUE , PT:=TonWait_PT[4] , Q=> , ET=> );
+	IF TonWait_st[4].Q THEN
+		nMoverSequence :=50;
+	END_IF*)
+	
+	
+	50:
+	IF POS_BYPASS[5] THEN
+	nMoverSequence:=60;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[5], 
+	Velocity:= rVelocity [5], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[5]:= FALSE;
+	IF STATIONDONE[5]= FALSE THEN
+	nMoverSequence :=51;		
+	END_IF
+	END_IF
+	
+	51: 
+	IF POS_BYPASS[5] THEN
+	nMoverSequence:=60;
+	ELSE 	
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[5], 
+	Velocity:= rVelocity [5], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[5] THEN
+		nMoverSequence :=60;
+		STATIONDONE[5]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[5](IN:=FALSE , PT:=TonWait_PT[5] , Q=> , ET=> );
+	
+	55:
+(*	TonWait_st[5](IN:=TRUE , PT:=TonWait_PT[5] , Q=> , ET=> );
+	IF TonWait_st[5].Q THEN
+		nMoverSequence :=60;
+	END_IF*)
+	
+	
+	60:
+	IF POS_BYPASS[6] THEN
+	nMoverSequence:=70;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[6], 
+	Velocity:= rVelocity [6], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[6]:= FALSE;
+	IF STATIONDONE[6]= FALSE THEN
+	nMoverSequence :=61;
+	END_IF
+	END_IF
+
+	61:
+	IF POS_BYPASS[6] THEN
+	nMoverSequence:=70;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[6], 
+	Velocity:= rVelocity [6], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[6] THEN
+		nMoverSequence :=70;
+		STATIONDONE[6]			:=FALSE;
+	END_IF
+	END_IF	
+
+//	TonWait_st[6](IN:=FALSE , PT:=TonWait_PT[6] , Q=> , ET=> );
+	
+	65:
+(*	TonWait_st[6](IN:=TRUE , PT:=TonWait_PT[6] , Q=> , ET=> );
+	IF TonWait_st[6].Q THEN
+		nMoverSequence :=70;
+	END_IF*)
+	
+	
+	70:
+	IF POS_BYPASS[7] THEN
+	nMoverSequence:=80;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[7], 
+	Velocity:= rVelocity [7], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[7]			:=FALSE;
+	IF STATIONDONE[7]=FALSE THEN
+	nMoverSequence :=71;
+	END_IF
+	END_IF
+	
+	71:
+	IF POS_BYPASS[7] THEN
+	nMoverSequence:=80;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[7], 
+	Velocity:= rVelocity [7], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[7] THEN
+		nMoverSequence :=80;
+		STATIONDONE[7]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[7](IN:=FALSE , PT:=TonWait_PT[7] , Q=> , ET=> );
+	
+	75:
+(*	TonWait_st[7](IN:=TRUE , PT:=TonWait_PT[7] , Q=> , ET=> );
+	IF TonWait_st[7].Q THEN
+		nMoverSequence :=80;
+	END_IF*)
+	
+	
+	80:
+	IF POS_BYPASS[8] THEN
+	nMoverSequence:=90;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[8], 
+	Velocity:= rVelocity [8], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[8]:= FALSE;
+	IF STATIONDONE[8]= FALSE THEN
+	nMoverSequence :=81;
+	END_IF
+	END_IF
+	
+	81:
+	IF POS_BYPASS[8] THEN
+	nMoverSequence:=90;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[8], 
+	Velocity:= rVelocity [8], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[8] THEN
+		nMoverSequence :=90;
+		STATIONDONE[8]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[8](IN:=FALSE , PT:=TonWait_PT[8] , Q=> , ET=> );
+	
+	85:
+(*	TonWait_st[8](IN:=TRUE , PT:=TonWait_PT[8] , Q=> , ET=> );
+	IF TonWait_st[8].Q THEN
+		nMoverSequence :=90;
+	END_IF*)
+	
+	
+	90:
+	IF POS_BYPASS[9] THEN
+	nMoverSequence:=100;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[9], 
+	Velocity:= rVelocity [9], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[9]:= FALSE;
+	IF STATIONDONE[9]= FALSE THEN
+	nMoverSequence :=91;
+	END_IF
+	END_IF
+	
+	91:
+	IF POS_BYPASS[9] THEN
+	nMoverSequence:=100;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[9], 
+	Velocity:= rVelocity [9], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[9] THEN
+		nMoverSequence :=100;
+		STATIONDONE[9]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[9](IN:=FALSE , PT:=TonWait_PT[9] , Q=> , ET=> );
+	
+	95:
+(*	TonWait_st[9](IN:=TRUE , PT:=TonWait_PT[9] , Q=> , ET=> );
+	IF TonWait_st[9].Q THEN
+		nMoverSequence :=100;
+	END_IF *)
+	
+	
+	100:
+	IF POS_BYPASS[10] THEN
+	nMoverSequence:=110;
+	ELSE
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[10], 
+	Velocity:= rVelocity [10], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[10]			:=FALSE;
+	IF STATIONDONE[10]= FALSE THEN
+	nMoverSequence :=101;
+	END_IF
+	END_IF
+	
+	101:
+	IF POS_BYPASS[10] THEN
+	nMoverSequence:=110;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[10], 
+	Velocity:= rVelocity [10], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[10] THEN
+		nMoverSequence :=110;
+		STATIONDONE[10]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[10](IN:=FALSE , PT:=TonWait_PT[10] , Q=> , ET=> );
+	
+	105:
+(*	TonWait_st[10](IN:=TRUE , PT:=TonWait_PT[10] , Q=> , ET=> );
+	IF TonWait_st[10].Q THEN
+		nMoverSequence :=110;
+	END_IF*)
+	
+	
+	110:
+	IF POS_BYPASS[11] THEN
+	nMoverSequence:=120;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[11], 
+	Velocity:= rVelocity [11], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[11]			:=FALSE;
+	IF STATIONDONE[11]=FALSE THEN
+	nMoverSequence :=111;
+	END_IF
+	END_IF
+	
+	111:
+	IF POS_BYPASS[11] THEN
+	nMoverSequence:=120;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[11], 
+	Velocity:= rVelocity [11], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[11] THEN
+		nMoverSequence :=120;
+		STATIONDONE[11]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[11](IN:=FALSE , PT:=TonWait_PT[11] , Q=> , ET=> );
+	
+	115:
+(*	TonWait_st[11](IN:=TRUE , PT:=TonWait_PT[11] , Q=> , ET=> );
+	IF TonWait_st[11].Q THEN
+		nMoverSequence :=120;
+	END_IF*)
+	
+	
+	120:
+	IF POS_BYPASS[12] THEN
+	nMoverSequence:=130;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[12], 
+	Velocity:= rVelocity [12], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+		STATIONDONE[12]			:=FALSE;	
+	IF STATIONDONE[12]=FALSE THEN
+	nMoverSequence :=121;
+	END_IF
+	END_IF
+	
+	121:
+	IF POS_BYPASS[12] THEN
+	nMoverSequence:=130;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[12], 
+	Velocity:= rVelocity [12], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[12] THEN
+		nMoverSequence :=130;
+		STATIONDONE[12]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[12](IN:=FALSE , PT:=TonWait_PT[12] , Q=> , ET=> );
+	
+	125:
+(*	TonWait_st[12](IN:=TRUE , PT:=TonWait_PT[12] , Q=> , ET=> );
+	IF TonWait_st[12].Q THEN
+		nMoverSequence :=130;
+	END_IF*)
+	
+	130:
+	IF POS_BYPASS[13] THEN
+	nMoverSequence:=140;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[13], 
+	Velocity:= rVelocity [13], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[13]:=FALSE;
+	IF STATIONDONE[13]=FALSE THEN
+	nMoverSequence :=131;
+	END_IF
+	END_IF
+	131:
+	IF POS_BYPASS[13] THEN
+	nMoverSequence:=140;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[13], 
+	Velocity:= rVelocity [13], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[13] THEN
+		nMoverSequence :=140;
+		STATIONDONE[13]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[13](IN:=FALSE , PT:=TonWait_PT[13] , Q=> , ET=> );
+	
+	135:
+(*	TonWait_st[13](IN:=TRUE , PT:=TonWait_PT[13] , Q=> , ET=> );
+	IF TonWait_st[13].Q THEN
+		nMoverSequence :=140;
+	END_IF*)
+	
+	
+	140:
+	IF POS_BYPASS[14] THEN
+	nMoverSequence:=150;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[14], 
+	Velocity:= rVelocity [14], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[14]			:=FALSE;
+	IF STATIONDONE[14]=FALSE THEN
+	nMoverSequence :=141;
+	END_IF
+	END_IF
+	141:
+	IF POS_BYPASS[14] THEN
+	nMoverSequence:=150;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[14], 
+	Velocity:= rVelocity [14], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[14] THEN
+		nMoverSequence :=150;
+		STATIONDONE[14]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[14](IN:=FALSE , PT:=TonWait_PT[14] , Q=> , ET=> );
+	
+	145:
+(*	TonWait_st[14](IN:=TRUE , PT:=TonWait_PT[14] , Q=> , ET=> );
+	IF TonWait_st[14].Q THEN
+		nMoverSequence :=150;
+	END_IF*)
+	
+	
+	150: 
+	IF POS_BYPASS[15] THEN
+	nMoverSequence:=160;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[15], 
+	Velocity:= rVelocity [15], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[15]			:=FALSE;
+	IF STATIONDONE[15]=FALSE THEN
+	nMoverSequence :=151;
+	END_IF
+	END_IF
+	
+	151:
+	IF POS_BYPASS[15] THEN
+	nMoverSequence:=160;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[15], 
+	Velocity:= rVelocity [15], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[15] THEN
+		nMoverSequence :=160;
+		STATIONDONE[15]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[15](IN:=FALSE , PT:=TonWait_PT[15] , Q=> , ET=> );
+	
+	155:
+(*	TonWait_st[15](IN:=TRUE , PT:=TonWait_PT[15] , Q=> , ET=> );
+	IF TonWait_st[15].Q THEN
+		nMoverSequence :=160;
+	END_IF*)
+	
+	
+	160:
+	IF POS_BYPASS[16] THEN
+	nMoverSequence:=170;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[16], 
+	Velocity:= rVelocity [16], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[16]			:=FALSE;
+	IF STATIONDONE[16]=FALSE THEN
+	nMoverSequence :=161;
+	END_IF
+	END_IF
+	
+	161:
+	IF POS_BYPASS[16] THEN
+	nMoverSequence:=170;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[16], 
+	Velocity:= rVelocity [16], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[16] THEN
+		nMoverSequence :=170;
+		STATIONDONE[16]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[16](IN:=FALSE , PT:=TonWait_PT[16] , Q=> , ET=> );
+	
+//	165:
+(*	TonWait_st[16](IN:=TRUE , PT:=TonWait_PT[16] , Q=> , ET=> );
+	IF TonWait_st[16].Q THEN
+		nMoverSequence :=170;
+	END_IF*)
+	
+	170:
+	IF POS_BYPASS[17] THEN
+	nMoverSequence:=180;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[17], 
+	Velocity:= rVelocity [17], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:=  lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[17]			:=FALSE;
+	IF STATIONDONE[17]=FALSE THEN
+	nMoverSequence :=171;
+	END_IF
+	END_IF
+	
+	
+	171:
+	IF POS_BYPASS[17] THEN
+	nMoverSequence:=180;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[17], 
+	Velocity:= rVelocity [17], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[17] THEN
+		nMoverSequence :=180;
+		STATIONDONE[17]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[17](IN:=FALSE , PT:=TonWait_PT[17] , Q=> , ET=> );
+	
+//	175:
+(*	TonWait_st[17](IN:=TRUE , PT:=TonWait_PT[17] , Q=> , ET=> );
+	IF TonWait_st[17].Q THEN
+		nMoverSequence :=180;
+	END_IF*)
+
+180:
+	IF POS_BYPASS[18] THEN
+	nMoverSequence:=190;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[18], 
+	Velocity:= rVelocity [18], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[18]			:=FALSE;
+	IF STATIONDONE[18]=FALSE THEN
+	nMoverSequence :=181;
+	END_IF
+	END_IF
+	
+	
+	181:
+	IF POS_BYPASS[18] THEN
+	nMoverSequence:=190;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[18], 
+	Velocity:= rVelocity [18], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> axis_busy, 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[18] THEN
+		nMoverSequence 				:=190;
+		STATIONDONE[18]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[1](IN:=FALSE , PT:=TonWait_PT[1] , Q=> , ET=> );
+//	15:
+(*	TonWait_st[1](IN:=TRUE , PT:=TonWait_PT[1] , Q=> , ET=> );
+	IF TonWait_st[1].Q THEN
+		nMoverSequence :=20;
+	END_IF *)
+	
+
+	190:
+	IF POS_BYPASS[19] THEN
+	nMoverSequence:=200;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[19], 
+	Velocity:= rVelocity [19], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[19]:=FALSE;
+	IF STATIONDONE[19]=FALSE THEN
+	nMoverSequence :=191;
+	END_IF
+	END_IF
+	
+	191:
+	IF POS_BYPASS[19] THEN
+	nMoverSequence:=200;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[19], 
+	Velocity:= rVelocity [19], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[19] THEN
+		nMoverSequence :=200;
+		STATIONDONE[19]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[2](IN:=FALSE , PT:=TonWait_PT[2] , Q=> , ET=> );
+//	25:
+(*	TonWait_st[2](IN:=TRUE , PT:=TonWait_PT[2] , Q=> , ET=> );
+	IF TonWait_st[2].Q THEN
+		nMoverSequence :=30;
+	END_IF *)
+	
+	
+
+	
+	200:
+	IF POS_BYPASS[20] THEN
+	nMoverSequence:=210;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[20], 
+	Velocity:= rVelocity [20], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[20]			:=FALSE;
+	IF STATIONDONE[20]=FALSE THEN
+	nMoverSequence :=201;
+	END_IF
+	END_IF
+	
+	201:
+	IF POS_BYPASS[20] THEN
+	nMoverSequence:=210;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[20], 
+	Velocity:= rVelocity [20], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[20] THEN
+		nMoverSequence :=210;
+		STATIONDONE[20]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[3](IN:=FALSE , PT:=TonWait_PT[3] , Q=> , ET=> );
+	
+//	35:
+(*	TonWait_st[3](IN:=TRUE , PT:=TonWait_PT[3] , Q=> , ET=> );
+	IF TonWait_st[3].Q THEN
+		nMoverSequence :=40;
+	END_IF*)
+	
+	
+	210:
+	IF POS_BYPASS[21] THEN
+	nMoverSequence:=220;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[21], 
+	Velocity:= rVelocity [21], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[21]			:=FALSE;
+	IF STATIONDONE[21]=FALSE THEN
+	nMoverSequence :=211;
+	END_IF
+	END_IF
+	
+	
+	211:
+	IF POS_BYPASS[21] THEN
+	nMoverSequence:=220;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[21], 
+	Velocity:= rVelocity [21], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[21] THEN
+		nMoverSequence :=220;
+		STATIONDONE[21]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[4](IN:=FALSE , PT:=TonWait_PT[4] , Q=> , ET=> );
+	
+//	45:
+(*	TonWait_st[4](IN:=TRUE , PT:=TonWait_PT[4] , Q=> , ET=> );
+	IF TonWait_st[4].Q THEN
+		nMoverSequence :=50;
+	END_IF*)
+	
+	
+	220:
+	IF POS_BYPASS[22] THEN
+	nMoverSequence:=230;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[22], 
+	Velocity:= rVelocity [22], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[22]			:=FALSE;
+	IF STATIONDONE[22]=FALSE THEN
+	nMoverSequence :=221;
+	END_IF
+	END_IF
+	
+	
+	221:
+	IF POS_BYPASS[22] THEN
+	nMoverSequence:=230;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[22], 
+	Velocity:= rVelocity [22], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[22] THEN
+		nMoverSequence :=230;
+		STATIONDONE[22]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[5](IN:=FALSE , PT:=TonWait_PT[5] , Q=> , ET=> );
+	
+//	55:
+(*	TonWait_st[5](IN:=TRUE , PT:=TonWait_PT[5] , Q=> , ET=> );
+	IF TonWait_st[5].Q THEN
+		nMoverSequence :=60;
+	END_IF*)
+	
+	
+	230:
+	IF POS_BYPASS[23] THEN
+	nMoverSequence:=240;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[23], 
+	Velocity:= rVelocity [23], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[23]			:=FALSE;
+	IF STATIONDONE[23]=FALSE THEN
+	nMoverSequence :=231;
+	END_IF
+	END_IF
+	
+	231:
+	IF POS_BYPASS[23] THEN
+	nMoverSequence:=240;
+	ELSE   
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[23], 
+	Velocity:= rVelocity [23], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[23] THEN
+		nMoverSequence :=240;
+		STATIONDONE[23]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[6](IN:=FALSE , PT:=TonWait_PT[6] , Q=> , ET=> );
+	
+(*	65:
+	TonWait_st[6](IN:=TRUE , PT:=TonWait_PT[6] , Q=> , ET=> );
+	IF TonWait_st[6].Q THEN
+		nMoverSequence :=70;
+	END_IF*)
+	
+	
+	240:
+	IF POS_BYPASS[24] THEN
+	nMoverSequence:=250;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[24], 
+	Velocity:= rVelocity [24], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[24]			:=FALSE;
+	IF STATIONDONE[24]=FALSE THEN
+	nMoverSequence :=241;
+	END_IF
+	END_IF
+	
+	241:
+	IF POS_BYPASS[24] THEN
+	nMoverSequence:=250;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[24], 
+	Velocity:= rVelocity [24], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[24] THEN
+		nMoverSequence :=250;
+		STATIONDONE[24]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[7](IN:=FALSE , PT:=TonWait_PT[7] , Q=> , ET=> );
+	
+(*	75:
+	TonWait_st[7](IN:=TRUE , PT:=TonWait_PT[7] , Q=> , ET=> );
+	IF TonWait_st[7].Q THEN
+		nMoverSequence :=80;
+	END_IF*)
+	
+	
+	250:
+	IF POS_BYPASS[25] THEN
+	nMoverSequence:=260;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[25], 
+	Velocity:= rVelocity [25], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[25]			:=FALSE;
+	IF STATIONDONE[25]=FALSE THEN
+	nMoverSequence :=251;
+	END_IF
+	END_IF
+	
+	251:
+	IF POS_BYPASS[25] THEN
+	nMoverSequence:=260;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[25], 
+	Velocity:= rVelocity [25], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[25] THEN
+		nMoverSequence :=260;
+		STATIONDONE[25]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[8](IN:=FALSE , PT:=TonWait_PT[8] , Q=> , ET=> );
+	
+(*	85:
+	TonWait_st[8](IN:=TRUE , PT:=TonWait_PT[8] , Q=> , ET=> );
+	IF TonWait_st[8].Q THEN
+		nMoverSequence :=90;
+	END_IF*)
+	
+	
+	260:
+	IF POS_BYPASS[26] THEN
+	nMoverSequence:=270;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[26], 
+	Velocity:= rVelocity [26], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[26]			:=FALSE;
+	IF STATIONDONE[26]=FALSE THEN
+	nMoverSequence :=261;
+	END_IF
+	END_IF
+	
+	
+	261:
+	IF POS_BYPASS[26] THEN
+	nMoverSequence:=270;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[26], 
+	Velocity:= rVelocity [26], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[26] THEN
+		nMoverSequence :=270;
+		STATIONDONE[26]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[9](IN:=FALSE , PT:=TonWait_PT[9] , Q=> , ET=> );
+	
+(*	95:
+	TonWait_st[9](IN:=TRUE , PT:=TonWait_PT[9] , Q=> , ET=> );
+	IF TonWait_st[9].Q THEN
+		nMoverSequence :=100;
+	END_IF *)
+	
+	
+	270:
+	IF POS_BYPASS[27] THEN
+	nMoverSequence:=280;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[27], 
+	Velocity:= rVelocity [27], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[27]			:=FALSE;
+	IF STATIONDONE[27]=FALSE THEN
+	nMoverSequence :=271;
+	END_IF
+	END_IF
+	
+	271:
+	IF POS_BYPASS[27] THEN
+	nMoverSequence:=280;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[27], 
+	Velocity:= rVelocity [27], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[27] THEN
+		nMoverSequence :=280;
+		STATIONDONE[27]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[10](IN:=FALSE , PT:=TonWait_PT[10] , Q=> , ET=> );
+	
+(*	105:
+	TonWait_st[10](IN:=TRUE , PT:=TonWait_PT[10] , Q=> , ET=> );
+	IF TonWait_st[10].Q THEN
+		nMoverSequence :=110;
+	END_IF*)
+	
+	
+	280:
+	IF POS_BYPASS[28] THEN
+	nMoverSequence:=290;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[28], 
+	Velocity:= rVelocity [28], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[28]			:=FALSE;
+	IF STATIONDONE[28]=FALSE THEN
+	nMoverSequence :=281;
+	END_IF
+	END_IF
+	
+	281:
+	IF POS_BYPASS[28] THEN
+	nMoverSequence:=290;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[28], 
+	Velocity:= rVelocity [28], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[28] THEN
+		nMoverSequence :=290;
+		STATIONDONE[28]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[11](IN:=FALSE , PT:=TonWait_PT[11] , Q=> , ET=> );
+	
+(*	115:
+	TonWait_st[11](IN:=TRUE , PT:=TonWait_PT[11] , Q=> , ET=> );
+	IF TonWait_st[11].Q THEN
+		nMoverSequence :=120;
+	END_IF*)
+	
+	
+	290:
+	IF POS_BYPASS[29] THEN
+	nMoverSequence:=300;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[29], 
+	Velocity:= rVelocity [29], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[29]	:=FALSE;
+	IF STATIONDONE[29]=FALSE THEN
+	nMoverSequence :=291;
+	END_IF
+	END_IF
+	
+	
+	291:
+	IF POS_BYPASS[29] THEN
+	nMoverSequence:=300;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[29], 
+	Velocity:= rVelocity [29], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[29] THEN
+		nMoverSequence :=300;
+		STATIONDONE[29]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[12](IN:=FALSE , PT:=TonWait_PT[12] , Q=> , ET=> );
+	
+(*	125:
+	TonWait_st[12](IN:=TRUE , PT:=TonWait_PT[12] , Q=> , ET=> );
+	IF TonWait_st[12].Q THEN
+		nMoverSequence :=130;
+	END_IF*)
+	
+	300:
+	IF POS_BYPASS[30] THEN
+	nMoverSequence:=310;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[30], 
+	Velocity:= rVelocity [30], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[30]			:=FALSE;
+	IF STATIONDONE[30]=FALSE THEN
+	nMoverSequence :=301;
+	END_IF
+	END_IF
+	
+	301:
+	IF POS_BYPASS[30] THEN
+	nMoverSequence:=310;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[30], 
+	Velocity:= rVelocity [30], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[30] THEN
+		nMoverSequence :=310;
+		STATIONDONE[30]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[13](IN:=FALSE , PT:=TonWait_PT[13] , Q=> , ET=> );
+	
+(*	135:
+	TonWait_st[13](IN:=TRUE , PT:=TonWait_PT[13] , Q=> , ET=> );
+	IF TonWait_st[13].Q THEN
+		nMoverSequence :=140;
+	END_IF*)
+	
+	
+	310:
+	IF POS_BYPASS[31] THEN
+	nMoverSequence:=320;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[31], 
+	Velocity:= rVelocity [31], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[31]			:=FALSE;
+	IF STATIONDONE[31]=FALSE THEN
+	nMoverSequence :=311;
+	END_IF
+	END_IF
+	
+	
+	311:
+	IF POS_BYPASS[31] THEN
+	nMoverSequence:=320;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[31], 
+	Velocity:= rVelocity [31], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[31] THEN
+		nMoverSequence :=320;
+		STATIONDONE[31]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[14](IN:=FALSE , PT:=TonWait_PT[14] , Q=> , ET=> );
+	
+(*	145:
+	TonWait_st[14](IN:=TRUE , PT:=TonWait_PT[14] , Q=> , ET=> );
+	IF TonWait_st[14].Q THEN
+		nMoverSequence :=150;
+	END_IF*)
+	
+	
+	320:
+	IF POS_BYPASS[32] THEN
+	nMoverSequence:=330;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[32], 
+	Velocity:= rVelocity [32], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[32]			:=FALSE;
+	IF STATIONDONE[32]=FALSE THEN
+	nMoverSequence :=321;
+	END_IF
+	END_IF
+	
+	321:
+	IF POS_BYPASS[32] THEN
+	nMoverSequence:=330;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[32], 
+	Velocity:= rVelocity [32], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[32] THEN
+		nMoverSequence :=330;
+		STATIONDONE[32]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[15](IN:=FALSE , PT:=TonWait_PT[15] , Q=> , ET=> );
+	
+(*	155:
+	TonWait_st[15](IN:=TRUE , PT:=TonWait_PT[15] , Q=> , ET=> );
+	IF TonWait_st[15].Q THEN
+		nMoverSequence :=160;
+	END_IF*)
+	
+	
+	330:
+	IF POS_BYPASS[33] THEN
+	nMoverSequence:=340;
+	ELSE  
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[33], 
+	Velocity:= rVelocity [33], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[33]			:=FALSE;
+	IF STATIONDONE[33]=FALSE THEN
+	nMoverSequence :=331;
+	END_IF
+	END_IF
+	
+	
+	331:
+	IF POS_BYPASS[33] THEN
+	nMoverSequence:=340;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[33], 
+	Velocity:= rVelocity [33], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap , 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[33] THEN
+		nMoverSequence :=340;
+		STATIONDONE[33]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[16](IN:=FALSE , PT:=TonWait_PT[16] , Q=> , ET=> );
+	
+(*	165:
+	TonWait_st[16](IN:=TRUE , PT:=TonWait_PT[16] , Q=> , ET=> );
+	IF TonWait_st[16].Q THEN
+		nMoverSequence :=170;
+	END_IF*)
+	
+	340:
+	IF POS_BYPASS[34] THEN
+	nMoverSequence:=350;
+	ELSE
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[34], 
+	Velocity:= rVelocity [34], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:=  lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[34]			:=FALSE;
+	IF STATIONDONE[34]=FALSE THEN
+	nMoverSequence :=341;
+	END_IF
+	END_IF
+	
+	341:
+	IF POS_BYPASS[34] THEN
+	nMoverSequence:=350;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[34], 
+	Velocity:= rVelocity [34], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[34] THEN
+		nMoverSequence :=350;
+		STATIONDONE[34]			:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[17](IN:=FALSE , PT:=TonWait_PT[17] , Q=> , ET=> );
+	
+(*	175:
+	TonWait_st[17](IN:=TRUE , PT:=TonWait_PT[17] , Q=> , ET=> );
+	IF TonWait_st[17].Q THEN
+		nMoverSequence :=180;
+	END_IF*)
+
+	350:
+	IF POS_BYPASS[35] THEN
+	nMoverSequence:=360;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[35], 
+	Velocity:= rVelocity [35], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:=  lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	STATIONDONE[35]					:=FALSE;
+	IF STATIONDONE[35]=FALSE THEN
+	nMoverSequence :=351;
+	END_IF
+	END_IF
+	
+	351:
+	IF POS_BYPASS[35] THEN
+	nMoverSequence:=360;
+	ELSE 
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= TRUE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= rPosition[35], 
+	Velocity:= rVelocity [35], 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	IF mcMoveAbsoluteCA.Done AND STATIONDONE[35] THEN
+		nMoverSequence :=360;
+		STATIONDONE[35]					:=FALSE;
+	END_IF
+	END_IF
+//	TonWait_st[17](IN:=FALSE , PT:=TonWait_PT[17] , Q=> , ET=> );
+	
+(*	175:
+	TonWait_st[17](IN:=TRUE , PT:=TonWait_PT[17] , Q=> , ET=> );
+	IF TonWait_st[17].Q THEN
+		nMoverSequence :=180;
+	END_IF*)	
+	
+	360:
+	IF bStopCommandTriggered THEN
+		nMoverSequence :=0;
+		 bStopCommandTriggered :=FALSE;
+		 ELSE
+		  nMoverSequence :=10; 
+	END_IF
+	
+	
+END_CASE
+ELSE
+	mc_moverhalt(
+	Axis:= MoverAxis, 
+	Execute:= TRUE , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	
+	
+	mcMoveAbsoluteCA(
+	Axis:=MoverAxis , 
+	Execute:= FALSE, 
+	ContinuousUpdate:= TRUE, 
+	Position:= , 
+	Velocity:= , 
+	Acceleration:= , 
+	Deceleration:= , 
+	Jerk:= , 
+	Gap:= lrCaGap, 
+	BufferMode:= , 
+	Direction:= , 
+	Options:= , 
+	Done=> , 
+	Busy=> , 
+	Active=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorId=> );
+	nMoverSequence := nMoverSequence;
+	
+END_IF
+
+IF R_TRIG_Run.Q THEN
+		bStopCommandTriggered :=FALSE;
+END_IF
+	
+POSITION_DONE:=mcMoveAbsoluteCA.Done;
+
+//Test
+bStopCommandTriggered := TRUE;
+bStopCommandTriggered := TRUE;
+bStopCommandTriggered := TRUE;
+POSITION_DONE:=mcMoveAbsoluteCA.Done;]]></ST>
+    </Implementation>
+    <LineIds Name="Fb_MoverSequence">
+      <LineId Id="3" Count="61" />
+      <LineId Id="2466" Count="1" />
+      <LineId Id="65" Count="64" />
+      <LineId Id="2423" Count="0" />
+      <LineId Id="2470" Count="1" />
+      <LineId Id="2469" Count="0" />
+      <LineId Id="131" Count="66" />
+      <LineId Id="2472" Count="0" />
+      <LineId Id="2474" Count="0" />
+      <LineId Id="2473" Count="0" />
+      <LineId Id="198" Count="62" />
+      <LineId Id="2477" Count="3" />
+      <LineId Id="2476" Count="0" />
+      <LineId Id="262" Count="64" />
+      <LineId Id="2481" Count="2" />
+      <LineId Id="327" Count="62" />
+      <LineId Id="2485" Count="0" />
+      <LineId Id="2484" Count="0" />
+      <LineId Id="390" Count="65" />
+      <LineId Id="2487" Count="0" />
+      <LineId Id="2486" Count="0" />
+      <LineId Id="456" Count="64" />
+      <LineId Id="2490" Count="0" />
+      <LineId Id="2488" Count="0" />
+      <LineId Id="521" Count="64" />
+      <LineId Id="2492" Count="0" />
+      <LineId Id="2491" Count="0" />
+      <LineId Id="586" Count="64" />
+      <LineId Id="2494" Count="0" />
+      <LineId Id="2493" Count="0" />
+      <LineId Id="651" Count="64" />
+      <LineId Id="2497" Count="0" />
+      <LineId Id="2495" Count="0" />
+      <LineId Id="716" Count="2" />
+      <LineId Id="2496" Count="0" />
+      <LineId Id="719" Count="60" />
+      <LineId Id="2499" Count="0" />
+      <LineId Id="2498" Count="0" />
+      <LineId Id="780" Count="63" />
+      <LineId Id="2501" Count="0" />
+      <LineId Id="2500" Count="0" />
+      <LineId Id="844" Count="63" />
+      <LineId Id="2503" Count="0" />
+      <LineId Id="2502" Count="0" />
+      <LineId Id="908" Count="63" />
+      <LineId Id="2506" Count="0" />
+      <LineId Id="2504" Count="0" />
+      <LineId Id="972" Count="2" />
+      <LineId Id="2505" Count="0" />
+      <LineId Id="975" Count="60" />
+      <LineId Id="2508" Count="0" />
+      <LineId Id="2507" Count="0" />
+      <LineId Id="1036" Count="2" />
+      <LineId Id="2509" Count="0" />
+      <LineId Id="1039" Count="59" />
+      <LineId Id="2511" Count="0" />
+      <LineId Id="2510" Count="0" />
+      <LineId Id="1099" Count="2" />
+      <LineId Id="2512" Count="1" />
+      <LineId Id="1102" Count="59" />
+      <LineId Id="2517" Count="0" />
+      <LineId Id="2514" Count="0" />
+      <LineId Id="1162" Count="2" />
+      <LineId Id="2515" Count="1" />
+      <LineId Id="1165" Count="59" />
+      <LineId Id="2520" Count="0" />
+      <LineId Id="2518" Count="0" />
+      <LineId Id="1225" Count="2" />
+      <LineId Id="2519" Count="0" />
+      <LineId Id="1228" Count="61" />
+      <LineId Id="2522" Count="0" />
+      <LineId Id="2521" Count="0" />
+      <LineId Id="1290" Count="2" />
+      <LineId Id="2523" Count="0" />
+      <LineId Id="1293" Count="60" />
+      <LineId Id="2527" Count="0" />
+      <LineId Id="2524" Count="0" />
+      <LineId Id="1354" Count="2" />
+      <LineId Id="2525" Count="1" />
+      <LineId Id="1357" Count="60" />
+      <LineId Id="2531" Count="0" />
+      <LineId Id="2528" Count="0" />
+      <LineId Id="1418" Count="2" />
+      <LineId Id="2529" Count="1" />
+      <LineId Id="1421" Count="60" />
+      <LineId Id="2534" Count="0" />
+      <LineId Id="2532" Count="0" />
+      <LineId Id="1482" Count="2" />
+      <LineId Id="2533" Count="0" />
+      <LineId Id="1485" Count="60" />
+      <LineId Id="2535" Count="1" />
+      <LineId Id="1546" Count="2" />
+      <LineId Id="2537" Count="0" />
+      <LineId Id="1549" Count="60" />
+      <LineId Id="2538" Count="1" />
+      <LineId Id="1610" Count="2" />
+      <LineId Id="2540" Count="0" />
+      <LineId Id="1613" Count="60" />
+      <LineId Id="2541" Count="1" />
+      <LineId Id="1674" Count="2" />
+      <LineId Id="2543" Count="1" />
+      <LineId Id="1677" Count="60" />
+      <LineId Id="2545" Count="1" />
+      <LineId Id="1738" Count="2" />
+      <LineId Id="2547" Count="0" />
+      <LineId Id="1741" Count="60" />
+      <LineId Id="2548" Count="1" />
+      <LineId Id="1802" Count="2" />
+      <LineId Id="2550" Count="0" />
+      <LineId Id="1805" Count="60" />
+      <LineId Id="2551" Count="1" />
+      <LineId Id="1866" Count="2" />
+      <LineId Id="2553" Count="1" />
+      <LineId Id="1869" Count="59" />
+      <LineId Id="2555" Count="1" />
+      <LineId Id="1929" Count="2" />
+      <LineId Id="2557" Count="0" />
+      <LineId Id="1932" Count="60" />
+      <LineId Id="2558" Count="1" />
+      <LineId Id="1993" Count="2" />
+      <LineId Id="2560" Count="1" />
+      <LineId Id="1996" Count="60" />
+      <LineId Id="2562" Count="1" />
+      <LineId Id="2057" Count="2" />
+      <LineId Id="2564" Count="0" />
+      <LineId Id="2060" Count="60" />
+      <LineId Id="2565" Count="1" />
+      <LineId Id="2121" Count="2" />
+      <LineId Id="2567" Count="1" />
+      <LineId Id="2124" Count="59" />
+      <LineId Id="2569" Count="1" />
+      <LineId Id="2184" Count="2" />
+      <LineId Id="2571" Count="0" />
+      <LineId Id="2187" Count="59" />
+      <LineId Id="2572" Count="1" />
+      <LineId Id="2247" Count="1" />
+      <LineId Id="2574" Count="0" />
+      <LineId Id="2249" Count="90" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="2618" Count="0" />
+      <LineId Id="2617" Count="0" />
+      <LineId Id="2619" Count="3" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <DUT Name="Inspection_status" Id="{4e3a562b-4507-4c58-827a-6b244a19462d}">
+  <DUT Name="Inspection_status" Id="{80909324-aa92-4c34-8b3f-0b75d129cb2a}">
     <Declaration><![CDATA[TYPE Inspection_status :
 STRUCT
 System_Busy				: BIT ;

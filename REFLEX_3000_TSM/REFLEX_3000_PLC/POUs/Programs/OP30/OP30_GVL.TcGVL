@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP30_GVL" Id="{be3040d8-1b7c-457d-bcd1-9515b212dc46}">
+  <GVL Name="OP30_GVL" Id="{6de41f41-89b6-4321-9250-d9006a582fe3}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 			
@@ -35,7 +35,10 @@ OP30_LH_AutoSeq: 			INT;
 OP30_RH_AutoSeq: 			INT;
 OP30_Homing_Seq:			INT;
 OP30_Safety_OK:				BOOL;
-
+OP30_STN_ENABLE				: BOOL;
+OP30_Stop_Request			: BOOL;
+OP30_Conveyor_ON			: BOOL;
+	
 OP30_ManualSelected:		BOOL;
 OP30_StepSelected:			BOOL;
 OP30_AutoSelected:		    BOOL;
@@ -94,8 +97,19 @@ OP30_HMI_RH_Rej_Cyl_Home_PB : BOOL;
 OP30_HMI_RH_Rej_Cyl_Work_PB : BOOL;
 
 //conveyor
-OP30_pick_ready: BOOL;
-OP30_pick_done : BOOL;
+OP30_pick_ready     : BOOL;
+OP30_pick_done      : BOOL;
+OP30_Conv_Fwd_Time	: INT;
+OP30_Conv_Rev_Time	: INT;
+OP30_Conveyor_FWD_Speed	: REAL;
+OP30_Conveyor_REV_Speed	: REAL;
+
+//
+CR30_LH_Rej_Cyl_wrk  : BOOL;
+CR30_LH_Rej_Cyl_hme  : BOOL;
+CR30_RH_Rej_Cyl_wrk  : BOOL;
+CR30_RH_Rej_Cyl_hme  : BOOL;
+
 
 //Schunk Gripper
 HwIn1 	 	AT%I*:	ARRAY [0..8] OF WORD;
@@ -108,11 +122,62 @@ HwOut2		AT%Q*:	ARRAY [0..11] OF WORD;
 HwOut3		AT%Q*:	ARRAY [0..11] OF WORD;
 HwOut4		AT%Q*:	ARRAY [0..11] OF WORD;
 
-
+//Camera
+	OP30_Camera_Trigger				  : BOOL;
+	OP30_LH_Clr_OK					  : BOOL;
+	OP30_LH_Clr_NOK					  : BOOL;
+	OP30_LH_Size_OK					  : BOOL;
+	OP30_LH_Size_NOK				  : BOOL;
+	OP30_LH_Part_OK					  : BOOL;
+	OP30_LH_Part_NOK				  : BOOL;
+	OP30_Size_Rej					  : BOOL;
+	OP30_Size_Rej_Complete			  : BOOL;
+	OP30_One_Cycle				      : BOOL;
+	OP30_LH_Camera_OK 				  : BOOL;
+	OP30_LH_Camera_NOK                : BOOL;
+	OP30_RH_Camera_OK                 : BOOL;
+	OP30_RH_Camera_NOK                : BOOL;
+	OP30_Camera_Done				  : BOOL;
+	
+	OP30_RH_Clr_OK					  : BOOL;
+	OP30_RH_Clr_NOK					  : BOOL;
+	OP30_RH_Size_OK					  : BOOL;
+	OP30_RH_Size_NOK				  : BOOL;
+	OP30_RH_Part_OK					  : BOOL;
+	OP30_RH_Part_NOK				  : BOOL;	
+	
+	OP30_LH_Camera_Trigger		      : BOOL;
+	OP30_LH_Camera_Job_Change_start   : BOOL;
+	OP30_LH_Camera_Error			  : BOOL;
+	OP30_LH_Camera_Ready			  : BOOL;
+	OP30_LH_Camera_Online			  : BOOL;	
+	OP30_LH_Job_Change_Complete		    : BOOL;
+	OP30_LH_Job_Change_Error   		    : BOOL;
+	OP30_LH_Picture_Taken      		    : BOOL;	
+	OP30_LH_Error_status			    : STRING;
+	OP30_LH_Target_Job_ID				: UINT;
+	OP30_LH_Loaded_Job_ID		    	: UINT;
+	
+	OP30_RH_Camera_Trigger		      : BOOL;
+	OP30_RH_Camera_Job_Change_start   : BOOL;
+	OP30_RH_Camera_Error			  : BOOL;
+	OP30_RH_Camera_Ready			  : BOOL;
+	OP30_RH_Camera_Online			  : BOOL;
+	OP30_RH_Job_Change_Complete		    : BOOL;
+	OP30_RH_Job_Change_Error   		    : BOOL;
+	OP30_RH_Picture_Taken      		    : BOOL;
+	OP30_RH_Error_status				: STRING;
+	OP30_RH_Target_Job_ID				: UINT;
+	OP30_RH_Loaded_Job_ID		    	: UINT;	
 
 END_VAR
 
 VAR_GLOBAL PERSISTENT
+	
+	
+
+	OP30_Cycle_time : UDINT;
+	
 	OP30_Gripper_LH_Open  : BOOL;
     OP30_Gripper_LH_Close : BOOL;
     OP30_Gripper_LH_State : BOOL;  //1-- Open 0--Close
@@ -130,21 +195,23 @@ VAR_GLOBAL PERSISTENT
 	  
 	OP30_VERT_SERVO_POSITION		: LREAL ;
 	OP30_VERT_SERVO_HME_POS			: REAL := 0;  				
-	OP30_VERT_SERVO_SFE_WRK_POS		: REAL := 100;		
-	OP30_VERT_SERVO_PICK_POS		: REAL := 400;	
-	OP30_VERT_SERVO_PLACE_POS		: REAL := 200;
+	OP30_VERT_SERVO_SFE_WRK_POS		: REAL := 10;		
+	OP30_VERT_SERVO_PICK_POS		: REAL := 64;	
+	OP30_VERT_SERVO_PLACE_POS		: REAL := 80;
 
     OP30_HORI_SERVO_POS_DONE	    	: BOOL;
     OP30_HORI_SERVO_ON_SFE_WRK			: BOOL;
     OP30_HORI_SERVO_ON_WRK_PICK			: BOOL;
+    OP30_HORI_SERVO_ON_SFE_WRK_PICK		: BOOL;	
 	OP30_HORI_SERVO_ON_WRK_PLACE		: BOOL;
     OP30_HORI_SERVO_ON_HOME				: BOOL;
 	  
 	OP30_HORI_SERVO_POSITION		: LREAL ;
-	OP30_HORI_SERVO_HME_POS			: REAL := 0;  				
-	OP30_HORI_SERVO_SFE_WRK_POS		: REAL := 300;		
-	OP30_HORI_SERVO_PICK_POS		: REAL := 400;	
-	OP30_HORI_SERVO_PLACE_POS		: REAL := 200;
+	OP30_HORI_SERVO_HME_POS			: REAL := -40;  				
+	OP30_HORI_SERVO_SFE_WRK_POS		: REAL :=-40;
+	OP30_HORI_SERVO_SAFE_PICK_POS	: REAL := 100; 		
+	OP30_HORI_SERVO_PICK_POS		: REAL :=149.8;	
+	OP30_HORI_SERVO_PLACE_POS		: REAL :=36.6;
 	
     OP30_CONV_SERVO_POS_DONE	    	: BOOL;
     OP30_CONV_SERVO_ON_SFE_WRK			: BOOL;
@@ -152,14 +219,59 @@ VAR_GLOBAL PERSISTENT
     OP30_CONV_SERVO_ON_HOME				: BOOL;
 	
 	OP30_CONV_SERVO_POSITION		: LREAL ;
-	OP30_CONV_SERVO_HME_POS			: REAL;// := 0;  				
-	OP30_CONV_SERVO_SFE_WRK_POS		: REAL ;//:= 40;		
-	OP30_CONV_SERVO_WRK_POS			: REAL;// := 200;
-
+	OP30_CONV_SERVO_HME_POS			: REAL; 				
+	OP30_CONV_SERVO_SFE_WRK_POS		: REAL ;		
+	OP30_CONV_SERVO_WRK_POS			: REAL;
+	
+//Drum_Feeder
+	OP30_Drum_Feed_Motor_Speed		AT %Q*  : INT;	
+	OP30_HMI_Drum_Feed_Mtr_Speed_IP		: INT;
+	OP30_Drum_Feed_Mtr_Speed_Select		: BOOL;
+	OP30_Drum_Feed_Mtr_Run_Fwd 			: BOOL;
+	OP30_Drum_Feed_Mtr_Reset   			: BOOL;
 //Error
 OP30_ErrorWord_0: DINT;
 OP30_ErrorWord_1: DINT;
 OP30_ErrorWord_2: DINT;	
+
+//Setting Parameters
+    OP30_HMI_Servo_Speed_Vertical     : REAL ;
+	OP30_HMI_Servo_Speed_Horizontal	  : REAL ;
+    OP30_HMI_Hori_Low_Limit		 : REAL:=0;
+    OP30_HMI_Hori_High_Limit     : REAL:=200;
+    OP30_HMI_Vert_Low_Limit		 : REAL:=0;
+    OP30_HMI_Vert_High_Limit     : REAL:=100;	
+
+	OP30_Vert_Ser_Safe_Pos			: REAL;
+	OP30_Hori_Ser_Rej_Pos			: REAL;	
+	OP30_Hori_Ser_Jerk_Pos			: REAL :=1;		
+	OP30_Drum_Freq		  			: REAL;
+	
+	OP30_Conv_Fwd_Time_6_3			: INT:=750;
+	OP30_Conv_Fwd_Speed_6_3			: INT:=150;
+	OP30_Conv_Rev_Time_6_3			: INT:=500;
+	OP30_Conv_Rev_Speed_6_3			: INT:=-100;
+	
+	OP30_Conv_Fwd_Pos				: REAL :=10;
+	OP30_Conv_Rev_Pos				: REAL  :=5;
+
+	OP30_Conv_Fwd_Time_7_89			: INT:=750;
+	OP30_Conv_Fwd_Speed_7_89		: INT:=150;
+	OP30_Conv_Rev_Time_7_89			: INT:=500;
+	OP30_Conv_Rev_Speed_7_89		: INT:=-100;		
+	
+	OP30_Conveyor_Speed				: REAL;
+	OP30_Model						: STRING[80];
+	OP30_Gripper_WRK_POS			: REAL :=2;
+	
+	OP30_Grip_LH_Bypass				: BOOL;
+	OP30_Grip_RH_Bypass				: BOOL;
+	OP30_Guide_Pos					: REAL :=75;
+	
+//Drum Timers
+	OP30_Drum_ON_Time				: INT :=4000;
+	OP30_Drum_OFF_Time				: INT :=1000;
+	
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

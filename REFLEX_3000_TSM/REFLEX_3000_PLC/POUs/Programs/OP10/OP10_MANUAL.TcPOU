@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP10_MANUAL" Id="{a983217b-c081-4f1d-9886-278b0f7186da}" SpecialFunc="None">
+  <POU Name="OP10_MANUAL" Id="{9e7f684a-f156-4b15-9ac9-b8d545a62920}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP10_MANUAL
 VAR
 //OP10A
@@ -85,6 +85,16 @@ VAR
 	OP10A_RH_PUSH_A3								: BOOL;
 	OP10A_RH_PUSH_A4								: BOOL;
 	OP10A_RH_PUSH_A5								: BOOL;
+	OP10A_LH_REJ_A1									: BOOL;
+	OP10A_LH_REJ_A2									: BOOL;
+	OP10A_LH_REJ_A3									: BOOL;
+	OP10A_LH_REJ_A4									: BOOL;
+	OP10A_LH_REJ_A5									: BOOL;
+	OP10A_RH_REJ_A1									: BOOL;
+	OP10A_RH_REJ_A2									: BOOL;
+	OP10A_RH_REJ_A3									: BOOL;
+	OP10A_RH_REJ_A4									: BOOL;
+	OP10A_RH_REJ_A5									: BOOL;
 	OP10B_HORZ_CYL_A1								: BOOL;
 	OP10B_HORZ_CYL_A2								: BOOL;
 	OP10B_HORZ_CYL_A3								: BOOL;
@@ -120,6 +130,29 @@ VAR
 	OP10B_RH_PUSH_A3								: BOOL;
 	OP10B_RH_PUSH_A4								: BOOL;
 	OP10B_RH_PUSH_A5								: BOOL;
+	OP10B_LH_REJ_A1									: BOOL;
+	OP10B_LH_REJ_A2									: BOOL;
+	OP10B_LH_REJ_A3									: BOOL;
+	OP10B_LH_REJ_A4									: BOOL;
+	OP10B_LH_REJ_A5									: BOOL;
+	OP10B_RH_REJ_A1									: BOOL;
+	OP10B_RH_REJ_A2									: BOOL;
+	OP10B_RH_REJ_A3									: BOOL;
+	OP10B_RH_REJ_A4									: BOOL;
+	OP10B_RH_REJ_A5									: BOOL;	
+	OP10_BDY_SING_FRT_A1							: BOOL;
+	OP10_BDY_SING_FRT_A2							: BOOL;
+	OP10_BDY_SING_FRT_A3							: BOOL;
+	OP10_BDY_SING_FRT_A4							: BOOL;
+	OP10_BDY_SING_FRT_A5							: BOOL;	
+	OP10_BDY_SING_SEC_A1							: BOOL;
+	OP10_BDY_SING_SEC_A2							: BOOL;
+	OP10_BDY_SING_SEC_A3							: BOOL;
+	OP10_BDY_SING_SEC_A4							: BOOL;
+	OP10_BDY_SING_SEC_A5							: BOOL;	
+	
+	
+	
 
 //INT
 
@@ -160,26 +193,26 @@ TEMP	: BOOL;
 	OP10_BDY_SING_SEC_STATUS: INT;
 
 
+
+
+	OP10B_PARLLEL: INT;
+	OP10A_PARALLEL: INT;
 END_VAR
 
 VAR RETAIN
 
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF MANUAL_SELECTED OR TEMP THEN
-	
+      <ST><![CDATA[//#############################		OP10A		###############################
+
+IF OP10A_MANUAL_SELECTED THEN
+
 //OP10A
 	OP10A_M_LNR1_ONOFF							:= OP10A_H_LNR1_ONOFF;
 	OP10A_M_LNR2_ONOFF          				:= OP10A_H_LNR2_ONOFF;
 	OP10A_M_BOWL_ONOFF          				:= OP10A_H_BOWL_ONOFF;
-	OP10A_M_HOPPER_ONOFF        				:= OP10A_H_HOPPER_ONOFF;
-                                				
-//OP10B                         				
-	OP10B_M_LNR1_ONOFF          				:= OP10B_H_LNR1_ONOFF  ;
-	OP10B_M_LNR2_ONOFF          				:= OP10B_H_LNR2_ONOFF  ;
-	OP10B_M_BOWL_ONOFF          				:= OP10B_H_BOWL_ONOFF  ;
-	OP10B_M_HOPPER_ONOFF        				:= OP10B_H_HOPPER_ONOFF;
-	                                		
+	OP10A_M_HOPPER_ONOFF        				:= OP10A_H_HOPPER_ONOFF;	
+
 CASE OP10_CYL_NO OF                 		
 	                                		
 	1: IF OP10_HOME THEN            		
@@ -275,8 +308,117 @@ CASE OP10_CYL_NO OF
 		END_IF                              	
                     		                	
 		                            	    	
-END_CASE                            	
- 
+END_CASE
+
+CASE OP10_SERVO_NO OF               	
+	                                	
+	1: OP10A_SRV_O_CNVY_STUS.jogPos				:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
+	   OP10A_SRV_O_CNVY_STUS.jogNeg				:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
+	   OP10A_SRV_O_CNVY_CNT.Bsethome	        := OP10A_SET_HOME;
+	   OP10A_SRV_O_CNVY_STUS.targetPositon	    := OP10A_TARGET_POSITION;
+	   OP10A_SRV_O_CNVY_STUS.moveAbsolute	    := OP10A_MOVE_TARGET;
+	   OP10A_SRV_ACT_POS						:= OP10A_SRV_O_CNVY_STUS.actualPosition;
+	   OP10A_SRV_FAULT							:= OP10A_CONVEYOR.bAxisError;
+	   OP10A_SRV_ENABLE							:= OP10A_CONVEYOR.bAxisEnabled;
+
+	    
+	3: OP10A_SRV_LH_BDYGRP_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
+	   OP10A_SRV_LH_BDYGRP_STUS.jogNeg      	:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;  
+	   OP10A_SRV_LH_BDYGRP_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
+	   OP10A_SRV_LH_BDYGRP_STUS.targetPositon	:= OP10A_TARGET_POSITION;
+	   OP10A_SRV_LH_BDYGRP_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
+	   OP10A_SRV_ACT_POS						:= OP10A_SRV_LH_BDYGRP_STUS.actualPosition;
+	   OP10A_SRV_FAULT							:= OP10A_LH_GRIPR.bAxisError;
+	   OP10A_SRV_ENABLE							:= OP10A_LH_GRIPR.bAxisEnabled;
+	   
+	4: OP10A_SRV_RH_BDYGRP_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
+	   OP10A_SRV_RH_BDYGRP_STUS.jogNeg   		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
+	   OP10A_SRV_RH_BDYGRP_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
+	   OP10A_SRV_RH_BDYGRP_STUS.targetPositon	:= OP10A_TARGET_POSITION;
+	   OP10A_SRV_RH_BDYGRP_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
+	   OP10A_SRV_ACT_POS						:= OP10A_SRV_RH_BDYGRP_STUS.actualPosition;
+	   OP10A_SRV_FAULT							:= OP10A_RH_GRIPR.bAxisError;
+	   OP10A_SRV_ENABLE							:= OP10A_RH_GRIPR.bAxisEnabled;
+	                                			
+	5: OP10A_SRV_LH_BDYANG_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
+	   OP10A_SRV_LH_BDYANG_STUS.jogNeg   		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
+	   OP10A_SRV_LH_BDYANG_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
+	   OP10A_SRV_LH_BDYANG_STUS.targetPositon	:= OP10A_TARGET_POSITION;
+	   OP10A_SRV_LH_BDYANG_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
+	   OP10A_SRV_ACT_POS						:= OP10A_SRV_LH_BDYANG_STUS.actualPosition;
+	   OP10A_SRV_FAULT							:= OP10A_LH_ROTY.bAxisError;
+	   OP10A_SRV_ENABLE							:= OP10A_LH_ROTY.bAxisEnabled;
+                                			
+	6: OP10A_SRV_RH_BDYANG_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
+	   OP10A_SRV_RH_BDYANG_STUS.jogNeg   		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
+	   OP10A_SRV_RH_BDYANG_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
+	   OP10A_SRV_RH_BDYANG_STUS.targetPositon	:= OP10A_TARGET_POSITION;
+	   OP10A_SRV_RH_BDYANG_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
+	   OP10A_SRV_ACT_POS						:= OP10A_SRV_RH_BDYANG_STUS.actualPosition;
+	   OP10A_SRV_FAULT							:= OP10A_RH_ROTY.bAxisError;
+	   OP10A_SRV_ENABLE							:= OP10A_RH_ROTY.bAxisEnabled;
+                           			
+	11:OP10_SRV_FRST_PCKBDY_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
+	   OP10_SRV_FRST_PCKBDY_STUS.jogNeg  		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
+	   OP10_SRV_FRST_PCKBDY_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
+	   OP10_SRV_FRST_PCKBDY_STUS.targetPositon	:= OP10A_TARGET_POSITION;    
+	   OP10_SRV_FRST_PCKBDY_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
+	   OP10A_SRV_ACT_POS						:= OP10_SRV_FRST_PCKBDY_STUS.actualPosition;
+	   OP10A_SRV_FAULT							:= OP10_FRT_BDY_GPR.bAxisError;
+	   OP10A_SRV_ENABLE							:= OP10_FRT_BDY_GPR.bAxisEnabled;
+
+                         			
+	12:OP10_SRV_SCND_PCKBDY_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
+	   OP10_SRV_SCND_PCKBDY_STUS.jogNeg  		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;   
+	   OP10_SRV_SCND_PCKBDY_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
+	   OP10_SRV_SCND_PCKBDY_STUS.targetPositon	:= OP10A_TARGET_POSITION;
+	   OP10_SRV_SCND_PCKBDY_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
+	   OP10A_SRV_ACT_POS						:= OP10_SRV_SCND_PCKBDY_STUS.actualPosition;
+	   OP10A_SRV_FAULT							:= OP10_SEC_BDY_GPR.bAxisError;
+	   OP10A_SRV_ENABLE							:= OP10_SEC_BDY_GPR.bAxisEnabled;	   
+END_CASE
+
+ELSE
+		OP10_CYL_NO									:=0;	
+		OP10A_O_HORZ_MANUALPB1						:=FALSE;
+		OP10A_O_HORZ_MANUALPB2						:=FALSE;
+		OP10A_O_VERT_MANUALPB1						:=FALSE;
+		OP10A_O_VERT_MANUALPB2						:=FALSE;
+		OP10A_M_O_LHGRIP_ONOFF						:=FALSE;
+		OP10A_O_0DEGRE_MANUALPB1					:=FALSE;
+		OP10A_O_180DEGRE_MANUALPB2					:=FALSE;
+		OP10A_M_O_LHPUSH_CYL						:=FALSE;
+		OP10A_M_LNR1_ONOFF		    				:=FALSE;
+		OP10A_M_LNR2_ONOFF          				:=FALSE;
+		OP10A_M_BOWL_ONOFF         					:=FALSE;
+		OP10A_M_HOPPER_ONOFF       					:=FALSE;
+		OP10A_M_O_RHPUSH_CYL						:=FALSE;	
+		OP10A_M_O_RHGRIP_ONOFF						:=FALSE;
+		OP10A_M_RH_REJ_HOME							:=FALSE;
+		OP10A_M_RH_REJ_WRK	 						:=FALSE;
+		OP10A_M_LH_REJ_HOME							:=FALSE;
+		OP10A_M_LH_REJ_WRK	 						:=FALSE;		
+		OP10_FRT_BDY_SING_HME	 					:=FALSE;
+		OP10_FRT_BDY_SING_WRK						:=FALSE;
+		OP10_SEC_BDY_SING_HME	 					:=FALSE;
+		OP10_SEC_BDY_SING_WRK						:=FALSE;		
+		
+		
+		
+END_IF
+	
+
+//#############################		OP10B		###############################
+
+
+
+IF OP10B_MANUAL_SELECTED THEN
+//OP10B                         				
+	OP10B_M_LNR1_ONOFF          				:= OP10B_H_LNR1_ONOFF  ;
+	OP10B_M_LNR2_ONOFF          				:= OP10B_H_LNR2_ONOFF  ;
+	OP10B_M_BOWL_ONOFF          				:= OP10B_H_BOWL_ONOFF  ;
+	OP10B_M_HOPPER_ONOFF        				:= OP10B_H_HOPPER_ONOFF;	
+
 CASE OP10B_CYL_NO OF 
 
 5: IF OP10B_HOME THEN            		
@@ -352,82 +494,8 @@ CASE OP10B_CYL_NO OF
 		OP10B_M_O_RHPUSH_CYL					:=TRUE;
 		END_IF 
 
-END_CASE
-
-                                 	
-CASE OP10_SERVO_NO OF               	
-	                                	
-	1: OP10A_SRV_O_CNVY_STUS.jogPos				:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
-	   OP10A_SRV_O_CNVY_STUS.jogNeg				:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
-	   OP10A_SRV_O_CNVY_CNT.Bsethome	        := OP10A_SET_HOME;
-	   OP10A_SRV_O_CNVY_STUS.targetPositon	    := OP10A_TARGET_POSITION;
-//	   OP10A_SRV_LH_BDYGRP_STUS.targetVelocity	:= OP10A_TARGET_VEL;
-	   OP10A_SRV_O_CNVY_STUS.moveAbsolute	    := OP10A_MOVE_TARGET;
-	   OP10A_SRV_ACT_POS						:= OP10A_SRV_O_CNVY_STUS.actualPosition;
-	   OP10A_SRV_FAULT							:= OP10A_CONVEYOR.bAxisError;
-	   OP10A_SRV_ENABLE							:= OP10A_CONVEYOR.bAxisEnabled;
-
-	    
-	3: OP10A_SRV_LH_BDYGRP_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
-	   OP10A_SRV_LH_BDYGRP_STUS.jogNeg      	:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;  
-	   OP10A_SRV_LH_BDYGRP_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
-	   OP10A_SRV_LH_BDYGRP_STUS.targetPositon	:= OP10A_TARGET_POSITION;
-//	   OP10A_SRV_LH_BDYGRP_STUS.targetVelocity	:= OP10A_TARGET_VEL;
-	   OP10A_SRV_LH_BDYGRP_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
-	   OP10A_SRV_ACT_POS						:= OP10A_SRV_LH_BDYGRP_STUS.actualPosition;
-	   OP10A_SRV_FAULT							:= OP10A_LH_GRIPR.bAxisError;
-	   OP10A_SRV_ENABLE							:= OP10A_LH_GRIPR.bAxisEnabled;
-	   
-	4: OP10A_SRV_RH_BDYGRP_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
-	   OP10A_SRV_RH_BDYGRP_STUS.jogNeg   		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
-	   OP10A_SRV_RH_BDYGRP_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
-	   OP10A_SRV_RH_BDYGRP_STUS.targetPositon	:= OP10A_TARGET_POSITION;
-//	   OP10A_SRV_RH_BDYGRP_STUS.targetVelocity	:= OP10A_TARGET_VEL;
-	   OP10A_SRV_RH_BDYGRP_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
-	   OP10A_SRV_ACT_POS						:= OP10A_SRV_RH_BDYGRP_STUS.actualPosition;
-	   OP10A_SRV_FAULT							:= OP10A_RH_GRIPR.bAxisError;
-	   OP10A_SRV_ENABLE							:= OP10A_RH_GRIPR.bAxisEnabled;
-	                                			
-	5: OP10A_SRV_LH_BDYANG_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
-	   OP10A_SRV_LH_BDYANG_STUS.jogNeg   		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
-	   OP10_SRV_FRST_PCKBDY_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
-	   OP10A_SRV_LH_BDYANG_STUS.targetPositon	:= OP10A_TARGET_POSITION;
-//	   OP10A_SRV_LH_BDYANG_STUS.targetVelocity	:= OP10A_TARGET_VEL;
-	   OP10A_SRV_LH_BDYANG_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
-	   OP10A_SRV_ACT_POS						:= OP10A_SRV_LH_BDYANG_STUS.actualPosition;
-	   OP10A_SRV_FAULT							:= OP10A_LH_ROTY.bAxisError;
-	   OP10A_SRV_ENABLE							:= OP10A_LH_ROTY.bAxisEnabled;
-                                			
-	6: OP10A_SRV_RH_BDYANG_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
-	   OP10A_SRV_RH_BDYANG_STUS.jogNeg   		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
-	   OP10A_SRV_RH_BDYANG_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
-	   OP10A_SRV_RH_BDYANG_STUS.targetPositon	:= OP10A_TARGET_POSITION;
-//	   OP10A_SRV_RH_BDYANG_STUS.targetVelocity	:= OP10A_TARGET_VEL;
-	   OP10A_SRV_RH_BDYANG_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
-	   OP10A_SRV_ACT_POS						:= OP10A_SRV_RH_BDYANG_STUS.actualPosition;
-	   OP10A_SRV_FAULT							:= OP10A_RH_ROTY.bAxisError;
-	   OP10A_SRV_ENABLE							:= OP10A_RH_ROTY.bAxisEnabled;
-                           			
-	11:OP10_SRV_FRST_PCKBDY_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
-	   OP10_SRV_FRST_PCKBDY_STUS.jogNeg  		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;
-	   OP10_SRV_FRST_PCKBDY_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
-	   OP10_SRV_FRST_PCKBDY_STUS.targetPositon	:= OP10A_TARGET_POSITION;    
-	   OP10_SRV_FRST_PCKBDY_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
-	   OP10A_SRV_ACT_POS						:= OP10_SRV_FRST_PCKBDY_STUS.actualPosition;
-	   OP10A_SRV_FAULT							:= OP10_FRT_BDY_GPR.bAxisError;
-	   OP10A_SRV_ENABLE							:= OP10_FRT_BDY_GPR.bAxisEnabled;
-
-                         			
-	12:OP10_SRV_SCND_PCKBDY_STUS.jogPos			:= OP10_JOG_POSITIVE AND NOT OP10_JOG_NEGATIVE;
-	   OP10_SRV_SCND_PCKBDY_STUS.jogNeg  		:= OP10_JOG_NEGATIVE AND NOT OP10_JOG_POSITIVE;   
-	   OP10_SRV_SCND_PCKBDY_CNT.Axis_Home_Cmd	:= OP10A_SET_HOME;
-	   OP10_SRV_SCND_PCKBDY_STUS.targetPositon	:= OP10A_TARGET_POSITION;
-	   OP10_SRV_SCND_PCKBDY_STUS.moveAbsolute	:= OP10A_MOVE_TARGET;
-	   OP10A_SRV_ACT_POS						:= OP10_SRV_SCND_PCKBDY_STUS.actualPosition;
-	   OP10A_SRV_FAULT							:= OP10_SEC_BDY_GPR.bAxisError;
-	   OP10A_SRV_ENABLE							:= OP10_SEC_BDY_GPR.bAxisEnabled;	   
-END_CASE
-
+END_CASE	
+	
 CASE OP10B_SERVO_NO OF 
 	
 	2: OP10B_SRV_O_CNVY_STUS.jogPos				:= OP10B_JOG_POSITIVE AND NOT OP10B_JOG_NEGATIVE;
@@ -482,38 +550,9 @@ CASE OP10B_SERVO_NO OF
 	   OP10B_SRV_FAULT							:= OP10B_RH_ROTY.bAxisError;
 	   OP10B_SRV_ENABLE							:= OP10B_RH_ROTY.bAxisEnabled;	
 
-END_CASE
+END_CASE	
 
-
-ELSE 
-
-//OP10
-
-	OP10_CYL_NO									:=0;
-	                            				
-//OP10A                         				
-		                        				
-	OP10A_O_HORZ_MANUALPB1						:=FALSE;
-	OP10A_O_HORZ_MANUALPB2						:=FALSE;
-	OP10A_O_VERT_MANUALPB1						:=FALSE;
-	OP10A_O_VERT_MANUALPB2						:=FALSE;
-	OP10A_M_O_LHGRIP_ONOFF						:=FALSE;
-	OP10A_O_0DEGRE_MANUALPB1					:=FALSE;
-	OP10A_O_180DEGRE_MANUALPB2					:=FALSE;
-	OP10A_M_O_LHPUSH_CYL						:=FALSE;
-	OP10A_M_LNR1_ONOFF		    				:=FALSE;
-	OP10A_M_LNR2_ONOFF          				:=FALSE;
-	OP10A_M_BOWL_ONOFF         					:=FALSE;
-	OP10A_M_HOPPER_ONOFF       					:=FALSE;
-	OP10A_M_O_RHPUSH_CYL						:=FALSE;	
-	OP10A_M_O_RHGRIP_ONOFF						:=FALSE;
-	OP10A_M_RH_REJ_HOME							:=FALSE;
-	OP10A_M_RH_REJ_WRK	 						:=FALSE;
-	OP10A_M_LH_REJ_HOME							:=FALSE;
-	OP10A_M_LH_REJ_WRK	 						:=FALSE;	
-	
-//OP10B
-	
+ELSE
 	OP10B_O_HORZ_MANUALPB1						:=FALSE;		
 	OP10B_O_HORZ_MANUALPB2						:=FALSE;		
 	OP10B_O_VERT_MANUALPB1						:=FALSE;		
@@ -532,43 +571,37 @@ ELSE
 	OP10B_M_LH_REJ_HOME							:=FALSE;
 	OP10B_M_LH_REJ_WRK	 						:=FALSE;
 
-//////////////SERVO///////////////
-
-	OP10_SERVO_NO								:=0;
-
-	
-END_IF	
-
-// OP10A_HORZ_CYLINDER_SAFE_WRK/HME
-//OP10A_HORZ_CYL.SafeHome				:=I10A_ORING_VERT_CYL_UP AND I10A_ORING_ROTRY_CYL_O_DEG;
-//OP10A_HORZ_CYL.SafeWork             :=I10A_ORING_VERT_CYL_UP AND I10A_ORING_ROTRY_CYL_O_DEG;
+END_IF
+// OP10B_HORZ_CYLINDER_SAFE_WRK/HME
+OP10A_HORZ_CYL.SafeHome				:=OP10A_VERT_CYL.Sensor1 ;//AND OP10A_DEGREE_CYL.Sensor1;
+OP10A_HORZ_CYL.SafeWork             :=OP10A_VERT_CYL.Sensor1 ;//AND OP10A_DEGREE_CYL.Sensor1;
 
 
 OP10A_HORZ_CYL(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 								
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 
+	ResetPB:= Servo_Reset, 								
 	Sensor1:= I10A_ORING_HORZ_CYL_REV_I1011_2,         						(*OP10A_HORZ_CYL_FUNTIONAL_BLCK*)                                
 	Sensor2:= I10A_ORING_HORZ_CYL_FWD_I1011_3, 
 	ManualPB1:= OP10A_O_HORZ_MANUALPB1, 
 	ManualPB2:= OP10A_O_HORZ_MANUALPB2, 
 	AutoCmd1:= OP10A_O_HORZ_AUTOCMD1, 
 	AutoCmd2:= OP10A_O_HORZ_AUTOCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:= (OP10A_HME_STP_NO=25), 
+	HOMING_STRT:= (OP10A_HME_STP_NO=15), 
 	HME_DLY:= 100, 
-	HME_DN_NO:= OP10A_HME_25_30, 
-	HME_CYL_2:=TRUE , 
-	HME_CYL_3:=TRUE , 
+	HME_DN_NO:= OP10A_HME_15_20, 
+	HME_CYL_2:= TRUE, 
+	HME_CYL_3:= TRUE, 
 	Solenoid1=> O10A_ORING_HORZ_CYL_REV_Q1050_6, 
 	Solenoid2=> O10A_ORING_HORZ_CYL_FWD_Q1050_7, 
 	AlarmSensor1=> OP10A_HORZ_CYL_A1, 
@@ -576,34 +609,34 @@ OP10A_HORZ_CYL(
 	AlarmSolenoid1=> OP10A_HORZ_CYL_A3, 
 	AlarmSolenoid2=> OP10A_HORZ_CYL_A4, 
 	AllSignal=> OP10A_HORZ_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.0, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_HORZ_CYL_STUS);
+	Status:= OP10A_HORZ_CYL_STUS,
+	HMENG_RESULT := OP10A_HME_STP_NO);
 	
 
 // OP10A_VERT_CYLINDER_SAFE_WRK/HME
-//OP10A_VERT_CYL.SafeHome				:= I10A_ORING_HORZ_CYL_FWD OR I10A_ORING_HORZ_CYL_REV;
-//OP10A_VERT_CYL.SafeWork				:= (I10A_ORING_HORZ_CYL_FWD OR I10A_ORING_HORZ_CYL_REV) AND I10A_ORING_ROTRY_CYL_O_DEG;
+OP10A_VERT_CYL.SafeHome				:= OP10A_HORZ_CYL.Sensor1 OR OP10A_HORZ_CYL.Sensor2;
+OP10A_VERT_CYL.SafeWork				:= (OP10A_HORZ_CYL.Sensor1 OR OP10A_HORZ_CYL.Sensor2) AND OP10A_DEGREE_CYL.Sensor1;
 	
 OP10A_VERT_CYL(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10A_ORING_VERT_CYL_UP_I1011_4, 
 	Sensor2:= I10A_ORING_VERT_CYL_DWN_I1011_5, 								(*OP10A_VERT_CYL_FUNTIONAL_BLOCK*)
 	ManualPB1:= OP10A_O_VERT_MANUALPB1, 
 	ManualPB2:= OP10A_O_VERT_MANUALPB2, 
 	AutoCmd1:= OP10A_O_VERT_AUTOCMD1, 
 	AutoCmd2:= OP10A_O_VERT_AUTOCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -621,41 +654,42 @@ OP10A_VERT_CYL(
 	AlarmSolenoid1=> OP10A_VERT_CYL_A3, 
 	AlarmSolenoid2=> OP10A_VERT_CYL_A4, 
 	AllSignal=> OP10A_VERT_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.1, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_VERT_CYL_STUS);
+	Status:= OP10A_VERT_CYL_STUS,
+	HMENG_RESULT := OP10A_HME_STP_NO);
 
 // OP10A_DEGREE_CYLINDER_SAFE_WRK/HME	
-//OP10A_DEGREE_CYL.SafeHome				:= I10A_ORING_VERT_CYL_UP;
-//OP10A_DEGREE_CYL.SafeWork				:= I10A_ORING_VERT_CYL_UP AND I10A_ORING_HORZ_CYL_REV ; 	
+OP10A_DEGREE_CYL.SafeHome				:= OP10A_HORZ_CYL.Sensor1 AND OP10A_VERT_CYL.Sensor1;
+OP10A_DEGREE_CYL.SafeWork				:= OP10A_HORZ_CYL.Sensor1 AND OP10A_VERT_CYL.Sensor1; 
+	
 	
 OP10A_DEGREE_CYL(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10A_ORING_ROTRY_CYL_O_DEG_I1011_0, 							(*OP10A_DEGREE_CYL_FUNTIONAL_BLCK*)
 	Sensor2:= I10A_ORING_ROTRY_CYL_180_DEG_I1011_1, 
 	ManualPB1:= OP10A_O_0DEGRE_MANUALPB1, 
 	ManualPB2:= OP10A_O_180DEGRE_MANUALPB2, 
 	AutoCmd1:= OP10A_O_0DEGRE_AUTOCMD1, 
 	AutoCmd2:= OP10A_O_180DEGRE_AUTOCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:= (OP10A_HME_STP_NO=15), 
+	HOMING_STRT:= (OP10A_HME_STP_NO=25), 
 	HME_DLY:= 100, 
-	HME_DN_NO:= OP10A_HME_15_20, 
+	HME_DN_NO:=  OP10A_HME_25_30, 
 	HME_CYL_2:=TRUE , 
 	HME_CYL_3:=TRUE , 
 	Solenoid1=> O10A_ORING_ROTRY_CYL_O_DEG_Q1050_4, 
@@ -665,31 +699,32 @@ OP10A_DEGREE_CYL(
 	AlarmSolenoid1=> OP10A_DEGREE_CYL_A3, 
 	AlarmSolenoid2=> OP10A_DEGREE_CYL_A4, 
 	AllSignal=> OP10A_DEGREE_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.2, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_DEGREE_CYL_STUS);
+	Status:= OP10A_DEGREE_CYL_STUS,
+	HMENG_RESULT := OP10A_HME_STP_NO);
 	
 // OP10A_LH_GRIPPER_CYLINDER_SAFE_WRK/HME	
-//OP10A_LH_GRP.SafeHome						:= TRUE;
-//OP10A_LH_GRP.SafeWork						:= TRUE;
+OP10A_LH_GRP.SafeHome						:= OP10A_LH_PUSH.Sensor1;
+OP10A_LH_GRP.SafeWork						:= OP10A_LH_PUSH.Sensor1;
 
+	
 OP10A_LH_GRP(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:=I10A_ORING_LH_GRPR_CLSE_I1010_2 , 								(*OP10A_LH_GRIPPER_FUNCATIONAL_BLOCK*)
-	Sensor2:=I10A_ORING_LH_GRPR_OPN_I1010_3 , 
-	ManualPB1:=OP10A_LH_GRP.Manual AND NOT OP10A_M_O_LHGRIP_ONOFF,//NOT OP10A_M_O_LHGRIP_ONOFF, 
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 
+	ResetPB:= Servo_Reset, 
+	Sensor1:= I10A_ORING_LH_GRPR_CLSE_I1010_2, 								(*OP10A_LH_GRIPPER_FUNCATIONAL_BLOCK*)
+	Sensor2:= I10A_ORING_LH_GRPR_OPN_I1010_3, 
+	ManualPB1:=OP10A_LH_GRP.Manual AND  NOT OP10A_M_O_LHGRIP_ONOFF,//NOT OP10A_M_O_LHGRIP_ONOFF, 
 	ManualPB2:=OP10A_LH_GRP.Manual AND OP10A_M_O_LHGRIP_ONOFF,//OP10A_M_O_LHGRIP_ONOFF, 
-	AutoCmd1:=,// NOT OP10A_A_O_LHGRIP_ONOFF, 
+	AutoCmd1:=OP10A_LH_GRP.Auto AND NOT OP10A_A_O_LHGRIP_ONOFF,// NOT OP10A_A_O_LHGRIP_ONOFF, 
 	AutoCmd2:=OP10A_LH_GRP.Auto AND OP10A_A_O_LHGRIP_ONOFF, 
-	OperationEnable:= MACHINE_ENABLE, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -709,31 +744,33 @@ OP10A_LH_GRP(
 	AlarmSolenoid1=> OP10A_LH_GRP_A3, 
 	AlarmSolenoid2=> OP10A_LH_GRP_A4, 
 	AllSignal=> OP10A_LH_GRP_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.3, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_LH_GRP_STATS);
+	Status:= OP10A_LH_GRP_STATS,
+	HMENG_RESULT := OP10A_HME_STP_NO);
 
 // OP10A_RH_GRIPPER_CYLINDER_SAFE_WRK/HME	
-//OP10A_RH_GRP.SafeHome						:= TRUE;
-//OP10A_RH_GRP.SafeWork						:= FALSE;				// CHANGE THE INPUT AS FALSE
+OP10A_RH_GRP.SafeHome						:= OP10A_RH_PUSH.Sensor1;
+OP10A_RH_GRP.SafeWork						:= OP10A_RH_PUSH.Sensor1;				// CHANGE THE INPUT AS FALSE
 
+	
+	
 OP10A_RH_GRP(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I10A_ORING_RH_GRPR_OPN_I1010_5, 
-	Sensor2:= I10A_ORING_RH_GRPR_CLSE_I1010_6, 
-	ManualPB1:=OP10A_RH_GRP.Manual AND NOT OP10A_M_O_RHGRIP_ONOFF, 
-	ManualPB2:=OP10A_RH_GRP.Manual AND OP10A_M_O_RHGRIP_ONOFF, 									(*OP10A_RH_GRIPPER_CYLINDER*)
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 
+	ResetPB:= Servo_Reset, 
+	Sensor1:= I10A_ORING_RH_GRPR_CLSE_I1010_6, 
+	Sensor2:= I10A_ORING_RH_GRPR_OPN_I1010_5, 
+	ManualPB1:=OP10A_RH_GRP.Manual AND  NOT OP10A_M_O_RHGRIP_ONOFF, 
+	ManualPB2:= OP10A_RH_GRP.Manual AND OP10A_M_O_RHGRIP_ONOFF, 									(*OP10A_RH_GRIPPER_CYLINDER*)
 	AutoCmd1:=OP10A_RH_GRP.Auto AND NOT OP10A_A_O_RHGRIP_ONOFF, 
 	AutoCmd2:=OP10A_RH_GRP.Auto AND OP10A_A_O_RHGRIP_ONOFF, 
-	OperationEnable:= MACHINE_ENABLE, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -753,33 +790,34 @@ OP10A_RH_GRP(
 	AlarmSolenoid1=> OP10A_RH_GRP_A3, 
 	AlarmSolenoid2=> OP10A_RH_GRP_A4, 
 	AllSignal=> OP10A_RH_GRP_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.4, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO, 
-	Status:= OP10A_RH_GRP_STUS);
+	Status:= OP10A_RH_GRP_STUS,
+	HMENG_RESULT := OP10A_PARALLEL);
 
 // OP10A_LH_PUSH_CYLINDER_SAFE_WRK/HME
-//OP10A_LH_PUSH.SafeHome						:=TRUE;
-//OP10A_LH_PUSH.SafeWork						:=TRUE;
+OP10A_LH_PUSH.SafeHome						:=OP10A_LH_GRP.Sensor2 ;
+OP10A_LH_PUSH.SafeWork						:=OP10A_LH_GRP.Sensor2 ;
+
 	
 OP10A_LH_PUSH(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= , 										(*OP10A_LH_PUSHING_CYLINDER*)
-	Sensor2:= I10A_ORING_LH_PUSHR_CYL_REV_FWD_I1010_4, 
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 
+	ResetPB:= Servo_Reset, 
+	Sensor1:= NOT I10A_ORING_LH_PUSHR_CYL_REV_I1010_4, 										(*OP10A_LH_PUSHING_CYLINDER*)
+	Sensor2:= I10A_ORING_LH_PUSHR_CYL_REV_I1010_4, 
 	ManualPB1:=OP10A_LH_PUSH.Manual AND NOT OP10A_M_O_LHPUSH_CYL, 
 	ManualPB2:=OP10A_LH_PUSH.Manual AND OP10A_M_O_LHPUSH_CYL, 
 	AutoCmd1:=OP10A_LH_PUSH.Auto AND NOT OP10A_A_O_LHPUSH_CYL, 
 	AutoCmd2:=OP10A_LH_PUSH.Auto AND OP10A_A_O_LHPUSH_CYL, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -797,33 +835,35 @@ OP10A_LH_PUSH(
 	AlarmSolenoid1=> OP10A_LH_PUSH_A3, 
 	AlarmSolenoid2=> OP10A_LH_PUSH_A4, 
 	AllSignal=> OP10A_LH_PUSH_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.5, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_LH_PUSH_STUS);
+	Status:= OP10A_LH_PUSH_STUS,
+	HMENG_RESULT := OP10A_HME_STP_NO);
 
-// OP10A_RH_PUSH_CYLINDER_SAFE_WRK/HME
-//OP10A_RH_PUSH.SafeHome						:= FALSE;
-//OP10A_RH_PUSH.SafeWork						:= FALSE;
+
+// OP10A_LH_PUSH_CYLINDER_SAFE_WRK/HME
+OP10A_RH_PUSH.SafeHome						:= OP10A_RH_GRP.Sensor2 ;
+OP10A_RH_PUSH.SafeWork						:= OP10A_RH_GRP.Sensor2 ;
+
 
 OP10A_RH_PUSH(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= , 
-	Sensor2:=I10A_ORING_RH_PUSHR_CYL_REV_FWD_I1010_7 , 
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
+	Sensor1:= NOT I10A_ORING_RH_PUSHR_CYL_REV_I1010_7, 
+	Sensor2:=I10A_ORING_RH_PUSHR_CYL_REV_I1010_7 , 
 	ManualPB1:=OP10A_RH_PUSH.Manual AND NOT OP10A_M_O_RHPUSH_CYL, 
 	ManualPB2:=OP10A_RH_PUSH.Manual AND OP10A_M_O_RHPUSH_CYL, 
 	AutoCmd1:=OP10A_RH_PUSH.AUTO AND NOT OP10A_A_O_RHPUSH_CYL, 
-	AutoCmd2:= OP10A_A_O_RHPUSH_CYL, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
+	AutoCmd2:= OP10A_RH_PUSH.AUTO AND OP10A_A_O_RHPUSH_CYL, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -841,31 +881,31 @@ OP10A_RH_PUSH(
 	AlarmSolenoid1=> OP10A_RH_PUSH_A3, 
 	AlarmSolenoid2=> OP10A_RH_PUSH_A4, 
 	AllSignal=> OP10A_RH_PUSH_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.6, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_RH_PUSH_STUS);
+	Status:= OP10A_RH_PUSH_STUS,
+	HMENG_RESULT := OP10A_PARALLEL);
 	
 // OP10A_LH_REJ_CYLINDER_SAFE_WRK/HME
 //OP10A_LH_REJ.SafeHome						:= TRUE;
 //OP10A_LH_REJ.SafeWork						:= TRUE;
 
 OP10A_LH_REJ(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10A_LH_FIRTRE_ORING_REJ_CYL_REV_I1011_6, 
 	Sensor2:= I10A_LH_FIRTRE_ORING_REJ_CYL_FWD_I1011_7 , 
 	ManualPB1:= OP10A_M_LH_REJ_HOME, 
 	ManualPB2:= OP10A_M_LH_REJ_WRK, 
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
+	AutoCmd1:= OP10A_A_LH_REJ_HOME, 
+	AutoCmd2:= OP10A_A_LH_REJ_WRK, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -880,36 +920,36 @@ OP10A_LH_REJ(
 	HME_CYL_3:=TRUE , 
 	Solenoid1=>O10A_LH_FIRTRE_ORING_REJ_CYL_REV_Q1051_2 , 
 	Solenoid2=>O10A_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1051_3 , 						
-	AlarmSensor1=> ,                    
-	AlarmSensor2=> ,                    
-	AlarmSolenoid1=>,                   
-	AlarmSolenoid2=> , 
-	AllSignal=> , 
-	AlarmPresent=> , 
+	AlarmSensor1=> OP10A_LH_REJ_A1,                    
+	AlarmSensor2=> OP10A_LH_REJ_A2,                    
+	AlarmSolenoid1=>OP10A_LH_REJ_A3,                   
+	AlarmSolenoid2=> OP10A_LH_REJ_A4, 
+	AllSignal=> OP10A_LH_REJ_A5, 
+	AlarmPresent=> OP10A_CYLINDER_ERR.7, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_RH_PUSH_STUS);	
+	Status:= OP10A_RH_PUSH_STUS,
+	HMENG_RESULT := OP10A_PARALLEL);	
 	
 // OP10A_RH_REJ_CYLINDER_SAFE_WRK/HME
 //OP10A_RH_REJ.SafeHome						:= TRUE;
 //OP10A_RH_REJ.SafeWork						:= TRUE;
 
 OP10A_RH_REJ(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10A_CYL_PNP_CHECK, 
+	Manual:= OP10A_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10A_START_HOMNG, 
+	ErrorActive:= OP10A_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10A_RH_FIRTRE_ORING_REJ_CYL_REV_I1020_0, 
 	Sensor2:= I10A_RH_FIRTRE_ORING_REJ_CYL_FWD_I1020_1, 
 	ManualPB1:= OP10A_M_RH_REJ_HOME, 
 	ManualPB2:= OP10A_M_RH_REJ_WRK, 
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
+	AutoCmd1:= OP10A_A_RH_REJ_HOME, 
+	AutoCmd2:= OP10A_A_RH_REJ_WRK, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -924,52 +964,50 @@ OP10A_RH_REJ(
 	HME_CYL_3:=TRUE , 
 	Solenoid1=>O10A_RH_FIRTRE_ORING_REJ_CYL_REV_Q1051_4 , 
 	Solenoid2=>O10A_RH_FIRTRE_ORING_REJ_CYL_FWD_Q1051_5 , 
-	AlarmSensor1=> , 
-	AlarmSensor2=> , 
-	AlarmSolenoid1=>, 
-	AlarmSolenoid2=> , 
-	AllSignal=> , 
-	AlarmPresent=> , 
+	AlarmSensor1=>  OP10A_RH_REJ_A1,	
+	AlarmSensor2=>  OP10A_RH_REJ_A2,	
+	AlarmSolenoid1=>OP10A_RH_REJ_A3,	 
+	AlarmSolenoid2=> OP10A_RH_REJ_A4, 
+	AllSignal=>  OP10A_RH_REJ_A5,	
+	AlarmPresent=> OP10A_CYLINDER_ERR.8, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_RH_PUSH_STUS);	
+	Status:= OP10A_RH_PUSH_STUS,
+	HMENG_RESULT := OP10A_PARALLEL);	
 
 
 
 
-
-	
 ////////////////////////////////////OP10B_CYLINDER_BLOCK////////////////////////////////////
 // OP10B_HORZ_CYLINDER_SAFE_WRK/HME
-//OP10B_HORZ_CYL.SafeHome				:=I10B_ORING_VERT_CYL_UP AND I10B_ORING_ROTRY_CYL_O_DEG;
-//OP10B_HORZ_CYL.SafeWork             :=I10B_ORING_VERT_CYL_UP AND I10B_ORING_ROTRY_CYL_O_DEG;
+OP10B_HORZ_CYL.SafeHome				:=OP10B_VERT_CYL.Sensor1 ;//AND OP10B_DEGREE_CYL.Sensor1;
+OP10B_HORZ_CYL.SafeWork             :=OP10B_VERT_CYL.Sensor1 ;//AND OP10B_DEGREE_CYL.Sensor1;
 
 OP10B_HORZ_CYL(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 								
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK , 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 
+	ResetPB:= Servo_Reset, 								
 	Sensor1:= I10B_ORING_HORZ_CYL_REV_I1031_2,         						(*OP10B_HORZ_CYL_FUNTIONAL_BLCK*)                                
 	Sensor2:= I10B_ORING_HORZ_CYL_FWD_I1031_3, 
 	ManualPB1:= OP10B_O_HORZ_MANUALPB1, 
 	ManualPB2:= OP10B_O_HORZ_MANUALPB2, 
 	AutoCmd1:= OP10B_O_HORZ_AUTOCMD1, 
 	AutoCmd2:= OP10B_O_HORZ_AUTOCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:=1, 
-	SafeWork:=1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:=, 
+	SafeWork:=, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:= (OP10B_HME_STP_NO= 25),
+	HOMING_STRT:= (OP10B_HME_STP_NO= 15),
 	HME_DLY:= 100,
-	HME_DN_NO:= OP10B_HME_25_30,	
+	HME_DN_NO:= OP10B_HME_15_20,	
 	HME_CYL_2:=TRUE ,
 	HME_CYL_3:=TRUE , 
 	Solenoid1=> O10B_ORING_HORZ_CYL_REV_Q1060_6, 
@@ -979,34 +1017,34 @@ OP10B_HORZ_CYL(
 	AlarmSolenoid1=> OP10B_HORZ_CYL_A3, 
 	AlarmSolenoid2=> OP10B_HORZ_CYL_A4, 
 	AllSignal=> OP10B_HORZ_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10B_CYLINDER_ERR.0, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10B_HME_STP_NO , 
-	Status:= OP10B_HORZ_CYL_STUS);
+	Status:= OP10B_HORZ_CYL_STUS,
+	HMENG_RESULT := OP10B_HME_STP_NO);
 	
 
 // OP10B_VERT_CYLINDER_SAFE_WRK/HME
-//OP10B_VERT_CYL.SafeHome				:= I10B_ORING_HORZ_CYL_FWD OR I10B_ORING_HORZ_CYL_REV;
-//OP10B_VERT_CYL.SafeWork				:= (I10B_ORING_HORZ_CYL_FWD OR I10B_ORING_HORZ_CYL_REV) AND I10B_ORING_ROTRY_CYL_O_DEG;
+OP10B_VERT_CYL.SafeHome				:= OP10B_HORZ_CYL.Sensor1 OR OP10B_HORZ_CYL.Sensor2;
+OP10B_VERT_CYL.SafeWork				:= (OP10B_HORZ_CYL.Sensor1 OR OP10B_HORZ_CYL.Sensor2) AND OP10B_DEGREE_CYL.Sensor1;
 	
 OP10B_VERT_CYL(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK , 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10B_ORING_VERT_CYL_UP_I1031_4, 
 	Sensor2:= I10B_ORING_VERT_CYL_DWN_I1031_5, 								(*OP10B_VERT_CYL_FUNTIONAL_BLOCK*)
 	ManualPB1:= OP10B_O_VERT_MANUALPB1, 
 	ManualPB2:= OP10B_O_VERT_MANUALPB2, 
 	AutoCmd1:= OP10B_O_VERT_AUTOCMD1, 
 	AutoCmd2:= OP10B_O_VERT_AUTOCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:= 1, 
-	SafeWork:= 1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -1024,41 +1062,41 @@ OP10B_VERT_CYL(
 	AlarmSolenoid1=> OP10B_VERT_CYL_A3, 
 	AlarmSolenoid2=> OP10B_VERT_CYL_A4, 
 	AllSignal=> OP10B_VERT_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10B_CYLINDER_ERR.1, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,
-	HMENG_RESULT=> OP10B_HME_STP_NO , 
-	Status:= OP10B_VERT_CYL_STUS);
+	Status:= OP10B_VERT_CYL_STUS,
+	HMENG_RESULT := OP10B_HME_STP_NO);
 
 // OP10B_DEGREE_CYLINDER_SAFE_WRK/HME	
-//OP10B_DEGREE_CYL.SafeHome				:= I10B_ORING_VERT_CYL_UP;
-//OP10B_DEGREE_CYL.SafeWork				:= I10B_ORING_VERT_CYL_UP AND I10B_ORING_HORZ_CYL_REV ; 	
+OP10B_DEGREE_CYL.SafeHome				:= OP10B_HORZ_CYL.Sensor1 AND OP10B_VERT_CYL.Sensor1;
+OP10B_DEGREE_CYL.SafeWork				:= OP10B_HORZ_CYL.Sensor1 AND OP10B_VERT_CYL.Sensor1; 	
 	
 OP10B_DEGREE_CYL(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK , 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10B_ORING_ROTRY_CYL_O_DEG_I1031_0, 							(*OP10B_DEGREE_CYL_FUNTIONAL_BLCK*)
 	Sensor2:= I10B_ORING_ROTRY_CYL_180_DEG_I1031_1, 
 	ManualPB1:= OP10B_O_0DEGRE_MANUALPB1, 
 	ManualPB2:= OP10B_O_180DEGRE_MANUALPB2, 
 	AutoCmd1:= OP10B_O_0DEGRE_AUTOCMD1, 
 	AutoCmd2:= OP10B_O_180DEGRE_AUTOCMD2, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:=1, 
-	SafeWork:=1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:=, 
+	SafeWork:=, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:= (OP10B_HME_STP_NO= 15),
+	HOMING_STRT:= (OP10B_HME_STP_NO= 25),
 	HME_DLY:= 100,
-	HME_DN_NO:= OP10B_HME_15_20,
+	HME_DN_NO:=  OP10B_HME_25_30,
 	HME_CYL_2:=TRUE ,
 	HME_CYL_3:=TRUE , 
 	Solenoid1=> O10B_ORING_ROTRY_CYL_O_DEG_Q1060_4, 
@@ -1068,32 +1106,32 @@ OP10B_DEGREE_CYL(
 	AlarmSolenoid1=> OP10B_DEGREE_CYL_A3, 
 	AlarmSolenoid2=> OP10B_DEGREE_CYL_A4, 
 	AllSignal=> OP10B_DEGREE_CYL_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10B_CYLINDER_ERR.2, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10B_HME_STP_NO , 
-	Status:= OP10B_DEGREE_CYL_STUS);
+	Status:= OP10B_DEGREE_CYL_STUS,
+	HMENG_RESULT := OP10B_HME_STP_NO);
 // OP10B_LH_GRIPPER_CYLINDER_SAFE_WRK/HME	
-//OP10B_LH_GRP.SafeHome						:= TRUE;
-//OP10B_LH_GRP.SafeWork						:= I10B_ORING_LH_PUSHR_CYL_REV_FWD;
+OP10B_LH_GRP.SafeHome						:= OP10B_LH_PUSH.Sensor1;
+OP10B_LH_GRP.SafeWork						:= OP10B_LH_PUSH.Sensor1;
 
 OP10B_LH_GRP(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK , 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10B_ORING_LH_GRPR_CLSE_I1030_2, 								(*OP10B_LH_GRIPPER_FUNCATIONAL_BLOCK*)
 	Sensor2:= I10B_ORING_LH_GRPR_OPN_I1030_3, 
-	ManualPB1:=OP10B_LH_GRP.Manual AND NOT OP10B_M_O_LHGRIP_ONOFF, 
-	ManualPB2:=OP10B_LH_GRP.Manual AND  OP10B_M_O_LHGRIP_ONOFF, 
-	AutoCmd1:=OP10B_LH_GRP.AUTO AND  NOT OP10B_A_O_LHGRIP_ONOFF, 
+	ManualPB1:=OP10B_MANUAL_SELECTED AND NOT OP10B_M_O_LHGRIP_ONOFF , 
+	ManualPB2:=OP10B_MANUAL_SELECTED AND OP10B_M_O_LHGRIP_ONOFF, 
+	AutoCmd1:=OP10B_LH_GRP.AUTO AND NOT OP10B_A_O_LHGRIP_ONOFF, 
 	AutoCmd2:=OP10B_LH_GRP.AUTO AND OP10B_A_O_LHGRIP_ONOFF, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:=1, 
-	SafeWork:=1, 
+	OperationEnable:= OperationEnable, 
+	SafeHome:=, 
+	SafeWork:=, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -1111,33 +1149,33 @@ OP10B_LH_GRP(
 	AlarmSolenoid1=> OP10B_LH_GRP_A3, 
 	AlarmSolenoid2=> OP10B_LH_GRP_A4, 
 	AllSignal=> OP10B_LH_GRP_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10B_CYLINDER_ERR.3, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10B_HME_STP_NO , 
-	Status:= OP10B_LH_GRP_STATS);
+	Status:= OP10B_LH_GRP_STATS,
+	HMENG_RESULT := OP10B_HME_STP_NO);
 
 // OP10B_RH_GRIPPER_CYLINDER_SAFE_WRK/HME	
-//OP10B_RH_GRP.SafeHome						:= TRUE;
-//OP10B_RH_GRP.SafeWork						:= FALSE;				// CHANGE THE INPUT AS FALSE
+OP10B_RH_GRP.SafeHome						:= OP10B_RH_PUSH.Sensor1;
+OP10B_RH_GRP.SafeWork						:= OP10B_RH_PUSH.Sensor1;				// CHANGE THE INPUT AS FALSE
 
 OP10B_RH_GRP(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:=I10B_ORING_RH_GRPR_CLSE_I1030_5 , 
-	Sensor2:=I10B_ORING_RH_GRPR_OPN_I1030_6 , 
-	ManualPB1:=OP10B_RH_GRP.Manual AND NOT OP10B_M_O_RHGRIP_ONOFF, 
-	ManualPB2:=OP10B_RH_GRP.Manual AND OP10B_M_O_RHGRIP_ONOFF, 									(*OP10B_RH_GRIPPER_CYLINDER*)
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK  , 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 
+	ResetPB:= Servo_Reset, 
+	Sensor1:=I10B_ORING_RH_GRPR_CLSE_I1030_6 , 
+	Sensor2:=I10B_ORING_RH_GRPR_OPN_I1030_5 , 
+	ManualPB1:=OP10B_MANUAL_SELECTED AND NOT OP10B_M_O_RHGRIP_ONOFF, 
+	ManualPB2:=OP10B_MANUAL_SELECTED AND OP10B_M_O_RHGRIP_ONOFF, 									(*OP10B_RH_GRIPPER_CYLINDER*)
 	AutoCmd1:=OP10B_RH_GRP.AUTO AND NOT OP10B_A_O_RHGRIP_ONOFF, 
 	AutoCmd2:=OP10B_RH_GRP.AUTO AND OP10B_A_O_RHGRIP_ONOFF, 
-	OperationEnable:= MACHINE_ENABLE, 
-	SafeHome:=1 , 
-	SafeWork:=1 , 
+	OperationEnable:= OperationEnable, 
+	SafeHome:= , 
+	SafeWork:= , 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
 	BlinkingBit:= , 
 	TimeOut1:= 5, 
@@ -1155,31 +1193,31 @@ OP10B_RH_GRP(
 	AlarmSolenoid1=> OP10B_RH_GRP_A3, 
 	AlarmSolenoid2=> OP10B_RH_GRP_A4, 
 	AllSignal=> OP10B_RH_GRP_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10B_CYLINDER_ERR.4, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10B_HME_STP_NO , 
-	Status:= OP10B_RH_GRP_STUS);
+	Status:= OP10B_RH_GRP_STUS,
+	HMENG_RESULT := OP10B_PARLLEL);
 
 // OP10B_LH_PUSH_CYLINDER_SAFE_WRK/HME
-//OP10B_LH_PUSH.SafeHome						:=I10B_ORING_LH_GRPR_CLSE;
-//OP10B_LH_PUSH.SafeWork						:=I10B_ORING_LH_GRPR_CLSE;
+OP10B_LH_PUSH.SafeHome						:=OP10B_LH_GRP.Sensor2 ;
+OP10B_LH_PUSH.SafeWork						:=OP10B_LH_GRP.Sensor2 ;
 	
 OP10B_LH_PUSH(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= , 										(*OP10B_LH_PUSHING_CYLINDER*)
-	Sensor2:= I10B_ORING_LH_PUSHR_CYL_REV_FWD_I1030_4, 
-	ManualPB1:=OP10B_LH_PUSH.Manual AND NOT OP10B_M_O_LHPUSH_CYL, 
-	ManualPB2:=OP10B_LH_PUSH.Manual AND OP10B_M_O_LHPUSH_CYL, 
-	AutoCmd1:= OP10B_LH_PUSH.Auto AND NOT OP10B_A_O_LHPUSH_CYL, 
-	AutoCmd2:= OP10B_LH_PUSH.Auto AND OP10B_A_O_LHPUSH_CYL, 
-	OperationEnable:= MACHINE_ENABLE, 
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK , 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 
+	ResetPB:= Servo_Reset, 
+	Sensor1:= NOT I10B_ORING_LH_PUSHR_CYL_REV_I1030_4, 										(*OP10B_LH_PUSHING_CYLINDER*)
+	Sensor2:= I10B_ORING_LH_PUSHR_CYL_REV_I1030_4, 
+	ManualPB1:=OP10B_MANUAL_SELECTED AND NOT OP10B_M_O_LHPUSH_CYL, 
+	ManualPB2:=OP10B_MANUAL_SELECTED AND OP10B_M_O_LHPUSH_CYL, 
+	AutoCmd1:= OP10B_LH_PUSH.AUTO AND NOT OP10B_A_O_LHPUSH_CYL, 
+	AutoCmd2:= OP10B_LH_PUSH.AUTO AND OP10B_A_O_LHPUSH_CYL, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -1199,31 +1237,31 @@ OP10B_LH_PUSH(
 	AlarmSolenoid1=> OP10B_LH_PUSH_A3, 
 	AlarmSolenoid2=> OP10B_LH_PUSH_A4, 
 	AllSignal=> OP10B_LH_PUSH_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10B_CYLINDER_ERR.5, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,
-	HMENG_RESULT=> OP10B_HME_STP_NO , 
-	Status:= OP10B_LH_PUSH_STUS);
+	Status:= OP10B_LH_PUSH_STUS,
+	HMENG_RESULT := OP10B_HME_STP_NO);
 
 // OP10B_LH_PUSH_CYLINDER_SAFE_WRK/HME
-//OP10B_RH_PUSH.SafeHome						:= FALSE;
-//OP10B_RH_PUSH.SafeWork						:= FALSE;
+OP10B_RH_PUSH.SafeHome						:= OP10B_RH_GRP.Sensor2 ;
+OP10B_RH_PUSH.SafeWork						:= OP10B_RH_GRP.Sensor2 ;
 
 OP10B_RH_PUSH(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10B_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= , 
-	Sensor2:=I10B_ORING_RH_PUSHR_CYL_REV_FWD_I1030_7 , 
-	ManualPB1:= OP10B_RH_PUSH.Manual AND NOT OP10B_M_O_RHPUSH_CYL, 
-	ManualPB2:= OP10B_RH_PUSH.Manual AND OP10B_M_O_RHPUSH_CYL, 
-	AutoCmd1:= OP10B_RH_PUSH.Auto AND NOT OP10B_A_O_RHPUSH_CYL, 
-	AutoCmd2:= OP10B_RH_PUSH.Auto AND OP10B_A_O_RHPUSH_CYL, 
-	OperationEnable:= MACHINE_ENABLE, 
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK , 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 								(*OP10B_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
+	Sensor1:= NOT I10B_ORING_RH_PUSHR_CYL_REV_I1030_7, 
+	Sensor2:=I10B_ORING_RH_PUSHR_CYL_REV_I1030_7 , 
+	ManualPB1:=OP10B_MANUAL_SELECTED AND NOT OP10B_M_O_RHPUSH_CYL, 
+	ManualPB2:=OP10B_MANUAL_SELECTED AND OP10B_M_O_RHPUSH_CYL, 
+	AutoCmd1:=OP10B_RH_PUSH.Auto AND NOT OP10B_A_O_RHPUSH_CYL, 
+	AutoCmd2:=OP10B_RH_PUSH.Auto AND OP10B_A_O_RHPUSH_CYL, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -1243,31 +1281,31 @@ OP10B_RH_PUSH(
 	AlarmSolenoid1=> OP10B_RH_PUSH_A3, 
 	AlarmSolenoid2=> OP10B_RH_PUSH_A4, 
 	AllSignal=> OP10B_RH_PUSH_A5, 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10B_CYLINDER_ERR.6, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10B_HME_STP_NO , 
-	Status:= OP10B_RH_PUSH_STUS);
+	Status:= OP10B_RH_PUSH_STUS,
+	HMENG_RESULT := OP10B_PARLLEL);
 
 // OP10B_LH_REJ_CYLINDER_SAFE_WRK/HME
 //OP10B_LH_REJ.SafeHome						:= TRUE;
 //OP10B_LH_REJ.SafeWork						:= TRUE;
 
 OP10B_LH_REJ(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK, 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 								(*OP10B_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
 	Sensor1:=I10B_LH_FIRTRE_ORING_REJ_CYL_REV_I1031_6, 											 
 	Sensor2:=I10B_LH_FIRTRE_ORING_REJ_CYL_FWD_I1031_7,                                              
 	ManualPB1:= OP10B_M_LH_REJ_HOME,                        
 	ManualPB2:= OP10B_M_LH_REJ_WRK,
-	AutoCmd1:= ,                                              
-	AutoCmd2:= ,                                              
-	OperationEnable:= MACHINE_ENABLE, 
+	AutoCmd1:= OP10B_A_LH_REJ_HOME,                                              
+	AutoCmd2:= OP10B_A_LH_REJ_WRK,                                              
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -1275,43 +1313,43 @@ OP10B_LH_REJ(
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:= (OP10A_HME_STP_NO=1),
+	HOMING_STRT:= (OP10B_HME_STP_NO=1),
 	HME_DLY:= ,
 	HME_DN_NO:= ,
 	HME_CYL_2:=TRUE ,
 	HME_CYL_3:=TRUE , 
 	Solenoid1=>O10B_LH_FIRTRE_ORING_REJ_CYL_REV_Q1061_2 , 
 	Solenoid2=> O10B_LH_FIRTRE_ORING_REJ_CYL_FWD_Q1061_3, 
-	AlarmSensor1=> , 
-	AlarmSensor2=> , 
-	AlarmSolenoid1=>, 
-	AlarmSolenoid2=> , 
-	AllSignal=> , 
-	AlarmPresent=> , 
+	AlarmSensor1=> OP10B_LH_REJ_A1,	
+	AlarmSensor2=>OP10B_LH_REJ_A2,	
+	AlarmSolenoid1=>OP10B_LH_REJ_A3,	
+	AlarmSolenoid2=>OP10B_LH_REJ_A4,	
+	AllSignal=> OP10B_LH_REJ_A5,	
+	AlarmPresent=> OP10B_CYLINDER_ERR.7, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_RH_PUSH_STUS);	
+	Status:= OP10B_RH_PUSH_STUS,
+	HMENG_RESULT := OP10B_PARLLEL);	
 	
 // OP10B_RH_REJ_CYLINDER_SAFE_WRK/HME
 //OP10B_RH_REJ.SafeHome						:= TRUE;
 //OP10B_RH_REJ.SafeWork						:= TRUE;
 
 OP10B_RH_REJ(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
+	Auto:= OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR OP10B_CYL_PNP_CHECK, 
+	Manual:= OP10B_MANUAL_SELECTED,
+	HOMING_RUNNING:= OP10B_START_HOMNG, 
+	ErrorActive:= OP10B_ERR, 								(*OP10B_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
 	Sensor1:= I10B_RH_FIRTRE_ORING_REJ_CYL_REV_I1040_0 , 
 	Sensor2:= I10B_RH_FIRTRE_ORING_REJ_CYL_FWD_I1040_1 , 
 	ManualPB1:= OP10B_M_RH_REJ_HOME,		
 	ManualPB2:= OP10B_M_RH_REJ_WRK,	  
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
+	AutoCmd1:= OP10B_A_RH_REJ_HOME, 
+	AutoCmd2:= OP10B_A_RH_REJ_WRK, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -1319,43 +1357,43 @@ OP10B_RH_REJ(
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:= (OP10A_HME_STP_NO=1),
+	HOMING_STRT:= (OP10B_HME_STP_NO=1),
 	HME_DLY:= ,
 	HME_DN_NO:= ,
 	HME_CYL_2:=TRUE ,
 	HME_CYL_3:=TRUE , 
 	Solenoid1=>O10B_RH_FIRTRE_ORING_REJ_CYL_REV_Q1061_4 , 
 	Solenoid2=>O10B_RH_FIRTRE_ORING_REJ_CYL_FWD_Q1061_5 , 
-	AlarmSensor1=> , 
-	AlarmSensor2=> , 
-	AlarmSolenoid1=>, 
-	AlarmSolenoid2=> , 
-	AllSignal=> , 
-	AlarmPresent=> , 
+	AlarmSensor1=> OP10B_RH_REJ_A1,	
+	AlarmSensor2=> OP10B_RH_REJ_A2,	
+	AlarmSolenoid1=> OP10B_RH_REJ_A3,	
+	AlarmSolenoid2=>OP10B_RH_REJ_A4,	
+	AllSignal=>OP10B_RH_REJ_A5,	
+	AlarmPresent=> OP10B_CYLINDER_ERR.8, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10A_RH_PUSH_STUS);	
+	Status:= OP10B_RH_PUSH_STUS,
+	HMENG_RESULT := OP10B_PARLLEL);	
 
 	
 ////////////////////////////////////////OP10 SINGULATING GRIPPER/////////////////////////////
 
 
 OP10_BDY_SING_FRT(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I10A_BDY_SING_CYL_CLSE_I1020_2, 
-	Sensor2:= I10A_BDY_SING_CYL_OPN_I1020_3, 
-	ManualPB1:=OP10_FRT_BDY_SING_HME ,											
-	ManualPB2:=OP10_FRT_BDY_SING_WRK ,	                                    	
-	AutoCmd1:= ,                                        	
-	AutoCmd2:= ,                                        	
-	OperationEnable:= MACHINE_ENABLE, 
+	Auto:= (OP10A_AUTO_RUNNING OR  OP10A_STEP_RUNNING )OR (OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING) OR CHECK, 
+	Manual:= OP10B_MANUAL_SELECTED AND OP10A_MANUAL_SELECTED AND NOT CHECK,
+	HOMING_RUNNING:= (OP10A_START_HOMNG OR OP10B_START_HOMNG), 
+	ErrorActive:= (OP10B_ERR AND NOT OP10B_BYPASS) OR (OP10A_ERR AND NOT OP10A_BYPASS), 								(*OP10B_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
+	Sensor1:= I10A_BDY_SING_CYL_CLSE_I1020_2,  
+	Sensor2:= I10A_BDY_SING_CYL_OPN_I1020_3,  
+	ManualPB1:=OP10_FRT_BDY_SING_HME,											
+	ManualPB2:=OP10_FRT_BDY_SING_WRK,	                                    	
+	AutoCmd1:= OP10_A_FRT_BDY_SING_HME,                                        	
+	AutoCmd2:= OP10_A_FRT_BDY_SING_WRK,                                        	
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -1363,40 +1401,40 @@ OP10_BDY_SING_FRT(
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:=,
+	HOMING_STRT:= OP10_FRT_CYL_INITZAL,
 	HME_DLY:= ,
 	HME_DN_NO:= ,
 	HME_CYL_2:=TRUE ,
 	HME_CYL_3:=TRUE , 
 	Solenoid1=>O10A_BDY_SING_CYL_CLSE_Q1051_6, 
 	Solenoid2=>O10A_BDY_SING_CYL_OPN_Q1051_7,  
-	AlarmSensor1=> , 
-	AlarmSensor2=> , 
-	AlarmSolenoid1=>, 
-	AlarmSolenoid2=> , 
-	AllSignal=> , 
-	AlarmPresent=> , 
+	AlarmSensor1=>OP10_BDY_SING_FRT_A1,	
+	AlarmSensor2=>OP10_BDY_SING_FRT_A2,	
+	AlarmSolenoid1=>OP10_BDY_SING_FRT_A3,	
+	AlarmSolenoid2=>OP10_BDY_SING_FRT_A4,	
+	AllSignal=>OP10_BDY_SING_FRT_A5,	
+	AlarmPresent=> OP10A_CYLINDER_ERR.9, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
-	HMENG_RESULT=> OP10A_HME_STP_NO , 
-	Status:= OP10_BDY_SING_FRT_STATUS);
+	Status:= OP10_BDY_SING_FRT_STATUS,
+	HMENG_RESULT := OP10B_PARLLEL);
 
 
 OP10_BDY_SING_SEC(
-	Auto:= MACHINE_AUTO, 
-	Manual:= MANUAL_SELECTED,
-	HOMING_RUNNING:= START_HOMNG, 
-	ErrorActive:= MACHINE_ERR, 								(*OP10A_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
-	ResetPB:= MACHINE_RST, 
-	Sensor1:= I10B_BDY_SING_CYL_CLSE_I1040_2, 
-	Sensor2:= I10B_BDY_SING_CYL_OPN_I1040_3, 
-	ManualPB1:=OP10_SEC_BDY_SING_HME ,		
-	ManualPB2:=OP10_SEC_BDY_SING_WRK ,	  
-	AutoCmd1:= , 
-	AutoCmd2:= , 
-	OperationEnable:= MACHINE_ENABLE, 
+	Auto:= (OP10A_AUTO_RUNNING OR  OP10A_STEP_RUNNING )OR (OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING) OR CHECK, 
+	Manual:= OP10B_MANUAL_SELECTED AND OP10A_MANUAL_SELECTED AND NOT CHECK,
+	HOMING_RUNNING:= (OP10A_START_HOMNG OR OP10B_START_HOMNG), 
+	ErrorActive:= (OP10B_ERR AND NOT OP10B_BYPASS) OR (OP10A_ERR AND NOT OP10A_BYPASS), 								(*OP10B_RH _ PUSHING CYL_FUNTIONAL_BLCK*)
+	ResetPB:= Servo_Reset, 
+	Sensor1:= I10B_BDY_SING_CYL_CLSE_I1040_2,   
+	Sensor2:= I10B_BDY_SING_CYL_OPN_I1040_3,   
+	ManualPB1:=OP10_SEC_BDY_SING_HME,		
+	ManualPB2:=OP10_SEC_BDY_SING_WRK,	  
+	AutoCmd1:= OP10_A_SEC_BDY_SING_HME, 
+	AutoCmd2:= OP10_A_SEC_BDY_SING_WRK, 
+	OperationEnable:= OperationEnable, 
 	SafeHome:= 1, 
 	SafeWork:= 1, 
 	Pulse_1Sec:= Pulse_Block.Q1Hz, 
@@ -1404,7 +1442,7 @@ OP10_BDY_SING_SEC(
 	TimeOut1:= 5, 
 	TimeOut2:= 5, 
 	TimeOut3:= 5,
-	HOMING_STRT:=,
+	HOMING_STRT:=OP10_SEC_CYL_INITZAL,
 	HME_DLY:= ,
 	HME_DN_NO:= ,
 	HME_CYL_2:=TRUE ,
@@ -1416,136 +1454,20 @@ OP10_BDY_SING_SEC(
 	AlarmSolenoid1=>, 
 	AlarmSolenoid2=> , 
 	AllSignal=> , 
-	AlarmPresent=> , 
+	AlarmPresent=> OP10A_CYLINDER_ERR.10, 
 	Position1=> , 
 	Position2=> , 
 	HomeSensorBlink=> , 
 	WorkSensorBlink=> ,	
 	HMENG_RESULT=>  , 
-	Status:= OP10_BDY_SING_SEC_STATUS);]]></ST>
+	Status:= OP10_BDY_SING_SEC_STATUS,
+	HMENG_RESULT := OP10B_PARLLEL);
+
+]]></ST>
     </Implementation>
     <LineIds Name="OP10_MANUAL">
-      <LineId Id="3" Count="41" />
-      <LineId Id="72" Count="18" />
-      <LineId Id="109" Count="27" />
-      <LineId Id="1512" Count="0" />
-      <LineId Id="1521" Count="6" />
-      <LineId Id="1510" Count="0" />
-      <LineId Id="1519" Count="0" />
-      <LineId Id="1528" Count="6" />
-      <LineId Id="1520" Count="0" />
-      <LineId Id="1518" Count="0" />
-      <LineId Id="166" Count="2" />
-      <LineId Id="1135" Count="0" />
-      <LineId Id="1195" Count="25" />
-      <LineId Id="1194" Count="0" />
-      <LineId Id="1193" Count="0" />
-      <LineId Id="1176" Count="7" />
-      <LineId Id="1185" Count="7" />
-      <LineId Id="1172" Count="0" />
-      <LineId Id="1139" Count="0" />
-      <LineId Id="1146" Count="25" />
-      <LineId Id="1142" Count="0" />
-      <LineId Id="1141" Count="0" />
-      <LineId Id="1140" Count="0" />
-      <LineId Id="1253" Count="0" />
-      <LineId Id="1134" Count="0" />
-      <LineId Id="169" Count="3" />
-      <LineId Id="1808" Count="5" />
-      <LineId Id="1806" Count="1" />
-      <LineId Id="1545" Count="0" />
-      <LineId Id="177" Count="1" />
-      <LineId Id="1548" Count="0" />
-      <LineId Id="1551" Count="0" />
-      <LineId Id="1556" Count="0" />
-      <LineId Id="1552" Count="0" />
-      <LineId Id="1559" Count="0" />
-      <LineId Id="1553" Count="0" />
-      <LineId Id="1561" Count="0" />
-      <LineId Id="1554" Count="0" />
-      <LineId Id="180" Count="1" />
-      <LineId Id="1566" Count="5" />
-      <LineId Id="182" Count="0" />
-      <LineId Id="1572" Count="0" />
-      <LineId Id="183" Count="1" />
-      <LineId Id="1575" Count="5" />
-      <LineId Id="1573" Count="0" />
-      <LineId Id="185" Count="2" />
-      <LineId Id="1584" Count="5" />
-      <LineId Id="1581" Count="0" />
-      <LineId Id="200" Count="3" />
-      <LineId Id="1793" Count="0" />
-      <LineId Id="1798" Count="2" />
-      <LineId Id="1795" Count="1" />
-      <LineId Id="1794" Count="0" />
-      <LineId Id="204" Count="1" />
-      <LineId Id="208" Count="0" />
-      <LineId Id="1797" Count="0" />
-      <LineId Id="1802" Count="2" />
-      <LineId Id="1801" Count="0" />
-      <LineId Id="209" Count="0" />
-      <LineId Id="1221" Count="1" />
-      <LineId Id="1240" Count="0" />
-      <LineId Id="1814" Count="7" />
-      <LineId Id="1223" Count="0" />
-      <LineId Id="1822" Count="0" />
-      <LineId Id="1243" Count="1" />
-      <LineId Id="1594" Count="5" />
-      <LineId Id="1592" Count="1" />
-      <LineId Id="1245" Count="2" />
-      <LineId Id="1608" Count="5" />
-      <LineId Id="1607" Count="0" />
-      <LineId Id="1614" Count="0" />
-      <LineId Id="1248" Count="2" />
-      <LineId Id="1617" Count="5" />
-      <LineId Id="1616" Count="0" />
-      <LineId Id="1251" Count="1" />
-      <LineId Id="1224" Count="0" />
-      <LineId Id="1624" Count="5" />
-      <LineId Id="1623" Count="0" />
-      <LineId Id="1229" Count="0" />
-      <LineId Id="1254" Count="1" />
-      <LineId Id="210" Count="74" />
-      <LineId Id="1272" Count="3" />
-      <LineId Id="289" Count="40" />
-      <LineId Id="1276" Count="3" />
-      <LineId Id="334" Count="39" />
-      <LineId Id="1280" Count="3" />
-      <LineId Id="378" Count="39" />
-      <LineId Id="1284" Count="3" />
-      <LineId Id="422" Count="39" />
-      <LineId Id="1288" Count="3" />
-      <LineId Id="466" Count="39" />
-      <LineId Id="1292" Count="3" />
-      <LineId Id="510" Count="39" />
-      <LineId Id="1296" Count="3" />
-      <LineId Id="554" Count="39" />
-      <LineId Id="1300" Count="3" />
-      <LineId Id="598" Count="39" />
-      <LineId Id="1304" Count="3" />
-      <LineId Id="642" Count="45" />
-      <LineId Id="1308" Count="3" />
-      <LineId Id="692" Count="40" />
-      <LineId Id="1312" Count="3" />
-      <LineId Id="737" Count="39" />
-      <LineId Id="1316" Count="3" />
-      <LineId Id="781" Count="38" />
-      <LineId Id="1320" Count="3" />
-      <LineId Id="824" Count="39" />
-      <LineId Id="1324" Count="3" />
-      <LineId Id="868" Count="39" />
-      <LineId Id="1328" Count="3" />
-      <LineId Id="912" Count="39" />
-      <LineId Id="1332" Count="3" />
-      <LineId Id="956" Count="20" />
-      <LineId Id="1337" Count="87" />
+      <LineId Id="3" Count="1259" />
       <LineId Id="2" Count="0" />
-      <LineId Id="1425" Count="0" />
-      <LineId Id="1427" Count="1" />
-      <LineId Id="1431" Count="37" />
-      <LineId Id="1429" Count="1" />
-      <LineId Id="1469" Count="38" />
-      <LineId Id="1426" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

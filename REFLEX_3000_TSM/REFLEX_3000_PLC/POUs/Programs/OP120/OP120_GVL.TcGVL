@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP120_GVL" Id="{7c7d8993-bb40-4c72-ade2-c8610928c668}">
+  <GVL Name="OP120_GVL" Id="{927745fc-622c-4a9f-aeee-094ea6909ab2}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 	//GENERAL
@@ -22,7 +22,7 @@ OP120_ControlledByRobo:		BOOL;
 OP120_Any_Bypass:			BOOL;
 OP120_ManualModeStatus:		INT;
 OP120_ManualModeWord:		INT;
-
+OP120_STN_MOVER				: INT;
 OP120Seq:				INT;
 OP120_LH_AutoSeq: 			INT;
 OP120_RH_AutoSeq: 			INT;
@@ -109,13 +109,70 @@ OP120_Lring_Placed:						BOOL;
 //Camera Inputs
 OP120_Camera_OK:								BOOL;
 OP120_Camera_NOK:								BOOL;
-
+OP120_Robo_ProgramReset: BOOL;
 
 	OP120_Temp_Home_OK: BOOL;
 	OP120_HomeCondition_OK: BOOL;
 	OP120_OperationEnable: BOOL;
 	OP130_CycleTime: UDINT;
 	b1sec: BOOL;
+//Robo Seq Inputs
+
+CheckParkOK: BOOL;
+CheckParkNOK: BOOL;
+OP120_PushPlace:BOOL;
+Part_Picked: BOOL;
+Ready_for_next_singulation:BOOL;
+OP120_PartPushed: BOOL;
+Op120_PartPlaced:BOOL;
+OP120_Sing_AutoSeq:INT;
+OP120_Lock_AutoSeq:INT;
+OP120_Bowl_OK:BOOL;
+OP120_Camera_Auto_Trigger: BOOL;
+OP120_CamOK: BOOL;
+pickParkOK: BOOL;
+pickParkNOK: BOOL;
+OP120_CamNOK: BOOL;
+OP120_MoverinStation:BOOL;
+OP120_MoverPresent:BOOL;
+tempdelete1:BOOL;
+TempDelete3:BOOL;
+Op120_DryrunOK:BOOL;
+Op120_Bowl_SeqRun:BOOL;
+
+OP120_Vaccuum_IP_Port5_Byte1 AT %I* : BYTE;
+OP120_Vaccuum_IP_Port5_Byte2 AT %I* : BYTE;
+OP120_Vaccuum_OP_Port5_Byte1 AT %Q* : BYTE;
+OP120_Vaccuum_OP_Port5_Byte2 AT %Q* : BYTE;
+
+OP120_Vaccuum_IP_Port6_Byte1 AT %I* : BYTE;
+OP120_Vaccuum_IP_Port6_Byte2 AT %I* : BYTE;
+OP120_Vaccuum_OP_Port6_Byte1 AT %Q* : BYTE;
+OP120_Vaccuum_OP_Port6_Byte2 AT %Q* : BYTE;
+
+OP120_Vaccum1_Bit0 :BOOL;
+OP120_Vaccum1_Bit1 :BOOL;
+OP120_Vaccum2_Bit0 :BOOL;
+OP120_Vaccum2_Bit1 :BOOL;
+
+OP120_GotoPick :BOOL;
+OP120_STN_ENABLE: BOOL;
+Op120_PartSingulated: BOOL;
+
+// temp need to be deleted
+temp_var : ARRAY [0..1000] OF BOOL;
+
+
+conveyor_status :INT;
+robot_status    :INT;	
+
+	
+	op120_setuserdata: BOOL;
+	op120_all_camera_ok: BOOL;
+END_VAR
+VAR_GLOBAL PERSISTENT
+	
+	op120_modelselected: INT;
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

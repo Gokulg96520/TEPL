@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="IO_OP10_MP" Id="{2d02f617-3133-4f4d-ab04-f50099913fe3}">
+  <GVL Name="IO_OP10_MP" Id="{4c4cfb6d-505e-4a67-8d1d-c6d8dc50aaee}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 		I10A_SPARE_I300_0						: BOOL;
@@ -105,7 +105,7 @@ VAR_GLOBAL
 		I80_SPARE_I311_6                        : BOOL;
 		I80_SPARE_I311_7                        : BOOL;		
 		
-		O10A_SPARE_Q300_0								: BOOL;
+		O10_XTS_GREASE_VALVE_ON_Q300_0					: BOOL;
 		O10A_SPARE_Q300_1								: BOOL;
 		O10A_SPARE_Q300_2                               : Bool;
 		O10A_SPARE_Q300_3                               : Bool;
@@ -131,7 +131,7 @@ VAR_GLOBAL
 		O10_TWR_LMP_GN_Q302_6                           : Bool;
 		O10_TWR_LMP_YELW_Q302_7                         : Bool;
 		O10_TWR_LMP_BUZZ_Q303_0                         : Bool;
-		O10B_DRUM_RST_Q303_1                            : Bool;
+		O10B_SPARE_Q303_1 		                        : Bool;
 		O10B_FIRTREE_ORING_CAM_LGHT1_ON_Q303_2          : Bool;
 		O10B_FIRTREE_ORING_CAM_LGHT2_ON_Q303_3          : Bool;
 		O10B_ORING_CAM_LGHT1_ON_Q303_4                  : Bool;
@@ -165,7 +165,7 @@ VAR_GLOBAL
 		O50_SPARE_Q306_6                                : Bool;
 		O50_BARLIGHT_OP1_Q306_7                         : Bool;
 		O50_BARLIGHT_OP2_Q307_0                         : Bool;
-		O70_DRUM_MTR_FWD_Q307_1                         : Bool;
+		O70_DRUM_MTR_FWD_Q307_1                         : BOOL;
 		O70_DRUM_RST_Q307_2                             : Bool;
 		O70_DRUM_EXT_SPEED_Q307_3                       : Bool;
 		O70_SPARE_Q307_4                                : Bool;

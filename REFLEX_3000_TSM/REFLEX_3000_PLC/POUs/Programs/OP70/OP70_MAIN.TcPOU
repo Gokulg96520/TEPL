@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP70_MAIN" Id="{274a6342-ae05-4ff5-bf11-5c024a4de019}" SpecialFunc="None">
+  <POU Name="OP70_MAIN" Id="{edbc5b74-7044-4806-a7fa-d4143159dcf0}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP70_MAIN
 VAR
 	OP70_Modeselection_FB: Mode_Selection_Block1;
@@ -8,16 +8,18 @@ VAR
 	Pulse_1s: BOOL;
 	Times: LREAL;
 	Pge_NUM : INT;
+	Gen_Timer: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
 OP70_Manual();
 OP70_AUTOSEQUENCE();
-OP70_CONVEYOR();
+//OP70_CONVEYOR();
+OP70_Camera_FB();
 OP70_Error();
 OP70_Initialize_Seq();
-
+OP70_Conveyor_Cam_Seq();
 //MOdeselection From HMI
 
 IF (OP70_GVL.OP70_HMI_AutoMode AND NOT OP70_GVL.OP70_HMI_ManualMOde AND NOT OP70_GVL.OP70_HMI_StepMode) THEN
@@ -38,12 +40,14 @@ ELSE
   SR70_CONV_servo.bEnable:=FALSE;
   SR70_HORI_servo.bEnable:=FALSE;
   SR70_VERT_servo.bEnable:=FALSE;	
-END_IF
+END_IF*)
 
-IF SR70_CONV_servo.bAxisError THEN//OR SR70_HORI_servo.bAxisError OR SR70_VERT_servo.bAxisError THEN
+IF SR70_CONV_servo.bAxisError OR SR70_HORI_servo.bAxisError OR SR70_VERT_servo.bAxisError THEN
 	OP70_ErrorActive:=TRUE;
 END_IF
-*)
+
+OP70_Safety_OK:=OperationEnable;
+
 OP70_Modeselection_FB(
 	ModeWord:= , 
 	HomeConditionOK:=OP70_HomeConditionOK , 
@@ -63,11 +67,20 @@ OP70_Modeselection_FB(
 	StepRunning:=OP70_StepRunning , 
 	StartEnable:=OP70_StartEnable  , 
 	MachineStop:=OP70_Machine_Stop );
-	
-TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#1S , Q=>Pulse_1s, ET=> );	]]></ST>
+
+IF OP70_Stop_Request AND NOT OP70_STN_ENABLE THEN
+	OP70_Machine_Stop:=1;
+END_IF
+Gen_Timer(IN:=OP70_Machine_Stop,PT:=T#5S);
+IF Gen_Timer.Q THEN
+	OP70_Machine_Stop:=0;
+END_IF	]]></ST>
     </Implementation>
     <LineIds Name="OP70_MAIN">
-      <LineId Id="3" Count="52" />
+      <LineId Id="3" Count="3" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="7" Count="49" />
+      <LineId Id="65" Count="6" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

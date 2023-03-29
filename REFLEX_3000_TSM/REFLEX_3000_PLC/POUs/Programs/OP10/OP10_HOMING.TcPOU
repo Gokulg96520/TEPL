@@ -1,72 +1,223 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP10_HOMING" Id="{75b2591d-ef7c-4ddf-b71c-e7a85eb44e97}" SpecialFunc="None">
+  <POU Name="OP10_HOMING" Id="{2cd5ddb8-6dbc-4d2c-b606-3e87d117d6bf}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP10_HOMING
 VAR
-	
-	R_TRIG_1					: R_TRIG;
-	AFT_EVRY_STP				: TON;
-	OP10A_HME_STP_NO			: INT;
-	OP10A_HME_STP_NO_MIRR		: INT;
-	
-
-
-	
-
-
+	OP10A_ERR_TMR				: TON;
+	OP10B_ERR_TMR				: TON;
+	OP10A_ROBO_RST_SEQ			: INT;	
+	OP10B_ROBO_RST_SEQ			: INT;
+	OP10A_START_HOMING			: BOOL;
+	OP10B_START_HOMING			: BOOL;
+	OP10A_ROBO_INZI_DN			: BOOL;	
+	OP10B_ROBO_INZI_DN			: BOOL;	
+	temp_42						: BOOL;	
+	temp_43						: BOOL;	
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[	OP10A_O_LHGRIP_HMG1 			:= FALSE;
-	OP10A_O_RHGRIP_HMG1 			:= FALSE;
-	OP10A_O_LHPUSH_HMG1 			:= FALSE;
-	OP10A_O_RHPUSH_HMG1 			:= FALSE;
-	OP10A_O_VERT_HMG1   			:= FALSE;
-	OP10A_O_DEGRE_HMG1  			:= FALSE;
-	OP10A_O_HORZ_HMG1   			:= FALSE;
-	                    			
-	OP10B_O_LHGRIP_HMG1 			:= FALSE;
-	OP10B_O_RHGRIP_HMG1 			:= FALSE;
-	OP10B_O_LHPUSH_HMG1 			:= FALSE;
-	OP10B_O_RHPUSH_HMG1 			:= FALSE;
-	OP10B_O_VERT_HMG1   			:= FALSE;
-	OP10B_O_DEGRE_HMG1  			:= FALSE;
-	OP10B_O_HORZ_HMG1   			:= FALSE;
+      <ST><![CDATA[//#############################		OP10	###########################################
 
+IF (OP10A_START_HOMNG OR OP10B_START_HOMNG) AND (NOT (OP10A_AUTO_RUNNING OR OP10A_STEP_RUNNING OR OP10B_AUTO_RUNNING OR OP10B_STEP_RUNNING OR 
+	 OP10A_Rbt_In_Pick_Zone OR OP10B_Rbt_In_Pick_Zone)) THEN
+	OP10_A_SRV_SCND_BDYPCK_HME		:= (OP10_BDY_SING_FRT.Sensor1 AND OP10_BDY_SING_SEC.Sensor1) OR OP10_COMP_PICKED_1;		
+	OP10_A_SRV_FST_BDYPCK_HME	    := (OP10_BDY_SING_FRT.Sensor1 AND OP10_BDY_SING_SEC.Sensor1) OR OP10_COMP_PICKED_2;
+	OP10_FRT_CYL_INITZAL			:= NOT OP10_COMP_PICKED_1;
+	OP10_SEC_CYL_INITZAL			:= NOT OP10_COMP_PICKED_2;	
+END_IF
 
-IF (OP10A_HME_STP_NO = 10) AND START_HOMNG THEN
-	OP10A_ROBO_SFE_HME	:= TRUE;
-IF OP10A_ROBO_SFE_HME_FB THEN
-	OP10A_HME_STP_NO := OP10A_HME_10_15;
+//#############################		OP10A	################################
+
+R1(CLK:= OP10A_START_HOMING AND NOT OP10A_ERR AND NOT OP10A_AUTO_RUNNING AND NOT OP10A_STEP_RUNNING, Q=> );
+IF R1.Q THEN
+	OP10A_START_HOMNG		:= TRUE;
+	OP10A_START_HOMING		:= FALSE;
+	OP10A_HME_STP_NO		:= 1;
+	OP10A_ROBO_RST_SEQ		:= 0;
+	OP10_COMP_PICKED_1		:= 0;	// need to be deleted
+	OP10_COMP_PICKED_2		:= 0;
+	OP10A_Sing_Seq			:=10;
+	OP10B_Sing_Seq			:=10;	
+END_IF
+IF OP10A_ALL_HOME OR OP10A_ERR THEN
+	OP10A_START_HOMNG		:= FALSE;	
+END_IF
+
+IF (OP10A_HME_STP_NO = 10) AND OP10A_START_HOMNG THEN
+	OP10A_ROBO_SFE_HME		:= TRUE;
+IF OP10A_Rbt_In_Home THEN
+	OP10A_HME_STP_NO 		:= OP10A_HME_10_15;
 END_IF
 END_IF
 
-IF (OP10B_HME_STP_NO = 10) AND START_HOMNG THEN
+OP10A_ALL_HOME	:= OP10_SRV_FRST_PCKBDY_HME_FB AND OP10_SRV_SCND_PCKBDY_HME_FB AND OP10A_Rbt_In_Home AND 
+					(OP10A_HME_STP_NO=30)AND (OP10A_ROBO_RST_SEQ=30) AND OP10A_GRIPPER_HOME AND ((OP10_BDY_SING_FRT.Sensor1 OR OP10_COMP_PICKED_1)AND 
+						(OP10_BDY_SING_SEC.Sensor1 OR OP10_COMP_PICKED_2));
+
+
+
+//####################################		OP10A_ROBO	RST		#################################
+
+IF OP10A_START_HOMNG THEN
+CASE OP10A_ROBO_RST_SEQ OF 
+	
+	0: 	OP10A_ROBO_MODE_NO				:= 3;	
+		OP10A_ROBO_PRGM_RST				:= TRUE;
+		OP10A_ROBO_RST_SEQ				:= 5;
+		
+	5:	IF (OP10A_ROBO_PRGM_RST =TRUE) AND (NOT OP10A_Program_Execute) THEN
+		IF NOT OP10A_CMP_PRS_ROBO THEN
+		OP10A_Homing_Start				:= TRUE;
+		OP10A_ROBO_RST_SEQ				:= 10;
+		ELSE
+		OP10A_Homing_Start				:= TRUE;
+		OP10A_PLACE_IN_REJECTION		:= TRUE;
+		OP10A_ROBO_RST_SEQ				:= 100;	
+		END_IF		
+		OP10A_ROBO_PRGM_RST				:= FALSE;		
+		END_IF	
+	
+	10: IF OP10A_Rbt_In_Home THEN
+		OP10A_Homing_Start				:= FALSE;
+		OP10A_ROBO_RST_SEQ				:= 15;
+		END_IF
+
+	15: IF OP10A_Rbt_In_Home THEN
+		OP10A_Homing_Start				:= FALSE;
+		OP10A_ROBO_MODE_NO				:= 1;
+		OP10A_ROBO_PRGM_RST				:= TRUE;
+		OP10A_ROBO_RST_SEQ				:= 20;			
+		END_IF
+
+	20: IF (OP10A_ROBO_MODE_NO=1) AND OP10A_ROBO_PRGM_RST AND NOT OP10A_Program_Execute THEN
+		OP10A_ROBO_PRGM_RST				:= FALSE;
+		OP10A_ROBO_RST_SEQ				:= 30;		
+		END_IF
+
+	100: IF OP10A_Rbt_In_Reject_Zone AND OP10A_ROBO_Gripper_Open THEN
+		OP10A_PLACE_IN_REJECTION		:= FALSE;
+		OP10A_ROBO_RST_SEQ				:= 15;
+		 END_IF
+END_CASE
+END_IF
+
+//#############################		OP10B	################################
+
+R2(CLK:= OP10B_START_HOMING AND NOT OP10B_ERR AND NOT OP10B_AUTO_RUNNING AND NOT OP10B_STEP_RUNNING, Q=> );
+IF R2.Q THEN
+	OP10B_START_HOMNG		:= TRUE;
+	OP10B_START_HOMING		:= FALSE;
+	OP10B_HME_STP_NO		:= 1;
+	OP10B_ROBO_RST_SEQ		:= 0;
+	OP10_COMP_PICKED_1		:= 0;	// need to be deleted
+	OP10_COMP_PICKED_2		:= 0;
+	OP10A_Sing_Seq			:=10;
+	OP10B_Sing_Seq			:=10;	
+END_IF
+IF OP10B_ALL_HOME OR OP10B_ERR THEN
+	OP10B_START_HOMNG		:= FALSE;	
+END_IF
+
+IF (OP10B_HME_STP_NO = 10) AND OP10B_START_HOMNG THEN
 	OP10B_ROBO_SFE_HME	:= TRUE;
-IF OP10B_ROBO_SFE_HME_FB THEN
+IF OP10B_Rbt_In_Home THEN
 	OP10B_HME_STP_NO := OP10B_HME_10_15;
 END_IF
 END_IF
 
-IF I10A_ORING_HORZ_CYL_REV AND I10A_ORING_VERT_CYL_UP AND I10A_ORING_ROTRY_CYL_O_DEG AND 
-	I10A_ORING_LH_GRPR_CLSE AND OP10A_ROBO_SFE_HME_FB THEN     (* AND RH GRIPPER SENSOR *)
-	OP10A_ALL_HOME					:= TRUE;
-ELSE
-	OP10A_ALL_HOME					:= FALSE;
+OP10B_ALL_HOME	:= OP10_SRV_FRST_PCKBDY_HME_FB AND OP10_SRV_SCND_PCKBDY_HME_FB AND OP10B_Rbt_In_Home AND 
+					(OP10B_HME_STP_NO=30) AND (OP10B_ROBO_RST_SEQ=30)AND OP10B_GRIPPER_HOME AND ((OP10_BDY_SING_FRT.Sensor1 OR OP10_COMP_PICKED_1)AND 
+						(OP10_BDY_SING_SEC.Sensor1 OR OP10_COMP_PICKED_2)); 
+
+
+
+//####################################		OP10B_ROBO	RST		#################################
+
+IF OP10B_START_HOMNG THEN
+CASE OP10B_ROBO_RST_SEQ OF 
+	
+	0:	OP10B_ROBO_MODE_NO				:= 3;	
+		OP10B_ROBO_PRGM_RST				:= TRUE;
+		OP10B_ROBO_RST_SEQ				:= 5;
+		
+	5:	IF (OP10B_ROBO_PRGM_RST =TRUE) AND (NOT OP10B_Program_Execute) THEN
+		IF NOT OP10B_CMP_PRS_ROBO THEN
+		OP10B_Homing_Start				:= TRUE;
+		OP10B_ROBO_RST_SEQ				:= 10;
+		ELSE
+		OP10B_Homing_Start				:= TRUE;
+		OP10B_PLACE_IN_REJECTION		:= TRUE;
+		OP10B_ROBO_RST_SEQ				:= 100;	
+		END_IF		
+		OP10B_ROBO_PRGM_RST				:= FALSE;		
+		END_IF	
+	
+	10: IF OP10B_Rbt_In_Home THEN
+		OP10B_Homing_Start				:= FALSE;
+		OP10B_ROBO_RST_SEQ				:= 15;
+		END_IF
+
+	15: IF OP10B_Rbt_In_Home THEN
+		OP10B_Homing_Start				:= FALSE;
+		OP10B_ROBO_MODE_NO				:= 1;
+		OP10B_ROBO_PRGM_RST				:= TRUE;
+		OP10B_ROBO_RST_SEQ				:= 20;			
+		END_IF
+
+	20: IF (OP10B_ROBO_MODE_NO=1) AND OP10B_ROBO_PRGM_RST AND NOT OP10B_Program_Execute THEN
+		OP10B_ROBO_PRGM_RST				:= FALSE;
+		OP10B_ROBO_RST_SEQ				:= 30;		
+		END_IF
+
+	100: IF OP10B_Rbt_In_Reject_Zone AND OP10B_ROBO_Gripper_Open THEN
+		OP10B_PLACE_IN_REJECTION		:= FALSE;
+		OP10B_ROBO_RST_SEQ				:= 15;
+		 END_IF
+END_CASE	
 END_IF
 
-IF I10A_ORING_HORZ_CYL_REV AND I10A_ORING_VERT_CYL_UP AND I10A_ORING_ROTRY_CYL_O_DEG AND 
- 	I10A_ORING_LH_GRPR_CLSE AND I10A_ORING_LH_PUSHR_CYL_REV_FWD THEN  (* AND RH GRIPPER SENSOR *)
-	OP10B_ALL_HOME					:= TRUE;
-ELSE
-	OP10B_ALL_HOME					:= FALSE;
-END_IF
 
 
 ]]></ST>
     </Implementation>
     <LineIds Name="OP10_HOMING">
-      <LineId Id="3" Count="45" />
+      <LineId Id="3" Count="17" />
+      <LineId Id="289" Count="1" />
+      <LineId Id="293" Count="1" />
+      <LineId Id="21" Count="13" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="35" Count="7" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="48" Count="5" />
+      <LineId Id="214" Count="0" />
+      <LineId Id="54" Count="2" />
+      <LineId Id="215" Count="0" />
+      <LineId Id="57" Count="1" />
+      <LineId Id="60" Count="1" />
+      <LineId Id="208" Count="0" />
+      <LineId Id="216" Count="0" />
+      <LineId Id="218" Count="0" />
+      <LineId Id="217" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="219" Count="4" />
+      <LineId Id="210" Count="1" />
+      <LineId Id="224" Count="2" />
+      <LineId Id="212" Count="1" />
+      <LineId Id="228" Count="0" />
+      <LineId Id="232" Count="0" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="233" Count="0" />
+      <LineId Id="89" Count="10" />
+      <LineId Id="291" Count="1" />
+      <LineId Id="296" Count="0" />
+      <LineId Id="295" Count="0" />
+      <LineId Id="100" Count="13" />
+      <LineId Id="188" Count="0" />
+      <LineId Id="114" Count="7" />
+      <LineId Id="237" Count="0" />
+      <LineId Id="240" Count="30" />
+      <LineId Id="272" Count="3" />
+      <LineId Id="168" Count="5" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP160_MP_IO" Id="{d604617e-9ec9-40e8-a9aa-f4dec258b957}" SpecialFunc="None">
+  <POU Name="OP160_MP_IO" Id="{ae49bd38-8538-4ebb-b774-92bcb7a16b91}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP160_MP_IO
 VAR
 	OP160_MP_DI_MODULE_1 AT %I* : WORD;

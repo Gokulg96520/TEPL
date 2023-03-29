@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="Master3_IO" Id="{44c3106d-d00c-498e-b0b9-a2b4002f3235}">
+  <GVL Name="Master3_IO" Id="{dbb97bec-0eba-4731-896a-42e6973af855}">
     <Declaration><![CDATA[
 VAR_GLOBAL
 	//port1
@@ -46,12 +46,12 @@ I120_PUSH_CYL_REV_I1220_0                      :BOOL;
 I120_PUSH_CYL_FWD_I1220_1                      :BOOL;
 I120_LH_SING_CYL_REV_I1220_2                   :BOOL;
 I120_LH_SING_CYL_FWD_I1220_3                   :BOOL;
-I120_CAMERA_SLIDECYL_REV_I1220_4               :BOOL;
-I120_CAMERA_SLIDECYL_FWD_I1220_5               :BOOL;
-I120_SPARE_I1220_6                             :BOOL;
-I120_SPARE_I1220_7                             :BOOL;
+I120_CAMERA_SLIDE_CYL_REV_I1220_4               :BOOL;
+I120_CAMERA_SLIDE_CYL_FWD_I1220_5               :BOOL;
+I120_SLAVE1_PRSN_PARK_TRAY_I1220_6             :BOOL;
+I120_SLAVE2_PRSN_PARK_TRAY_I1220_7             :BOOL;
 											   
-I120_SPARE_I1221_0                             :BOOL;
+I120_REJ_BIN_PRSNCE_I1221_0                    :BOOL;
 I120_SPARE_I1221_1                             :BOOL;
 I120_SPARE_I1221_2                             :BOOL;
 I120_SPARE_I1221_3                             :BOOL;

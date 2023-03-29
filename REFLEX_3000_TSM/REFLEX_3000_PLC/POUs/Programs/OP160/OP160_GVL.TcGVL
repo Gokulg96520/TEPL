@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="OP160_GVL" Id="{4782f352-9e96-4c67-8af4-f40fa75f3e26}">
+    <Declaration><![CDATA[
+VAR_GLOBAL
+	//GENERAL
+OP160_Auto:					BOOL;
+OP160_HomeRunning:			BOOL;
+OP160_ErrorActive:			BOOL;
+OP160_Home_PB:				BOOL;
+OP160_Work_PB:				BOOL;
+OP160_ManualSafetyBypass:	BOOL;
+OP160_LightCurtainBypass:	BOOL;
+OP160_OperationCompleted:	BOOL;
+OP160_LampCheck:			BOOL;
+OP160_MachineLamp:			BOOL;
+OP160_ComponentOk:			BOOL;
+OP160_ComponentNok:			BOOL;
+OP160_RepeatBit:			BOOL;
+OP160_HomingResetBit:		BOOL;
+OP160_ControlledByRobo:		BOOL;
+OP160_Any_Bypass:			BOOL;
+OP160_STN_MOVER: INT;
+OP160_STN_ENABLE: BOOL;
+OP160_ManualModeStatus:		INT;
+OP160_ManualModeWord:		INT;
+OP160_AutoRunning:			BOOL;
+OP160_StepRunning:			BOOL;
+OP160_StartEnable:   		BOOL;
+OP160_Machine_Stop: 		BOOL;
+OP160_AutoSeq:				INT;
+OP160_LH_AutoSeq: 			INT;
+OP160_RH_AutoSeq: 			INT;
+OP160_Homing_Seq:			INT;
+OP160_DryRun:				BOOL;
+//Automatic_Run:				BOOL;
+OP160_Prev_Stat_Operation_Completed: BOOL;
+OP160_Prev_Comp_Status: INT;
+OP160_Prev_LH_COMP_OK:BOOL;
+OP160_Prev_LH_COMP_NOK:BOOL;
+OP160_Prev_RH_COMP_OK:BOOL;
+OP160_Prev_RH_COMP_NOK:BOOL;
+OP160_LH_Operation_Completed:BOOL;
+OP160_RH_Operation_Completed:BOOL;
+
+OP160_LH_Comp_OK: BOOL;
+OP160_LH_Comp_NOK: BOOL;
+OP160_RH_Comp_OK: BOOL;
+OP160_RH_Comp_NOK: BOOL;
+
+OP160_RH_Laser_Start:BOOL;
+OP160_LH_Laser_Start:BOOL;
+OP160_RH_Laser_Completed:BOOL;
+OP160_LH_Laser_Completed:BOOL;
+
+//ModeSelection Outputs
+//OP160_AutoSelected:		    BOOL;
+
+OP160_ManualSelected:		BOOL;
+OP160_StepSelected:			BOOL;
+OP160_AutoSelected:		    BOOL;
+OP160_HomeCondition_OK:BOOL;
+OP160_Temp_Home_OK:BOOL;
+
+//Manual Cylinder FB Tags
+
+CR130_RH_Rotart_Cyl_Status:	 INT;
+CR130_LH_Rotart_Cyl_Status:	 INT;
+
+// Manual Cyl
+
+CR160_Gripper_Cyl_1: Cylinder_Block;
+CR160_Gripper_Cyl_2:Cylinder_Block;
+
+CR160_MoverREM_Cyl: Cylinder_Block;
+//HMI Tags(From HMI)
+
+OP160_HMI_AutoMode:						BOOL;
+OP160_HMI_ManualMOde:					BOOL;
+OP160_HMI_StepMode:						BOOL;
+OP160_HMI_CycleStart:					BOOL;
+//Cyl tags
+
+OP160_HMI_MOVREM_Home_PB:BOOL;
+OP160_HMI_MOVREM_Work_PB:BOOL;
+
+OP160_HMI_Cycle_Start:					BOOL;
+OP160_HMI_Reset:						BOOL;
+OP160_HMI_Homing:						BOOL;
+SR130_LH_Vert_Servo_Max_Lim:					BOOL;
+SR130_RH_Vert_Servo_Max_Lim:					BOOL;
+SR130_Clm_Vert_Max_Lim:					BOOL;
+
+
+//Error
+
+OP160_ErrorWord_0:    							 DINT;
+OP160_ErrorWord_1:								 DINT;
+OP160_ErrorWord_2:								 DINT;
+
+
+
+//Robo bits
+
+OP160_QC_Pick_Completed                            :BOOL;
+OP160_Moverpresent                                 :BOOL;
+OP160_PartPicked                                   :BOOL;
+OP160_AutoPlaceSeq                                 :INT;
+OP160_Robo_ProgramReset                            :BOOL;
+OP160_Part_Placed                                  :BOOL;
+OP160_MoverinStation                               :BOOL;
+op160_place_both_component_ok                      :BOOL;
+op160_place_1_ok_1_nok                             :BOOL;
+op160_go_to_place                                  :BOOL;
+op160_place_both_component_rej                     :BOOL;
+op160_comp_Lh_ok_to_rbt                            :BOOL;
+op160_comp_Lh_nok_to_rbt                           :BOOL;
+op160_comp_rh_ok_to_rbt                            :BOOL;
+op160_comp_rh_nok_to_rbt                           :BOOL;
+
+END_VAR
+
+VAR_GLOBAL PERSISTENT
+	
+Componenets_Produced        : DINT;
+sampling_quantity           : INT;
+sampling_request_qty        : INT;
+sampling_request            : BOOL;
+sampling_interval           : INT;
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

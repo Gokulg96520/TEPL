@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="FB_Cognex_ProfiNET_1" Id="{877902c3-0e9d-4d6a-8b4e-14b196c1af60}" SpecialFunc="None">
+  <POU Name="FB_Cognex_ProfiNET_1" Id="{59392d45-dbf3-47d3-b250-842133577df6}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_Cognex_ProfiNET_1
 VAR_INPUT
 	tTimeout						: TIME := T#10S;
@@ -13,14 +13,14 @@ VAR_INPUT
     aResults_64_Bytes	     		: ARRAY[0..63] OF BYTE;
     number_of_inspections			: UINT;
 	iresult_code					: UINT;
-	
+	bClear_Error					: BOOL;	
 	bTarget_job_ID					: UINT;
 END_VAR
 
 VAR_OUTPUT
 	Error_Status_message			:STRING;
 	bError							: BOOL := 0;
-	stCognex_record_control 		: Acquisition_control;
+	stCognex_record_control 		: Acquisition_Control;
 	stCognex_inspection_control 	: Inspection_control;
     wCommandControl_out 			: UINT;
     aUser_data_64_Byte 			    : ARRAY[0..63] OF BYTE;
@@ -31,24 +31,28 @@ VAR_OUTPUT
 	bTXTSM_Error_Job_Change 		: BOOL;
 	bPictureTakenComplete			: BOOL;
 	Loaded_Job_ID					: UINT;
+	camera_ready					: BOOL;
+	Camera_online					: BOOL;
+	TXTSM_camera_not_online 		: BOOL := 0;
 END_VAR
 
 VAR_IN_OUT
-	bClear_Error					: BOOL := 0;
-	bJob_change_start				: BOOL := 0;
-	TXTSM_camera_not_online 		: BOOL := 0;
+	bJob_change_start				: BOOL := 0;	
 	bTrigger_start					: BOOL := 0;
 END_VAR
 
 VAR
 	ttimeout_step					: TON;
 	tTimeoutStepTrigger			    : TON;
+	Resul_ACk_Timer					: TON;
 	//JobChange
+	job_Change_OK					: R_TRIG;
+	job_Change_NOK					: R_TRIG;	
 	iStep_Jobchange 				: INT := 0;
 	bJob_change_io 					: BOOL:= 0;
 	bJob_change_nio 				: BOOL:= 0;
 	//Trigger
-	
+	Trig_Start						: R_TRIG;
     iStep_Trigger				    : INT := 0;
 	bInspection_io 					: BOOL:= 0;
 	bInspection_nio 				: BOOL:= 0;
@@ -69,6 +73,11 @@ END_VAR
     <Implementation>
       <ST><![CDATA[stCognex_inspection_control.Buffer_Results_Enable 	:= FALSE;
 stCognex_inspection_control.Inspection_Results_Ack 	:= FALSE;
+
+Resul_ACk_Timer(IN:=stCognex_inspection_control.Inspection_Results_Ack,PT:=T#100MS);
+IF Resul_ACk_Timer.Q THEN
+	stCognex_inspection_control.Inspection_Results_Ack:=FALSE;
+END_IF
 
 // picture taken complete
 bPictureTakenComplete:=stCognex_record_status .Exposure_Complete AND (iStep_Trigger <> 0);
@@ -225,8 +234,14 @@ CASE iStep_Jobchange OF
 			iStep_Jobchange := 9;
 			
 	9://Set Output signals
-		bJob_loading_completed := bJob_change_io;
-		bJob_load_failed := bJob_change_nio;
+	 IF bTarget_job_ID=Loaded_Job_ID  THEN
+		bJob_loading_completed:=1;
+	 ELSE
+	 	bJob_load_failed:=1;
+	 END_IF
+
+		//bJob_loading_completed := bJob_change_io;
+		//bJob_load_failed := bJob_change_nio;
 		iStep_Jobchange := 0;
 	ELSE //CASE JobChange default
 		
@@ -244,8 +259,11 @@ ELSIF (bJob_change_io AND NOT bJob_change_nio) OR bClear_Error THEN
 	bTXTSM_Error_Job_Change := FALSE;
 END_IF;
 
-
-
+	// IF bTarget_job_ID=Loaded_Job_ID  THEN
+	//	bJob_loading_completed:=1;
+	// ELSE
+	// 	bJob_load_failed:=1;
+	// END_IF
 //#########################################################################
 //Trigger##################################################################
 //#########################################################################
@@ -261,12 +279,14 @@ IF iStep_Trigger = 2
 	 OR iStep_Trigger = 4 
 THEN
 	IF (FPInspection_Completed OR FNInspection_Completed) THEN
-        IF stCognex_Inspection_status .Job_Pass THEN
+        IF stCognex_Inspection_status .Results_Valid THEN // stCognex_Inspection_status .Job_Pass THEN
 		    bInspection_io  := TRUE;
 		    bInspection_nio := FALSE;
+			stCognex_inspection_control.Inspection_Results_Ack :=TRUE;
         ELSE
 		    bInspection_io  := FALSE;
 		    bInspection_nio := TRUE;
+			stCognex_inspection_control.Inspection_Results_Ack :=TRUE;
         END_IF
 	END_IF
 (* PHU: von ARU
@@ -283,8 +303,9 @@ CASE iStep_Trigger OF
 		bInspection_Result_NIO := FALSE;
 		bInspection_io  := FALSE;
 		bInspection_nio := FALSE;
-
-		IF bTrigger_start AND (iStep_Jobchange = 0) AND NOT bTXTSM_Error_Job_Change THEN
+		
+		Trig_Start(CLK:=bTrigger_start);
+		IF Trig_Start.Q AND (iStep_Jobchange = 0) AND NOT bTXTSM_Error_Job_Change THEN
 			bTrigger_start := FALSE;
 			iStep_Trigger := 1;
 		END_IF;
@@ -359,8 +380,8 @@ CASE iStep_Trigger OF
 
 END_CASE;
 
-
-	
+camera_ready:=stCognex_record_status.Trigger_Ready;
+Camera_online:=	stCognex_record_status.Online;
 Loaded_Job_ID:=wcommand_control_in;
 
 //#########################################################################
@@ -400,7 +421,25 @@ END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="FB_Cognex_ProfiNET_1">
-      <LineId Id="3" Count="329" />
+      <LineId Id="3" Count="1" />
+      <LineId Id="496" Count="0" />
+      <LineId Id="495" Count="0" />
+      <LineId Id="497" Count="2" />
+      <LineId Id="5" Count="155" />
+      <LineId Id="404" Count="0" />
+      <LineId Id="417" Count="0" />
+      <LineId Id="419" Count="1" />
+      <LineId Id="418" Count="0" />
+      <LineId Id="408" Count="0" />
+      <LineId Id="161" Count="18" />
+      <LineId Id="421" Count="3" />
+      <LineId Id="181" Count="18" />
+      <LineId Id="492" Count="0" />
+      <LineId Id="200" Count="2" />
+      <LineId Id="493" Count="0" />
+      <LineId Id="203" Count="16" />
+      <LineId Id="400" Count="0" />
+      <LineId Id="220" Count="112" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

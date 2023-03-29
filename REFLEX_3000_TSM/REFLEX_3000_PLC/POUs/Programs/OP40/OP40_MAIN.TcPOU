@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP40_MAIN" Id="{48ab2033-8330-499e-941b-5b0a313c98f8}" SpecialFunc="None">
+  <POU Name="OP40_MAIN" Id="{0597d35d-8fa2-4c72-92e3-c415b1b468eb}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP40_MAIN
 VAR
 	OP40_Modeselection_FB: Mode_Selection_Block1;	
@@ -9,6 +9,7 @@ VAR
 	Pulse_100ms: BOOL;
 	Times: LREAL;
 	reset: BOOL;
+	Gen_Timer: TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -18,7 +19,7 @@ OP40_Manual();
 OP40_AUTOSEQUENCE();
 OP40_Error();
 OP40_Initialization_Seq();
-
+op40_toolchangeover ();
 //MOdeselection From HMI
 
 IF (OP40_HMI_AutoMode AND NOT OP40_HMI_ManualMOde AND NOT OP40_HMI_StepMode) THEN
@@ -49,8 +50,10 @@ OP40_Modeselection_FB(
 	StepRunning:=OP40_StepRunning , 
 	StartEnable:=OP40_StartEnable  , 
 	MachineStop:=OP40_Machine_Stop );
-(*
-IF (OP40_AutoSelected OR OP40_ManualSelected )AND NOT OP40_ErrorActive AND OP40_Safety_OK THEN
+
+OP40_Safety_OK:=OperationEnable;	
+	
+IF OP40_AutoSelected OR OP40_ManualSelected AND NOT ( OP40_ErrorActive OR OP40_Safety_OK) THEN
 	SR40_Vert_servo.bEnable:=TRUE;
 ELSE
 	SR40_Vert_servo.bEnable:=FALSE;
@@ -60,22 +63,25 @@ IF OP40_GVL.SR40_Vert_servo.bAxisError OR NOT OP40_Safety_OK  THEN
 	OP40_ErrorActive:=TRUE;
 END_IF
 
-IF NOT SR40_Vert_servo.bAxisHomed THEN
-	SR40_Vert_servo_not_Home:=TRUE;
-ELSE
-	SR40_Vert_servo_not_Home:=FALSE;
+IF OP40_Stop_Request AND NOT OP40_STN_ENABLE THEN
+	OP40_Machine_Stop:=1;
 END_IF
-*)
-	//Cycle Time Block
-//	OP40_Cycle_Time(Cycle_Start_Bit:= , Pulse_100ms:=Pulse_100ms , Time_In_Sec=>Times , CT_Running=> );
 
-	
-	
-	//Pulse Generation 100ms
-	TP_100ms(IN:=NOT TP_100ms.Q , PT:=T#100MS , Q=>Pulse_100ms, ET=> );]]></ST>
+Gen_Timer(IN:=OP40_Machine_Stop,PT:=T#5S);
+IF Gen_Timer.Q THEN
+	OP40_Machine_Stop:=0;
+END_IF
+]]></ST>
     </Implementation>
     <LineIds Name="OP40_MAIN">
-      <LineId Id="3" Count="59" />
+      <LineId Id="3" Count="39" />
+      <LineId Id="83" Count="7" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="70" Count="2" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="73" Count="2" />
+      <LineId Id="54" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

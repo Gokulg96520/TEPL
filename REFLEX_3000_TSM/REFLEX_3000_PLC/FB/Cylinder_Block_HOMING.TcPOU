@@ -41,10 +41,10 @@ VAR_OUTPUT
 	Position2 :BOOL;
 	HomeSensorBlink :BOOL;
 	WorkSensorBlink :BOOL;
-	HMENG_RESULT:INT;
 END_VAR
 VAR_IN_OUT
 	Status :INT;
+	HMENG_RESULT: INT;
 END_VAR
 VAR
 	Timer1 :INT;
@@ -59,8 +59,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-Status:=0;
+      <ST><![CDATA[Status:=0;
 //Cylinder Moving to Home Position by Manual
 
 IF ManualPB1 THEN
@@ -96,13 +95,12 @@ IF AutoCmd1 THEN
 	ELSIF AutoCmd2 THEN Status :=6;
 	ELSIF ErrorActive THEN Status :=4; 
 	ELSIF AllSignal THEN Status :=3;
-	ELSIF NOT OperationEnable THEN Status :=9; 
+	ELSIF NOT OperationEnable THEN Status :=9;
 	ELSIF Status =0 AND SafeHome THEN
 		Solenoid1 :=1;
 		Solenoid2 :=0;
 	END_IF 
 END_IF
-
 
 //Cylinder Moving to Work Position by Auto
 
@@ -111,7 +109,7 @@ IF AutoCmd2 THEN
 	ELSIF AutoCmd1 THEN Status :=6;
 	ELSIF ErrorActive THEN Status :=4; 
 	ELSIF AllSignal THEN Status :=3;
-	ELSIF NOT OperationEnable THEN Status :=9; 
+	ELSIF NOT OperationEnable THEN Status :=9;
 	ELSIF Status =0 AND SafeWork THEN
 		Solenoid2 :=1;
 		Solenoid1 :=0;
@@ -145,8 +143,10 @@ IF NOT Solenoid1 THEN Timer1 :=0; END_IF
 //Timer1 is for Monitoring Cylinder Home Position Time
 HomePositionErr_1SecPls(CLK := Pulse_1Sec);
 
-IF Solenoid1 AND HomePositionErr_1SecPls.Q THEN 
+IF Solenoid1 AND NOT Sensor1 AND HomePositionErr_1SecPls.Q THEN 
 Timer1 := Timer1 + 1;
+ELSE
+Timer1	:= 0;	
 END_IF
 
 
@@ -164,8 +164,10 @@ IF NOT Solenoid2 THEN Timer2 :=0; END_IF
 //Timer2 is for Monitoring Cylinder Work Position Time
 WorkPositionErr_1SecPls(CLK := Pulse_1Sec);
 
-IF Solenoid2 AND WorkPositionErr_1SecPls.Q THEN 
+IF Solenoid2 AND NOT Sensor2 AND WorkPositionErr_1SecPls.Q THEN 
 	Timer2 := Timer2 + 1;
+ELSE
+	Timer2	:=0;
 END_IF
 
 
@@ -216,7 +218,7 @@ END_IF
 
 AFT_CYL_HME(IN:= (HomingCmd1 AND HME_CYL_2 AND HME_CYL_3 AND Sensor1 AND NOT ErrorActive), PT:=INT_TO_TIME(HME_DLY) , Q=> , ET=> );
 IF AFT_CYL_HME.Q THEN
-	HMENG_RESULT			:= HME_DN_NO;
+	HMENG_RESULT:=HME_DN_NO;
 END_IF
 
 // ALARM RESET
@@ -229,12 +231,20 @@ AlarmSolenoid1          					:= FALSE;
 AlarmSolenoid2          					:= FALSE;
 AllSignal               					:= FALSE;
 
+END_IF
+
+
+IF AlarmSensor1 OR AlarmSensor2 OR AlarmSolenoid1 OR AlarmSolenoid2 OR AllSignal THEN
+		AlarmPresent						:= TRUE;
+ELSE
+		AlarmPresent						:= FALSE;
 END_IF]]></ST>
     </Implementation>
     <LineIds Name="Cylinder_Block_HOMING">
-      <LineId Id="3" Count="159" />
-      <LineId Id="219" Count="9" />
-      <LineId Id="2" Count="0" />
+      <LineId Id="467" Count="158" />
+      <LineId Id="645" Count="0" />
+      <LineId Id="626" Count="18" />
+      <LineId Id="285" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

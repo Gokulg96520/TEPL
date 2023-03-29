@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP160_Main" Id="{0cd97a78-c2b4-4ccc-a413-47600a6e10b1}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP160_Main
+VAR
+	OP160_ModeSelection_FB: Mode_Selection_Block1;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[OP160_Error();
+OP160_Manual();
+OP160_QCPlace_AutoSequence();
+OP160_AutoSequence();
+OP160_Initialization_Seq();
+
+
+
+
+//ModeSection 
+
+IF (OP160_HMI_AutoMode AND NOT OP160_HMI_ManualMOde AND NOT OP160_HMI_StepMode) THEN
+	OP160_Modeselection_FB.ModeWord:=1;
+	ELSIF (NOT OP160_HMI_AutoMode AND OP160_HMI_ManualMOde AND NOT OP160_HMI_StepMode) THEN
+		OP160_Modeselection_FB.ModeWord:=2;
+	ELSIF  (NOT OP160_HMI_AutoMode AND NOT OP160_HMI_ManualMOde AND  OP160_HMI_StepMode) THEN
+		OP160_Modeselection_FB.ModeWord:=3;
+    ELSE   
+		OP160_Modeselection_FB.ModeWord:=0;
+END_IF
+	
+
+
+
+
+
+
+OP160_Modeselection_FB(
+	ModeWord:= , 
+	HomeConditionOK:=OP160_HomeCondition_OK , 
+	OperationEnable:=OperationEnable , 
+	StartPB:= , 
+	SafetyAndNOError:=OperationEnable , 
+	ModeAck:=TRUE , 
+	HomingINProgress:= , 
+	TempHomeOK:=OP160_Temp_Home_OK , 
+	ResetPB:= , 
+	AutoSelected=>OP160_AutoSelected , 
+	ManualSelected=>OP160_ManualSelected , 
+	StepSelected=>OP160_StepSelected , 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP160_AutoRunning , 
+	StepRunning:=OP160_StepRunning , 
+	StartEnable:=OP160_StartEnable , 
+	MachineStop:=OP160_Machine_Stop );
+	
+	IF (OP160_AutoSelected OR  OP160_StepSelected ) THEN
+		OP160_GVL.OP160_Auto:=TRUE;
+		//O160_ROB_MAN_AUTO_MODE_Q709_4:=TRUE;
+		OP160_SI_Dry_Run:=TRUE;
+		OP160_Robo_Out6002:=1;
+		
+		ELSE
+			OP160_GVL.OP160_Auto:=FALSE;
+			//O160_ROB_MAN_AUTO_MODE_Q709_4:=FALSE;
+			OP160_Robo_Out6002:=0;
+		END_IF
+IF OP160_Auto AND NOT OP160_ManualSelected AND NOT OP160_HomeRunning THEN
+	OP160_Robo_Out6001:=1;
+END_IF
+IF OP160_EO_RO_ATC_Open THEN
+	O160_TOOL_CHO_UNLOCK_Q1351_0:=TRUE;
+	ELSE
+		O160_TOOL_CHO_UNLOCK_Q1351_0:=FALSE;
+	END_IF
+IF OP160_EO_RO_ATC_Close THEN
+	O160_TOOL_CHO_LOCK_Q1351_1:=TRUE;
+	ELSE
+		O160_TOOL_CHO_LOCK_Q1351_1:=FALSE;
+	END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="OP160_Main">
+      <LineId Id="3" Count="1" />
+      <LineId Id="7" Count="67" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

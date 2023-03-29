@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Rejection_Codes_Function" Id="{2bcbdead-ab76-4953-9d91-d1aa69abb9a0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION Rejection_Codes_Function : STRING
+VAR_INPUT
+	Fixture_Code	: INT;
+END_VAR
+VAR	
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF Fixture_Code = 0 OR Fixture_Code >151 THEN
+	Rejection_Codes_Function:=' NA ';
+END_IF
+IF Fixture_Code = 21 THEN
+	Rejection_Codes_Function:='  OP20';
+END_IF
+IF Fixture_Code = 31 THEN
+	Rejection_Codes_Function:='  OP30';
+END_IF
+IF Fixture_Code = 41 THEN
+	Rejection_Codes_Function:='  OP40';
+END_IF
+IF Fixture_Code = 51 THEN
+	Rejection_Codes_Function:='  OP50';
+END_IF
+IF Fixture_Code = 61 THEN
+	Rejection_Codes_Function:='  OP60';
+END_IF
+IF Fixture_Code = 71 THEN
+	Rejection_Codes_Function:='  OP70';
+END_IF
+IF Fixture_Code = 81 THEN
+	Rejection_Codes_Function:='  OP80';
+END_IF
+IF Fixture_Code = 91 THEN
+	Rejection_Codes_Function:='  OP90';
+END_IF
+IF Fixture_Code = 111 THEN
+	Rejection_Codes_Function:='  OP110';
+END_IF
+IF Fixture_Code = 121 THEN
+	Rejection_Codes_Function:='  OP120';
+END_IF
+IF Fixture_Code = 131 THEN
+	Rejection_Codes_Function:='  OP130';
+END_IF
+IF Fixture_Code = 141 THEN
+	Rejection_Codes_Function:='  OP140';
+END_IF
+IF Fixture_Code = 151 THEN
+	Rejection_Codes_Function:='  OP150-V';
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="Rejection_Codes_Function">
+      <LineId Id="13" Count="1" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="16" Count="1" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="31" Count="1" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="34" Count="2" />
+      <LineId Id="43" Count="1" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="49" Count="1" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="52" Count="1" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="55" Count="1" />
+      <LineId Id="54" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

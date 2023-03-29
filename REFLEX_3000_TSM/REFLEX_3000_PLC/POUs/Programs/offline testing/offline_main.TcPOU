@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="offline_main" Id="{03973bd6-d3cb-485e-a7a7-f24d52dd5fb5}" SpecialFunc="None">
+  <POU Name="offline_main" Id="{ae4fb863-54c8-4713-9411-e8dc45d4f1c7}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM offline_main
 
 

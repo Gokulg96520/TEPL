@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="PRG_XTS_Sequence" Id="{680435d3-7ccb-41f1-b217-37d9ffff1f26}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM PRG_XTS_Sequence
+VAR	
+	
+// MOVER STATION POSITION AND VELOCITY ARRAY
+	rStationPostion											: ARRAY [0..nNumberOfStations] OF LREAL ;
+	lr_internal_vel_cmd										: LREAL :=100;
+	rCalculatedPostion										: ARRAY[0..nNumberofMovers] OF ARRAY[0..nNumberOfStations]OF LREAL;
+	rStationVelocity										: ARRAY[0..nNumberOfStations] OF LREAL ;
+	XTS_STP_POS_2_D											: ARRAY[0..nNumberofMovers] OF ARRAY[0..nNumberOfStations]OF LREAL;
+	STATION_POSS_DN											: ARRAY[0..nNumberofMovers] OF ARRAY[0..nNumberOfStations]OF BOOL;	
+// MOVER FUNCTIONAL BLOCK
+	FbMoverSequence											: ARRAY [0..nNumberofMovers] OF Fb_MoverSequence;
+	bRunCmd													: BOOL; // MOVER START FOR AUTO LOGIC
+	bStopCmd												: BOOL; //MOVER STOP AND ALLIGN AT ONE POSITION
+	bPausCmd												: BOOL; // MOVER HAULT	
+// INT,REAL
+	XTS_POSITION_P_TOLERANCE								: LREAL		:=1;
+	XTS_POSITION_N_TOLERANCE								: LREAL		:=-1;
+
+//DECLERATION
+
+	
+
+
+// FOR LOOP INTEGER	
+	X														: INT; // FOR LOOP
+	Y														: INT; // FOR LOOP
+	i														: INT; // FOR LOOP
+	j														: INT; // FOR LOOP
+
+
+
+
+
+
+
+ 	
+//FbMoverSequence_2Parallel_OP: ARRAY [1..nNumberofMovers] OF Fb_MoverSequence_2Parallel_OP;
+//	bSt4Busy: BOOL;
+//Fb_MoverSequence_time: Fb_MoverSequence;	
+	TonWait_ST_PT: ARRAY [1..20] OF TIME := [TIME#800MS, TIME#900MS, TIME#800MS, TIME#850MS, TIME#800MS, TIME#850MS, TIME#800MS, TIME#850MS, TIME#800MS, TIME#850MS, TIME#900MS, TIME#1S100MS, TIME#1S200MS, TIME#1S500MS, TIME#400MS, TIME#700MS, TIME#700MS];
+	bMover1_Cycle_Time_on: BOOL;
+	bMover1_Cycle_Time_Timer: Ton;
+	bMover1_Cycle_Time_on_Ftrig: F_TRIG;
+	bMover1_Cycle_Time: TIME;
+
+	MOVER_CNTINUE							: BOOL;
+	OP10A_SAFE								: BOOL;
+	OP10B_SAFE								: BOOL;	
+	OP20_SAFE								: BOOL;
+	OP30_SAFE								: BOOL;
+	OP40_SAFE								: BOOL;	
+	OP50_SAFE								: BOOL;	
+	OP60_SAFE								: BOOL;	
+	OP70_SAFE								: BOOL;	
+	OP80_SAFE								: BOOL;	
+	OP90_SAFE								: BOOL;
+	OP110_SAFE								: BOOL;
+	OP120_SAFE								: BOOL;
+	OP130_SAFE								: BOOL;	
+	OP140_SAFE								: BOOL;	
+	OP150A_SAFE								: BOOL;
+	OP150B_SAFE								: BOOL;
+	OP160_SAFE								: BOOL;	
+	done_check								: BOOL;
+	rst_array_memory						: BOOL;	
+	OP140_XTS_TARGET						: LREAL;
+	XTS_LOGIC_CHECK: BOOL;
+	PerMISSION: R_TRIG;
+	ZERO_POS_MOVER: INT;
+	ALL_MOVER_EMPTY: BOOL;
+	END_OF_CYLE: R_TRIG;
+END_VAR
+
+
+VAR PERSISTENT
+
+	MVR_POS_BYPAS_LOG_COUNT					: INT;
+	COIL_1									: BOOL;
+	COIL_2									: BOOL;	
+	COIL_3									: BOOL;
+	COIL_4									: BOOL;	
+	COIL_5									: BOOL;	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FOR i :=1 TO nNumberOfMovers BY 1 DO
+	FOR j:=1 TO nNumberOfStations BY 1 DO
+			IF Mover[i].NcToPlc.ModuloSetPos > rStationPostion[j] THEN
+			rCalculatedPostion[i][j] := (((Mover[i].NcToPlc.ModuloSetTurns +1 ) *9000) + rStationPostion[j]);
+			ELSE
+			rCalculatedPostion[i][j] := (((Mover[i].NcToPlc.ModuloSetTurns +0) *9000) + rStationPostion[j]);
+			END_IF			
+			rStationVelocity[j]:=lr_internal_vel_cmd;			
+		IF (i MOD 2)<>0 THEN
+			IF j=OP10A_XTS_POS_NO THEN
+			STN_BYPASS_ARAAY[i][j]	:= NOT OP10B_BYPASS;
+			ELSIF j=(OP10A_XTS_POS_NO+1) THEN
+			STN_BYPASS_ARAAY[i][j]	:= OP10B_BYPASS;			
+			ELSE
+			STN_BYPASS_ARAAY[i][j]	:= STN_BYPASS_ARRAY_HMI[j];
+			END_IF	
+		ELSIF (i MOD 2)=0 THEN
+			IF j=OP10B_XTS_POS_NO THEN
+			STN_BYPASS_ARAAY[i][j]	:= NOT OP10A_BYPASS;
+			ELSIF j=(OP10B_XTS_POS_NO+1) THEN
+			STN_BYPASS_ARAAY[i][j]	:= OP10A_BYPASS;				
+			ELSE
+			STN_BYPASS_ARAAY[i][j]	:= STN_BYPASS_ARRAY_HMI[j];		
+			END_IF
+		END_IF
+END_FOR
+END_FOR
+
+(*PerMISSION(CLK:=MOVER_POS_RECHED[OP130_STN_MOVER] , Q=> );
+IF PerMISSION.Q THEN
+	OP130_MVR_DN_PERMISSION		:= TRUE;
+END_IF*)
+
+
+
+IF (OP130_MVR_DN_PERMISSION) AND NOT COIL_2 AND NOT OP140_P3_BYPASS THEN
+	XTS_STOP_POSITION[OP140_XTS_POS_NO]:= XTS_STOP_POSITION[OP140_P3_XTS_POS_NO];//7200.18;
+	COIL_1							:= TRUE;
+	OP130_MVR_DN_PERMISSION			:= FALSE;
+	ELSIF OP140_P3_BYPASS THEN
+	COIL_1							:= TRUE;		
+END_IF
+
+IF COIL_1 AND NOT OP130_MVR_DN_PERMISSION THEN
+	COIL_2							:= TRUE;	
+END_IF
+
+IF (OP130_MVR_DN_PERMISSION) AND COIL_2 AND NOT COIL_3 AND NOT OP140_P2_BYPASS THEN
+	XTS_STOP_POSITION[OP140_XTS_POS_NO]:= XTS_STOP_POSITION[OP140_P2_XTS_POS_NO];//7000.18;	
+	COIL_3							:= TRUE;
+	OP130_MVR_DN_PERMISSION			:= FALSE;
+	ELSIF COIL_1 AND OP140_P2_BYPASS THEN
+	COIL_3							:= TRUE;		
+END_IF
+
+IF COIL_3 AND NOT OP130_MVR_DN_PERMISSION THEN
+	COIL_4							:= TRUE;
+END_IF
+
+IF OP130_MVR_DN_PERMISSION AND COIL_4 AND NOT OP140_P1_BYPASS THEN
+	XTS_STOP_POSITION[OP140_XTS_POS_NO]:= XTS_STOP_POSITION[OP140_P1_XTS_POS_NO];//6799.26 ;
+	COIL_5							:= TRUE;
+	OP130_MVR_DN_PERMISSION			:= FALSE;
+	ELSIF COIL_3 AND OP140_P1_BYPASS THEN
+	COIL_5							:= TRUE;	
+END_IF
+
+IF COIL_5 AND NOT OP130_MVR_DN_PERMISSION THEN
+	COIL_1							:= FALSE;
+	COIL_2                          := FALSE;
+	COIL_3                          := FALSE;
+	COIL_4                          := FALSE;
+	COIL_5                          := FALSE;
+END_IF
+
+(*IF XTS_LOGIC_CHECK	THEN
+	FOR i:=0 TO nNumberOfStations BY 1 DO
+	ALL_STATION_DONE.POSITION_DONE[i]:= TRUE;		
+	END_FOR
+	XTS_LOGIC_CHECK					:= FALSE;
+	OP130_MVR_DN_PERMISSION			:= FALSE;
+END_IF*)
+
+
+FOR i :=1 TO nNumberOfMovers BY 1 DO
+	FbMoverSequence[i](
+										bRun:= bRunCmd, 
+										bStop:=bStopCmd ,
+										bPause:=bPausCmd, 
+										rPosition:=rCalculatedPostion[i] , 
+										rVelocity:=rStationVelocity,
+										lrCaGap := 200 ,
+										XTS_STP_POS	:= XTS_STP_POS_2_D[i],			
+										ACTUAL_MOVER_MODULE_POS	:= Mover[i].NcToPlc.ModuloActPos,TonWait_PT:=TonWait_ST_PT ,
+										MOVER_CONTINUE := MOVER_CNTINUE,
+										POS_BYPASS := STN_BYPASS_ARAAY[i],
+										MoverAxis:=Mover[i],
+										STATIONDONE := STATION_DONE[i],
+										nMoverSequence := MOVER_STP_NO[i],
+									//	STATION_DONE := ALL_STATION_DONE,
+										POSITION_DONE:= );									
+										MOVER_POS_RECHED[i]	:= FbMoverSequence[i].POSITION_DONE;
+END_FOR;
+
+
+// Part out time of  1st mover
+bMover1_Cycle_Time_Timer.IN := bMover1_Cycle_Time_on;
+bMover1_Cycle_Time_Timer.PT:=T#120S;
+bMover1_Cycle_Time_Timer();
+
+//IF PRG_XTS_Sequence.FbMoverSequence[1].nMoverSequence = 10 THEN bMover1_Cycle_Time_on := TRUE; END_IF
+//IF PRG_XTS_Sequence.FbMoverSequence[1].nMoverSequence = 175 THEN bMover1_Cycle_Time_on := FALSE; END_IF
+
+
+bMover1_Cycle_Time_on_Ftrig(CLK:= bMover1_Cycle_Time_on, Q=> );
+
+IF bMover1_Cycle_Time_on_Ftrig.Q THEN bMover1_Cycle_Time :=bMover1_Cycle_Time_Timer.et; END_IF
+
+(*
+FOR i :=1 TO nNumberOfMovers BY 1 DO
+	FbMoverSequence_2Parallel_OP[i](
+									bRun:=bRunCmd , 
+									bStop:=bStopCmd , 
+									rPosition:=rCalculatedPostion[i] , 
+									rVelocity:=rStationVelocity , 
+									lrCaGap:= 100, 
+									bSt4Busy:= bSt4Busy, 
+									MoverAxis:= Mover[i]);
+END_FOR
+
+*)
+FOR X:=1 TO nNumberOfStations DO
+	rStationPostion[X]:= XTS_STOP_POSITION[X];
+END_FOR
+
+FOR i:=1 TO nNumberofMovers BY 1 DO
+ 	FOR j:=1 TO nNumberOfStations BY 1 DO
+		XTS_STP_POS_2_D[i][j]:= XTS_STOP_POSITION[j];
+	END_FOR
+END_FOR
+
+
+FOR X:=1 TO nNumberofMovers DO
+FOR Y:=1 TO nNumberOfStations DO
+	     MOVER_POSITION[Y]:=0;
+ 
+END_FOR
+END_FOR
+
+FOR X:=1 TO nNumberofMovers DO
+FOR Y:=1 TO nNumberOfStations DO
+	IF ((Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])<=XTS_POSITION_P_TOLERANCE AND (Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])>0) OR
+	   ((Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])>XTS_POSITION_N_TOLERANCE AND (Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])<0 ) THEN
+	     MOVER_POSITION[Y]:=X;
+	END_IF  
+END_FOR
+END_FOR
+
+(*FOR X:=1 TO nNumberofMovers DO
+FOR Y:=1 TO nNumberOfStations DO
+	IF ((Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])<=XTS_POSITION_P_TOLERANCE AND (Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])>0) OR
+	   ((Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])>XTS_POSITION_N_TOLERANCE AND (Mover[X].NcToPlc.ModuloActPos-rStationPostion[Y])<0 ) THEN
+	     MOVER_POSITION[Y]:=X;
+	END_IF  
+END_FOR
+END_FOR
+*)
+
+
+
+
+
+
+//#########################				SAFETY		#####################################
+
+
+	IF OP20_SAFE AND OP30_SAFE AND OP40_SAFE AND OP50_SAFE AND OP60_SAFE AND OP70_SAFE AND OP80_SAFE AND 
+		OP90_SAFE AND OP110_SAFE AND OP130_SAFE AND OP140_SAFE THEN
+			bPausCmd			:= FALSE;	
+	ELSE	
+			bPausCmd			:= FALSE;
+	END_IF
+
+	
+IF NOT OP20_STN_ENABLE THEN
+	OP20_SAFE			:=(OP20_SERVO_ON_SFE_WRK OR OP20_SERVO_ON_HOME);
+END_IF
+
+IF NOT OP30_STN_ENABLE THEN
+	OP30_SAFE			:=(OP30_VERT_SERVO_ON_HOME OR OP30_VERT_SERVO_ON_SFE_WRK);
+END_IF
+
+IF NOT OP40_STN_ENABLE THEN
+	OP40_SAFE			:=(OP40_SERVO_ON_SFE_WRK OR OP40_SERVO_ON_HOME); 
+END_IF 
+
+IF NOT OP50_STN_ENABLE THEN
+	OP50_SAFE			:=(OP50_VERT_SERVO_ON_SFE_WRK OR OP50_VERT_SERVO_ON_HOME); 
+END_IF
+
+IF NOT OP60_STN_ENABLE THEN
+	OP60_SAFE			:=(OP60_SERVO_ON_SFE_WRK OR OP60_SERVO_ON_HOME); 
+END_IF
+
+IF NOT OP70_STN_ENABLE THEN
+	OP70_SAFE			:=(OP70_VERT_SERVO_ON_SFE_WRK OR OP70_VERT_SERVO_ON_HOME); 
+END_IF
+
+IF NOT OP80_STN_ENABLE THEN
+	OP80_SAFE			:=(OP80_SERVO_ON_SFE_WRK OR OP80_SERVO_ON_HOME); 
+END_IF
+
+IF NOT OP90_STN_ENABLE THEN
+	OP90_SAFE			:=(OP90_SRV_LH_VERT_CNTRL.Axis_In_Pos AND (OP90_SRV_LH_VRT_HME_FB OR OP90_SRV_LH_VRT_SPLCWRK_FB)) AND 
+							(OP90_SRV_RH_VERT_CNTRL.Axis_In_Pos AND (OP90_SRV_RH_VRT_HME_FB OR OP90_SRV_RH_VRT_SPLCWRK_FB));(* AND 
+							  (OP90_SUP_HORZP1_CYL.Sensor1 AND OP90_SUP_HORZP2_CYL.Sensor1); *)
+END_IF
+
+IF NOT OP110_STN_ENABLE THEN
+	OP110_SAFE			:=(OP110_SERVO_ON_SFE_WRK OR OP110_SERVO_ON_HOME); 
+END_IF
+
+IF NOT OP130_STN_ENABLE THEN
+	OP130_SAFE			:=OP130_Temp_Home_OK;
+END_IF
+
+//IF NOT OP140_STN_ENABLE THEN
+//	OP140_SAFE			:=OP140_Temp_Home_Ok;
+//END_IF
+
+	ZERO_POS_MOVER									:= MOVER_POSITION[ZERO_POS_NO];	
+	STATION_DONE[ZERO_POS_MOVER][ZERO_POS_NO]		:= done_check;
+	
+IF END_OF_CYCLE THEN
+	ALL_MOVER_EMPTY			:= TRUE;
+	FOR i:= 1 TO nNumberofMovers BY 1 DO 
+		FOR j:= 1 TO 2 BY 1 DO 
+		IF MOVER_CMP_STATUS[i][j]<>5 THEN
+		ALL_MOVER_EMPTY			:= FALSE;	
+		END_IF
+END_FOR	
+END_FOR
+END_IF
+
+END_OF_CYLE(CLK:=ALL_MOVER_EMPTY AND END_OF_CYCLE , Q=> );
+IF END_OF_CYLE.Q THEN
+	done_check			:= FALSE;
+	END_OF_CYCLE		:= FALSE;
+END_IF
+
+
+IF rst_array_memory OR bRunCmd THEN
+	FOR i :=1 TO nNumberOfMovers BY 1 DO
+		FOR j :=1 TO 3 BY 1 DO
+					MOVER_CMP_STATUS[i][j]:=0;
+		END_FOR
+END_FOR
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="PRG_XTS_Sequence">
+      <LineId Id="3" Count="97" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="101" Count="147" />
+      <LineId Id="425" Count="0" />
+      <LineId Id="249" Count="9" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,12 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP20_Recipe" Id="{fc64926e-99e8-412f-a6ca-1c3f59fd3b2e}">
+  <GVL Name="OP20_Recipe" Id="{20978979-69af-497a-b5f3-1f606cdc21a1}">
     <Declaration><![CDATA[
-VAR_GLOBAL
-	OP20_DLY_SPN_ON : INT;
-	OP20_DLY_BEF_OIL : INT;
-	OP20_DLY_AFT_OIL : INT;
-	OP20_DLY_SPN_OFF : INT;
+VAR_GLOBAL PERSISTENT
+	OP20_DLY_OIL_ON : INT;
 	OP20_VERT_SERVO_WORK_POS : REAL;
 	OP20_VERT_SERVO_SFE_WORK_POS : REAL;	
 END_VAR]]></Declaration>

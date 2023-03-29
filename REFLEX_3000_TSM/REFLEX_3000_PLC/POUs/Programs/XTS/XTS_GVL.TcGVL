@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <GVL Name="XTS_GVL" Id="{c33ce58c-ab8d-4997-9414-0a54d12c6c02}">
+    <Declaration><![CDATA[//{attribute 'qualified_only'}
+VAR_GLOBAL
+	MOVER_POS_RECHED						: ARRAY [0..nNumberofMovers] OF BOOL;
+	MOVER_POSITION							: ARRAY[0..nNumberOfStations]OF INT;
+	nCAGroupState							: INT;
+	OP130_MVR_DN_PERMISSION					: BOOL;	
+	STATION_DONE							: ARRAY[0..nNumberofMovers] OF ARRAY[0..nNumberOfStations]OF BOOL;														
+END_VAR
+VAR_GLOBAL PERSISTENT
+	MOVER_CMP_STATUS						: ARRAY [0..nNumberofMovers] OF ARRAY [1..3] OF INT;
+	XTS_STOP_POSITION						: ARRAY[1..nNumberOfStations] OF LREAL;
+	MOVER_STP_NO							: ARRAY [0..nNumberofMovers] OF INT;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

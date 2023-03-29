@@ -1,0 +1,362 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP90_Conveyor_FBs" Id="{e0a30ce3-98cf-469b-ad5c-85126103d6d7}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM OP90_Conveyor_FBs
+VAR
+	OP90_Conveyor_LH 							: Servo_Conveyor_FB_OP90;
+	OP90_Conveyor_RH 							: Servo_Conveyor_FB_OP90;
+	
+	OVR_FLW_TMR_7_89							: TON;
+	OVR_FLW_TMR_6_38							: TON;
+	Conveyor_Conti_run							: BOOL;
+	Conveyor_Velocity_mode						: BOOL;
+	OP90_Camera_Done 							: BOOL;
+	OP90_One_Cycle								: BOOL;
+	OP90_Conveyor_ON							: BOOL;
+	OP90_RH_Conveyor_ON							: BOOL;
+	OP90_LH_Conveyor_ON							: BOOL;
+
+
+	BOWL_ON_OFF_7_89: TON;
+	
+	Conv_Cam_Step : INT :=10;
+	Temp_Counter_LH : UINT;
+	Temp_Counter_RH : UINT;
+	Toggle_Pos: R_TRIG;
+	Toggle_Neg: F_TRIG;
+	Conv_Step_no: INT;
+	Camera_Trigger_Ack_OP90 : BOOL;
+	Toggle_Pos_LH : R_TRIG;
+	Toggle_Neg_LH : F_TRIG;
+	Toggle_Pos_RH : R_TRIG;
+	Toggle_Neg_RH : F_TRIG;
+	Track_ON_Timer: TON;
+	LH_Cam_Completed : BOOL;
+	RH_Cam_Completed : BOOL;	
+END_VAR
+
+VAR PERSISTENT
+	OVR_FLW_TMR_7_89_TMR						: TIME;
+	OVR_FLW_TMR_6_38_TMR						: TIME;	
+	OP90_Conv_Fwd_Pos_7_89						: REAL;
+	OP90_Conv_Rev_Pos_7_89						: REAL;
+	OP90_Conveyor_FWD_Speed_7_89 				: REAL; 
+	OP90_Conveyor_REV_Speed_7_89 				: REAL;
+	OP90_Conv_Fwd_Pos_6_38						: REAL;
+	OP90_Conv_Rev_Pos_6_38						: REAL;
+	OP90_Conveyor_FWD_Speed_6_38 				: REAL; 
+	OP90_Conveyor_REV_Speed_6_38 				: REAL;	
+	OP90_Conv_Fwd_Time_7_89 					: INT;
+	OP90_Conv_Rev_Time_7_89 					: INT;
+	OP90_Conv_Fwd_Time_6_38 					: INT;
+	OP90_Conv_Rev_Time_6_38 					: INT;	
+	OP90_Conveyor_Manual_Speed					: REAL;	
+	Track_On_Delay								: INT :=1000;
+	Comp_Not_present_Counter					: INT;
+	Track_Fill_Cmnd								: BOOL;
+	Temp_var : BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Toggle_Pos_LH(CLK:=OP90_Camera_FB.OP90_LH_Inspection_Status.Inspection_Completed);
+Toggle_Neg_LH(CLK:=OP90_Camera_FB.OP90_LH_Inspection_Status.Inspection_Completed);
+Toggle_Pos_RH(CLK:=OP90_Camera_FB.OP90_RH_Inspection_Status.Inspection_Completed);
+Toggle_Neg_RH(CLK:=OP90_Camera_FB.OP90_RH_Inspection_Status.Inspection_Completed);
+
+IF Toggle_Pos_LH.Q OR Toggle_Neg_LH.Q THEN
+	LH_Cam_Completed:=1;	
+END_IF
+IF Toggle_Pos_RH.Q OR Toggle_Neg_RH.Q THEN
+	RH_Cam_Completed:=1;	
+END_IF
+
+
+IF OP90_MANUAL_SELECTED THEN               
+	IF  I90_CONV1_REVI500_7 THEN
+		OP90_SRV_RH_CNVY_STATUS.targetVelocity:=OP90_Conveyor_Manual_Speed;
+		OP90_SRV_RH_CNVY_STATUS.moveVelocity:=TRUE;	
+ 	ELSIF   I90_CONV1_FWDI501_0 THEN
+		OP90_SRV_RH_CNVY_STATUS.targetVelocity:=OP90_Conveyor_Manual_Speed;
+		OP90_SRV_RH_CNVY_STATUS.moveVelocity:=TRUE;		
+	ELSE 	
+		OP90_SRV_RH_CNVY_STATUS.moveVelocity:=0;			
+	END_IF  	
+END_IF
+
+IF OP90_MANUAL_SELECTED THEN               
+	IF I90_CONV2_REVI503_0 THEN
+		OP90_SRV_LH_CNVY_STATUS.targetVelocity:=OP90_Conveyor_Manual_Speed;
+		OP90_SRV_LH_CNVY_STATUS.moveVelocity:=TRUE;
+ 	ELSIF I90_CONV2_FWDI503_1 THEN
+		OP90_SRV_LH_CNVY_STATUS.targetVelocity:=OP90_Conveyor_Manual_Speed;
+		OP90_SRV_LH_CNVY_STATUS.moveVelocity:=TRUE;		
+	ELSE 	
+	OP90_SRV_LH_CNVY_STATUS.moveVelocity:=0;    	
+	END_IF  	
+END_IF
+
+
+IF (OP90_MANUAL_SELECTED AND I90_BOWL2_OFF_ONI502_6) OR (OP90_AUTO_SELECTED AND BOWL_ON_OFF_7_89.Q AND OP90_POS2_V7_89) AND NOT OP90_ERR THEN
+	//O90_BOWL2_ENABLEQ501_1			:=1;
+	O90_HPR2_TWR_LMP_GREENQ501_3 	:=1;
+	O90_BOWL2_AIR_PURGE1Q501_4		:=1;
+	O90_BOWL2_AIR_PURGE2Q501_5		:=1;
+ELSE 
+	O90_HPR2_TWR_LMP_GREENQ501_3 	:=0;
+	//O90_BOWL2_ENABLEQ501_1			:=0;
+	O90_BOWL2_AIR_PURGE1Q501_4		:=0;
+	O90_BOWL2_AIR_PURGE2Q501_5		:=0;	
+END_IF	
+
+BOWL_ON_OFF_7_89(IN:= NOT (I90_VBF1_CONV2_TRK2_OVERFLWI503_3 AND I90_VBF1_CONV2_TRK1_OVERFLWI503_2), PT:=T#1S, Q=> , ET=> );
+
+
+IF I90_HPR2_OFF_ONI502_7 AND NOT OP90_ERR THEN
+	O90_HPR2_ENABLEQ501_0			:=1;
+ELSE 
+	O90_HPR2_ENABLEQ501_0			:=0;
+END_IF
+
+IF (OP90_MANUAL_SELECTED AND I90_BOWL1_OFF_ONI500_5) OR (OP90_AUTO_SELECTED AND NOT OVR_FLW_TMR_6_38.Q AND OP90_POS1_V6_3) AND NOT OP90_ERR THEN
+	O90_BOWL1_ENABLEQ500_1			:=1;
+	O90_HPR1_TWR_LMP_GREENQ500_3 	:=1;
+	O90_BOWL1_AIR_PURGE1Q500_4		:=1;
+	O90_BOWL1_AIR_PURGE2Q500_5		:=1;
+ELSE 
+	O90_HPR1_TWR_LMP_GREENQ500_3 	:=0;
+	O90_BOWL1_ENABLEQ500_1			:=0;
+	O90_BOWL1_AIR_PURGE1Q500_4		:=0;
+	O90_BOWL1_AIR_PURGE2Q500_5		:=0;	
+END_IF	
+
+IF I90_HPR1_OFF_ONI500_6 AND NOT OP90_ERR THEN
+	O90_HPR1_ENABLEQ500_0			:=1;
+ELSE 
+	O90_HPR1_ENABLEQ500_0			:=0;
+END_IF
+
+
+OP90_Conveyor_LH(
+	Conveyor_Prgrm_Start:= OP90_LH_Conveyor_ON OR (OP90_AUTO_SELECTED AND OP90_POS2_V7_89), 
+	Conveyor_Prgrm_Reset:= , 
+	Conveyor_Continuous_Run:= Conveyor_Conti_run,
+	Conveyor_FWD_Position	:= OP90_Conv_Fwd_Pos_7_89,
+    Conveyor_REV_Position	:= OP90_Conv_Rev_Pos_7_89,
+    Velocity_mode			:= Conveyor_Velocity_mode,
+	Camera_Trigger_OK 	:= OP90_Camera_Done,
+	Fwd_Time_IP			:= OP90_Conv_Fwd_Time_7_89, 
+	Rev_Time_IP			:= OP90_Conv_Rev_Time_7_89, 
+	Conveyor_FWD_Speed  := OP90_Conveyor_FWD_Speed_7_89 , 
+	Conveyor_REV_Speed  := OP90_Conveyor_REV_Speed_7_89 , 
+	LH_Work_Sensor:= OP90_LH_REJP2_CYL.Sensor2, 
+	LH_Home_Sensor:= OP90_LH_REJP2_CYL.Sensor1, 
+	RH_Work_Sensor:= OP90_RH_REJP2_CYL.Sensor2, 
+	RH_Home_Sensor:=OP90_RH_REJP2_CYL.Sensor1,
+	Track_Sensor_FB := Track_ON_Timer.Q, 
+	Track_Overflow := OVR_FLW_TMR_7_89.Q, 
+	LH_Camera_OK  := OP90_LH_Camera_OK, 
+	LH_Camera_NOK := OP90_LH_Camera_NOK,
+	RH_Camera_OK  := OP90_RH_Camera_OK, 
+	RH_Camera_NOK := OP90_RH_Camera_NOK,
+	Camera_trigger:=  OP90_CAMERA_TRIGGER, 
+	LH_Work_Coil=> OP90_A_LH_REJP2_WORK, 
+	LH_Home_Coil=> OP90_A_LH_REJP2_HOME, 
+	RH_Work_Coil=> OP90_A_RH_REJP2_WORK,
+	RH_Home_Coil=> OP90_A_RH_REJP2_HOME,
+	Step_Num=> Conv_Step_no,
+	Camera_Trigger_ACK=>Camera_Trigger_Ack_OP90 ,
+	Ready_to_Pick=>  , 
+	Pick_Done       := OP90_pick_done_7_89, 
+	One_Cycle		:=  OP90_One_Cycle,
+	Conveyor_Servo_Control_Structure:= OP90_SRV_LH_CNVY_CNTRL );
+
+IF OP90_POS2_V7_89 THEN
+		OP90_pick_ready					:= OP90_Conveyor_LH.Ready_to_Pick;
+END_IF
+
+OVR_FLW_TMR_7_89(IN:=I90_VBF1_CONV2_TRK2_OVERFLWI503_3 AND I90_VBF1_CONV2_TRK1_OVERFLWI503_2 , PT:=OVR_FLW_TMR_7_89_TMR, Q=> , ET=> );
+Track_ON_Timer(IN:= I90_VBF1_CONV1_TRK2_OVERFLWI501_2 AND I90_VBF1_CONV1_TRK1_OVERFLWI501_1, PT:=INT_TO_TIME(Track_On_Delay), Q=> , ET=> );
+	
+	
+	
+OP90_Conveyor_RH(
+	Conveyor_Prgrm_Start:= OP90_RH_Conveyor_ON OR (OP90_AUTO_SELECTED AND OP90_POS1_V6_3), 
+	Conveyor_Prgrm_Reset:= , 
+	Conveyor_Continuous_Run:= Conveyor_Conti_run,
+	Conveyor_FWD_Position	:= OP90_Conv_Fwd_Pos_6_38,
+    Conveyor_REV_Position	:= OP90_Conv_Rev_Pos_6_38,
+    Velocity_mode			:= Conveyor_Velocity_mode,
+	Camera_Trigger_OK   := OP90_Camera_Done,
+	Fwd_Time_IP			:= OP90_Conv_Fwd_Time_6_38, 
+	Rev_Time_IP			:= OP90_Conv_Rev_Time_6_38, 
+	Conveyor_FWD_Speed  := OP90_Conveyor_FWD_Speed_6_38 , 
+	Conveyor_REV_Speed  := OP90_Conveyor_REV_Speed_6_38 , 
+	LH_Work_Sensor:= OP90_LH_REJP1_CYL.Sensor2 , 
+	LH_Home_Sensor:= OP90_LH_REJP1_CYL.Sensor1, 
+	RH_Work_Sensor:= OP90_RH_REJP1_CYL.Sensor2, 
+	RH_Home_Sensor:=OP90_RH_REJP1_CYL.Sensor1,
+	Track_Sensor_FB := Temp_var,
+	Track_Overflow := OVR_FLW_TMR_6_38.Q,              
+	LH_Camera_OK  := OP90_LH_Camera_OK,  
+	LH_Camera_NOK := OP90_LH_Camera_NOK,
+	RH_Camera_OK  := OP90_RH_Camera_OK,  
+	RH_Camera_NOK := OP90_RH_Camera_NOK,
+	Camera_Trigger_Ack=> OP90_Camera_Trigger_Ack,	
+	Camera_trigger:=  OP90_CAMERA_TRIGGER, 
+	LH_Work_Coil=> OP90_A_LH_REJP1_WORK, 
+	LH_Home_Coil=> OP90_A_LH_REJP1_HOME, 
+	RH_Work_Coil=>OP90_A_RH_REJP1_WORK,
+	RH_Home_Coil=>OP90_A_RH_REJP1_HOME,
+	Ready_to_Pick=>  , 
+	Pick_Done       :=  OP90_pick_done_6_38 , 
+	One_Cycle		:=  OP90_One_Cycle,
+	Conveyor_Servo_Control_Structure:= OP90_SRV_RH_CNVY_CNTRL );	
+	
+IF OP90_POS1_V6_3 THEN
+		OP90_pick_ready					:= OP90_Conveyor_RH.Ready_to_Pick;
+END_IF	
+
+OVR_FLW_TMR_6_38(IN:=I90_VBF1_CONV1_TRK2_OVERFLWI501_2 AND I90_VBF1_CONV1_TRK1_OVERFLWI501_1 , PT:=OVR_FLW_TMR_6_38_TMR, Q=> , ET=> );
+
+IF Comp_Not_present_Counter>10 AND Track_ON_Timer.Q THEN
+	//Track_Fill_Cmnd:=1;
+	Comp_Not_present_Counter:=0;
+END_IF
+
+CASE Conv_Cam_Step OF
+	10: 	OP90_LH_Camera_OK :=0;
+            OP90_LH_Camera_NOK:=0;
+	        OP90_RH_Camera_OK :=0;
+	        OP90_RH_Camera_NOK:=0;	
+			LH_Cam_Completed:=0;
+			RH_Cam_Completed:=0;		
+			OP90_Camera_Done	:=0;
+			//OP90_LH_Clr_OK 		:=0;
+		   // OP90_RH_Clr_OK 		:=0;		
+			//OP90_LH_Size_OK		:=0;
+		   // OP90_RH_Size_OK		:=0;	
+			Conv_Cam_Step		:=11;	
+	
+	11: IF (OP90_Camera_Trigger AND (NOT OP90_Camera_Done)) OR OP90_Miss_Trigger THEN
+			OP90_LH_Camera_Trigger:=1;
+			OP90_RH_Camera_Trigger:=1;
+			Conv_Cam_Step		  :=15;	
+		END_IF
+
+	15:	IF LH_Cam_Completed AND RH_Cam_Completed THEN// (NOT OP90_LH_Camera_Trigger) AND (NOT OP90_RH_Camera_Trigger) THEN //(Temp_Counter_LH<OP90_Camera_FB.OP90_LH_Acquisition_ID AND Temp_Counter_RH<OP90_Camera_FB.OP90_RH_Acquisition_ID )THEN
+			OP90_LH_Camera_Trigger:=0;
+			OP90_RH_Camera_Trigger:=0;
+			OP90_Camera_Trigger :=0;
+			OP90_Miss_Trigger	:=0;
+			Conv_Cam_Step:=25;
+		END_IF  
+	   
+	25: IF OP90_Camera_FB.OP90_LH_Cam_Result[0]=1 AND OP90_Camera_FB.OP90_RH_Cam_Result[0]=1 THEN
+			OP90_LH_Camera_OK:=1;
+			OP90_RH_Camera_OK:=1;
+			Conv_Cam_Step    :=50;
+		ELSIF (OP90_Camera_FB.OP90_LH_Cam_Result[2]<>1 OR OP90_Camera_FB.OP90_RH_Cam_Result[2]<>1) THEN
+			OP90_One_Cycle	 :=1;
+			Comp_Not_present_Counter:=Comp_Not_present_Counter+1;
+			Conv_Cam_Step    :=50;
+		ELSIF (OP90_Camera_FB.OP90_LH_Cam_Result[1]=1 OR OP90_Camera_FB.OP90_RH_Cam_Result[1]=1) THEN //AND ( OP90_Camera_FB.OP90_LH_Cam_Result[2]=1 AND OP90_Camera_FB.OP90_RH_Cam_Result[2]=1) THEN			
+			IF OP90_Camera_FB.OP90_LH_Cam_Result[0]=1 THEN
+				OP90_LH_Camera_OK:=1;
+			END_IF
+			IF OP90_Camera_FB.OP90_RH_Cam_Result[0]=1 THEN
+				OP90_RH_Camera_OK:=1;
+			END_IF
+			Conv_Cam_Step:=30;
+		END_IF	
+			
+   30: 	IF OP90_Camera_FB.OP90_LH_Cam_Result[1]=1 THEN
+	   		OP90_LH_Camera_NOK:=1;
+  	    END_IF
+		IF OP90_Camera_FB.OP90_RH_Cam_Result[1]=1 THEN
+	   		OP90_RH_Camera_NOK:=1;
+  	    END_IF
+		Conv_Cam_Step:=50;
+		
+   50:  OP90_Camera_Done:=1;
+   		Comp_Not_present_Counter:=0;
+   		Temp_Counter_LH:=OP90_Camera_FB.OP90_LH_Acquisition_ID;
+		Temp_Counter_RH:=OP90_Camera_FB.OP90_RH_Acquisition_ID;
+		IF Camera_Trigger_Ack_OP90 THEN
+			Conv_Cam_Step   :=10;
+			OP90_Camera_Done:=0;
+		END_IF
+   	    
+END_CASE
+
+
+
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="OP90_Conveyor_FBs">
+      <LineId Id="724" Count="9" />
+      <LineId Id="721" Count="2" />
+      <LineId Id="6" Count="1" />
+      <LineId Id="310" Count="0" />
+      <LineId Id="312" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="316" Count="0" />
+      <LineId Id="314" Count="0" />
+      <LineId Id="13" Count="3" />
+      <LineId Id="319" Count="0" />
+      <LineId Id="329" Count="9" />
+      <LineId Id="320" Count="0" />
+      <LineId Id="328" Count="0" />
+      <LineId Id="17" Count="11" />
+      <LineId Id="382" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="384" Count="0" />
+      <LineId Id="383" Count="0" />
+      <LineId Id="30" Count="3" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="47" Count="16" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="67" Count="17" />
+      <LineId Id="786" Count="0" />
+      <LineId Id="85" Count="9" />
+      <LineId Id="839" Count="0" />
+      <LineId Id="626" Count="0" />
+      <LineId Id="95" Count="2" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="210" Count="0" />
+      <LineId Id="340" Count="0" />
+      <LineId Id="343" Count="2" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="787" Count="0" />
+      <LineId Id="202" Count="0" />
+      <LineId Id="260" Count="0" />
+      <LineId Id="116" Count="0" />
+      <LineId Id="118" Count="15" />
+      <LineId Id="897" Count="0" />
+      <LineId Id="134" Count="4" />
+      <LineId Id="484" Count="0" />
+      <LineId Id="139" Count="7" />
+      <LineId Id="117" Count="0" />
+      <LineId Id="263" Count="0" />
+      <LineId Id="346" Count="1" />
+      <LineId Id="264" Count="0" />
+      <LineId Id="266" Count="1" />
+      <LineId Id="893" Count="0" />
+      <LineId Id="269" Count="0" />
+      <LineId Id="894" Count="0" />
+      <LineId Id="899" Count="0" />
+      <LineId Id="895" Count="0" />
+      <LineId Id="270" Count="0" />
+      <LineId Id="524" Count="4" />
+      <LineId Id="734" Count="1" />
+      <LineId Id="529" Count="24" />
+      <LineId Id="670" Count="1" />
+      <LineId Id="892" Count="0" />
+      <LineId Id="672" Count="0" />
+      <LineId Id="554" Count="18" />
+      <LineId Id="900" Count="0" />
+      <LineId Id="573" Count="8" />
+      <LineId Id="273" Count="2" />
+      <LineId Id="268" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

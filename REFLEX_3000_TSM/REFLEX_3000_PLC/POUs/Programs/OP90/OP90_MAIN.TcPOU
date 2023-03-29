@@ -1,26 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP90_MAIN" Id="{632e0e57-1459-47f2-a5fe-1951d4342f01}" SpecialFunc="None">
+  <POU Name="OP90_MAIN" Id="{0d7da15a-cfa6-410f-bf66-e6fb5b99af66}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP90_MAIN
 VAR
+
+
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[OP90_MANUAL();
+      <ST><![CDATA[
+OP90_MANUAL();
 OP90_SERVO();
+OP90_AUTO();
+OP90_CAMERA();
+OP90_Camera_FB();
+//OP90_LH_CONVEYOR();
+//OP90_RH_CONVEYOR();
+OP90_HOMING();
+OP90_Conveyor_FBs();
 
-IF OP90_SRV_RH_VERT.bAxisError OR OP90_SRV_LH_VERT.bAxisError OR OP90_GUIDE_SERVO.bAxisError OR OP90_SRV_HORZ.bAxisError THEN
-	OP90_ERROR_ACTIVE			:= TRUE;
+IF OP90_SRV_RH_VERT.bAxisError OR OP90_SRV_LH_VERT.bAxisError OR OP90_GUIDE_SERVO.bAxisError OR OP90_SRV_HORZ.bAxisError OR OP90A_CYLINDER_ERR<>0 THEN
+	OP90_ERR			:= TRUE;
 ELSE
-	OP90_ERROR_ACTIVE			:= FALSE;
-END_IF]]></ST>
+	OP90_ERR			:= FALSE;
+END_IF
+///////////////////////////////////////////////////////////////////////////////////
+// WILL BE DELETED
+//	1)OP90_DRY_RUN
+
+OP90_MODE_BLOCK(
+	ModeWord:= OP90_MODE_WORD, 
+	HomeConditionOK:= OP90_ALL_HOME, 
+	OperationEnable:= OperationEnable, 
+	StartPB:= OP90_STRT_PB, 
+	SafetyAndNOError:= NOT OP90_ERR, 
+	ModeAck:= 1, 
+	HomingINProgress:= , 
+	TempHomeOK:= , 
+	ResetPB:= OP90_RESET_PB, 
+	AutoSelected=> OP90_AUTO_SELECTED, 
+	ManualSelected=> OP90_MANUAL_SELECTED, 
+	StepSelected=> OP90_STEP_SELECTED, 
+	ModeSelAck_Indication=> , 
+	StatusDisplay=> , 
+	AutoRunning:=OP90_AUTO_RUNNING, 
+	StepRunning:=OP90_STEP_RUNNING , 
+	StartEnable:=OP90_START_ENABLE , 
+	MachineStop:=OP90_MACHINE_STOP );]]></ST>
     </Implementation>
     <LineIds Name="OP90_MAIN">
-      <LineId Id="3" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="3" Count="3" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="7" Count="1" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="9" Count="27" />
       <LineId Id="2" Count="0" />
-      <LineId Id="8" Count="1" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="10" Count="2" />
     </LineIds>
   </POU>
 </TcPlcObject>

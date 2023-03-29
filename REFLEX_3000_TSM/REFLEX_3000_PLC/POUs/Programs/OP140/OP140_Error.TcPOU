@@ -1,66 +1,47 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP140_Error" Id="{ac65b6e6-27bf-4de3-9923-224b69f44c75}" SpecialFunc="None">
+  <POU Name="OP140_Error" Id="{b2235a5b-26d6-48e0-a6cb-6c0b4b1c3264}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP140_Error
 VAR
 	Step_No: INT;
 	AutoStepErr_1: TON;
 	OP140_StepErr1: TON;
 	OP140_StepErr2: TON;
+	bdone: BOOL;
+	i: INT;
+	j: INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[// Set ERROR ACTIVE
-IF ((OP140_ErrorWord_0= 1) OR (OP140_ErrorWord_1= 1) OR (OP140_ErrorWord_2= 1)) THEN
-	OP140_ErrorActive:= TRUE;
-	END_IF
-	//Reset ErrorActive
-IF (OP140_HMI_Reset) THEN 
-	OP140_ErrorActive:= FALSE;
-	OP140_ErrorWord_0:= 0;
-	OP140_ErrorWord_1:= 0;
-	Op140_ErrorWord_2:= 0;
-	END_IF
+      <ST><![CDATA[IF NOT bdone THEN
+	bdone:=TRUE;
+FOR i:=1300 TO 1400 BY 1 DO 
 	
-//Step Errors
-
-
-IF OP140_AutoSequence.OP140_Leak_Test_1.Step_No=40 AND  NOT OP140_AutoSequence.OP140_Leak_Test_1.Axis_In_Pos AND OP140_StepErr1.q THEN
-OP140_ErrorWord_0.0:=TRUE;
+IF berror[i] THEN
+	OP140_ErrorActive:=TRUE;
 END_IF
-IF OP140_AutoSequence.OP140_Leak_Test_1.Step_No=80 AND  NOT OP140_AutoSequence.OP140_Leak_Test_1.Axis_In_home AND OP140_StepErr2.q THEN
-OP140_ErrorWord_0.1:=TRUE;
+END_FOR
+bdone:=FALSE;
 END_IF
-IF OP140_AutoSequence.OP140_Leak_Test_1.LH_ATEQ_FB.Result_Error=TRUE THEN
-	OP140_ErrorWord_0.2:=TRUE;
+
+IF OP130_HMI_Reset OR Servo_Reset THEN
+	FOR j:=1300 TO 1400 BY 1 DO 
+		
 	
-END_IF
-IF OP140_AutoSequence.OP140_Leak_Test_1.RH_ATEQ_FB.Result_Error=TRUE THEN
-	OP140_ErrorWord_0.3:=TRUE;
+	berror[j]:=FALSE;
+	OP140_ErrorActive:=FALSE;
 	
+	END_FOR
+	temp:=false;
 END_IF
-
-
-	OP140_StepErr1(IN:=OP140_AutoSequence.OP140_Leak_Test_1.Step_No=40 , PT:=T#2S , Q=> , ET=> );
-	OP140_StepErr2(IN:=OP140_AutoSequence.OP140_Leak_Test_1.Step_No=80 , PT:=T#2S , Q=> , ET=> );
-
-
-
-
-
-
-
-
-
-
-
 
 
 
 ]]></ST>
     </Implementation>
     <LineIds Name="OP140_Error">
-      <LineId Id="3" Count="46" />
+      <LineId Id="59" Count="19" />
+      <LineId Id="48" Count="3" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

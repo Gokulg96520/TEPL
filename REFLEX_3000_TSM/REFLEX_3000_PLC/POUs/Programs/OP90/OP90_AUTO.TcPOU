@@ -1,13 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP90_AUTO" Id="{d8645966-d7df-4810-9d03-3321ce50db59}" SpecialFunc="None">
+  <POU Name="OP90_AUTO" Id="{a0760510-3591-405c-ae74-809fa049b4a6}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP90_AUTO
 VAR
 	
-// R_TRIG
-	CYLE_STRT					: R_TRIG;
-	SUP_VERT_UP					: R_TRIG;
-	SUP_HORZ_WRK				: R_TRIG;
 // TON
 	AFT_SUP_HRZ_WRK				: TON;
 	AFT_VERT_PCK_WRK			: TON;
@@ -15,38 +11,103 @@ VAR
 	AFT_VRT_PLC_WRK				: TON;
 	AFT_GRP_HME					: TON;
 	AFT_VRT_SUP_HME				: TON;
-
+	AFT_SUP_CYL_HME				: TON;
 //INT
 	OP90_STP_NO					: INT;
+//BOOL
+
+	OP90_LH_CMP_OK				: BOOL;
+	OP90_RH_CMP_OK				: BOOL;
+	
+
+	OP90_STN_MOVER: INT;
+
+	Track_1_TMR : TON;
+	Track_2_TMR : TON;
+	Track_3_TMR : TON;
+	Track_4_TMR : TON;
+	Track_5_TMR : TON;
+	Track_6_TMR : TON;
+	Track_7_TMR : TON;
+	Track_8_TMR : TON;
+	Track_9_TMR : TON;
+	Track_10_TMR : TON;
+	Track_11_TMR : TON;
+	Track_12_TMR : TON;	
+	
+	
+	
+	dllky: Ton;
+	OP90_RH_CMP_TORQE_OK: BOOL;
+	OP90_LH_CMP_TORQE_OK: BOOL;
+END_VAR
+
+VAR PERSISTENT
+	OP90_Auto_Status			: STRING;
 	OP90_AFT_SUP_HRZ_WRK		: INT;
 	OP90_AFT_VRT_PCK_WRK		: INT;
 	OP90_AFT_CMP_PCK			: INT;
 	OP90_AFT_VRT_PLC_WRK		: INT;
 	OP90_AFT_GRP_HME			: INT;
 	OP90_AFT_SUP_VRT_HME		: INT;
-
-	
-//BOOL
-
-	OP90_LH_CMP_OK				: BOOL;
-	OP90_RH_CMP_OK				: BOOL;
-	OP90_MVR_IN_POS				: BOOL;
-	OP90_PROCESS_DONE			: BOOL;
-END_VAR
-]]></Declaration>
+	OP90_AFT_SUP_CYL_HME		: INT;
+	OP90_Guide_Servo_Position   : REAL := 73;
+END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF MACHINE_AUTO AND NOT MACHINE_ERR THEN 
-	
-CYLE_STRT(CLK:=START_PB , Q=> );
+      <ST><![CDATA[///////Status message///////////
 
-IF CYLE_STRT.Q AND NOT AUTO_RUNNING AND NOT STEP_RUNNING AND OP90_ALL_HOME THEN
+IF OP90_STP_NO=0 AND NOT OP90_ALL_HOME THEN
+	OP90_Auto_Status:='Homing not Done';
+ELSIF  OP90_STP_NO=0 AND OP90_ALL_HOME THEN
+	OP90_Auto_Status:='Press Cycle Start';
+ELSIF  OP90_STP_NO=1 AND ((OP90_LH_CMP_PICKED AND OP90_RH_CMP_PICKED) OR OP90_pick_ready)  THEN
+	OP90_Auto_Status:='Component Picked';	
+ELSIF  OP90_STP_NO=1 AND NOT OP90_pick_ready THEN
+	OP90_Auto_Status:='Waiting For Conveyor Singulation';
+ELSIF  OP90_STP_NO=5  THEN
+	OP90_Auto_Status:='Horizontal Servo moving to Pick Position';
+ELSIF  OP90_STP_NO=10  THEN
+	OP90_Auto_Status:='Vertical Servo moving to Place Position';
+ELSIF  OP90_STP_NO=15  THEN
+	OP90_Auto_Status:='Waiting for Gripper Open Feedback';	
+ELSIF  OP90_STP_NO=20  THEN
+	OP90_Auto_Status:='Vertical Servo moving to Safe Position';	
+ELSIF OP90_STP_NO=30  THEN
+	OP90_Auto_Status:='Vertical Servo moving to Safe Place Position';	
+ELSIF OP90_STP_NO=35  THEN
+	OP90_Auto_Status:='Waiting Mover and Station Enable';	
+ELSIF OP90_STP_NO=40  THEN
+	OP90_Auto_Status:='Waiting for Gripper Close Feedback';	
+ELSIF OP90_STP_NO=45  THEN
+	OP90_Auto_Status:='Updating Result and Moving to next Cycle';
+ELSIF OP90_STP_NO=50  THEN
+	OP90_Auto_Status:='Vertical Servo moving to Safe Position';	
+ELSIF OP90_STP_NO=55  THEN
+	OP90_Auto_Status:='Supporting Cyclinder moving home';			
+END_IF
+
+IF OP90_AUTO_SELECTED OR OP90_STEP_SELECTED THEN
+	OP90_SERVO_GUIDE_CNTRL.Position:=OP90_Guide_Servo_Position;
+	OP90_SERVO_GUIDE_CNTRL.Velocity:=50;
+ELSIF NOT (OP90_AUTO_RUNNING OR OP90_STEP_RUNNING) AND NOT In_Range(OP90_SERVO_GUIDE_CNTRL.Actual_Position,0,1) THEN
+	OP90_SERVO_GUIDE_CNTRL.Position:=0;
+	OP90_SERVO_GUIDE_CNTRL.Velocity:=50;
+	OP90_SERVO_GUIDE_CNTRL.ABSmove_Start:=TRUE;
+END_IF
+
+IF OP90_AUTO_RUNNING OR OP90_STEP_RUNNING THEN
+
+IF OP90_START_ENABLE THEN
+
+IF OP90_STRT_PB AND OP90_ALL_HOME AND OP90_STP_NO=0 THEN
+	OP90_SERVO_GUIDE_CNTRL.ABSmove_Start:=TRUE;
 	OP90_STP_NO							:= 1;
 END_IF
 
 CASE OP90_STP_NO OF 
 	1:	IF OP90_LH_CMP_PICKED AND OP90_RH_CMP_PICKED THEN
 		OP90_STP_NO						:= 30;							
-		ELSE
+		ELSIF OP90_pick_ready THEN
 		OP90_A_SRV_HORZ_WRK				:= TRUE;
 		OP90_STP_NO						:= 5;		
 		END_IF
@@ -99,45 +160,56 @@ CASE OP90_STP_NO OF
 		END_IF
 	   
 	25: IF OP90_SRV_LH_VRT_HME_FB AND OP90_SRV_RH_VRT_HME_FB THEN
-		OP90_SRV_HORZ_HME_FB			:= TRUE;
+		OP90_A_SRV_HORZ_HME				:= TRUE;
+		OP90_pick_done_7_89				:= OP90_POS2_V7_89;
+		OP90_pick_done_6_38				:= OP90_POS1_V6_3;
+		OP90_A_SRV_LH_ROTRY_WRK			:= TRUE;
+		OP90_A_SRV_RH_ROTRY_WRK			:= TRUE;		
 		OP90_STP_NO						:= 30;		
 		END_IF
 		
 	30: IF OP90_SRV_HORZ_HME_FB THEN                     	
-		IF NOT OP90_MVR_IN_POS THEN  	
+		IF NOT OP90_STN_ENABLE THEN  	
 		OP90_A_SRV_LHVERT_SPLCWRK		:= TRUE;
 		OP90_A_SRV_RHVERT_SPLCWRK		:= TRUE;
  		OP90_STP_NO						:= 35;		
-		ELSIF OP90_MVR_IN_POS AND ((OP90_POS1 AND I90_P1_SUP_VERT_CYL_UP )OR(OP90_POS2 AND I90_P2_SUP_VERT_CYL_UP)) THEN
+		ELSIF OP90_STN_ENABLE AND ((OP90_POS1_V6_3 AND OP90_SUP_VERTP1_CYL.Sensor2 )OR(OP90_POS2_V7_89 AND OP90_SUP_VERTP2_CYL.Sensor2)) THEN
 		IF OP90_LH_CMP_OK THEN
 		OP90_A_SRV_LHVERT_PLCWRK		:= TRUE;	
 		END_IF	                    	
 		IF OP90_RH_CMP_OK THEN      	
 		OP90_A_SRV_RHVERT_PLCWRK		:= TRUE;	
 		END_IF
- 		OP90_STP_NO						:= 35;				// CHANGE THE STEP NO
+		 OP90_STP_NO					:= 40;
 		END_IF
 		END_IF
 		
-	35: IF OP90_MVR_IN_POS AND OP90_SRV_LH_VRT_SPLCWRK_FB AND OP90_SRV_RH_VRT_SPLCWRK_FB AND 
-			((OP90_POS1 AND I90_P1_SUP_VERT_CYL_UP )OR(OP90_POS2 AND I90_P2_SUP_VERT_CYL_UP)) THEN
+	35: IF OP90_STN_ENABLE AND OP90_SRV_LH_VRT_SPLCWRK_FB AND OP90_SRV_RH_VRT_SPLCWRK_FB AND 
+			((OP90_POS1_V6_3 AND OP90_SUP_VERTP1_CYL.Sensor2 )OR(OP90_POS2_V7_89 AND OP90_SUP_VERTP2_CYL.Sensor2 )) THEN
 		IF OP90_LH_CMP_OK THEN
-		OP90_A_SRV_LHVERT_PLCWRK		:= TRUE;	
+		OP90_A_SRV_LHVERT_PLCWRK		:= TRUE;
+		OP90_A_SRV_LHVERT_SPLCWRK		:= FALSE;	
 		END_IF	                    	
 		IF OP90_RH_CMP_OK THEN      	
-		OP90_A_SRV_RHVERT_PLCWRK		:= TRUE;	
+		OP90_A_SRV_RHVERT_PLCWRK		:= TRUE;
+		OP90_A_SRV_RHVERT_SPLCWRK		:= FALSE;	
 		END_IF
  		OP90_STP_NO						:= 40;	
 		END_IF
 		
-	40: IF OP90_LH_CMP_OK AND NOT OP90_RH_CMP_OK AND OP90_SRV_LH_VRT_PLCWRK_FB AND AFT_VRT_PLC_WRK.Q THEN
+	40: OP90_CURR_MOVER					:= OP90_STN_MOVER;
+		OP90_LH_CMP_TORQE_OK			:= TRUE;					// NEED TO BE CHANGED BASED ON TORQUE FB
+		OP90_RH_CMP_TORQE_OK			:= TRUE;					// NEED TO BE CHANGED BASED ON TORQUE FB
+		IF OP90_LH_CMP_OK AND NOT OP90_RH_CMP_OK AND OP90_SRV_LH_VRT_PLCWRK_FB AND AFT_VRT_PLC_WRK.Q THEN
 		OP90_A_LH_GRP_AUTCMD2			:= FALSE;
 		OP90_A_LH_GRP_AUTCMD1		    := TRUE;
+		OP90_LH_CMP_PICKED				:= FALSE; 
  		OP90_STP_NO						:= 45;	
   		END_IF
 		IF NOT OP90_LH_CMP_OK AND  OP90_RH_CMP_OK AND OP90_SRV_RH_VRT_PLCWRK_FB AND AFT_VRT_PLC_WRK.Q THEN
 		OP90_A_RH_GRP_AUTCMD2			:= FALSE;
 		OP90_A_RH_GRP_AUTCMD1		    := TRUE;
+		OP90_RH_CMP_PICKED				:= FALSE;
  		OP90_STP_NO						:= 45;
   		END_IF
 		IF OP90_LH_CMP_OK AND OP90_RH_CMP_OK AND OP90_SRV_LH_VRT_PLCWRK_FB AND OP90_SRV_RH_VRT_PLCWRK_FB AND AFT_VRT_PLC_WRK.Q THEN
@@ -145,18 +217,27 @@ CASE OP90_STP_NO OF
 		OP90_A_LH_GRP_AUTCMD1		    := TRUE;
 		OP90_A_RH_GRP_AUTCMD2			:= FALSE;
 		OP90_A_RH_GRP_AUTCMD1		    := TRUE;
+		OP90_LH_CMP_PICKED				:= FALSE;
+		OP90_RH_CMP_PICKED              := FALSE;
  		OP90_STP_NO						:= 45;			
 		END_IF
 	
-	45: IF OP90_LH_CMP_OK AND NOT OP90_RH_CMP_OK AND I90_RET_LH_GRIPR_CYL_CLSE THEN
-																////////////////////////////WRITE XTS AS OK/////////////////////////////																	
+		
+	45: IF OP90_STN_MOVER>0 THEN
+		MOVER_CMP_STATUS[OP90_CURR_MOVER][1]:=90;
+		MOVER_CMP_STATUS[OP90_CURR_MOVER][2]:=90;	
+		END_IF
+		IF OP90_LH_CMP_TORQE_OK AND NOT OP90_RH_CMP_OK AND I90_RET_LH_GRIPR_CYL_CLSE_I1200_0 THEN
+		MOVER_CMP_STATUS[OP90_CURR_MOVER][1]:=90;
+		MOVER_CMP_STATUS[OP90_CURR_MOVER][2]:=90;																////////////////////////////WRITE XTS AS OK/////////////////////////////																	
  		OP90_STP_NO						:= 50;		
 		END_IF
-		IF NOT OP90_LH_CMP_OK AND  OP90_RH_CMP_OK AND I90_RET_RH_GRIPR_CYL_CLSE THEN
-																////////////////////////////WRITE XTS AS OK/////////////////////////////
+		IF NOT OP90_LH_CMP_OK AND  OP90_RH_CMP_OK AND I90_RET_RH_GRIPR_CYL_CLSE_I1200_2 THEN
+		MOVER_CMP_STATUS[OP90_CURR_MOVER][1]:=90;
+		MOVER_CMP_STATUS[OP90_CURR_MOVER][2]:=90;																////////////////////////////WRITE XTS AS OK/////////////////////////////
  		OP90_STP_NO						:= 50;			
 		END_IF
-		IF OP90_LH_CMP_OK AND OP90_RH_CMP_OK AND I90_RET_LH_GRIPR_CYL_CLSE AND I90_RET_RH_GRIPR_CYL_CLSE THEN
+		IF OP90_LH_CMP_OK AND OP90_RH_CMP_OK AND I90_RET_LH_GRIPR_CYL_CLSE_I1200_0 AND I90_RET_RH_GRIPR_CYL_CLSE_I1200_2 THEN
 																////////////////////////////WRITE XTS AS OK/////////////////////////////
  		OP90_STP_NO						:= 50;			
 		END_IF
@@ -167,9 +248,10 @@ CASE OP90_STP_NO OF
 		OP90_A_MVR_SUP_VERTP1_HME		:= TRUE;
 		OP90_A_MVR_SUP_VERTP1_WRK		:= FALSE;
 		OP90_A_MVR_SUP_VERTP2_HME		:= TRUE;
-		OP90_A_MVR_SUP_VERTP2_WRK		:= FALSE;		   
- 		OP90_STP_NO						:= 55;
-		END_IF
+		OP90_A_MVR_SUP_VERTP2_WRK		:= FALSE;
+	   
+		OP90_STP_NO						:= 55;
+		END_IF			
 
 	55: IF AFT_VRT_SUP_HME.Q THEN
 		OP90_A_MVR_SUP_HORZP1_HME		:= TRUE;
@@ -177,34 +259,36 @@ CASE OP90_STP_NO OF
 		OP90_A_MVR_SUP_HORZP2_HME		:= TRUE;
 		OP90_A_MVR_SUP_HORZP2_WRK		:= FALSE;
  		OP90_STP_NO						:= 60;
+//		OP90_STN_ENABLE					:= 0;
 		END_IF
 	
-	60: IF I90_P1_SUP_HORZ_CYL_REV AND I90_P2_SUP_HORZ_CYL_REV AND OP90_SRV_LH_VRT_HME_FB AND OP90_SRV_RH_VRT_HME_FB THEN
-		OP90_PROCESS_DONE				:= TRUE;
+	60: IF AFT_SUP_CYL_HME.Q AND OP90_VERT_SRV_SAFE_ZONE THEN
+		STATION_DONE[OP90_CURR_MOVER][OP90_XTS_POS_NO]:= TRUE;
  		OP90_STP_NO						:= 1;
 		END_IF
 END_CASE
+END_IF
 
+
+		
 //////////////////////////////////HORZ/VERT SUP CYL UP//////////////////////////////////////////////
-SUP_HORZ_WRK(CLK:=OP90_MVR_IN_POS, Q=> ); 
-IF SUP_HORZ_WRK.Q THEN
-		IF OP90_POS1 THEN
+IF OP90_STN_ENABLE AND OP90_AUTO_RUNNING AND ((OP90_STP_NO=30)OR(OP90_STP_NO=35)) THEN
+		IF OP90_POS1_V6_3 THEN
 		OP90_A_MVR_SUP_HORZP1_HME		:= FALSE;
 		OP90_A_MVR_SUP_HORZP1_WRK		:= TRUE;
 		END_IF
-		IF OP90_POS2 THEN 
+		IF OP90_POS2_V7_89 THEN 
 		OP90_A_MVR_SUP_HORZP2_HME		:= FALSE;
 		OP90_A_MVR_SUP_HORZP2_WRK		:= TRUE;
 		END_IF
 END_IF
 
-SUP_VERT_UP(CLK:=AFT_SUP_HRZ_WRK.Q , Q=> );
-IF SUP_VERT_UP.Q THEN
- 	   IF OP90_POS1 THEN
+IF (AFT_SUP_HRZ_WRK.Q AND OP90_STP_NO<50) THEN
+ 	   IF OP90_POS1_V6_3 THEN
 		OP90_A_MVR_SUP_VERTP1_HME		:= FALSE;
 		OP90_A_MVR_SUP_VERTP1_WRK		:= TRUE;
 	   END_IF
-	   IF OP90_POS2 THEN
+	   IF OP90_POS2_V7_89 THEN
 		OP90_A_MVR_SUP_VERTP2_HME		:= FALSE;
 		OP90_A_MVR_SUP_VERTP2_WRK		:= TRUE;		   
 	   END_IF	
@@ -213,20 +297,22 @@ END_IF
 
 /////////////////////////////////////////////DELAY TIMERS///////////////////////////////////////////////////////
 
-AFT_SUP_HRZ_WRK(IN:=(OP90_POS1 AND I90_P1_SUP_HORZ_CYL_FWD ) OR (OP90_POS2 AND I90_P2_SUP_HORZ_CYL_FWD ), PT:=INT_TO_TIME(OP90_AFT_SUP_HRZ_WRK) , Q=> , ET=> );
+AFT_SUP_HRZ_WRK(IN:=(OP90_POS1_V6_3 AND (I90_LH_MOVR_SUP_HORZ_CYL_FWD_I1201_1)) OR (OP90_POS2_V7_89 AND I90_RH_MOVR_SUP_HORZ_CYL_FWD_I1201_5), PT:=INT_TO_TIME(OP90_AFT_SUP_HRZ_WRK) , Q=> , ET=> );
 
 AFT_VERT_PCK_WRK(IN:=(OP90_LH_CMP_PICKED AND NOT OP90_RH_CMP_PICKED AND OP90_SRV_RH_VRT_PCKWRK_FB) OR (NOT OP90_LH_CMP_PICKED AND  OP90_RH_CMP_PICKED AND OP90_SRV_LH_VRT_PCKWRK_FB) OR 
 				(NOT OP90_LH_CMP_PICKED AND NOT OP90_RH_CMP_PICKED AND OP90_SRV_LH_VRT_PCKWRK_FB AND OP90_SRV_RH_VRT_PCKWRK_FB), PT:=INT_TO_TIME(OP90_AFT_VRT_PCK_WRK) , Q=> , ET=> );
 				
-AFT_PCK_DN(IN:=(OP90_STP_NO =20) AND I90_RET_LH_GRIPR_CYL_OPN AND I90_RET_RH_GRIPR_CYL_OPN, PT:=INT_TO_TIME(OP90_AFT_CMP_PCK) , Q=> , ET=> );
+AFT_PCK_DN(IN:=(OP90_STP_NO =20) AND (I90_RET_LH_GRIPR_CYL_OPN_I1200_1 OR OP90_LH_GRP_BYPASS) AND (I90_RET_RH_GRIPR_CYL_OPN_I1200_3 OR OP90_RH_GRP_BYPASS), PT:=INT_TO_TIME(OP90_AFT_CMP_PCK) , Q=> , ET=> );
 
 AFT_VRT_PLC_WRK(IN:= (OP90_LH_CMP_OK AND NOT OP90_RH_CMP_OK AND OP90_SRV_LH_VRT_PLCWRK_FB) OR (NOT OP90_LH_CMP_OK AND  OP90_RH_CMP_OK AND OP90_SRV_RH_VRT_PLCWRK_FB)OR
 					(OP90_LH_CMP_OK AND OP90_RH_CMP_OK AND OP90_SRV_LH_VRT_PLCWRK_FB AND OP90_SRV_RH_VRT_PLCWRK_FB), PT:=INT_TO_TIME(OP90_AFT_VRT_PLC_WRK) , Q=> , ET=> );
 					
 AFT_GRP_HME(IN:= OP90_STP_NO =50, PT:=INT_TO_TIME(OP90_AFT_GRP_HME) , Q=> , ET=> );
 
-AFT_VRT_SUP_HME(IN:= (OP90_STP_NO =45) AND I90_P2_SUP_VERT_CYL_DWN AND I90_P1_SUP_VERT_CYL_DWN  , PT:=INT_TO_TIME(OP90_AFT_SUP_VRT_HME) , Q=> , ET=> );
-			
+AFT_VRT_SUP_HME(IN:= (OP90_STP_NO =55) AND I90_LH_MOVR_SUP_VERT_CYL_DWN_I1200_6 AND I90_RH_MOVR_SUP_VERT_CYL_DWN_I1201_2  , PT:=INT_TO_TIME(OP90_AFT_SUP_VRT_HME) , Q=> , ET=> );
+
+AFT_SUP_CYL_HME(IN:= I90_LH_MOVR_SUP_HORZ_CYL_REV_I1201_0 AND I90_RH_MOVR_SUP_HORZ_CYL_REV_I1201_4 AND OP90_SRV_LH_VRT_HME_FB AND OP90_SRV_RH_VRT_HME_FB, PT:=INT_TO_TIME(OP90_AFT_SUP_CYL_HME), Q=> , ET=> );			
+
 ELSE
 	OP90_STP_NO							:= 0;
 	OP90_A_MVR_SUP_HORZP1_HME			:= FALSE;
@@ -254,13 +340,156 @@ ELSE
 	
 END_IF
 
-OP90_LH_CMP_OK				:= TRUE;				// CONDITION HAS TO BE GIVEN AFTER CREATING XTS ARRAY
-OP90_RH_CMP_OK              := TRUE;				// CONDITION HAS TO BE GIVEN AFTER CREATING XTS ARRAY
-OP90_MVR_IN_POS				:= TRUE;				// GIVE ENABLE TO MOVER IN POSITION]]></ST>
+
+
+//####################################   	TEMP	#################################################			
+				
+OP90_POS1_V6_3							:= FALSE;
+OP90_POS2_V7_89							:= TRUE;
+
+
+//############################		OP90 STATION ENABLE CONDITION		##########################
+
+	OP90_LH_CMP_OK						:= TRUE;
+	OP90_RH_CMP_OK						:= TRUE;
+	
+	OP90_STN_MOVER						:= MOVER_POSITION[OP90_XTS_POS_NO];
+	IF AUTO_WITH_XTS THEN	        	
+	IF OP90_STN_MOVER>0 THEN   
+	IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP90_STN_MOVER][1]=5 AND MOVER_CMP_STATUS[OP90_STN_MOVER][2]=5)THEN	     	
+	OP90_STN_ENABLE						:= MOVER_POS_RECHED[OP90_STN_MOVER] AND ((MOVER_CMP_STATUS[OP90_STN_MOVER][1]=80)OR 
+											(MOVER_CMP_STATUS[OP90_STN_MOVER][2]=80)) AND STATION_ENABLE_CONTROL ;		
+	ELSE
+	STATION_DONE[OP90_STN_MOVER][OP90_XTS_POS_NO]			:= TRUE;		
+	END_IF
+	ELSE
+	OP90_STN_ENABLE						:= FALSE;	
+	END_IF																		
+	END_IF
+
+///////////////////////////////////// air purge ///////////////////////////
+IF Track_9_TMR.Q THEN
+		O90_RH_REJ_AIR_PURGE_Q1251_2 :=FALSE; 
+		O90_SPARE_Q1251_3  := FALSE;
+		O90_BOWL2_ENABLEQ501_1	:=0;	
+ELSIF Track_10_TMR.Q OR Track_11_TMR.Q THEN
+	IF Track_1_TMR.Q AND Track_5_TMR.Q AND Track_8_TMR.Q  THEN
+		O90_RH_REJ_AIR_PURGE_Q1251_2 :=TRUE;
+		O90_SPARE_Q1251_3  		     :=FALSE;
+		O90_BOWL2_ENABLEQ501_1		 :=1;
+	ELSIF Track_5_TMR.Q AND  Track_2_TMR.Q AND Track_7_TMR.Q  THEN  
+		O90_SPARE_Q1251_3  			 :=TRUE;
+	    O90_BOWL2_ENABLEQ501_1		 :=1;
+		O90_RH_REJ_AIR_PURGE_Q1251_2 :=FALSE;
+	ELSIF Track_6_TMR.Q THEN
+		O90_RH_REJ_AIR_PURGE_Q1251_2 :=0; 
+		O90_SPARE_Q1251_3  			 :=0;
+		O90_BOWL2_ENABLEQ501_1	     :=1;		
+	ELSIF Track_3_TMR.Q AND Track_9_TMR.Q THEN
+		O90_RH_REJ_AIR_PURGE_Q1251_2 :=FALSE; 
+		O90_SPARE_Q1251_3  			 :=FALSE;
+		O90_BOWL2_ENABLEQ501_1		 :=0;	
+	END_IF
+END_IF
+
+Track_1_TMR(IN:= I90_VBF1_CONV1_TRK2_OVERFLWI501_2,PT:=T#2S);
+Track_2_TMR(IN:= I90_VBF1_CONV1_TRK1_OVERFLWI501_1,PT:=T#2S);
+Track_3_TMR(IN:= I90_VBF1_CONV1_TRK2_OVERFLWI501_2 AND I90_VBF1_CONV1_TRK1_OVERFLWI501_1,PT:=T#2S);
+Track_4_TMR(IN:= NOT I90_VBF1_CONV1_TRK2_OVERFLWI501_2 ,PT:=T#2S);
+Track_5_TMR(IN:= NOT I90_VBF1_CONV1_TRK1_OVERFLWI501_1 ,PT:=T#2S);
+Track_6_TMR(IN:= (NOT I90_VBF1_CONV1_TRK2_OVERFLWI501_2) AND (NOT I90_VBF1_CONV1_TRK1_OVERFLWI501_1),PT:=T#2S);
+
+Track_7_TMR(IN:= I90_VBF1_CONV2_TRK1_OVERFLWI503_2,PT:=T#2S);
+Track_8_TMR(IN:= I90_VBF1_CONV2_TRK2_OVERFLWI503_3,PT:=T#2S);
+Track_9_TMR(IN:= I90_VBF1_CONV2_TRK1_OVERFLWI503_2 AND I90_VBF1_CONV2_TRK2_OVERFLWI503_3,PT:=T#2S);
+Track_10_TMR(IN:= NOT I90_VBF1_CONV2_TRK1_OVERFLWI503_2 ,PT:=T#2S);
+Track_11_TMR(IN:= NOT I90_VBF1_CONV2_TRK2_OVERFLWI503_3 ,PT:=T#2S);
+Track_12_TMR(IN:= (NOT I90_VBF1_CONV2_TRK1_OVERFLWI503_2) AND (NOT I90_VBF1_CONV2_TRK2_OVERFLWI503_3),PT:=T#2S);]]></ST>
     </Implementation>
     <LineIds Name="OP90_AUTO">
-      <LineId Id="3" Count="220" />
-      <LineId Id="2" Count="0" />
+      <LineId Id="1351" Count="29" />
+      <LineId Id="1347" Count="0" />
+      <LineId Id="1258" Count="1" />
+      <LineId Id="1264" Count="0" />
+      <LineId Id="1266" Count="0" />
+      <LineId Id="1273" Count="3" />
+      <LineId Id="1265" Count="0" />
+      <LineId Id="1263" Count="0" />
+      <LineId Id="3" Count="3" />
+      <LineId Id="548" Count="0" />
+      <LineId Id="1272" Count="0" />
+      <LineId Id="549" Count="0" />
+      <LineId Id="9" Count="58" />
+      <LineId Id="814" Count="0" />
+      <LineId Id="850" Count="0" />
+      <LineId Id="505" Count="1" />
+      <LineId Id="68" Count="14" />
+      <LineId Id="581" Count="0" />
+      <LineId Id="84" Count="6" />
+      <LineId Id="1078" Count="0" />
+      <LineId Id="91" Count="2" />
+      <LineId Id="1079" Count="0" />
+      <LineId Id="94" Count="4" />
+      <LineId Id="1220" Count="0" />
+      <LineId Id="1039" Count="0" />
+      <LineId Id="1035" Count="0" />
+      <LineId Id="99" Count="20" />
+      <LineId Id="461" Count="0" />
+      <LineId Id="466" Count="2" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="462" Count="0" />
+      <LineId Id="1033" Count="0" />
+      <LineId Id="121" Count="3" />
+      <LineId Id="1034" Count="0" />
+      <LineId Id="125" Count="14" />
+      <LineId Id="661" Count="0" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="652" Count="0" />
+      <LineId Id="142" Count="6" />
+      <LineId Id="886" Count="0" />
+      <LineId Id="149" Count="2" />
+      <LineId Id="1129" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="651" Count="0" />
+      <LineId Id="155" Count="1" />
+      <LineId Id="1316" Count="0" />
+      <LineId Id="1320" Count="0" />
+      <LineId Id="166" Count="1" />
+      <LineId Id="169" Count="9" />
+      <LineId Id="180" Count="15" />
+      <LineId Id="197" Count="11" />
+      <LineId Id="613" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="775" Count="0" />
+      <LineId Id="210" Count="26" />
+      <LineId Id="776" Count="1" />
+      <LineId Id="249" Count="0" />
+      <LineId Id="251" Count="2" />
+      <LineId Id="259" Count="1" />
+      <LineId Id="1166" Count="16" />
+      <LineId Id="653" Count="0" />
+      <LineId Id="376" Count="0" />
+      <LineId Id="372" Count="0" />
+      <LineId Id="1548" Count="0" />
+      <LineId Id="1551" Count="1" />
+      <LineId Id="1549" Count="1" />
+      <LineId Id="1419" Count="1" />
+      <LineId Id="1473" Count="0" />
+      <LineId Id="1470" Count="0" />
+      <LineId Id="1422" Count="0" />
+      <LineId Id="1474" Count="2" />
+      <LineId Id="1481" Count="0" />
+      <LineId Id="1483" Count="1" />
+      <LineId Id="1482" Count="0" />
+      <LineId Id="1478" Count="2" />
+      <LineId Id="1477" Count="0" />
+      <LineId Id="1421" Count="0" />
+      <LineId Id="1531" Count="0" />
+      <LineId Id="1553" Count="0" />
+      <LineId Id="1465" Count="0" />
+      <LineId Id="1532" Count="5" />
+      <LineId Id="1543" Count="4" />
+      <LineId Id="1425" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

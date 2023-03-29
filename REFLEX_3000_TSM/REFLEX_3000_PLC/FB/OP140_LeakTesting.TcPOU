@@ -1,0 +1,403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="OP140_LeakTesting" Id="{a2730339-be31-4840-826b-c1415da63903}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK OP140_LeakTesting
+VAR_INPUT
+	Horz_Cyl_Pos1:BOOL;
+	Horz_Cyl_Pos2:BOOL;
+	Vert_Cyl_Pos1:BOOL;
+	Vert_Cyl_Pos2:BOOL;
+	StartEnable:BOOL;
+	Home_pos_IP:LREAL;
+	Home_Vel_IP:LREAL;
+	SafeHome_Pos_IP:LREAL;
+	SafeHome_Vel_Ip:LREAL;
+	SafeWork_Pos_IP:LREAL;
+	SafeWork_Vel_IP:LREAL;
+	Work_Pos_IP:LREAL;
+	Work_Vel_IP:LREAL;
+	Axis_In_WorkPos:BOOL;
+	Axis_In_Home:BOOL;
+	Prev_Stat_LH_OK:BOOL;
+	Prev_Stat_RH_OK:BOOL;
+	servo_actual_pos:LREAL;
+	axis_in_position :bool;
+	//TestSeq1 I/P
+	
+	TS1_Test1_ProgNO:INT;
+	TS1_Test2_ProgNO:INT;
+	TS1_TestOk:BOOL;
+	TS1_TestNOK:BOOL;
+	TS1_StartEnable:BOOL;
+	TS1_ResultIN:STRING;
+	
+	//TestSeq2 I/P
+	
+	TS2_Test1_ProgNO:INT;
+	TS2_Test2_ProgNO:INT;
+	TS2_TestOk:BOOL;
+	TS2_TestNOK:BOOL;
+	TS2_StartEnable:BOOL;
+	TS2_ResultIN:STRING;
+	
+	
+END_VAR
+VAR_OUTPUT
+	Horz_Cyl_Auto1:BOOL;
+	Horz_Cyl_Auto2:BOOL;
+	Vert_Cyl_Auto1:BOOL;
+	Vert_Cyl_Auto2:BOOL;
+	
+	
+	Servo_Pos_Error:BOOL;
+	Servo_HomePos_Error:BOOL;
+	
+//TestSeq1 O/P
+
+	TS1_StartOP:BOOL;
+	TS1_Test_ProgNO:INT;
+//TestSeq2 O/P
+
+	TS2_StartOP:BOOL;
+	TS2_Test_ProgNO:INT;
+	actual_step_no: INT;
+END_VAR
+VAR_IN_OUT
+	
+	//LH_ATEQ_FB:ATEQ_Fb;
+	//RH_ATEQ_FB:ATEQ_Fb;
+	Seq_Start:BOOL;
+	Seq_Completed:BOOL;
+	//TestSeq INOUt
+	TS1_SeqStart:BOOL;
+	TS1_SeqCompleted:BOOL;
+	TS1_ATEQCompleted:BOOL;
+	TS1_Test1OK:BOOL;
+	TS1_Test1NOK:BOOL;
+	TS1_Test2Ok:BOOL;
+	TS1_Test2NOK:BOOL;
+	TS1_Test1Result:STRING;
+	TS1_Test2Result:STRING;
+	TS1_CompOK:BOOL;
+	TS1_CompNOK:BOOL;
+	TS1_ResultOK:BOOL;
+	TS1_ResultNOK:BOOL;
+	TS1_Result_Data:STRING;
+	LH_CompOK:BOOL;
+	LH_CompNOK:BOOL;
+	RH_CompOK:BOOL;
+	RH_CompNOK:BOOL;
+	//TestSeq2 IN OUT
+	
+	TS2_SeqStart:BOOL;
+	TS2_SeqCompleted:BOOL;
+	TS2_ATEQCompleted:BOOL;
+	TS2_Test1OK:BOOL;
+	TS2_Test1NOK:BOOL;
+	TS2_Test2Ok:BOOL;
+	TS2_Test2NOK:BOOL;
+	TS2_Test1Result:STRING;
+	TS2_Test2Result:STRING;
+	TS2_CompOK:BOOL;
+	TS2_CompNOK:BOOL;
+	TS2_ResultOK:BOOL;
+	TS2_ResultNOK:BOOL;
+	TS2_Result_Data:STRING;
+	Servo_Pos_OP:LREAL;
+	Servo_Vel_OP:LREAL;
+	ABS_Move_Start:BOOL;
+	
+END_VAR
+	
+
+VAR
+	Step_No:INT;
+	LH_Operation_Inhibit:BOOL;
+	RH_Operation_Inhibit:BOOL;
+	Test_Count:INT;
+	ServoPOsErr: TON;
+	ServoHomePosErr: TON;
+	TS1: TestSeq;
+	TS2: TestSeq;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT StartEnable THEN
+	Step_No:=0;
+END_IF
+
+
+CASE Step_No OF 
+	0:Seq_Start:=FALSE;
+	  Seq_Completed:=FALSE;
+	  Horz_Cyl_Auto1:=FALSE;
+	  Horz_Cyl_Auto2:=FALSE;
+	  Vert_Cyl_Auto1:=FALSE;
+			Vert_Cyl_Auto2:=FALSE;
+	 
+	  TS1_SeqStart:=FALSE;
+	  TS2_SeqStart:=FALSE;
+	  TS1_SeqCompleted:=FALSE;
+	  TS2_SeqCompleted:=FALSE;
+	  Step_No:=10;
+	  
+	  10:IF (Seq_Start= TRUE) AND (Seq_Completed=FALSE) THEN
+		   Seq_Start:=FALSE;
+		   Step_No:=20;
+	     END_IF
+		 
+	  20:IF (StartEnable=TRUE) THEN
+		  IF (Horz_Cyl_Pos2=TRUE) THEN 
+			  Step_No:=30;
+			  ELSE
+				  Horz_Cyl_Auto2:=TRUE;
+				  Horz_Cyl_Auto1:=FALSE;
+				  IF (Horz_Cyl_Pos2=TRUE) THEN 
+			       Step_No:=30;		  
+		          END_IF
+		      END_IF
+		END_IF
+		
+		30:IF (StartEnable=TRUE) THEN 
+			
+			Vert_Cyl_Auto2:=TRUE;
+			Vert_Cyl_Auto1:=FALSE;
+			Servo_Pos_OP:=Work_Pos_IP;
+			Servo_Vel_OP:=Work_Vel_IP;
+			ABS_Move_Start:=TRUE;
+			IF Axis_In_WorkPos AND Vert_Cyl_Pos2 THEN
+			   ABS_Move_Start:=FALSE;
+			   Step_No:=60;
+			END_IF
+			//IF (Vert_Cyl_Pos2=TRUE) THEN
+			//	//Step_No:=40;	
+			//END_IF
+		END_IF
+		
+		40:IF (StartEnable=TRUE) THEN 
+			  Servo_Pos_OP:=SafeWork_Pos_IP;
+			  Servo_Vel_OP:=SafeWork_Vel_IP;
+			  Step_No:=50;	
+			 END_IF
+			 
+		50: IF (StartEnable=TRUE) THEN 
+			ABS_Move_Start:=TRUE;
+			IF Axis_In_WorkPos=TRUE THEN
+				ABS_Move_Start:=FALSE;
+				Step_No:=55;
+			END_IF
+		    END_IF
+			
+		55:	 IF (StartEnable=TRUE) THEN 
+			Servo_Pos_OP:=Work_Pos_IP;
+			Servo_Vel_OP:=Work_Vel_IP;
+			
+			ABS_Move_Start:=TRUE;
+			IF Axis_In_WorkPos=TRUE THEN
+				ABS_Move_Start:=FALSE;
+				Step_No:=60;
+			END_IF
+		    END_IF
+			
+	   60:   IF (StartEnable=TRUE) THEN 
+		
+	         IF Prev_Stat_LH_OK THEN
+		        TS1_SeqStart:=TRUE;
+	         ELSE
+		        TS1_SeqStart:=FALSE;
+		        TS1_SeqCompleted:=TRUE;
+		     END_IF
+	         IF Prev_Stat_RH_OK THEN
+		        TS2_SeqStart:=TRUE;
+	         ELSE
+		        TS2_SeqStart:=FALSE;
+		        TS2_SeqCompleted:=TRUE;
+		     END_IF
+	         Step_No:=70;
+		     END_IF
+			 
+	70:IF (StartEnable=TRUE) AND TS1_SeqCompleted AND TS2_SeqCompleted  THEN 
+		
+      IF TS1_ResultOK THEN
+		  LH_CompOK:=TRUE;
+		   LH_CompNOK:=FALSE;
+	  ELSE
+		  LH_CompNOK:=TRUE;
+		  LH_CompOK:=TRUE;
+	  END_IF
+	   IF TS2_ResultOK THEN
+		  RH_CompOK:=TRUE;
+		  RH_CompNOK:=FALSE;
+	    ELSE
+		  RH_CompNOK:=TRUE;
+		  RH_CompOK:=FALSE;
+	    END_IF
+        IF (LH_CompOK OR LH_CompNOK) AND (RH_CompOK OR RH_CompNOK) THEN
+		   Step_No:=75;
+	    END_IF
+	    END_IF
+		
+	75:IF (StartEnable=TRUE)   THEN
+	      TS1_SeqCompleted:=FALSE;
+		  TS2_SeqCompleted:=FALSE;
+		  Servo_Pos_OP:=SafeHome_Pos_IP;
+		  Servo_Vel_OP:=SafeHome_Vel_Ip;
+		  ABS_Move_Start:=TRUE;
+		  IF  Axis_In_WorkPos THEN
+			  Step_No:=80;	
+			END_IF
+		  END_IF
+		  
+		80: IF (StartEnable) THEN
+			Servo_Pos_OP:=Home_pos_IP;
+			Servo_Vel_OP:=Home_Vel_IP;
+			ABS_Move_Start:=TRUE;
+			Vert_Cyl_Auto1:=TRUE;
+			Vert_Cyl_Auto2:=FALSE;
+			IF (Vert_Cyl_Pos1 AND In_Range(servo_actual_pos,SafeWork_Pos_IP,1)) THEN
+				Step_No:=95;
+				ABS_Move_Start:=FALSE;
+			END_IF
+		END_IF
+		95: IF (StartEnable=TRUE) THEN
+		  IF (Horz_Cyl_Pos1=TRUE) THEN 
+			  
+		 	Seq_Completed:=TRUE;
+			  Step_No:=100;
+			  ELSE
+				  Horz_Cyl_Auto1:=TRUE;
+				  Horz_Cyl_Auto2:=FALSE;
+		      END_IF
+		END_IF
+	
+			  
+ 	
+	100:IF NOT Seq_Completed THEN
+		Seq_Completed:=FALSE;
+		 LH_CompOK:=FALSE;
+		   LH_CompNOK:=FALSE;
+		    RH_CompNOK:=FALSE;
+		  RH_CompOK:=FALSE;
+		Step_NO:=0;
+	    END_IF	
+	
+END_CASE
+
+TS1(
+	Test1_ProgNO:=TS1_Test1_ProgNO , 
+	Test2_ProgNO:= TS1_Test2_ProgNO, 
+	TestOk:=TS1_TestOk , 
+	TestNOK:= TS1_TestNOK, 
+	StartEnable:=TS1_StartEnable , 
+	ResultIN:=TS1_ResultIN , 
+	ATEQCompleted:=TS1_ATEQCompleted , 
+	StartOP=>TS1_StartOP , 
+	Test_ProgNO=>TS1_Test_ProgNO , 
+	SeqStart:= TS1_SeqStart, 
+	SeqCompleted:=TS1_SeqCompleted , 
+	Test1OK:=TS1_Test1OK , 
+	Test1NOK:=TS1_Test1NOK , 
+	Test2Ok:=TS1_Test2Ok , 
+	Test2NOK:=TS1_Test2NOK , 
+	Test1Result:=TS1_Test1Result , 
+	Test2Result:= TS1_Test2Result, 
+	CompOK:= TS1_CompOK, 
+	CompNOK:=TS1_CompNOK , 
+	ResultOK:=TS1_ResultOK , 
+	ResultNOK:= TS1_ResultNOK, 
+	Result_Data:=TS1_Result_Data );
+	
+TS2(
+	Test1_ProgNO:=TS2_Test1_ProgNO , 
+	Test2_ProgNO:= TS2_Test2_ProgNO, 
+	TestOk:=TS2_TestOk , 
+	TestNOK:= TS2_TestNOK, 
+	StartEnable:=TS2_StartEnable , 
+	ResultIN:=TS2_ResultIN , 
+	ATEQCompleted:=TS2_ATEQCompleted , 
+	StartOP=>TS2_StartOP , 
+	Test_ProgNO=>TS2_Test_ProgNO , 
+	SeqStart:= TS2_SeqStart, 
+	SeqCompleted:=TS2_SeqCompleted , 
+	Test1OK:=TS2_Test1OK , 
+	Test1NOK:=TS2_Test1NOK , 
+	Test2Ok:=TS2_Test2Ok , 
+	Test2NOK:=TS2_Test2NOK , 
+	Test1Result:=TS2_Test1Result , 
+	Test2Result:= TS2_Test2Result, 
+	CompOK:= TS2_CompOK, 
+	CompNOK:=TS2_CompNOK , 
+	ResultOK:=TS2_ResultOK , 
+	ResultNOK:= TS2_ResultNOK, 
+	Result_Data:=TS2_Result_Data );
+
+
+
+
+
+
+
+
+
+//ServoHomePosErr(IN:=Step_No:=80 , PT:=T#2S , Q=> , ET=> );
+//IF Step_No=80  AND NOT Axis_In_Home AND ServoHomePosErr.q THEN
+	//Servo_HomePos_Error:=TRUE;
+	//END_IF
+	
+actual_step_no := Step_No;	]]></ST>
+    </Implementation>
+    <LineIds Name="OP140_LeakTesting">
+      <LineId Id="3" Count="7" />
+      <LineId Id="418" Count="1" />
+      <LineId Id="425" Count="1" />
+      <LineId Id="420" Count="4" />
+      <LineId Id="11" Count="5" />
+      <LineId Id="921" Count="0" />
+      <LineId Id="17" Count="15" />
+      <LineId Id="930" Count="1" />
+      <LineId Id="933" Count="3" />
+      <LineId Id="33" Count="10" />
+      <LineId Id="922" Count="0" />
+      <LineId Id="44" Count="6" />
+      <LineId Id="923" Count="0" />
+      <LineId Id="669" Count="0" />
+      <LineId Id="676" Count="1" />
+      <LineId Id="675" Count="0" />
+      <LineId Id="670" Count="4" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="924" Count="0" />
+      <LineId Id="52" Count="14" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="925" Count="0" />
+      <LineId Id="70" Count="19" />
+      <LineId Id="926" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="415" Count="0" />
+      <LineId Id="417" Count="0" />
+      <LineId Id="286" Count="0" />
+      <LineId Id="288" Count="0" />
+      <LineId Id="287" Count="0" />
+      <LineId Id="283" Count="1" />
+      <LineId Id="279" Count="0" />
+      <LineId Id="299" Count="0" />
+      <LineId Id="927" Count="0" />
+      <LineId Id="542" Count="0" />
+      <LineId Id="550" Count="1" />
+      <LineId Id="549" Count="0" />
+      <LineId Id="545" Count="1" />
+      <LineId Id="1059" Count="0" />
+      <LineId Id="547" Count="0" />
+      <LineId Id="1060" Count="0" />
+      <LineId Id="544" Count="0" />
+      <LineId Id="548" Count="0" />
+      <LineId Id="289" Count="1" />
+      <LineId Id="798" Count="1" />
+      <LineId Id="291" Count="3" />
+      <LineId Id="298" Count="0" />
+      <LineId Id="277" Count="1" />
+      <LineId Id="91" Count="71" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="1182" Count="1" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

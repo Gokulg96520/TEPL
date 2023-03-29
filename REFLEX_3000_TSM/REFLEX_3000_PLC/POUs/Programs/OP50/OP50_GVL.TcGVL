@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <GVL Name="OP50_GVL" Id="{915e8a16-d4c8-454b-ae92-a088e9b0e1da}">
+  <GVL Name="OP50_GVL" Id="{f015f7a2-9c66-4ed8-be35-a1cd706627a7}">
     <Declaration><![CDATA[VAR_GLOBAL
 			
 //GENERAL
@@ -34,7 +34,10 @@ OP50_LH_AutoSeq: 			INT;
 OP50_RH_AutoSeq: 			INT;
 OP50_Homing_Seq:			INT;
 OP50_Safety_OK:				BOOL;
-
+OP50_STN_ENABLE				: BOOL;
+OP50_Stop_Request: BOOL;	
+OP50_Conveyor_Run			: BOOL;
+	
 OP50_ManualSelected:		BOOL;
 OP50_StepSelected:			BOOL;
 OP50_AutoSelected:		    BOOL;
@@ -48,17 +51,9 @@ OP50_HMI_Cycle_Start:					BOOL;
 OP50_HMI_Homing:						BOOL;
 
 SR50_Vert_servo: FB_Axis;
-
-
 SR50_Hori_servo: FB_Axis;
-
-
 SR50_Conv_servo: FB_Axis;
-
-
 OP50_GIUDE_GRP: FB_Axis_FESTO;
-
-
 
 Drum_feeder_ON 	  : BOOL;
 Drum_feeder_State : BOOL;
@@ -87,10 +82,64 @@ OP50_HMI_LH_Grip_Cyl_Work_PB : BOOL;
 OP50_HMI_RH_Grip_Cyl_Home_PB : BOOL;
 OP50_HMI_RH_Grip_Cyl_Work_PB : BOOL;
 //conveyor
-OP50_pick_ready: BOOL;
-OP50_pick_done : BOOL;
-
+OP50_pick_ready     : BOOL;
+OP50_pick_done      : BOOL;
+OP50_Conv_Fwd_Time	: INT;
+OP50_Conv_Rev_Time	: INT;
+OP50_Conveyor_FWD_Speed	: REAL;
+OP50_Conveyor_REV_Speed	: REAL;
 // Sensors
+
+	
+//Camera GVLs
+	OP50_Camera_Trigger				  : BOOL;
+	OP50_LH_Clr_OK					  : BOOL;
+	OP50_LH_Clr_NOK					  : BOOL;
+	OP50_LH_Size_OK					  : BOOL;
+	OP50_LH_Size_NOK				  : BOOL;
+	OP50_LH_Part_OK					  : BOOL;
+	OP50_LH_Part_NOK				  : BOOL;
+	
+	OP50_Size_Rej					  : BOOL;
+	OP50_Size_Rej_Complete			  : BOOL;
+	OP50_One_Cycle				      : BOOL;
+	OP50_LH_Camera_OK 				  : BOOL;
+	OP50_LH_Camera_NOK                : BOOL;
+	OP50_RH_Camera_OK                 : BOOL;
+	OP50_RH_Camera_NOK                : BOOL;
+	OP50_Camera_Done				  : BOOL;
+	
+	OP50_RH_Clr_OK					  : BOOL;
+	OP50_RH_Clr_NOK					  : BOOL;
+	OP50_RH_Size_OK					  : BOOL;
+	OP50_RH_Size_NOK				  : BOOL;
+	OP50_RH_Part_OK					  : BOOL;
+	OP50_RH_Part_NOK				  : BOOL;
+	
+	OP50_LH_Camera_Trigger		      : BOOL;
+	OP50_LH_Camera_Job_Change_start   : BOOL;
+	OP50_LH_Camera_Error			  : BOOL;
+	OP50_LH_Camera_Ready			  : BOOL;
+	OP50_LH_Camera_Online			  : BOOL;	
+	OP50_LH_Job_Change_Complete		    : BOOL;
+	OP50_LH_Job_Change_Error   		    : BOOL;
+	OP50_LH_Picture_Taken      		    : BOOL;	
+	OP50_LH_Error_status			    : STRING;
+	OP50_LH_Target_Job_ID				: UINT;
+	OP50_LH_Loaded_Job_ID		    	: UINT;
+	
+	OP50_RH_Camera_Trigger		      : BOOL;
+	OP50_RH_Camera_Job_Change_start   : BOOL;
+	OP50_RH_Camera_Error			  : BOOL;
+	OP50_RH_Camera_Ready			  : BOOL;
+	OP50_RH_Camera_Online			  : BOOL;
+	OP50_RH_Job_Change_Complete		    : BOOL;
+	OP50_RH_Job_Change_Error   		    : BOOL;
+	OP50_RH_Picture_Taken      		    : BOOL;
+	OP50_RH_Error_status				: STRING;
+	OP50_RH_Target_Job_ID				: UINT;
+	OP50_RH_Loaded_Job_ID		    	: UINT;		
+	
 END_VAR
 
 VAR_GLOBAL PERSISTENT
@@ -111,21 +160,26 @@ VAR_GLOBAL PERSISTENT
 	  
 	OP50_VERT_SERVO_POSITION		: LREAL ;
 	OP50_VERT_SERVO_HME_POS			: REAL := 0;  				
-	OP50_VERT_SERVO_SFE_WRK_POS		: REAL := 100;		
-	OP50_VERT_SERVO_PICK_POS		: REAL := 400;	
-	OP50_VERT_SERVO_PLACE_POS		: REAL := 200;
+	OP50_VERT_SERVO_SFE_WRK_POS		: REAL :=10;		
+	OP50_VERT_SERVO_PICK_POS		: REAL :=58.5;	
+	OP50_VERT_SERVO_PLACE_POS		: REAL :=40;
 
+	OP50_Conv_Fwd_Pos				: REAL :=10;
+	OP50_Conv_Rev_Pos				: REAL :=5;	
+	
     OP50_HORI_SERVO_POS_DONE	    	: BOOL;
     OP50_HORI_SERVO_ON_SFE_WRK			: BOOL;
     OP50_HORI_SERVO_ON_WRK_PICK			: BOOL;
+    OP50_HORI_SERVO_ON_SFE_WRK_PICK		: BOOL;		
 	OP50_HORI_SERVO_ON_WRK_PLACE		: BOOL;
     OP50_HORI_SERVO_ON_HOME				: BOOL;
 	  
 	OP50_HORI_SERVO_POSITION		: LREAL ;
-	OP50_HORI_SERVO_HME_POS			: REAL := 0;  				
-	OP50_HORI_SERVO_SFE_WRK_POS		: REAL := 500;		
-	OP50_HORI_SERVO_PICK_POS		: REAL := 400;	
-	OP50_HORI_SERVO_PLACE_POS		: REAL := 200;
+	OP50_HORI_SERVO_HME_POS			: REAL :=-40;  				
+	OP50_HORI_SERVO_SFE_WRK_POS		: REAL :=-40;
+	OP50_HORI_SERVO_SAFE_PICK_POS	: REAL := 110; 		
+	OP50_HORI_SERVO_PICK_POS		: REAL :=151;	
+	OP50_HORI_SERVO_PLACE_POS		: REAL :=74;
 	
     OP50_CONV_SERVO_POS_DONE	    	: BOOL;
     OP50_CONV_SERVO_ON_SFE_WRK			: BOOL;
@@ -133,14 +187,58 @@ VAR_GLOBAL PERSISTENT
     OP50_CONV_SERVO_ON_HOME				: BOOL;
 	
 	OP50_CONV_SERVO_POSITION		: LREAL ;
-	OP50_CONV_SERVO_HME_POS			: REAL;// := 0;  				
-	OP50_CONV_SERVO_SFE_WRK_POS		: REAL ;//:= 40;		
-	OP50_CONV_SERVO_WRK_POS			: REAL;// := 200;
+	OP50_CONV_SERVO_HME_POS			: REAL;  				
+	OP50_CONV_SERVO_SFE_WRK_POS		: REAL ;		
+	OP50_CONV_SERVO_WRK_POS			: REAL;
 
 //Error
 OP50_ErrorWord_0: DINT;
 OP50_ErrorWord_1: DINT;
 OP50_ErrorWord_2: DINT;	
+
+	OP50_Cycle_Time : UDINT;
+
+//Drum_Feeder
+	OP50_Drum_Feed_Motor_Speed		AT %Q*  : INT;	
+	OP50_HMI_Drum_Feed_Mtr_Speed_IP		: INT;
+	OP50_Drum_Feed_Mtr_Speed_Select		: BOOL;
+	OP50_Drum_Feed_Mtr_Run_Fwd 			: BOOL;
+	OP50_Drum_Feed_Mtr_Reset   			: BOOL;
+
+//Setting Parameters
+    OP50_HMI_Servo_Speed_Vertical     : REAL ;
+	OP50_HMI_Servo_Speed_Horizontal	  : REAL ;
+    OP50_HMI_Hori_Low_Limit		 : REAL:=0;
+    OP50_HMI_Hori_High_Limit     : REAL:=200;
+    OP50_HMI_Vert_Low_Limit		 : REAL:=0;
+    OP50_HMI_Vert_High_Limit     : REAL:=100;	
+
+	OP50_Vert_Ser_Safe_Pos			: REAL;
+	OP50_Hori_Ser_Rej_Pos			: REAL;	
+	OP50_Hori_Ser_Jerk_Pos			: REAL :=2;		
+	OP50_Drum_Freq		  			: REAL;
+	
+	OP50_Conv_Fwd_Time_6_3			: INT:=750;
+	OP50_Conv_Fwd_Speed_6_3			: INT:=150;
+	OP50_Conv_Rev_Time_6_3			: INT:=500;
+	OP50_Conv_Rev_Speed_6_3			: INT:=-100;
+
+	OP50_Conv_Fwd_Time_7_89			: INT:=750;
+	OP50_Conv_Fwd_Speed_7_89		: INT:=150;
+	OP50_Conv_Rev_Time_7_89			: INT:=500;
+	OP50_Conv_Rev_Speed_7_89		: INT:=-100;		
+	
+	OP50_Conveyor_Speed				: REAL;
+	OP50_Model						: STRING[80];
+
+	OP50_Grip_LH_Bypass				: BOOL;
+	OP50_Grip_RH_Bypass				: BOOL;	
+	OP50_Guide_Pos					: REAL :=75;
+//Drum Timers
+	OP50_Drum_ON_Time				: INT:=4000;
+	OP50_Drum_OFF_Time				: INT:=1000;
+	
+	
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

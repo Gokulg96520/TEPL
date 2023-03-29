@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP80_MANUAL" Id="{cabc15c5-7076-47ff-a027-b22f889a8a1f}" SpecialFunc="None">
+  <POU Name="OP80_MANUAL" Id="{7478fdd4-05b5-400e-859c-2aeba5b8271b}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP80_MANUAL
 VAR
 	//SR80_Vert_servo_status:stManualModeAxis;
@@ -16,7 +16,7 @@ END_VAR
 // IF MANUAL IS SELECTED 
 
 //SR80_Vert_servo_ctrl.ABSmove_Start:=OP80_VERT_SERVO_STRT;
-OP80_SERVO_POS_DONE:= SR80_Vert_servo_ctrl.pos_done;
+//OP80_SERVO_POS_DONE:= SR80_Vert_servo_ctrl.pos_done;
 
 IF In_Range(SR80_Vert_servo_status.actualPosition,OP80_VERT_SERVO_SFE_WRK_POS,1) THEN
 	OP80_SERVO_ON_SFE_WRK := TRUE;
@@ -30,11 +30,22 @@ ELSE
 	OP80_SERVO_ON_HOME := FALSE;
 END_IF
 
-IF In_Range(SR80_Vert_servo_status.actualPosition,OP80_VERT_SERVO_WRK_POS,1) THEN
-	OP80_SERVO_ON_WRK := TRUE;
+IF In_Range(SR80_Vert_servo_status.actualPosition,OP80_VERT_SERVO_WRK_POS_1,1) THEN
+	OP80_SERVO_ON_WRK_1 := TRUE;
 ELSE
-	OP80_SERVO_ON_WRK := FALSE;
+	OP80_SERVO_ON_WRK_1 := FALSE;
 END_IF
+
+IF In_Range(SR80_Vert_servo_status.actualPosition,OP80_VERT_SERVO_WRK_POS_2,1) THEN
+	OP80_SERVO_ON_WRK_2 := TRUE;
+ELSE
+	OP80_SERVO_ON_WRK_2 := FALSE;
+END_IF
+
+OP80_VERT_SERVO_SFE_WRK_POS   :=  OP80_HMI_Safe_Work;
+OP80_VERT_SERVO_HME_POS       :=  OP80_HMI_Safe_Home;
+OP80_VERT_SERVO_WRK_POS_2     :=  OP80_VERT_SERVO_WORK_POS;
+OP80_VERT_SERVO_WRK_POS_1	  := (OP80_VERT_SERVO_WRK_POS_2-OP80_HMI_Servo_Pos_Offset);
 
 SR80_Vert_servo(
 	bAxis1_Ref_Switch:= , 
@@ -43,13 +54,15 @@ SR80_Vert_servo(
 	bEnable:= Servo_Enable, 
 	bMoveVelocity:= , 
 	bHalt:= , 
-	bManualMode:=OP80_ManualSelected OR MANUAL_SELECTED , 
+	bManualMode:=OP80_ManualSelected AND MANUAL_SELECTED , 
 	fHomePos:= , 
 	fOverride:= , 
-	fTargetPosition:= , 
-	fTargetVelocity:= , 
+	fTargetPosition:=SR80_Vert_servo_ctrl.Position , 
+	fTargetVelocity:=SR80_Vert_servo_ctrl.Velocity , 
 	fAcc:= , 
 	fDec:= , 
+	Servo_High_Limit:= OP80_HMI_High_Limit,	
+	Servo_Low_Limit:=  OP80_HMI_Low_Limit,	
 	Safe_move_Conditions:=Servo_Safety,
 	Axis:=SR80_Vert_servo_Axis  , 
 	bmove_home:=SR80_Vert_servo_ctrl.Axis_Home_Cmd ,
@@ -70,12 +83,15 @@ SR80_Vert_servo(
 	bSetPositionDone=>   ,
     bsafe_to_move=>SR80_Vert_servo_ctrl.Safe_To_Move,  
 	bABS_Pos_done=> SR80_Vert_servo_ctrl.pos_done,
+	Actual_position=>SR80_Vert_servo_ctrl.Actual_Position ,  
+	Actual_velocity=>SR80_Vert_servo_ctrl.Actual_Velocity , 
+	Actual_Torque=> SR80_Vert_servo_ctrl.Actual_Torque,	
 	bHaltDone=> , 
 	bSTOPDone=> , 
 	bHomeDone=> , 
 	bDone=> );
 	
-IF MANUAL_SELECTED THEN
+IF MANUAL_SELECTED AND OP80_ManualSelected THEN
 	SR80_Vert_servo_status.targetVelocity:=50;	
 END_IF
 
@@ -84,11 +100,10 @@ OP80_RH_LVDT_VALUE := DINT_TO_REAL(OP80_RH)/10000;
 	]]></ST>
     </Implementation>
     <LineIds Name="OP80_MANUAL">
-      <LineId Id="3" Count="41" />
-      <LineId Id="79" Count="0" />
-      <LineId Id="45" Count="23" />
-      <LineId Id="89" Count="0" />
-      <LineId Id="69" Count="0" />
+      <LineId Id="3" Count="70" />
+      <LineId Id="95" Count="1" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="74" Count="10" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

@@ -1,69 +1,188 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP120_Initialization_Seq" Id="{130bbc1b-8f14-4660-840a-c233e2d27b03}" SpecialFunc="None">
+  <POU Name="OP120_Initialization_Seq" Id="{66a390c9-f982-4df2-b6d3-1852f3b6d9a7}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP120_Initialization_Seq
 VAR
+	Op120_temphomeTrig: R_TRIG;
+	TempHome: BOOL;
+	ROboProgResetDly: TON;
+	Master_reset :BOOL;
+	robot_homed : BOOL;
+	op120_Home_seq_done   :BOOL;
+	op120_model_selected  :INT;
+	air_purge_off         :ton;
+	air_purge_on          :BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF OP120_GVL.CR120_Lifting_Cyl.Position1 AND  OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 AND  OP120_IO_Tag_link.OP120_SO_Rbt_In_Home THEN
-OP120_GVL.OP120_Temp_Home_OK:=TRUE;
-OP120_HomeRunning:=FALSE;
-OP120_Homing_Seq:=0;
+      <ST><![CDATA[IF NOT OP120_HomeRunning AND OP120_GVL.CR120_Lifting_Cyl.Position1 AND  OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 AND ( OP120_IO_Tag_link.OP120_SO_Rbt_In_Home OR robot_homed )THEN
+	OP120_GVL.OP120_Temp_Home_OK:=TRUE;
+	OP120_HomeRunning:=FALSE;
+	OP120_Homing_Seq:=0;
+	TempHome:=FALSE;
+	air_purge_on      :=FALSE;
 ELSE
 	OP120_GVL.OP120_Temp_Home_OK:=FALSE;
-	
+END_IF
+
+// reset bits set during error active
+IF   OP120_GVL.OP120_AutoRunning OR  OP120_GVL.OP120_StepRunning OR OP120_ErrorActive THEN
+	 op120_Home_seq_done :=FALSE;
+     robot_homed := FALSE;
 END_IF
 
 CASE OP120_Homing_Seq OF
-	0: IF (OP120_Auto AND NOT OP120_HomeRunning AND  NOT OP120_ErrorActive AND  NOT OP120_GVL.OP120_AutoRunning AND NOT OP120_GVL.OP120_StepRunning	 AND NOT OP120_GVL.OP120_Temp_Home_OK) THEN
+	
+	0: IF (OP120_Auto AND NOT OP120_HomeRunning AND  NOT OP120_ErrorActive AND  NOT OP120_GVL.OP120_AutoRunning AND NOT OP120_GVL.OP120_StepRunning	AND NOT op120_Home_seq_done) THEN
 		OP120_HomeRunning:=TRUE;
-		OP120_Homing_Seq:=10;	
+		OP120_Homing_Seq:=5;	
 	   END_IF
-	10:IF (OP120_HomeRunning AND OP120_HMI_Homing_PB)THEN 
-        IF OP120_IO_Tag_Link.OP120_SO_Rbt_In_Home=TRUE THEN
-			OP120_Homing_Seq:=30;
-			ELSE
-				OP120_IO_Tag_Link.OP120_SI_Program_Reset:=TRUE;
-				OP120_IO_Tag_Link.OP120_SI_Homing_Start:=TRUE;
-				IF OP120_IO_Tag_Link.OP120_SO_Rbt_In_Home=TRUE THEN
-				OP120_Homing_Seq:=30;
-				OP120_IO_Tag_Link.OP120_SI_Program_Reset:=FALSE;
-				OP120_IO_Tag_Link.OP120_SI_Homing_Start:=FALSE;
-				END_IF
-				
-				END_IF
-				END_IF
-	20:IF (OP120_HomeRunning AND OP120_GVL.OP120_HMI_Homing_PB)THEN 
-        IF ( OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 AND OP120_GVL.CR120_Lifting_Cyl.Position1 )   THEN
-			OP120_Homing_Seq:=30;
-			ELSE
-	
-				OP120_GVL.CR120_Horizontal_Push_Cyl.HomingCmd1:= TRUE;
-				OP120_GVL.CR120_Lifting_Cyl.HomingCmd1:= TRUE;
-				
-				
-				IF   OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 AND OP120_GVL.CR120_Lifting_Cyl.Position1  THEN
-				OP120_Homing_Seq:=40;
-				
-				OP120_GVL.CR120_Horizontal_Push_Cyl.HomingCmd1:= FALSE;
-				OP120_GVL.CR120_Lifting_Cyl.HomingCmd1:= FALSE;
-				
-				END_IF
-				
-				END_IF
-				END_IF
+	   
+	  5:IF (OP120_HomeRunning AND OP120_GVL.OP120_HMI_Homing_PB )THEN
+		  // OP120_GVL.OP120_Vaccuum_OP_Port5_Byte1 :=1;
+	      // OP120_GVL.OP120_Vaccuum_OP_Port6_Byte1 :=1;
+           O120_LH_REJ_AIR_PURGE_Q1261_6 :=TRUE;
+	       O120_SPARE_Q1262_3:=TRUE;
+           air_purge_on      :=TRUE; 
+           IF NOT OP120_Vaccum1_Bit0 AND NOT OP120_Vaccum2_Bit0 AND air_purge_off.q THEN  
+              O120_LH_REJ_AIR_PURGE_Q1261_6 :=FALSE;
+		      O120_SPARE_Q1262_3:=FALSE;
+              air_purge_on      :=FALSE;            
+              OP120_Homing_Seq:=10;
+        END_IF
+		END_IF
 		
-				
-			40:	
-			OP120_Homing_Seq:=0;
-			OP120_HomeRunning:=FALSE;
+	 10:  IF (OP120_HomeRunning )THEN  
+		      OP120_GVL.CR120_Horizontal_Push_Cyl.HomingCmd1:= TRUE;
+			  OP120_GVL.CR120_Lifting_Cyl.HomingCmd1:= TRUE;
+			  IF OP120_GVL.CR120_Horizontal_Push_Cyl.Position1 AND OP120_GVL.CR120_Lifting_Cyl.Position1  THEN
+			     OP120_GVL.CR120_Horizontal_Push_Cyl.HomingCmd1:= FALSE;
+			     OP120_GVL.CR120_Lifting_Cyl.HomingCmd1:= FALSE;
+			     OP120_Homing_Seq:=20;
+			  END_IF
+	      END_IF
+		  
+		
+  
+	20:	  IF (OP120_HomeRunning)THEN
+		      OP120_Robo_ProgramReset:=TRUE;
+	          IF ROboProgResetDly.Q AND NOT OP120_SO_Program_Execute THEN
+		         OP120_Robo_ProgramReset:=FALSE;
+		         OP120_Homing_Seq:=30;
+	           END_IF
+	       END_IF
+		   
+	30:  IF (OP120_HomeRunning)AND NOT Master_reset THEN
+		     OP120_Robo_Out6001:=1;//3
+			 OP120_SI_Homing_Start:=TRUE;
+			 OP120_Homing_Seq:=40;
+		 ELSIF (OP120_HomeRunning)AND  Master_reset THEN
+			    OP120_Robo_Out6001:=3;//1
+			    OP120_SI_Homing_Start:=TRUE;
+				OP120_Homing_Seq:=40;
+	     END_IF
+		 
+	40:  IF (OP120_HomeRunning)AND OP120_SO_Rbt_In_Home THEN
+		     OP120_SI_Homing_Start:=FALSE;
+			 robot_homed := TRUE;
+			 OP120_Homing_Seq:=50;
+	    END_IF
 	
-END_CASE]]></ST>
+    50:	IF (OP120_HomeRunning) AND robot_homed THEN
+            op120_Home_seq_done :=TRUE;
+		    OP120_HomeRunning:=FALSE;
+            OP120_Homing_Seq:=60; 
+		END_IF	
+		
+	60:	IF op120_all_camera_ok THEN
+		   op120_setuserdata:=TRUE;
+           OP120_Homing_Seq:=0;
+		END_IF  
+			
+END_CASE
+
+IF NOT OP120_HomeRunning THEN
+	OP120_GVL.CR120_Horizontal_Push_Cyl.HomingCmd1:= FALSE;
+	OP120_GVL.CR120_Lifting_Cyl.HomingCmd1:= FALSE;
+END_IF
+
+Op120_temphomeTrig(CLK:=TempHome , Q=> );
+ROboProgResetDly(IN:= OP120_Robo_ProgramReset, PT:= T#200MS, Q=> , ET=> );
+air_purge_off(IN:=air_purge_on , PT:=T#500MS, Q=> , ET=> );
+
+
+
+
+
+
+]]></ST>
     </Implementation>
     <LineIds Name="OP120_Initialization_Seq">
-      <LineId Id="3" Count="52" />
+      <LineId Id="3" Count="4" />
+      <LineId Id="292" Count="0" />
+      <LineId Id="8" Count="2" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="185" Count="0" />
+      <LineId Id="191" Count="2" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="11" Count="1" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="13" Count="3" />
+      <LineId Id="277" Count="0" />
+      <LineId Id="293" Count="1" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="276" Count="0" />
+      <LineId Id="282" Count="0" />
+      <LineId Id="290" Count="0" />
+      <LineId Id="283" Count="2" />
+      <LineId Id="291" Count="0" />
+      <LineId Id="281" Count="0" />
+      <LineId Id="280" Count="0" />
+      <LineId Id="278" Count="1" />
+      <LineId Id="102" Count="1" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="107" Count="3" />
+      <LineId Id="106" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="274" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="275" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="120" Count="4" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="125" Count="1" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="129" Count="2" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="139" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="181" Count="0" />
+      <LineId Id="148" Count="0" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="195" Count="0" />
+      <LineId Id="307" Count="0" />
+      <LineId Id="334" Count="0" />
+      <LineId Id="320" Count="0" />
+      <LineId Id="335" Count="0" />
+      <LineId Id="319" Count="0" />
+      <LineId Id="318" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="85" Count="5" />
       <LineId Id="2" Count="0" />
+      <LineId Id="162" Count="1" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="167" Count="3" />
+      <LineId Id="166" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

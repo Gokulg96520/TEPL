@@ -1,47 +1,56 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP110_ERROR" Id="{97ff8ee1-6d3c-47d8-9fda-08a530f21d64}" SpecialFunc="None">
+  <POU Name="OP110_ERROR" Id="{0068231c-04d7-4cfc-b146-b49c5e3871c5}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP110_ERROR
 VAR
-	OP20_StErr_1: TON;
-	OP20_Step_Err_2: TON;
-	OP20_StepErr_3: TON;
-	OP20_StErr_4: TON;
-	OP20_Step_Err_5: TON;
-	OP20_StepErr_6: TON;
+	OP110_StErr_1: TON;
+	OP110_Step_Err_2: TON;
+	OP110_StepErr_3: TON;
+	OP110_StErr_4: TON;
+	OP110_Step_Err_5: TON;
+	OP110_StepErr_6: TON;
 //	end: INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-// Set ERROR ACTIVE
-IF ((OP20_GVL.OP20_ErrorWord_0<>0) OR (OP20_GVL.OP20_ErrorWord_1<>0) OR (OP20_GVL.OP20_ErrorWord_2<>0)) THEN
-	OP20_GVL.OP20_ErrorActive:= TRUE;
-	END_IF
-//Reset ErrorActive
-IF (OP20_GVL.OP20_HMI_Reset) THEN 
-	OP20_GVL.OP20_ErrorActive:= TRUE;
-	OP20_GVL.OP20_ErrorWord_0:= 0;
-	OP20_GVL.OP20_ErrorWord_1:= 0;
-	OP20_GVL.OP20_ErrorWord_2:= 0;	
+      <ST><![CDATA[//Reset ErrorActive
+IF (OP110_HMI_Reset OR Servo_Reset) THEN 
+	OP110_GVL.OP110_ErrorActive:= FALSE;
+	OP110_GVL.OP110_ErrorWord_0:= 0;
+	OP110_GVL.OP110_ErrorWord_1:= 0;
+	OP110_GVL.OP110_ErrorWord_2:= 0;	
 END_IF
 
+//(OP110_GVL.OP110_ErrorWord_0<>0) OR
+// Set ERROR ACTIVE
+IF ( (OP110_GVL.OP110_ErrorWord_1<>0) OR (OP110_GVL.OP110_ErrorWord_2<>0)) THEN
+	OP110_GVL.OP110_ErrorActive:= TRUE;
+END_IF
+
+
+OP110_ErrorWord_0.0:= SR110_Vert_servo_ctrl.Axis_Error;
+OP110_ErrorWord_0.1:= NOT OperationEnable;
 // Auto Seq Step Error
 //Servo not reaching work position
-OP20_StErr_1(IN:=(OP20_GVL.OP20_AUTO_STP_NO=6) , PT:=T#1S , Q=> , ET=> );
-IF (OP20_GVL.OP20_AUTO_STP_NO=6 AND NOT OP20_GVL.OP20_SERVO_ON_WRK AND OP20_StErr_1.Q) THEN
-	OP20_GVL.OP20_ErrorWord_0.0:=TRUE;
+OP110_StErr_1(IN:=(OP110_GVL.OP110_AUTO_STP_NO=80) , PT:=T#5S , Q=> , ET=> );
+IF (OP110_GVL.OP110_AUTO_STP_NO=80 AND NOT OP110_GVL.OP110_SERVO_ON_WRK AND OP110_StErr_1.Q) THEN
+	OP110_GVL.OP110_ErrorWord_0.2:=TRUE;
 END_IF
 
 // Servo Not Reached home position or safe-work position
-OP20_Step_Err_2(IN:=OP20_GVL.OP20_AUTO_STP_NO=16 , PT:=T#1S , Q=> , ET=> );
-IF (OP20_GVL.OP20_AUTO_STP_NO=16 AND NOT SR20_Vert_servo_ctrl.Axis_In_Pos AND OP20_Step_Err_2.Q) THEN
-	OP20_GVL.OP20_ErrorWord_0.1:=TRUE;
-	END_IF
+OP110_Step_Err_2(IN:=OP110_GVL.OP110_AUTO_STP_NO=160, PT:=T#5S , Q=> , ET=> );
+IF (OP110_GVL.OP110_AUTO_STP_NO=160 AND NOT OP110_SERVO_ON_SFE_WRK AND OP110_Step_Err_2.Q) THEN
+	OP110_GVL.OP110_ErrorWord_0.3:=TRUE;
+END_IF
+OP110_GVL.OP110_ErrorWord_0.4:=0;
+//OP110_StepErr_3(IN:=( OP110_HomeRunning AND (OP110_Homing_Seq=10) AND NOT SR110_Vert_servo_ctrl.Axis_In_Home), PT:=T#10S , Q=> , ET=> );
+//IF OP110_StepErr_3.Q THEN
+//	OP110_GVL.OP110_ErrorWord_0.4:=TRUE;
+//END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="OP110_ERROR">
-      <LineId Id="3" Count="24" />
+      <LineId Id="3" Count="33" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

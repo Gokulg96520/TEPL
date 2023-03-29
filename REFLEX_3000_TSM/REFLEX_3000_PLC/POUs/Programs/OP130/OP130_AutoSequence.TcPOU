@@ -1,44 +1,79 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
-  <POU Name="OP130_AutoSequence" Id="{a9950a16-4d48-44b9-b6af-6bd42c698bdd}" SpecialFunc="None">
+  <POU Name="OP130_AutoSequence" Id="{e3c04423-5f32-4fad-aa6c-d4f0af15e254}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM OP130_AutoSequence
 VAR
 	State: INT;
+	OP130_Stepper_Pos : REAL:=24;
+	temp5: BOOL;
+	OP130_StnEnableTRIG: R_TRIG;
+	dry_run:BOOL;
+	fix_lh:INT;
+	fix_rh:INT;
+	op130_clamp_stepper_work: BOOL;
+	op130_cycle_time_fb :FB_cycleTime;
+	OP130_Cycle_time : UDINT;
+	parts_ok: INT;
+	parts_nok: INT;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF (NOT OP130_Auto OR  OP130_ErrorActive OR OP130_HomeRunning ) THEN
+      <ST><![CDATA[IF (NOT OP130_Auto OR  OP130_ErrorActive OR OP130_HomeRunning OR OP130_Machine_Stop ) THEN
 	OP130_GVL.OP130_AutoRunning:= FALSE;
+	OP130_GVL.OP130_Home_ConditionOK:=FALSE;
+	OP130_Dry_Run:=FALSE;
 	OP130_ComponentOk:=FALSE;
 	OP130_ComponentNok:=FALSE;
+	OP130_RH_Comp_OK:=FALSE;
+	OP130_RH_Comp_NOK:= FALSE;
+	OP130_LH_Comp_OK:=FALSE;
+	OP130_LH_Comp_NOK:= FALSE;
 	OP130_AutoSeq:= 10;
-
+	OP130_LH_AutoSeq:=0;
+	OP130_RH_AutoSeq:=0;
 END_IF
+
+(*IF OP130_Auto AND NOT OP130_HomeRunning THEN
+	SR130_Stepper_Control.Position:=OP130_Stepper_Pos;
+	SR130_Stepper_Control.Velocity:=50;
+ELSE
+	SR130_Stepper_Control.Position:=0;
+	SR130_Stepper_Control.Velocity:=50;
+	SR130_Stepper_Control.ABSmove_Start:=1;
+END_IF
+*)
 
 CASE OP130_AutoSeq OF 
 	10:IF (OP130_Auto) THEN		// Check Automode Selected
-		OP130_AutoSeq :=20;
+		  OP130_AutoSeq :=20;
 	    END_IF
+		
 	20:IF ( NOT OP130_ErrorActive) THEN		//Check No error
-		OP130_AutoSeq:=30;
+		  OP130_AutoSeq:=30;
 	   END_IF
+	   
 	30:IF (NOT OP130_HomeRunning) THEN		//Check No Homerunning
-		OP130_AutoSeq :=40;
+		  OP130_AutoSeq :=40;
 		END_IF
+		
     40:IF ( OP130_GVL.OP130_Temp_Home_OK)THEN	//Check Machine in Home
-		OP130_AutoSeq:= 50;
+		  OP130_AutoSeq:= 50;
 		END_IF
+		
 	50:IF ( NOT OP130_OperationCompleted) THEN		// Check Operation Completed Reset
 		OP130_AutoSeq:=60;
 		END_IF
+		
 	60:IF (NOT OP130_ComponentOk) THEN		// Check Component Ok Reset
 		OP130_AutoSeq:=70;
 		END_IF
+		
 	70:IF (NOT OP130_ComponentNok) THEN 	// Check Component NOk Reset
 		OP130_AutoSeq:= 120;
 		END_IF
-    120:IF  (AUTO_RUNNING OR (NOT AUTO_RUNNING AND OP130_HMI_Cycle_Start )) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
-		   OP130_GVL.OP130_Home_ConditionOK:=TRUE;
+		
+    120:IF  (OP130_HMI_Cycle_Start OR OP130_Dry_Run) THEN		//Machine Start in Fully Automatic or Press Cycle Start For Semi Automatic
+		    OP130_GVL.OP130_Home_ConditionOK:=TRUE;
 	 			IF( OP130_GVL.OP130_Home_ConditionOK AND OP130_AutoSelected) THEN
 					OP130_AutoRunning:=TRUE;
 					OP130_StepRunning:= FALSE;
@@ -49,70 +84,278 @@ CASE OP130_AutoSeq OF
 				END_IF;
 		 END_IF
 		 IF ((OP130_AutoRunning OR OP130_StepRunning) AND OP130_StartEnable) THEN
-					OP130_AutoSeq:= 130;
+			     SR130_Stepper_Control.ABSmove_Start:=1;
+				 OP130_AutoSeq:= 130;
 		END_IF
-	130:IF (OP130_Prev_Stat_Operation_Completed=TRUE) THEN // Check Previous Station Completed
-		             OP130_AutoSeq:= 140;
-	END_IF
-	140: IF (OP130_Prev_Comp_Status=1) THEN  // Check Compoent Status in Previuos Station
-		OP130_Prev_LH_COMP_OK:=TRUE;
-		OP130_Prev_RH_COMP_OK:=TRUE;
-		OP130_LH_AutoSeq:=10;
-		OP130_RH_AutoSeq:=10;
-		ELSIF (OP130_Prev_Comp_Status=2)THEN 
-		OP130_Prev_LH_COMP_NOK:=TRUE;
-		OP130_Prev_RH_COMP_OK:=TRUE;
-		OP130_LH_AutoSeq:=10;
-		OP130_RH_AutoSeq:=10;
-		ELSIF (OP130_Prev_Comp_Status=3)THEN 
-		OP130_Prev_LH_COMP_OK:=TRUE;
-		OP130_Prev_RH_COMP_NOK:=TRUE;
-		OP130_LH_AutoSeq:=10;
-		OP130_RH_AutoSeq:=10;
-		ELSIF (OP130_Prev_Comp_Status=4)THEN 
-		OP130_Prev_LH_COMP_NOK:=TRUE;
-		OP130_Prev_RH_COMP_NOK:=TRUE;
-		OP130_LH_AutoSeq:=10;
-		OP130_RH_AutoSeq:=10;
-		END_IF
-		IF (OP130_Prev_LH_COMP_OK OR OP130_Prev_LH_COMP_NOK) AND (OP130_Prev_RH_COMP_OK OR OP130_Prev_RH_COMP_NOK) THEN
-			OP130_Cycle_Time_Start:=TRUE;
-			 OP130_AutoSeq:= 150;
-		END_IF
-			
-	150:IF (OP130_LH_Operation_Completed AND OP130_RH_Operation_Completed) THEN	//Waiting For Both RH & LH Seq Completion
-		OP130_AutoSeq:= 160;
-		END_IF
-	160:IF ( OP130_StartEnable) THEN  // Operation Completed
-		
-	OP130_Cycle_Time_Stop:=TRUE;
-			OP130_OperationCompleted:=TRUE;
-			OP130_AutoSeq:= 170;
-		END_IF
-	170:IF (OP130_OperationCompleted=FALSE) THEN
-		OP130_AutoSeq:= 180;
-		END_IF
-	180:		// Reset All Bits							
-         OP130_LH_Comp_OK:=FALSE;
-         OP130_LH_Comp_NOK:=FALSE;
-         OP130_RH_Comp_OK:=FALSE;
-         OP130_RH_Comp_NOK:=FALSE;
-         OP130_LH_AutoSeq:=0;
-		OP130_RH_AutoSeq:=0;
-		OP130_AutoSeq:= 10;
-			
+	130:IF (OP130_StartEnable) THEN // Check Previous Station Completed
+				OP130_AutoSeq:= 131;       
+     	END_IF
 	
-
-			
-			
+     131:   SR130_Stepper_Control.Position:=88;
+            SR130_Stepper_Control.Velocity:=50;
+		    SR130_Stepper_Control.ABSmove_Start:=TRUE;
+             IF SR130_Clm_Stepper.bAxisInPosition AND op130_clamp_stepper_work THEN
+				SR130_Stepper_Control.ABSmove_Start:=FALSE; 
+		        OP130_AutoSeq:= 140;
+		     END_IF
+	 	
+	140: IF NOT OP130_STN_ENABLE AND MOVER_POS_RECHED[OP130_STN_MOVER] AND fix_lh <> 120 AND fix_rh <> 120 THEN
+         	OP130_AutoSeq:= 200;
+         ELSIF OP130_STN_ENABLE AND fix_lh =120 AND fix_rh =120 THEN
+           OP130_Prev_LH_COMP_OK:=TRUE;
+	       OP130_Prev_RH_COMP_OK:=TRUE;
+           OP130_Prev_LH_COMP_NOK:=FALSE;
+           OP130_Prev_RH_COMP_NOK:=FALSE;
+		   OP130_AutoSeq:= 141;
+         ELSIF OP130_STN_ENABLE AND fix_lh = 120 AND fix_rh =121 THEN
+           OP130_Prev_LH_COMP_OK:=TRUE;
+	       OP130_Prev_RH_COMP_OK:=FALSE;
+           OP130_Prev_LH_COMP_NOK:=FALSE;
+           OP130_Prev_RH_COMP_NOK:=TRUE;
+		   OP130_AutoSeq:= 141;
+         ELSIF OP130_STN_ENABLE AND fix_lh = 121 AND fix_rh =120 THEN
+           OP130_Prev_LH_COMP_OK:=false;
+	       OP130_Prev_RH_COMP_OK:=TRUE;
+		   OP130_Prev_LH_COMP_NOK:=TRUE;
+           OP130_Prev_RH_COMP_NOK:=FALSE;
+           OP130_AutoSeq:= 141;
+          END_IF 
+		  
+    141:	OP130_LH_AutoSeq:=10;
+            OP130_RH_AutoSeq:=10;
+		    OP130_AutoSeq:= 150;  
+		  
+   
+	150:IF (OP130_LH_Operation_Completed AND OP130_RH_Operation_Completed ) THEN	//Waiting For Both RH & LH Seq Completion
+			OP130_MVR_DN_PERMISSION			:= TRUE;
+			OP130_AutoSeq					:= 151;			
+		 END_IF
+		 OP130_CURR_MOVER		:=OP130_STN_MOVER;
+	
+	151: IF NOT OP130_MVR_DN_PERMISSION THEN
+			OP130_AutoSeq					:= 155;		
+		END_IF	 
+	
+	155:IF OP130_LH_Comp_OK AND OP130_rH_Comp_OK THEN
+				MOVER_CMP_STATUS[OP130_CURR_MOVER][1]:=130;	
+                MOVER_CMP_STATUS[OP130_CURR_MOVER][2]:=130;
+		            IF MOVER_CMP_STATUS[OP130_CURR_MOVER][1]=130 AND MOVER_CMP_STATUS[OP130_CURR_MOVER][2]=130 THEN
+			     	STATION_DONE[OP130_CURR_MOVER][OP130_XTS_POS_NO]			:= TRUE;
+			            OP130_AutoSeq:= 160;
+						parts_ok :=parts_ok+1;
+				     END_IF
+				ELSIF OP130_LH_Comp_NOK AND OP130_rH_Comp_OK THEN	
+					  MOVER_CMP_STATUS[OP130_CURR_MOVER][1]:=130;	
+                      MOVER_CMP_STATUS[OP130_CURR_MOVER][2]:=130;
+		               IF MOVER_CMP_STATUS[OP130_CURR_MOVER][1]=130 AND MOVER_CMP_STATUS[OP130_CURR_MOVER][2]=130 THEN
+			         	STATION_DONE[OP130_CURR_MOVER][OP130_XTS_POS_NO]			:= TRUE;
+			              OP130_AutoSeq:= 160;
+						  parts_nok :=parts_nok+1;
+			    	   END_IF
+                 ELSIF OP130_LH_Comp_OK AND OP130_rH_Comp_NOK THEN	
+					  MOVER_CMP_STATUS[OP130_CURR_MOVER][1]:=130;	
+                      MOVER_CMP_STATUS[OP130_CURR_MOVER][2]:=130;
+		               IF MOVER_CMP_STATUS[OP130_CURR_MOVER][1]=130 AND MOVER_CMP_STATUS[OP130_CURR_MOVER][2]=130 THEN
+			       	STATION_DONE[OP130_CURR_MOVER][OP130_XTS_POS_NO]			:= TRUE;
+			              OP130_AutoSeq:= 160;
+						  parts_nok :=parts_nok+1;
+			    	   END_IF	
+					   ELSIF OP130_LH_Comp_NOK AND OP130_rH_Comp_NOK THEN	
+					  MOVER_CMP_STATUS[OP130_CURR_MOVER][1]         :=130;	
+                      MOVER_CMP_STATUS[OP130_CURR_MOVER][2]         :=130;
+		               IF MOVER_CMP_STATUS[OP130_CURR_MOVER][1]=130 AND MOVER_CMP_STATUS[OP130_CURR_MOVER][2]=130 THEN
+			          	STATION_DONE[OP130_CURR_MOVER][OP130_XTS_POS_NO]			:= TRUE;
+			              OP130_AutoSeq:= 160;
+						  parts_nok :=parts_nok+1;
+					   END_IF
+			  END_IF	
+		
+	160:IF ( OP130_StartEnable) THEN  // Operation Completed
+	        OP130_Cycle_Time_Stop                                   :=TRUE;
+			OP130_OperationCompleted                                :=TRUE;
+			OP130_AutoSeq                                           := 170;
+			STATION_DONE[OP130_CURR_MOVER][OP130_XTS_POS_NO]			:= TRUE;
+		END_IF
+		
+	170:OP130_LH_Operation_Completed             :=FALSE;
+	    OP130_RH_Operation_Completed             :=FALSE;
+	    OP130_OperationCompleted                 :=FALSE;
+	    OP130_ComponentOk                        :=FALSE;
+	    OP130_ComponentNOk                       :=FALSE;
+	    OP130_AutoSeq                            :=180;
+	
+	(*171 : SR130_Stepper_Control.Position:=0;
+          SR130_Stepper_Control.Velocity:=50;
+		  SR130_Stepper_Control.ABSmove_Start:=TRUE;
+		  
+             IF SR130_Clm_Stepper.bAxisInPosition THEN
+				SR130_Stepper_Control.ABSmove_Start:=FALSE; 
+		        OP130_AutoSeq:= 180;
+		     END_IF*)
+	
+	180:		// Reset All Bits	
+	
+        OP130_Prev_LH_COMP_OK:=FALSE;
+		OP130_Prev_RH_COMP_OK:=FALSE;						
+        OP130_LH_Comp_OK:=FALSE;
+        OP130_LH_Comp_NOK:=FALSE;
+        OP130_RH_Comp_OK:=FALSE;
+        OP130_RH_Comp_NOK:=FALSE;
+        OP130_LH_AutoSeq:=0;
+		OP130_RH_AutoSeq:=0;
+		OP130_AutoSeq:= 130;
 		
 		
+   200:	MOVER_CMP_STATUS[OP130_CURR_MOVER][1]:=130;	 ///// NEED TO BE UPDATED AS 131
+        MOVER_CMP_STATUS[OP130_CURR_MOVER][2]:=130;
+		IF MOVER_CMP_STATUS[OP130_CURR_MOVER][1]=130 AND MOVER_CMP_STATUS[OP130_CURR_MOVER][2]=130 THEN
+				STATION_DONE[OP130_CURR_MOVER][OP130_XTS_POS_NO]			:= TRUE;
+			OP130_AutoSeq:= 180;
+		END_IF
 
-END_CASE]]></ST>
+
+END_CASE
+
+op130_cycle_time_fb(i_b_startTime:=OP130_STN_ENABLE , i_b_stopTime:= NOT OP130_STN_ENABLE , o_t_StationTime=>OP130_Cycle_time );
+dry_run:=All_Station_Dry_Run;
+//staus FOR movers 
+IF  dry_run THEN
+	fix_lh :=120;
+	fix_rh :=120;
+ELSE 
+	fix_lh := MOVER_CMP_STATUS[OP130_STN_MOVER][1];
+	fix_rh := MOVER_CMP_STATUS[OP130_STN_MOVER][2];
+END_IF
+
+op130_clamp_stepper_work:=In_Range(value:=SR130_Clm_Stepper.Actual_position, setvalue:= 88, tolerance:= 0.2);
+
+
+
+//############################		OP130 STATION ENABLE CONDITION		##########################
+
+	OP130_STN_MOVER					:= MOVER_POSITION[OP130_XTS_POS_NO];
+	IF AUTO_WITH_XTS THEN
+	IF OP130_STN_MOVER>0 THEN
+	IF NOT(END_OF_CYCLE AND MOVER_CMP_STATUS[OP130_STN_MOVER][1]=5 AND MOVER_CMP_STATUS[OP130_STN_MOVER][2]=5)THEN		
+	OP130_STN_ENABLE				:= MOVER_POS_RECHED[OP130_STN_MOVER] AND ((MOVER_CMP_STATUS[OP130_STN_MOVER][1]=120)OR 
+										(MOVER_CMP_STATUS[OP130_STN_MOVER][2]=120))AND STATION_ENABLE_CONTROL;		
+	ELSE
+	STATION_DONE[OP130_STN_MOVER][OP130_XTS_POS_NO]			:= TRUE;		
+	END_IF
+	ELSE
+	OP130_STN_ENABLE				:= FALSE;	
+	END_IF
+	END_IF																	
+
+
+
+
+
+	
+	]]></ST>
     </Implementation>
     <LineIds Name="OP130_AutoSequence">
-      <LineId Id="3" Count="100" />
-      <LineId Id="2" Count="0" />
+      <LineId Id="3" Count="9" />
+      <LineId Id="15" Count="2" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="279" Count="1" />
+      <LineId Id="282" Count="0" />
+      <LineId Id="285" Count="2" />
+      <LineId Id="289" Count="0" />
+      <LineId Id="288" Count="0" />
+      <LineId Id="283" Count="0" />
+      <LineId Id="281" Count="0" />
+      <LineId Id="21" Count="4" />
+      <LineId Id="478" Count="0" />
+      <LineId Id="26" Count="2" />
+      <LineId Id="477" Count="0" />
+      <LineId Id="29" Count="2" />
+      <LineId Id="476" Count="0" />
+      <LineId Id="32" Count="2" />
+      <LineId Id="475" Count="0" />
+      <LineId Id="35" Count="2" />
+      <LineId Id="474" Count="0" />
+      <LineId Id="38" Count="2" />
+      <LineId Id="473" Count="0" />
+      <LineId Id="41" Count="2" />
+      <LineId Id="472" Count="0" />
+      <LineId Id="44" Count="11" />
+      <LineId Id="291" Count="0" />
+      <LineId Id="56" Count="2" />
+      <LineId Id="290" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="452" Count="0" />
+      <LineId Id="462" Count="4" />
+      <LineId Id="469" Count="1" />
+      <LineId Id="461" Count="0" />
+      <LineId Id="214" Count="6" />
+      <LineId Id="335" Count="0" />
+      <LineId Id="224" Count="4" />
+      <LineId Id="240" Count="0" />
+      <LineId Id="232" Count="2" />
+      <LineId Id="277" Count="1" />
+      <LineId Id="235" Count="0" />
+      <LineId Id="238" Count="0" />
+      <LineId Id="471" Count="0" />
+      <LineId Id="450" Count="1" />
+      <LineId Id="449" Count="0" />
+      <LineId Id="360" Count="0" />
+      <LineId Id="265" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="250" Count="0" />
+      <LineId Id="431" Count="0" />
+      <LineId Id="244" Count="0" />
+      <LineId Id="551" Count="0" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="432" Count="0" />
+      <LineId Id="434" Count="1" />
+      <LineId Id="433" Count="0" />
+      <LineId Id="403" Count="5" />
+      <LineId Id="479" Count="0" />
+      <LineId Id="409" Count="6" />
+      <LineId Id="481" Count="0" />
+      <LineId Id="416" Count="6" />
+      <LineId Id="483" Count="0" />
+      <LineId Id="423" Count="6" />
+      <LineId Id="484" Count="0" />
+      <LineId Id="430" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="212" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="94" Count="2" />
+      <LineId Id="242" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="211" Count="0" />
+      <LineId Id="98" Count="5" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="343" Count="2" />
+      <LineId Id="351" Count="0" />
+      <LineId Id="346" Count="1" />
+      <LineId Id="350" Count="0" />
+      <LineId Id="342" Count="0" />
+      <LineId Id="104" Count="1" />
+      <LineId Id="210" Count="0" />
+      <LineId Id="106" Count="8" />
+      <LineId Id="189" Count="2" />
+      <LineId Id="205" Count="2" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="208" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="122" Count="1" />
+      <LineId Id="388" Count="1" />
+      <LineId Id="213" Count="0" />
+      <LineId Id="192" Count="1" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="201" Count="3" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="373" Count="0" />
+      <LineId Id="194" Count="1" />
+      <LineId Id="124" Count="1" />
+      <LineId Id="520" Count="14" />
+      <LineId Id="147" Count="0" />
+      <LineId Id="185" Count="2" />
+      <LineId Id="184" Count="0" />
+      <LineId Id="148" Count="1" />
     </LineIds>
   </POU>
 </TcPlcObject>
