@@ -29,8 +29,6 @@ VAR
 	TonWait_st							: ARRAY[1..20] OF tON;
 	mc_moverhalt						: MC_HaltCA;
 	i									: INT;
-
-	
 	axis_busy: BOOL;
 END_VAR
 
@@ -2488,13 +2486,7 @@ IF R_TRIG_Run.Q THEN
 END_IF
 	
 POSITION_DONE:=mcMoveAbsoluteCA.Done;
-
-//Test
-bStopCommandTriggered := TRUE;
-bStopCommandTriggered := TRUE;
-//bStopCommandTriggered := TRUE;
-POSITION_DONE:=mcMoveAbsoluteCA.Done;
-//Simply]]></ST>
+]]></ST>
     </Implementation>
     <LineIds Name="Fb_MoverSequence">
       <LineId Id="3" Count="61" />
@@ -2636,9 +2628,7 @@ POSITION_DONE:=mcMoveAbsoluteCA.Done;
       <LineId Id="2574" Count="0" />
       <LineId Id="2249" Count="90" />
       <LineId Id="2" Count="0" />
-      <LineId Id="2618" Count="0" />
-      <LineId Id="2617" Count="0" />
-      <LineId Id="2619" Count="4" />
+      <LineId Id="2623" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
